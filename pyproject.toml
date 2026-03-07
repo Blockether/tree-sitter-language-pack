@@ -1,11 +1,7 @@
-[build-system]
-build-backend = "setuptools.build_meta"
-requires = [ "cython>=3.0.12", "setuptools>=80.9.0", "typing-extensions>=4.15.0" ]
-
 [project]
 name = "tree-sitter-language-pack"
-version = "0.13.0"
-description = "Comprehensive collection of 160+ tree-sitter language parsers"
+version = "2.0.0-alpha.1"
+description = "Comprehensive collection of 170+ tree-sitter language parsers with polyglot bindings"
 readme = "README.md"
 keywords = [
   "ast",
@@ -20,7 +16,7 @@ license = "MIT OR Apache-2.0"
 authors = [ { name = "Na'aman Hirschfeld", email = "nhirschfeld@gmail.com" } ]
 requires-python = ">=3.10.0"
 classifiers = [
-  "Development Status :: 5 - Production/Stable",
+  "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "Natural Language :: English",
   "Programming Language :: Python",
@@ -32,12 +28,6 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: Implementation :: CPython",
   "Typing :: Typed",
-]
-dependencies = [
-  "tree-sitter>=0.25.2",
-  "tree-sitter-c-sharp>=0.23.1",
-  "tree-sitter-embedded-template>=0.25.0",
-  "tree-sitter-yaml>=0.7.2",
 ]
 urls.documentation = "https://github.com/Goldziher/tree-sitter-language-pack#readme"
 urls.homepage = "https://github.com/Goldziher/tree-sitter-language-pack"
@@ -54,9 +44,7 @@ dev = [
   "pytest>=9.0.0",
   "pyyaml>=6.0.0",
   "ruff>=0.14.6",
-  "setuptools>=80.9.0",
   "tomli>=2.2.1; python_version<'3.11'",
-  "types-setuptools>=80.9.0.20250822",
   "typing-extensions>=4.15.0",
   "uv-bump",
 ]
@@ -67,19 +55,19 @@ sources.uv-bump = { git = "https://github.com/Goldziher/uv-bump" }
 [tool.ruff]
 target-version = "py310"
 line-length = 120
-src = [ "tests", "tree_sitter_language_pack" ]
+src = [ "scripts" ]
 format.docstring-code-line-length = 120
 format.docstring-code-format = true
 lint.select = [ "ALL" ]
 lint.ignore = [
   "ANN401", # dynamically typed ANY
   "COM812", # Conflicts with formatter
-  "D100",   # # pydocstyle - missing docstring in public module
+  "D100",   # pydocstyle - missing docstring in public module
   "D104",   # pydocstyle - missing docstring in public package
   "D107",   # pydocstyle - missing docstring in __init__
   "D205",   # pydocstyle - 1 blank line required between summary line and description
   "E501",   # pycodestyle line too long, handled by ruff format
-  "EM",     # Exception messages,
+  "EM",     # Exception messages
   "FBT",    # Boolean values
   "FIX",    # we allow todo and fixme comments
   "ISC001", # Conflicts with formatter
@@ -87,8 +75,7 @@ lint.ignore = [
   "TRY",    # Try except block, rules are too strict
 ]
 lint.per-file-ignores."scripts/**/*.*" = [ "S", "T201" ]
-lint.per-file-ignores."tests/**/*.*" = [ "D", "S" ]
-lint.isort.known-first-party = [ "tree_sitter_language_pack", "tests" ]
+lint.isort.known-first-party = [ "scripts" ]
 lint.pydocstyle.convention = "google"
 
 [tool.codespell]
@@ -99,7 +86,7 @@ keep_full_version = true
 max_supported_python = "3.14"
 
 [tool.mypy]
-packages = [ "tree_sitter_language_pack", "tests" ]
+packages = [ "scripts" ]
 python_version = "3.10"
 disallow_untyped_decorators = true
 disallow_any_unimported = true

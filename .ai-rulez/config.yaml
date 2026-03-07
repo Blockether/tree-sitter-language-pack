@@ -32,4 +32,6 @@ profiles:
     - parser-compilation
     - language-management
 default: full
+compression:
+  level: moderate
 gitignore: true
