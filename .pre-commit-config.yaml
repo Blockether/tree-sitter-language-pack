@@ -105,7 +105,7 @@ repos:
 
   # AI Rules
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v3.7.3
+    rev: v3.8.1
     hooks:
       - id: ai-rulez-generate
 
