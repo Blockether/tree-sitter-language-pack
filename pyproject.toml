@@ -74,7 +74,7 @@ lint.ignore = [
   "TD",     # we allow todo and fixme comments
   "TRY",    # Try except block, rules are too strict
 ]
-lint.per-file-ignores."scripts/**/*.*" = [ "S", "T201" ]
+lint.per-file-ignores."scripts/**/*.*" = [ "ASYNC", "D", "S", "T201" ]
 lint.isort.known-first-party = [ "scripts" ]
 lint.pydocstyle.convention = "google"
 
