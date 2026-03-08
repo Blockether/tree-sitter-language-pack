@@ -14,7 +14,7 @@ use tree_sitter::ffi::TSLanguage;
 use ts_pack_core::LanguageRegistry;
 
 // ---------------------------------------------------------------------------
-// Opaque handle
+// Opaque handles
 // ---------------------------------------------------------------------------
 
 /// Opaque handle to a language registry.
@@ -23,6 +23,12 @@ pub struct TsPackRegistry {
     inner: LanguageRegistry,
     /// Cached sorted list of language names kept in sync with the registry.
     cached_names: Vec<CString>,
+}
+
+/// Opaque handle to a parsed syntax tree.
+/// Created with `ts_pack_parse_string` and freed with `ts_pack_tree_free`.
+pub struct TsPackTree {
+    inner: tree_sitter::Tree,
 }
 
 // ---------------------------------------------------------------------------
@@ -297,6 +303,220 @@ pub unsafe extern "C" fn ts_pack_free_string(s: *mut c_char) {
 }
 
 // ---------------------------------------------------------------------------
+// Parsing functions
+// ---------------------------------------------------------------------------
+
+/// Parse a source string using the named language and return an opaque tree handle.
+///
+/// Returns null on error (check `ts_pack_last_error` for details).
+/// The caller must free the tree with `ts_pack_tree_free`.
+///
+/// # Safety
+///
+/// `registry` must be a valid pointer returned by `ts_pack_registry_new`.
+/// `name` and `source` must be valid null-terminated UTF-8 C strings.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_parse_string(
+    registry: *const TsPackRegistry,
+    name: *const c_char,
+    source: *const c_char,
+    source_len: usize,
+) -> *mut TsPackTree {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if registry.is_null() {
+            set_last_error("registry pointer is null");
+            return ptr::null_mut();
+        }
+        if name.is_null() {
+            set_last_error("name pointer is null");
+            return ptr::null_mut();
+        }
+        if source.is_null() {
+            set_last_error("source pointer is null");
+            return ptr::null_mut();
+        }
+        let reg = unsafe { &*registry };
+        let name_str = match unsafe { CStr::from_ptr(name) }.to_str() {
+            Ok(s) => s,
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in name: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        let source_bytes = unsafe { std::slice::from_raw_parts(source as *const u8, source_len) };
+        let lang = match reg.inner.get_language(name_str) {
+            Ok(l) => l,
+            Err(e) => {
+                set_last_error(&e.to_string());
+                return ptr::null_mut();
+            }
+        };
+        let mut parser = tree_sitter::Parser::new();
+        if let Err(e) = parser.set_language(&lang) {
+            set_last_error(&format!("failed to set language: {e}"));
+            return ptr::null_mut();
+        }
+        match parser.parse(source_bytes, None) {
+            Some(tree) => Box::into_raw(Box::new(TsPackTree { inner: tree })),
+            None => {
+                set_last_error("parsing returned no tree");
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
+/// Free a tree previously created with `ts_pack_parse_string`.
+///
+/// Passing a null pointer is a safe no-op.
+///
+/// # Safety
+///
+/// `tree` must be a pointer returned by `ts_pack_parse_string`, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_tree_free(tree: *mut TsPackTree) {
+    ffi_guard!((), {
+        if !tree.is_null() {
+            unsafe {
+                drop(Box::from_raw(tree));
+            }
+        }
+    });
+}
+
+/// Get the type name of the root node of the tree.
+///
+/// Returns a newly-allocated C string that the caller must free with
+/// `ts_pack_free_string`. Returns null if the tree pointer is null.
+///
+/// # Safety
+///
+/// `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_tree_root_node_type(tree: *const TsPackTree) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if tree.is_null() {
+            set_last_error("tree pointer is null");
+            return ptr::null_mut();
+        }
+        let t = unsafe { &*tree };
+        let kind = t.inner.root_node().kind();
+        match CString::new(kind) {
+            Ok(c) => CString::into_raw(c),
+            Err(e) => {
+                set_last_error(&format!("node type contains null byte: {e}"));
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
+/// Get the number of named children of the root node.
+///
+/// Returns 0 if the tree pointer is null.
+///
+/// # Safety
+///
+/// `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_tree_root_child_count(tree: *const TsPackTree) -> u32 {
+    ffi_guard!(0, {
+        clear_last_error();
+        if tree.is_null() {
+            set_last_error("tree pointer is null");
+            return 0;
+        }
+        let t = unsafe { &*tree };
+        t.inner.root_node().named_child_count() as u32
+    })
+}
+
+/// Check whether any node in the tree has the given type name.
+///
+/// Uses a depth-first traversal via TreeCursor.
+///
+/// # Safety
+///
+/// `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+/// `node_type` must be a valid null-terminated UTF-8 C string, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_tree_contains_node_type(tree: *const TsPackTree, node_type: *const c_char) -> bool {
+    ffi_guard!(false, {
+        clear_last_error();
+        if tree.is_null() {
+            set_last_error("tree pointer is null");
+            return false;
+        }
+        if node_type.is_null() {
+            set_last_error("node_type pointer is null");
+            return false;
+        }
+        let t = unsafe { &*tree };
+        let target = match unsafe { CStr::from_ptr(node_type) }.to_str() {
+            Ok(s) => s,
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in node_type: {e}"));
+                return false;
+            }
+        };
+        tree_contains_kind(&t.inner, target)
+    })
+}
+
+/// Check whether the tree contains any ERROR or MISSING nodes.
+///
+/// # Safety
+///
+/// `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_tree_has_error_nodes(tree: *const TsPackTree) -> bool {
+    ffi_guard!(false, {
+        clear_last_error();
+        if tree.is_null() {
+            set_last_error("tree pointer is null");
+            return false;
+        }
+        let t = unsafe { &*tree };
+        tree_has_errors(&t.inner)
+    })
+}
+
+// ---------------------------------------------------------------------------
+// Internal tree traversal helpers
+// ---------------------------------------------------------------------------
+
+fn tree_contains_kind(tree: &tree_sitter::Tree, target: &str) -> bool {
+    let mut cursor = tree.walk();
+    traverse_looking_for(&mut cursor, |node| node.kind() == target)
+}
+
+fn tree_has_errors(tree: &tree_sitter::Tree) -> bool {
+    let mut cursor = tree.walk();
+    traverse_looking_for(&mut cursor, |node| node.is_error() || node.is_missing())
+}
+
+fn traverse_looking_for(cursor: &mut tree_sitter::TreeCursor, predicate: impl Fn(tree_sitter::Node) -> bool) -> bool {
+    loop {
+        if predicate(cursor.node()) {
+            return true;
+        }
+        if cursor.goto_first_child() {
+            continue;
+        }
+        loop {
+            if cursor.goto_next_sibling() {
+                break;
+            }
+            if !cursor.goto_parent() {
+                return false;
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -455,6 +675,90 @@ mod tests {
     fn test_free_null_string_is_safe() {
         unsafe {
             ts_pack_free_string(ptr::null_mut());
+        }
+    }
+
+    #[test]
+    fn test_parse_string() {
+        unsafe {
+            let reg = ts_pack_registry_new();
+            let name = CString::new("python").unwrap();
+            let source = b"def hello(): pass";
+            let tree = ts_pack_parse_string(reg, name.as_ptr(), source.as_ptr() as *const c_char, source.len());
+            assert!(!tree.is_null(), "tree should not be null; error: {:?}", {
+                let err = ts_pack_last_error();
+                if err.is_null() {
+                    "none".to_string()
+                } else {
+                    CStr::from_ptr(err).to_str().unwrap_or("?").to_string()
+                }
+            });
+
+            // Check root node type
+            let root_type = ts_pack_tree_root_node_type(tree);
+            assert!(!root_type.is_null());
+            let root_str = CStr::from_ptr(root_type).to_str().unwrap();
+            assert_eq!(root_str, "module");
+            ts_pack_free_string(root_type);
+
+            // Check child count
+            let count = ts_pack_tree_root_child_count(tree);
+            assert!(count >= 1, "should have at least 1 child");
+
+            // Check contains node type
+            let func_def = CString::new("function_definition").unwrap();
+            assert!(ts_pack_tree_contains_node_type(tree, func_def.as_ptr()));
+
+            let bogus = CString::new("nonexistent_node_xyz").unwrap();
+            assert!(!ts_pack_tree_contains_node_type(tree, bogus.as_ptr()));
+
+            // Check no error nodes in valid code
+            assert!(!ts_pack_tree_has_error_nodes(tree));
+
+            ts_pack_tree_free(tree);
+            ts_pack_registry_free(reg);
+        }
+    }
+
+    #[test]
+    fn test_parse_string_with_errors() {
+        unsafe {
+            let reg = ts_pack_registry_new();
+            let name = CString::new("python").unwrap();
+            let source = b"def (broken syntax @@@ !!!";
+            let tree = ts_pack_parse_string(reg, name.as_ptr(), source.as_ptr() as *const c_char, source.len());
+            assert!(!tree.is_null());
+
+            assert!(ts_pack_tree_has_error_nodes(tree));
+
+            ts_pack_tree_free(tree);
+            ts_pack_registry_free(reg);
+        }
+    }
+
+    #[test]
+    fn test_parse_null_inputs() {
+        unsafe {
+            let reg = ts_pack_registry_new();
+            let name = CString::new("python").unwrap();
+
+            // Null registry
+            assert!(ts_pack_parse_string(ptr::null(), name.as_ptr(), name.as_ptr(), 0).is_null());
+            // Null name
+            assert!(ts_pack_parse_string(reg, ptr::null(), name.as_ptr(), 0).is_null());
+            // Null source
+            assert!(ts_pack_parse_string(reg, name.as_ptr(), ptr::null(), 0).is_null());
+
+            // Null tree for inspection functions
+            assert!(ts_pack_tree_root_node_type(ptr::null()).is_null());
+            assert_eq!(ts_pack_tree_root_child_count(ptr::null()), 0);
+            assert!(!ts_pack_tree_contains_node_type(ptr::null(), name.as_ptr()));
+            assert!(!ts_pack_tree_has_error_nodes(ptr::null()));
+
+            // Free null tree is safe
+            ts_pack_tree_free(ptr::null_mut());
+
+            ts_pack_registry_free(reg);
         }
     }
 }

@@ -3,6 +3,9 @@ name = "ts-pack-elixir"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
+description = "Elixir Rustler NIF bindings for tree-sitter language pack"
+publish = false
 
 [lib]
 name = "ts_pack_elixir"
@@ -10,4 +13,5 @@ crate-type = ["cdylib"]
 
 [dependencies]
 ts-pack-core = { path = "../ts-pack-core" }
+tree-sitter = { workspace = true }
 rustler = { workspace = true }

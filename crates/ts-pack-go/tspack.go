@@ -3,7 +3,30 @@
 // It wraps the C-FFI layer (ts-pack-ffi) to provide access to 165+ tree-sitter
 // language grammars through a safe, idiomatic Go API.
 //
-// The Registry type is safe for concurrent use from multiple goroutines.
+// Language names are plain strings such as "python", "rust", "javascript", etc.
+// Use [Registry.AvailableLanguages] to discover all supported names at runtime,
+// or [Registry.HasLanguage] to check for a specific language before loading it.
+//
+// # Usage
+//
+//	reg, err := tspack.NewRegistry()
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	defer reg.Close()
+//
+//	langPtr, err := reg.GetLanguage("python")
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	// langPtr is an unsafe.Pointer to a TSLanguage struct that can be
+//	// passed to a tree-sitter Go wrapper such as go-tree-sitter.
+//
+// # Concurrency
+//
+// The [Registry] type is safe for concurrent use from multiple goroutines.
+// All exported methods acquire the appropriate lock before accessing the
+// underlying C registry.
 package tspack
 
 /*
@@ -23,7 +46,11 @@ import (
 )
 
 // Registry wraps a TsPackRegistry handle and provides access to tree-sitter
-// language grammars. It is safe for concurrent use.
+// language grammars. It is safe for concurrent use from multiple goroutines.
+//
+// A Registry must be created via [NewRegistry] and should be closed with
+// [Registry.Close] when no longer needed. If Close is not called, the
+// finalizer will release the underlying C resources during garbage collection.
 type Registry struct {
 	mu  sync.RWMutex
 	ptr *C.TsPackRegistry
@@ -143,8 +170,9 @@ func (r *Registry) LanguageCount() int {
 	return int(C.ts_pack_language_count(r.ptr))
 }
 
-// LanguageNameAt returns the language name at the given index.
-// Returns an error if the index is out of bounds or the registry is closed.
+// LanguageNameAt returns the language name at the given index. Valid indices
+// are in the range [0, LanguageCount()). Returns an error if the index is out
+// of bounds or the registry is closed.
 func (r *Registry) LanguageNameAt(index int) (string, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -207,4 +235,96 @@ func (r *Registry) AvailableLanguages() []string {
 	}
 
 	return languages
+}
+
+// Tree wraps an opaque TsPackTree handle representing a parsed syntax tree.
+// It must be freed with Close when no longer needed.
+type Tree struct {
+	ptr *C.TsPackTree
+}
+
+// ParseString parses the given source code using the named language and returns
+// an opaque Tree handle. The caller must call Tree.Close when done.
+//
+// Returns an error if the language is not found or parsing fails.
+func (r *Registry) ParseString(language, source string) (*Tree, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if err := r.ensureOpen(); err != nil {
+		return nil, err
+	}
+
+	cname := C.CString(language)
+	defer C.free(unsafe.Pointer(cname))
+
+	csource := C.CString(source)
+	defer C.free(unsafe.Pointer(csource))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	tree := C.ts_pack_parse_string(r.ptr, cname, csource, C.uintptr_t(len(source)))
+
+	if tree == nil {
+		if err := lastError(); err != nil {
+			return nil, fmt.Errorf("tspack: parse %q: %w", language, err)
+		}
+		return nil, fmt.Errorf("tspack: parse %q failed", language)
+	}
+
+	return &Tree{ptr: tree}, nil
+}
+
+// Close frees the underlying C tree. Safe to call multiple times.
+func (t *Tree) Close() {
+	if t.ptr != nil {
+		C.ts_pack_tree_free(t.ptr)
+		t.ptr = nil
+	}
+}
+
+// RootNodeType returns the type name of the root node.
+func (t *Tree) RootNodeType() (string, error) {
+	if t.ptr == nil {
+		return "", errors.New("tspack: tree is closed")
+	}
+
+	cstr := C.ts_pack_tree_root_node_type(t.ptr)
+	if cstr == nil {
+		return "", errors.New("tspack: failed to get root node type")
+	}
+	defer C.ts_pack_free_string(cstr)
+
+	return C.GoString(cstr), nil
+}
+
+// RootChildCount returns the number of named children of the root node.
+func (t *Tree) RootChildCount() (int, error) {
+	if t.ptr == nil {
+		return 0, errors.New("tspack: tree is closed")
+	}
+
+	return int(C.ts_pack_tree_root_child_count(t.ptr)), nil
+}
+
+// ContainsNodeType checks whether any node in the tree has the given type name.
+func (t *Tree) ContainsNodeType(nodeType string) (bool, error) {
+	if t.ptr == nil {
+		return false, errors.New("tspack: tree is closed")
+	}
+
+	ctype := C.CString(nodeType)
+	defer C.free(unsafe.Pointer(ctype))
+
+	return bool(C.ts_pack_tree_contains_node_type(t.ptr, ctype)), nil
+}
+
+// HasErrorNodes checks whether the tree contains any ERROR or MISSING nodes.
+func (t *Tree) HasErrorNodes() (bool, error) {
+	if t.ptr == nil {
+		return false, errors.New("tspack: tree is closed")
+	}
+
+	return bool(C.ts_pack_tree_has_error_nodes(t.ptr)), nil
 }

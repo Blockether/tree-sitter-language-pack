@@ -68,6 +68,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "loads all 170 dynamic libraries — run with --ignored"]
     fn test_get_language_and_parse() {
         let langs = available_languages();
         for lang_name in &langs {

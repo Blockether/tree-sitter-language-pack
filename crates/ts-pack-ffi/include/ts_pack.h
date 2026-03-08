@@ -6,12 +6,20 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
+/* Forward declaration for tree-sitter's TSLanguage type */
+typedef struct TSLanguage TSLanguage;
 
 /**
  * Opaque handle to a language registry.
  * Created with `ts_pack_registry_new` and freed with `ts_pack_registry_free`.
  */
 typedef struct TsPackRegistry TsPackRegistry;
+
+/**
+ * Opaque handle to a parsed syntax tree.
+ * Created with `ts_pack_parse_string` and freed with `ts_pack_tree_free`.
+ */
+typedef struct TsPackTree TsPackTree;
 
 /**
  * Create a new language registry.
@@ -116,5 +124,76 @@ void ts_pack_clear_error(void);
  * `s` must be a pointer returned by an FFI function in this crate, or null.
  */
 void ts_pack_free_string(char *s);
+
+/**
+ * Parse a source string using the named language and return an opaque tree handle.
+ *
+ * Returns null on error (check `ts_pack_last_error` for details).
+ * The caller must free the tree with `ts_pack_tree_free`.
+ *
+ * # Safety
+ *
+ * `registry` must be a valid pointer returned by `ts_pack_registry_new`.
+ * `name` and `source` must be valid null-terminated UTF-8 C strings.
+ */
+struct TsPackTree *ts_pack_parse_string(const struct TsPackRegistry *registry,
+                                        const char *name,
+                                        const char *source,
+                                        uintptr_t source_len);
+
+/**
+ * Free a tree previously created with `ts_pack_parse_string`.
+ *
+ * Passing a null pointer is a safe no-op.
+ *
+ * # Safety
+ *
+ * `tree` must be a pointer returned by `ts_pack_parse_string`, or null.
+ */
+void ts_pack_tree_free(struct TsPackTree *tree);
+
+/**
+ * Get the type name of the root node of the tree.
+ *
+ * Returns a newly-allocated C string that the caller must free with
+ * `ts_pack_free_string`. Returns null if the tree pointer is null.
+ *
+ * # Safety
+ *
+ * `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+ */
+char *ts_pack_tree_root_node_type(const struct TsPackTree *tree);
+
+/**
+ * Get the number of named children of the root node.
+ *
+ * Returns 0 if the tree pointer is null.
+ *
+ * # Safety
+ *
+ * `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+ */
+uint32_t ts_pack_tree_root_child_count(const struct TsPackTree *tree);
+
+/**
+ * Check whether any node in the tree has the given type name.
+ *
+ * Uses a depth-first traversal via TreeCursor.
+ *
+ * # Safety
+ *
+ * `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+ * `node_type` must be a valid null-terminated UTF-8 C string, or null.
+ */
+bool ts_pack_tree_contains_node_type(const struct TsPackTree *tree, const char *node_type);
+
+/**
+ * Check whether the tree contains any ERROR or MISSING nodes.
+ *
+ * # Safety
+ *
+ * `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+ */
+bool ts_pack_tree_has_error_nodes(const struct TsPackTree *tree);
 
 #endif  /* TS_PACK_H */

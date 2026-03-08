@@ -11,15 +11,25 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Java binding for the tree-sitter-language-pack C FFI registry.
  *
- * <p>Uses the Panama Foreign Function and Memory API (JDK 22+) to call
- * into the native {@code ts_pack_ffi} library. No JNI is involved.</p>
+ * <p>Provides access to 165+ tree-sitter language grammars. Uses the Panama
+ * Foreign Function and Memory API (JDK 22+) to call into the native
+ * {@code ts_pack_ffi} library. No JNI is involved.</p>
+ *
+ * <p>Language names are plain strings such as {@code "java"}, {@code "python"},
+ * {@code "rust"}, etc. Use {@link #availableLanguages()} to discover all
+ * supported names at runtime, or {@link #hasLanguage(String)} to check for a
+ * specific language before loading it.</p>
  *
  * <p>Implements {@link AutoCloseable} so it can be used in try-with-resources blocks:</p>
  * <pre>{@code
  * try (var registry = new TsPackRegistry()) {
  *     MemorySegment lang = registry.getLanguage("java");
+ *     // pass lang to a tree-sitter Java wrapper
  * }
  * }</pre>
+ *
+ * <p>This class is <strong>not</strong> thread-safe. If concurrent access is
+ * required, callers must provide their own synchronization.</p>
  */
 public class TsPackRegistry implements AutoCloseable {
 
@@ -36,6 +46,7 @@ public class TsPackRegistry implements AutoCloseable {
     private static final MethodHandle LAST_ERROR;
     private static final MethodHandle CLEAR_ERROR;
     private static final MethodHandle FREE_STRING;
+    private static final MethodHandle PARSE_STRING;
 
     static {
         // Load the native library: check TSPACK_LIB_PATH env var first, then system path
@@ -99,7 +110,15 @@ public class TsPackRegistry implements AutoCloseable {
                 LOOKUP.find("ts_pack_free_string").orElseThrow(),
                 FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
         );
+
+        // ts_pack_parse_string(pointer, pointer, pointer, long) -> pointer
+        PARSE_STRING = LINKER.downcallHandle(
+                LOOKUP.find("ts_pack_parse_string").orElseThrow(),
+                FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_LONG)
+        );
     }
+
+    private static final System.Logger LOGGER = System.getLogger(TsPackRegistry.class.getName());
 
     private final AtomicReference<MemorySegment> registryPtr;
 
@@ -127,6 +146,11 @@ public class TsPackRegistry implements AutoCloseable {
 
     /**
      * Frees the underlying native registry. Safe to call multiple times.
+     *
+     * <p>After this method returns, all other instance methods will throw
+     * {@link IllegalStateException}.</p>
+     *
+     * @throws RuntimeException if the native free call fails
      */
     @Override
     public void close() {
@@ -143,9 +167,15 @@ public class TsPackRegistry implements AutoCloseable {
     /**
      * Returns the raw {@code TSLanguage*} pointer for the given language name.
      *
-     * @param name the language name (e.g. "java", "python")
-     * @return a {@link MemorySegment} pointing to the TSLanguage struct
-     * @throws IllegalArgumentException if the language is not found or an error occurred
+     * <p>The returned {@link MemorySegment} remains valid for the lifetime of
+     * this registry. It can be passed to tree-sitter Java wrappers that accept
+     * a language pointer.</p>
+     *
+     * @param name the language name (e.g. {@code "java"}, {@code "python"})
+     * @return a {@link MemorySegment} pointing to the native {@code TSLanguage} struct
+     * @throws LanguageNotFoundException if the language is not found
+     * @throws IllegalStateException    if the registry has been closed
+     * @throws RuntimeException         if the native call fails
      */
     public MemorySegment getLanguage(String name) {
         MemorySegment ptr = ensureOpen();
@@ -156,12 +186,12 @@ public class TsPackRegistry implements AutoCloseable {
 
             if (result.equals(MemorySegment.NULL)) {
                 String error = lastError();
-                throw new IllegalArgumentException(
-                        "Language not found: " + name + (error != null ? " (" + error + ")" : "")
-                );
+                throw error != null
+                        ? new LanguageNotFoundException(name, error)
+                        : new LanguageNotFoundException(name);
             }
             return result;
-        } catch (IllegalArgumentException e) {
+        } catch (LanguageNotFoundException e) {
             throw e;
         } catch (Throwable t) {
             throw new RuntimeException("Failed to invoke ts_pack_get_language", t);
@@ -171,7 +201,9 @@ public class TsPackRegistry implements AutoCloseable {
     /**
      * Returns the number of available languages in the registry.
      *
-     * @return the language count
+     * @return the language count (always non-negative)
+     * @throws IllegalStateException if the registry has been closed
+     * @throws RuntimeException      if the native call fails
      */
     public int languageCount() {
         MemorySegment ptr = ensureOpen();
@@ -187,9 +219,13 @@ public class TsPackRegistry implements AutoCloseable {
     /**
      * Returns the language name at the given index.
      *
-     * @param index zero-based index into the language list
-     * @return the language name
-     * @throws IndexOutOfBoundsException if the index is out of range
+     * @param index zero-based index into the language list, must be in the
+     *              range {@code [0, languageCount())}
+     * @return the language name (never {@code null} or empty)
+     * @throws IndexOutOfBoundsException if {@code index < 0} or
+     *                                   {@code index >= languageCount()}
+     * @throws IllegalStateException     if the registry has been closed
+     * @throws RuntimeException          if the native call fails
      */
     public String languageNameAt(int index) {
         MemorySegment ptr = ensureOpen();
@@ -218,8 +254,10 @@ public class TsPackRegistry implements AutoCloseable {
     /**
      * Checks whether the registry contains a language with the given name.
      *
-     * @param name the language name
-     * @return {@code true} if the language is available
+     * @param name the language name (e.g. {@code "java"}, {@code "python"})
+     * @return {@code true} if the language is available, {@code false} otherwise
+     * @throws IllegalStateException if the registry has been closed
+     * @throws RuntimeException      if the native call fails
      */
     public boolean hasLanguage(String name) {
         MemorySegment ptr = ensureOpen();
@@ -235,7 +273,9 @@ public class TsPackRegistry implements AutoCloseable {
     /**
      * Returns an unmodifiable list of all available language names.
      *
-     * @return list of language names
+     * @return an unmodifiable {@link List} of language names (never {@code null})
+     * @throws IllegalStateException if the registry has been closed
+     * @throws RuntimeException      if the native call fails
      */
     public List<String> availableLanguages() {
         int count = languageCount();
@@ -244,6 +284,43 @@ public class TsPackRegistry implements AutoCloseable {
             languages.add(languageNameAt(i));
         }
         return Collections.unmodifiableList(languages);
+    }
+
+    /**
+     * Parses source code using the named language and returns a tree handle.
+     *
+     * <p>The returned {@link TsPackTree} must be closed when no longer needed.</p>
+     *
+     * @param language the language name (e.g. {@code "python"}, {@code "java"})
+     * @param source   the source code to parse
+     * @return a {@link TsPackTree} handle for inspecting the parsed syntax tree
+     * @throws LanguageNotFoundException if the language is not found
+     * @throws IllegalStateException     if the registry has been closed
+     * @throws RuntimeException          if parsing fails
+     */
+    public TsPackTree parseString(String language, String source) {
+        MemorySegment ptr = ensureOpen();
+
+        try (Arena arena = Arena.ofConfined()) {
+            MemorySegment cName = arena.allocateFrom(language);
+            MemorySegment cSource = arena.allocateFrom(source);
+            MemorySegment result = (MemorySegment) PARSE_STRING.invokeExact(ptr, cName, cSource, (long) source.length());
+
+            if (result.equals(MemorySegment.NULL)) {
+                String error = lastError();
+                if (error != null && error.contains("not found")) {
+                    throw new LanguageNotFoundException(language, error);
+                }
+                throw new RuntimeException(
+                        "ts_pack_parse_string returned null" + (error != null ? ": " + error : "")
+                );
+            }
+            return new TsPackTree(result);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new RuntimeException("Failed to invoke ts_pack_parse_string", t);
+        }
     }
 
     /**
@@ -260,9 +337,12 @@ public class TsPackRegistry implements AutoCloseable {
     // --- internal helpers ---
 
     /**
-     * Reads the last error message from the FFI layer (thread-local).
+     * Reads the last error message from the FFI layer (thread-local storage).
      *
-     * @return the error message, or {@code null} if no error
+     * <p>The returned pointer is valid only until the next FFI call on the
+     * same thread, so callers must copy the string immediately.</p>
+     *
+     * @return the error message, or {@code null} if no error is pending
      */
     private static String lastError() {
         try {
@@ -273,10 +353,17 @@ public class TsPackRegistry implements AutoCloseable {
             // The pointer is valid until the next FFI call; do NOT free it.
             return errPtr.reinterpret(Long.MAX_VALUE).getString(0);
         } catch (Throwable t) {
+            LOGGER.log(System.Logger.Level.WARNING, "Failed to read FFI error message", t);
             return null;
         }
     }
 
+    /**
+     * Returns the current registry pointer, throwing if the registry is closed.
+     *
+     * @return the non-null registry pointer
+     * @throws IllegalStateException if the registry has been closed
+     */
     private MemorySegment ensureOpen() {
         MemorySegment ptr = registryPtr.get();
         if (ptr == null || ptr.equals(MemorySegment.NULL)) {

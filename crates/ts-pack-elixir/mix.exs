@@ -9,7 +9,21 @@ defmodule TreeSitterLanguagePack.MixProject do
       version: @version,
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      description: "Elixir bindings for tree-sitter-language-pack, providing access to 165+ language parsers",
+      package: package(),
+      source_url: "https://github.com/Goldziher/tree-sitter-language-pack"
+    ]
+  end
+
+  defp package do
+    [
+      maintainers: ["Goldziher"],
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => "https://github.com/Goldziher/tree-sitter-language-pack"
+      },
+      files: ~w(lib native mix.exs README.md LICENSE)
     ]
   end
 
@@ -21,7 +35,7 @@ defmodule TreeSitterLanguagePack.MixProject do
 
   defp deps do
     [
-      {:rustler, "~> 0.36"},
+      {:rustler, "~> 0.37"},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false}
     ]
   end

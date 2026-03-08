@@ -55,10 +55,9 @@ defmodule TreeSitterLanguagePackTest do
       assert ptr > 0
     end
 
-    test "raises for an unknown language" do
-      assert_raise ErlangError, fn ->
-        TreeSitterLanguagePack.get_language_ptr("nonexistent_language_xyz")
-      end
+    test "returns an error for an unknown language" do
+      assert {:error, {:language_not_found, "nonexistent_language_xyz"}} =
+               TreeSitterLanguagePack.get_language_ptr("nonexistent_language_xyz")
     end
   end
 end

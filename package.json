@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "workspaces": [
+    "crates/ts-pack-node",
+    "e2e/typescript"
+  ]
+}

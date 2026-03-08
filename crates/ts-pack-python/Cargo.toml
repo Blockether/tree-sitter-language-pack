@@ -3,6 +3,9 @@ name = "ts-pack-python"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
+description = "Python PyO3 bindings for tree-sitter language pack"
+publish = false
 
 [lib]
 name = "_native"
