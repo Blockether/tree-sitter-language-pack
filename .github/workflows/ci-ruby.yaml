@@ -1,37 +1,60 @@
-name: CI / Ruby
+name: CI Ruby
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "crates/ts-pack-ruby/**"
-      - "crates/ts-pack-core/**"
-      - "e2e/ruby/**"
-      - "fixtures/**"
-      - ".github/workflows/ci-ruby.yaml"
   push:
     branches: [main]
     paths:
       - "crates/ts-pack-ruby/**"
       - "crates/ts-pack-core/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".cargo/config.toml"
+      - "rust-toolchain.toml"
+      - ".task/ruby.yml"
+      - "Taskfile.yml"
       - "e2e/ruby/**"
       - "fixtures/**"
+      - "tools/e2e-generator/**"
+      - "scripts/ci/ruby/**"
+      - ".github/workflows/ci-ruby.yaml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-ruby/**"
+      - "crates/ts-pack-core/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".cargo/config.toml"
+      - "rust-toolchain.toml"
+      - ".task/ruby.yml"
+      - "Taskfile.yml"
+      - "e2e/ruby/**"
+      - "fixtures/**"
+      - "tools/e2e-generator/**"
+      - "scripts/ci/ruby/**"
       - ".github/workflows/ci-ruby.yaml"
   workflow_dispatch:
 
 concurrency:
-  group: ci-ruby-${{ github.ref }}
+  group: ci-ruby-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
-  CARGO_INCREMENTAL: "0"
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
   RUST_BACKTRACE: short
+  BUILD_PROFILE: ci
 
 jobs:
   clone-vendors:
     name: Clone vendors
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -67,8 +90,82 @@ jobs:
           path: parsers
           retention-days: 1
 
-  test-ruby:
-    name: Ruby tests
+  build-ruby:
+    name: Build Ruby (${{ matrix.ruby-version }})
+    needs: clone-vendors
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: true
+      matrix:
+        ruby-version: ["3.2", "3.4"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-ruby-${{ matrix.ruby-version }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-ruby-${{ matrix.ruby-version }}-
+            ${{ runner.os }}-cargo-ruby-
+
+      - name: Clippy (ts-pack-ruby)
+        if: matrix.ruby-version == '3.2'
+        run: cargo clippy -p ts-pack-ruby -- -D warnings
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+          working-directory: crates/ts-pack-ruby
+
+      - name: Install Ruby dependencies
+        working-directory: crates/ts-pack-ruby
+        run: bundle install
+
+      - name: Vendor core
+        run: python3 scripts/ci/ruby/vendor-core.py
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Build native extension
+        working-directory: crates/ts-pack-ruby
+        run: bundle exec rake compile
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          CARGO_TARGET_DIR: ${{ github.workspace }}/crates/ts-pack-ruby/target
+
+      - name: Run RSpec tests
+        working-directory: crates/ts-pack-ruby
+        run: bundle exec rspec
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+  e2e-ruby:
+    name: E2E Ruby
     needs: clone-vendors
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -85,6 +182,22 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-ruby-e2e-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-ruby-e2e-
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -92,11 +205,29 @@ jobs:
           bundler-cache: true
           working-directory: crates/ts-pack-ruby
 
-      - name: Build and test
+      - name: Vendor core
+        run: python3 scripts/ci/ruby/vendor-core.py
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Build native extension
         working-directory: crates/ts-pack-ruby
         run: |
           bundle install
           bundle exec rake compile
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          CARGO_TARGET_DIR: ${{ github.workspace }}/crates/ts-pack-ruby/target
+
+      - name: Generate E2E tests
+        run: cargo run -p e2e-generator -- generate --lang ruby
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Run E2E tests
+        working-directory: e2e/ruby
+        run: |
+          bundle install
           bundle exec rspec
         env:
           PROJECT_ROOT: ${{ github.workspace }}

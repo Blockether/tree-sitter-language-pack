@@ -1,37 +1,60 @@
-name: CI / Elixir
+name: CI Elixir
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "crates/ts-pack-elixir/**"
-      - "crates/ts-pack-core/**"
-      - "e2e/elixir/**"
-      - "fixtures/**"
-      - ".github/workflows/ci-elixir.yaml"
   push:
     branches: [main]
     paths:
-      - "crates/ts-pack-elixir/**"
-      - "crates/ts-pack-core/**"
-      - "e2e/elixir/**"
-      - "fixtures/**"
-      - ".github/workflows/ci-elixir.yaml"
+      - '.github/workflows/ci-elixir.yaml'
+      - '.cargo/config.toml'
+      - 'rust-toolchain.toml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'crates/ts-pack-core/**'
+      - 'crates/ts-pack-elixir/**'
+      - 'e2e/elixir/**'
+      - 'fixtures/**'
+      - 'tools/e2e-generator/**'
+      - 'scripts/**'
+      - '.task/elixir.yml'
+      - 'Taskfile.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/ci-elixir.yaml'
+      - '.cargo/config.toml'
+      - 'rust-toolchain.toml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'crates/ts-pack-core/**'
+      - 'crates/ts-pack-elixir/**'
+      - 'e2e/elixir/**'
+      - 'fixtures/**'
+      - 'tools/e2e-generator/**'
+      - 'scripts/**'
+      - '.task/elixir.yml'
+      - 'Taskfile.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
-  group: ci-elixir-${{ github.ref }}
+  group: ci-elixir-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always
-  CARGO_INCREMENTAL: "0"
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
   RUST_BACKTRACE: short
+  BUILD_PROFILE: ci
 
 jobs:
   clone-vendors:
     name: Clone vendors
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -68,7 +91,8 @@ jobs:
           retention-days: 1
 
   test-elixir:
-    name: Elixir tests
+    name: Elixir Build and Test
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     needs: clone-vendors
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -85,22 +109,102 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Setup Beam
-        uses: erlef/setup-beam@v1
+      - name: Cache cargo registry and build
+        uses: actions/cache@v4
         with:
-          otp-version: "26"
-          elixir-version: "1.16"
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-elixir-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-elixir-
+
+      - name: Setup Elixir
+        uses: erlef/setup-elixir@v1
+        with:
+          elixir-version: "1.17"
+          otp-version: "27.2"
+          version-type: strict
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+
+      - name: Cache Elixir dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            crates/ts-pack-elixir/deps
+            crates/ts-pack-elixir/_build
+          key: elixir-deps-${{ runner.os }}-${{ hashFiles('crates/ts-pack-elixir/mix.lock') }}
+          restore-keys: |
+            elixir-deps-${{ runner.os }}-
 
       - name: Install Elixir dependencies
-        working-directory: crates/ts-pack-elixir
-        run: |
-          mix local.hex --force
-          mix local.rebar --force
-          mix deps.get
+        run: task elixir:deps
 
-      - name: Compile and test
+      - name: Compile Elixir (warnings as errors)
         working-directory: crates/ts-pack-elixir
-        run: mix test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           MIX_ENV: test
+        run: mix compile --warnings-as-errors
+
+      - name: Run Elixir tests
+        run: task elixir:test
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+  e2e-elixir:
+    name: Elixir E2E Tests
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
+    needs: clone-vendors
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry and build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-elixir-e2e-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-elixir-e2e-
+
+      - name: Setup Elixir
+        uses: erlef/setup-elixir@v1
+        with:
+          elixir-version: "1.17"
+          otp-version: "27.2"
+          version-type: strict
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+
+      - name: Generate E2E tests
+        run: task elixir:e2e:generate
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Run E2E tests
+        run: task elixir:e2e:test
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}

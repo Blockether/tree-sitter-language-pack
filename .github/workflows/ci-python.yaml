@@ -1,37 +1,60 @@
-name: CI / Python
+name: CI Python
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "crates/ts-pack-python/**"
-      - "crates/ts-pack-core/**"
-      - "e2e/python/**"
-      - "fixtures/**"
-      - ".github/workflows/ci-python.yaml"
   push:
     branches: [main]
     paths:
       - "crates/ts-pack-python/**"
       - "crates/ts-pack-core/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
       - "e2e/python/**"
       - "fixtures/**"
+      - "tools/e2e-generator/**"
       - ".github/workflows/ci-python.yaml"
+      - ".cargo/config.toml"
+      - "rust-toolchain.toml"
+      - ".task/python.yml"
+      - "Taskfile.yml"
+      - "scripts/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-python/**"
+      - "crates/ts-pack-core/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "e2e/python/**"
+      - "fixtures/**"
+      - "tools/e2e-generator/**"
+      - ".github/workflows/ci-python.yaml"
+      - ".cargo/config.toml"
+      - "rust-toolchain.toml"
+      - ".task/python.yml"
+      - "Taskfile.yml"
+      - "scripts/**"
   workflow_dispatch:
 
 concurrency:
-  group: ci-python-${{ github.ref }}
+  group: ci-python-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
-  CARGO_INCREMENTAL: "0"
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
   RUST_BACKTRACE: short
+  BUILD_PROFILE: ci
 
 jobs:
   clone-vendors:
     name: Clone vendors
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -68,14 +91,22 @@ jobs:
           retention-days: 1
 
   build-python:
-    name: Build Python wheel (${{ matrix.os }})
+    name: Build Python wheel (${{ matrix.platform }})
     needs: clone-vendors
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest, ubuntu-24.04-arm]
+        include:
+          - os: ubuntu-latest
+            platform: linux-x86_64
+          - os: ubuntu-24.04-arm
+            platform: linux-arm64
+          - os: macos-latest
+            platform: macos-arm64
+          - os: windows-latest
+            platform: windows-x86_64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -89,6 +120,23 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-python-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-python-
+
+      - name: Clippy (ts-pack-python)
+        if: matrix.platform == 'linux-x86_64'
+        run: cargo clippy -p ts-pack-python -- -D warnings
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
       - name: Install maturin
         run: pip install maturin
 
@@ -100,20 +148,32 @@ jobs:
       - name: Upload wheel
         uses: actions/upload-artifact@v4
         with:
-          name: wheel-${{ matrix.os }}
+          name: wheel-${{ matrix.platform }}
           path: dist/*.whl
           if-no-files-found: error
+          retention-days: 7
 
   test-python:
-    name: Test Python (${{ matrix.python-version }}, ${{ matrix.os }})
+    name: Test Python (${{ matrix.python-version }}, ${{ matrix.platform }})
     needs: build-python
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        include:
+          - os: ubuntu-latest
+            platform: linux-x86_64
+            python-version: "3.10"
+          - os: ubuntu-latest
+            platform: linux-x86_64
+            python-version: "3.12"
+          - os: macos-latest
+            platform: macos-arm64
+            python-version: "3.10"
+          - os: macos-latest
+            platform: macos-arm64
+            python-version: "3.12"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -126,10 +186,29 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-python-e2e-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-python-e2e-
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+
       - name: Download wheel
         uses: actions/download-artifact@v4
         with:
-          name: wheel-${{ matrix.os }}
+          name: wheel-${{ matrix.platform }}
           path: dist
 
       - name: Install wheel
@@ -137,9 +216,12 @@ jobs:
           wheel_file=$(find dist -name '*.whl' -print -quit)
           pip install "$wheel_file" tree-sitter pytest
 
-      - name: Generate and run E2E tests
-        run: |
-          cargo run -p e2e-generator -- generate --lang python
-          cd e2e/python && pip install -e . && pytest tests/ -v
+      - name: Generate E2E tests
+        run: cargo run -p e2e-generator -- generate --lang python
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Run E2E tests
+        run: cd e2e/python && pip install -e . && pytest tests/ -v
         env:
           PROJECT_ROOT: ${{ github.workspace }}

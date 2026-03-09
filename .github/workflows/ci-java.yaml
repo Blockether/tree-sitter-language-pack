@@ -1,39 +1,62 @@
-name: CI / Java
+name: CI Java
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "crates/ts-pack-java/**"
-      - "crates/ts-pack-ffi/**"
-      - "crates/ts-pack-core/**"
-      - "e2e/java/**"
-      - "fixtures/**"
-      - ".github/workflows/ci-java.yaml"
   push:
     branches: [main]
     paths:
       - "crates/ts-pack-java/**"
       - "crates/ts-pack-ffi/**"
       - "crates/ts-pack-core/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
       - "e2e/java/**"
       - "fixtures/**"
+      - "tools/e2e-generator/**"
+      - ".cargo/config.toml"
+      - "rust-toolchain.toml"
+      - ".task/java.yml"
+      - "Taskfile.yml"
+      - "scripts/**"
+      - ".github/workflows/ci-java.yaml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-java/**"
+      - "crates/ts-pack-ffi/**"
+      - "crates/ts-pack-core/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "e2e/java/**"
+      - "fixtures/**"
+      - "tools/e2e-generator/**"
+      - ".cargo/config.toml"
+      - "rust-toolchain.toml"
+      - ".task/java.yml"
+      - "Taskfile.yml"
+      - "scripts/**"
       - ".github/workflows/ci-java.yaml"
   workflow_dispatch:
 
 concurrency:
-  group: ci-java-${{ github.ref }}
+  group: ci-java-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
-  CARGO_INCREMENTAL: "0"
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
   RUST_BACKTRACE: short
+  BUILD_PROFILE: ci
 
 jobs:
   clone-vendors:
     name: Clone vendors
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -87,6 +110,17 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-ffi-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-ffi-
+
       - name: Build FFI library
         run: cargo build -p ts-pack-ffi --release
         env:
@@ -103,7 +137,7 @@ jobs:
           retention-days: 1
 
   test-java:
-    name: Java tests
+    name: Java unit tests
     needs: build-ffi
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -127,15 +161,108 @@ jobs:
         run: |
           mkdir -p target/release
           cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
+          mkdir -p crates/ts-pack-ffi/include
+          cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
 
-      - name: Set up JDK
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: "22"
           distribution: "temurin"
+          java-version: "22"
+          cache: "maven"
+
+      - name: Set library paths for JNI
+        shell: bash
+        run: |
+          echo "LD_LIBRARY_PATH=${{ github.workspace }}/target/release:${LD_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
 
       - name: Run Java tests
         working-directory: crates/ts-pack-java
-        run: mvn test -Djava.library.path=../ts-pack-ffi/target/release --enable-native-access=ALL-UNNAMED
+        run: mvn test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSPACK_LIB_PATH: ${{ github.workspace }}/target/release/libts_pack_ffi.so
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-unit-reports
+          path: crates/ts-pack-java/target/surefire-reports
+          if-no-files-found: ignore
+          retention-days: 7
+
+  e2e-java:
+    name: Java E2E tests
+    needs: build-ffi
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Download FFI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ffi-linux
+          path: ffi-artifacts
+
+      - name: Restore FFI to expected path
+        run: |
+          mkdir -p target/release
+          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
+          mkdir -p crates/ts-pack-ffi/include
+          cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-e2e-java-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-e2e-java-
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "22"
+          cache: "maven"
+
+      - name: Generate E2E tests
+        run: cargo run -p e2e-generator -- generate --lang java
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Set library paths for JNI
+        shell: bash
+        run: |
+          echo "LD_LIBRARY_PATH=${{ github.workspace }}/target/release:${LD_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
+
+      - name: Run E2E tests
+        working-directory: e2e/java
+        run: mvn test
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSPACK_LIB_PATH: ${{ github.workspace }}/target/release/libts_pack_ffi.so
+
+      - name: Upload E2E test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-e2e-reports
+          path: e2e/java/target/surefire-reports
+          if-no-files-found: ignore
+          retention-days: 7

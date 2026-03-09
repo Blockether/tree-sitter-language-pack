@@ -1,39 +1,62 @@
-name: CI / Go
+name: CI Go
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "crates/ts-pack-go/**"
-      - "crates/ts-pack-ffi/**"
-      - "crates/ts-pack-core/**"
-      - "e2e/go/**"
-      - "fixtures/**"
-      - ".github/workflows/ci-go.yaml"
   push:
     branches: [main]
     paths:
-      - "crates/ts-pack-go/**"
-      - "crates/ts-pack-ffi/**"
-      - "crates/ts-pack-core/**"
-      - "e2e/go/**"
-      - "fixtures/**"
-      - ".github/workflows/ci-go.yaml"
+      - '.github/workflows/ci-go.yaml'
+      - '.cargo/config.toml'
+      - 'rust-toolchain.toml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'crates/ts-pack-core/**'
+      - 'crates/ts-pack-ffi/**'
+      - 'crates/ts-pack-go/**'
+      - 'e2e/go/**'
+      - 'fixtures/**'
+      - 'tools/e2e-generator/**'
+      - 'scripts/**'
+      - '.task/go.yml'
+      - 'Taskfile.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/ci-go.yaml'
+      - '.cargo/config.toml'
+      - 'rust-toolchain.toml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'crates/ts-pack-core/**'
+      - 'crates/ts-pack-ffi/**'
+      - 'crates/ts-pack-go/**'
+      - 'e2e/go/**'
+      - 'fixtures/**'
+      - 'tools/e2e-generator/**'
+      - 'scripts/**'
+      - '.task/go.yml'
+      - 'Taskfile.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
-  group: ci-go-${{ github.ref }}
+  group: ci-go-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always
-  CARGO_INCREMENTAL: "0"
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
   RUST_BACKTRACE: short
+  BUILD_PROFILE: ci
 
 jobs:
   clone-vendors:
     name: Clone vendors
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,7 +94,59 @@ jobs:
 
   build-ffi:
     name: Build FFI library
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     needs: clone-vendors
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry and build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-go-ffi-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-go-ffi-
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+
+      - name: Build FFI library
+        run: task go:build:ffi
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LINK_MODE: dynamic
+
+      - name: Upload FFI artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffi-go-linux
+          path: |
+            target/release/libts_pack_ffi.a
+            target/release/libts_pack_ffi.so
+            crates/ts-pack-ffi/include/
+          retention-days: 1
+
+  test-go:
+    name: Go Tests
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
+    needs: build-ffi
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -84,116 +159,103 @@ jobs:
           name: language-parsers
           path: parsers
 
+      - name: Download FFI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ffi-go-linux
+          path: ffi-artifacts
+
+      - name: Restore FFI to expected path
+        run: |
+          mkdir -p target/release
+          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
+          mkdir -p crates/ts-pack-ffi/include
+          cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+          cache-dependency-path: crates/ts-pack-go/go.sum
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+
+      - name: Run Go tests
+        run: task go:test
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Run Go lint
+        run: task go:lint
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Check Go formatting
+        run: task go:format:check
+
+  e2e-go:
+    name: Go E2E Tests
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
+    needs: build-ffi
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Download FFI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ffi-go-linux
+          path: ffi-artifacts
+
+      - name: Restore FFI to expected path
+        run: |
+          mkdir -p target/release
+          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
+          mkdir -p crates/ts-pack-ffi/include
+          cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache cargo
+      - name: Cache cargo registry and build
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-ffi-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Build FFI library
-        run: cargo build -p ts-pack-ffi --release
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-          TSLP_LINK_MODE: dynamic
-
-      - name: Upload FFI artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ffi-linux
-          path: |
-            target/release/libts_pack_ffi.a
-            target/release/libts_pack_ffi.so
-            crates/ts-pack-ffi/include/
-          retention-days: 1
-
-  test-go:
-    name: Go unit tests
-    needs: build-ffi
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download parsers
-        uses: actions/download-artifact@v4
-        with:
-          name: language-parsers
-          path: parsers
-
-      - name: Download FFI artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: ffi-linux
-          path: ffi-artifacts
-
-      - name: Restore FFI to expected path
-        run: |
-          mkdir -p target/release
-          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
-          mkdir -p crates/ts-pack-ffi/include
-          cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
+          key: ${{ runner.os }}-cargo-go-e2e-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-go-e2e-
 
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: "1.21"
+          cache-dependency-path: crates/ts-pack-go/go.sum
 
-      - name: Run Go tests
-        working-directory: crates/ts-pack-go
-        run: go test -tags tspack_dev -v ./...
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-
-  e2e-go:
-    name: Go E2E tests
-    needs: build-ffi
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download parsers
-        uses: actions/download-artifact@v4
+      - name: Install Task
+        uses: arduino/setup-task@v2
         with:
-          name: language-parsers
-          path: parsers
-
-      - name: Download FFI artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: ffi-linux
-          path: ffi-artifacts
-
-      - name: Restore FFI to expected path
-        run: |
-          mkdir -p target/release
-          cp ffi-artifacts/target/release/libts_pack_ffi.* target/release/ 2>/dev/null || true
-          mkdir -p crates/ts-pack-ffi/include
-          cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.21"
+          version: 3.x
 
       - name: Generate E2E tests
-        run: cargo run -p e2e-generator -- generate --lang go
+        run: task go:e2e:generate
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Run E2E tests
-        working-directory: e2e/go
-        run: go test -tags tspack_dev -v ./...
+        run: task go:e2e:test
         env:
           PROJECT_ROOT: ${{ github.workspace }}

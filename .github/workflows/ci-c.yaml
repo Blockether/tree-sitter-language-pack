@@ -1,37 +1,60 @@
-name: CI / C
+name: CI C FFI
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "crates/ts-pack-ffi/**"
-      - "crates/ts-pack-core/**"
-      - "e2e/c/**"
-      - "fixtures/**"
-      - ".github/workflows/ci-c.yaml"
   push:
     branches: [main]
     paths:
-      - "crates/ts-pack-ffi/**"
-      - "crates/ts-pack-core/**"
-      - "e2e/c/**"
-      - "fixtures/**"
-      - ".github/workflows/ci-c.yaml"
+      - '.github/workflows/ci-c.yaml'
+      - '.cargo/config.toml'
+      - 'rust-toolchain.toml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'crates/ts-pack-ffi/**'
+      - 'crates/ts-pack-core/**'
+      - 'e2e/c/**'
+      - 'fixtures/**'
+      - 'tools/e2e-generator/**'
+      - 'scripts/**'
+      - '.task/c.yml'
+      - 'Taskfile.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/ci-c.yaml'
+      - '.cargo/config.toml'
+      - 'rust-toolchain.toml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'crates/ts-pack-ffi/**'
+      - 'crates/ts-pack-core/**'
+      - 'e2e/c/**'
+      - 'fixtures/**'
+      - 'tools/e2e-generator/**'
+      - 'scripts/**'
+      - '.task/c.yml'
+      - 'Taskfile.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
-  group: ci-c-${{ github.ref }}
+  group: ci-c-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always
-  CARGO_INCREMENTAL: "0"
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
   RUST_BACKTRACE: short
+  BUILD_PROFILE: ci
 
 jobs:
   clone-vendors:
     name: Clone vendors
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -67,11 +90,12 @@ jobs:
           path: parsers
           retention-days: 1
 
-  build-and-test-c:
-    name: C E2E tests
+  build-and-test:
+    name: C FFI Tests
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     needs: clone-vendors
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -85,25 +109,30 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Build FFI library
-        run: cargo build -p ts-pack-ffi --release
+      - name: Cache cargo registry and build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-c-ffi-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-c-ffi-
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+
+      - name: Generate C E2E tests
+        run: task c:e2e:generate
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Build and run C tests
+        run: task c:e2e:test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: dynamic
-
-      - name: Generate C E2E tests
-        run: cargo run -p e2e-generator -- generate --lang c
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-
-      - name: Build C tests
-        working-directory: e2e/c
-        run: |
-          cmake -B build .
-          cmake --build build
-
-      - name: Run C tests
-        working-directory: e2e/c/build
-        run: ctest --output-on-failure
-        env:
           LD_LIBRARY_PATH: ${{ github.workspace }}/target/release

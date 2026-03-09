@@ -1,33 +1,61 @@
-name: CI / WASM
+name: CI WASM
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "crates/ts-pack-wasm/**"
-      - "crates/ts-pack-core/**"
-      - ".github/workflows/ci-wasm.yaml"
   push:
     branches: [main]
     paths:
-      - "crates/ts-pack-wasm/**"
-      - "crates/ts-pack-core/**"
-      - ".github/workflows/ci-wasm.yaml"
+      - '.github/workflows/ci-wasm.yaml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'crates/ts-pack-core/**'
+      - 'crates/ts-pack-wasm/**'
+      - 'e2e/wasm/**'
+      - 'tools/e2e-generator/**'
+      - '.task/wasm.yml'
+      - 'scripts/clone_vendors.py'
+      - 'scripts/readme_config.yaml'
+      - '.cargo/config.toml'
+      - 'rust-toolchain.toml'
+      - 'fixtures/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/ci-wasm.yaml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'crates/ts-pack-core/**'
+      - 'crates/ts-pack-wasm/**'
+      - 'e2e/wasm/**'
+      - 'tools/e2e-generator/**'
+      - '.task/wasm.yml'
+      - 'scripts/clone_vendors.py'
+      - 'scripts/readme_config.yaml'
+      - '.cargo/config.toml'
+      - 'rust-toolchain.toml'
+      - 'fixtures/**'
   workflow_dispatch:
 
 concurrency:
-  group: ci-wasm-${{ github.ref }}
+  group: ci-wasm-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
-  CARGO_INCREMENTAL: "0"
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
   RUST_BACKTRACE: short
+  BUILD_PROFILE: ci
 
 jobs:
+
   clone-vendors:
     name: Clone vendors
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -65,9 +93,10 @@ jobs:
 
   build-wasm:
     name: Build WASM
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
     needs: clone-vendors
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -83,8 +112,23 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
 
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/
+            ~/.cargo/git/
+            target/
+          key: cargo-wasm-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: cargo-wasm-${{ runner.os }}-
+
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Clippy (ts-pack-wasm)
+        run: cargo clippy -p ts-pack-wasm --target wasm32-unknown-unknown -- -D warnings
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Build WASM (web target)
         working-directory: crates/ts-pack-wasm
@@ -92,8 +136,122 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
+      - name: Verify WASM binary exists and check size
+        shell: bash
+        run: |
+          WASM_FILE="crates/ts-pack-wasm/pkg/ts_pack_wasm_bg.wasm"
+          if [ ! -f "$WASM_FILE" ]; then
+            echo "ERROR: WASM binary not found at $WASM_FILE"
+            exit 1
+          fi
+          SIZE=$(stat --format=%s "$WASM_FILE" 2>/dev/null || stat -f%z "$WASM_FILE")
+          echo "WASM binary size: $SIZE bytes ($(( SIZE / 1024 )) KB)"
+          if [ "$SIZE" -lt 1024 ]; then
+            echo "ERROR: WASM binary is suspiciously small ($SIZE bytes)"
+            exit 1
+          fi
+
+      - name: Verify generated files
+        shell: bash
+        run: |
+          for FILE in \
+            crates/ts-pack-wasm/pkg/ts_pack_wasm.js \
+            crates/ts-pack-wasm/pkg/ts_pack_wasm.d.ts \
+            crates/ts-pack-wasm/pkg/ts_pack_wasm_bg.wasm; do
+            if [ ! -f "$FILE" ]; then
+              echo "ERROR: Expected file missing: $FILE"
+              exit 1
+            fi
+            echo "OK: $FILE"
+          done
+
+      - name: Upload WASM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-pkg
+          path: |
+            crates/ts-pack-wasm/pkg/*.wasm
+            crates/ts-pack-wasm/pkg/*.js
+            crates/ts-pack-wasm/pkg/*.ts
+            crates/ts-pack-wasm/pkg/package.json
+          retention-days: 7
+
+  build-wasm-node:
+    name: Build WASM (Node.js target)
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
+    needs: clone-vendors
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/
+            ~/.cargo/git/
+            target/
+          key: cargo-wasm-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: cargo-wasm-${{ runner.os }}-
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
       - name: Build WASM (Node.js target)
         working-directory: crates/ts-pack-wasm
         run: wasm-pack build --target nodejs --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Verify WASM binary exists
+        shell: bash
+        run: |
+          WASM_FILE="crates/ts-pack-wasm/pkg/ts_pack_wasm_bg.wasm"
+          if [ ! -f "$WASM_FILE" ]; then
+            echo "ERROR: WASM binary not found at $WASM_FILE"
+            exit 1
+          fi
+          SIZE=$(stat --format=%s "$WASM_FILE" 2>/dev/null || stat -f%z "$WASM_FILE")
+          echo "WASM binary size: $SIZE bytes ($(( SIZE / 1024 )) KB)"
+
+  e2e-tests:
+    name: E2E Tests (WASM)
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
+    needs: build-wasm
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download WASM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-pkg
+          path: crates/ts-pack-wasm/pkg/
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install E2E dependencies
+        working-directory: e2e/wasm
+        run: npm install
+
+      - name: Run E2E tests
+        working-directory: e2e/wasm
+        run: npx vitest run
