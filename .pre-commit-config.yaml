@@ -1,7 +1,7 @@
 default_install_hook_types:
   - pre-commit
   - commit-msg
-exclude: ^e2e/|vendor/|node_modules/|target/|parsers/|crates/.*/deps/
+exclude: ^e2e/|vendor/|node_modules/|target/|parsers/|crates/.*/deps/|crates/.*/tmp/|_build/
 
 repos:
   # Commit message linting
@@ -108,6 +108,81 @@ repos:
     rev: v3.8.3
     hooks:
       - id: ai-rulez-generate
+
+  # JavaScript/TypeScript/JSON: biome (formatting + linting)
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v2.4.6
+    hooks:
+      - id: biome-format
+      - id: biome-lint
+
+  # C/C++: formatting and linting (FFI code)
+  - repo: https://github.com/pocc/pre-commit-hooks
+    rev: v1.3.5
+    hooks:
+      - id: clang-format
+        args: [--style=file]
+        files: (^crates/ts-pack-ffi/)
+        exclude: (include/)
+      - id: cppcheck
+        args: ["--std=c11", "--enable=warning,style,performance", "--suppress=missingIncludeSystem"]
+        files: (^crates/ts-pack-ffi/)
+
+  # Go: formatting and linting via Taskfile
+  - repo: local
+    hooks:
+      - id: golangci-lint-full
+        name: golangci-lint (all Go modules)
+        entry: task go:lint
+        language: system
+        files: \.go$
+        pass_filenames: false
+
+  # Local hooks for languages without native pre-commit support
+  - repo: local
+    hooks:
+      # Ruby - rubocop formatting and linting
+      - id: ruby-format
+        name: Ruby formatting (rubocop)
+        entry: task ruby:format
+        language: system
+        files: \.rb$
+        pass_filenames: false
+        require_serial: true
+
+      - id: ruby-lint
+        name: Ruby linting (rubocop)
+        entry: task ruby:lint
+        language: system
+        files: \.(rb|rbs)$
+        pass_filenames: false
+        require_serial: true
+
+      # Java - formatting and linting
+      - id: java-format
+        name: Java formatting (google-java-format)
+        entry: task java:format
+        language: system
+        files: \.java$
+        pass_filenames: false
+        require_serial: true
+
+      - id: java-lint
+        name: Java linting
+        entry: task java:lint
+        language: system
+        files: \.java$
+        pass_filenames: false
+        require_serial: true
+
+      # Elixir - mix format
+      - id: elixir-format
+        name: Elixir formatting (mix format)
+        entry: task elixir:format
+        language: system
+        files: \.(ex|exs)$
+        pass_filenames: false
+        require_serial: true
 
   # Spelling
   - repo: https://github.com/codespell-project/codespell

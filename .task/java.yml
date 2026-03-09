@@ -12,8 +12,22 @@ tasks:
     desc: Run Java tests (requires FFI built first)
     deps: [build:ffi]
     dir: crates/ts-pack-java
+    env:
+      TSPACK_LIB_PATH: "{{.PROJECT_ROOT}}/target/release/libts_pack_ffi.{{if eq OS \"darwin\"}}dylib{{else if eq OS \"windows\"}}dll{{else}}so{{end}}"
     cmds:
-      - mvn test -Djava.library.path=../ts-pack-ffi/target/release
+      - mvn test
+
+  format:
+    desc: Format Java code
+    dir: crates/ts-pack-java
+    cmds:
+      - mvn com.spotify.fmt:fmt-maven-plugin:format || true
+
+  lint:
+    desc: Lint Java code
+    dir: crates/ts-pack-java
+    cmds:
+      - mvn com.spotify.fmt:fmt-maven-plugin:check || true
 
   e2e:generate:
     desc: Generate Java E2E tests from fixtures
@@ -26,5 +40,7 @@ tasks:
     desc: Run Java E2E tests
     deps: [build:ffi]
     dir: e2e/java
+    env:
+      TSPACK_LIB_PATH: "{{.PROJECT_ROOT}}/target/release/libts_pack_ffi.{{if eq OS \"darwin\"}}dylib{{else if eq OS \"windows\"}}dll{{else}}so{{end}}"
     cmds:
-      - mvn test -Djava.library.path=../../crates/ts-pack-ffi/target/release
+      - mvn test

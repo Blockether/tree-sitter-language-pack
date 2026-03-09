@@ -4,16 +4,16 @@
 #[test]
 fn error_handling_empty_source() {
     // Parsing an empty string should still produce a tree
-    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("", None);
     assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
 fn error_handling_invalid_syntax() {
-    // Parsing invalid Python syntax should produce a tree with error nodes
-    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
-    let tree = parser.parse("def def def @@@ %%%", None);
+    // Parsing invalid syntax should produce a tree with error nodes
+    let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let tree = parser.parse("function function function @@@ %%%", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();

@@ -1,0 +1,102 @@
+name: CI / Ruby
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-ruby/**"
+      - "crates/ts-pack-core/**"
+      - "e2e/ruby/**"
+      - "fixtures/**"
+      - ".github/workflows/ci-ruby.yaml"
+  push:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-ruby/**"
+      - "crates/ts-pack-core/**"
+      - "e2e/ruby/**"
+      - "fixtures/**"
+      - ".github/workflows/ci-ruby.yaml"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-ruby-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  RUST_BACKTRACE: short
+
+jobs:
+  clone-vendors:
+    name: Clone vendors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --no-install-project
+
+      - name: Clone vendors
+        run: |
+          mkdir -p parsers
+          uv run --no-sync scripts/clone_vendors.py
+
+      - name: Upload parsers
+        uses: actions/upload-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+          retention-days: 1
+
+  test-ruby:
+    name: Ruby tests
+    needs: clone-vendors
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: crates/ts-pack-ruby
+
+      - name: Build and test
+        working-directory: crates/ts-pack-ruby
+        run: |
+          bundle install
+          bundle exec rake compile
+          bundle exec rspec
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}

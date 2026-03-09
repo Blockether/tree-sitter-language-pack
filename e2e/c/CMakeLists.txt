@@ -8,16 +8,94 @@ set(CMAKE_C_STANDARD 11)
 # Find ts_pack_ffi
 set(FFI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../crates/ts-pack-ffi")
 set(FFI_INCLUDE "${FFI_DIR}/include")
-set(FFI_LIB_DIR "${FFI_DIR}/target/release")
+set(FFI_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../target/release")
 
 include_directories(${FFI_INCLUDE})
 link_directories(${FFI_LIB_DIR})
 
-# Collect all test_*.c files
-file(GLOB TEST_SOURCES "test_*.c")
+enable_testing()
 
-foreach(TEST_SOURCE ${TEST_SOURCES})
-    get_filename_component(TEST_NAME ${TEST_SOURCE} NAME_WE)
-    add_executable(${TEST_NAME} ${TEST_SOURCE})
-    target_link_libraries(${TEST_NAME} ts_pack_ffi)
-endforeach()
+add_executable(test_error_handling_empty_source test_error_handling_empty_source.c)
+target_link_libraries(test_error_handling_empty_source ts_pack_ffi)
+add_test(NAME test_error_handling_empty_source COMMAND test_error_handling_empty_source)
+
+add_executable(test_error_handling_invalid_syntax test_error_handling_invalid_syntax.c)
+target_link_libraries(test_error_handling_invalid_syntax ts_pack_ffi)
+add_test(NAME test_error_handling_invalid_syntax COMMAND test_error_handling_invalid_syntax)
+
+add_executable(test_error_handling_unknown_language test_error_handling_unknown_language.c)
+target_link_libraries(test_error_handling_unknown_language ts_pack_ffi)
+add_test(NAME test_error_handling_unknown_language COMMAND test_error_handling_unknown_language)
+
+add_executable(test_parsing_go_function test_parsing_go_function.c)
+target_link_libraries(test_parsing_go_function ts_pack_ffi)
+add_test(NAME test_parsing_go_function COMMAND test_parsing_go_function)
+
+add_executable(test_parsing_html_element test_parsing_html_element.c)
+target_link_libraries(test_parsing_html_element ts_pack_ffi)
+add_test(NAME test_parsing_html_element COMMAND test_parsing_html_element)
+
+add_executable(test_parsing_javascript_variable test_parsing_javascript_variable.c)
+target_link_libraries(test_parsing_javascript_variable ts_pack_ffi)
+add_test(NAME test_parsing_javascript_variable COMMAND test_parsing_javascript_variable)
+
+add_executable(test_parsing_python_function test_parsing_python_function.c)
+target_link_libraries(test_parsing_python_function ts_pack_ffi)
+add_test(NAME test_parsing_python_function COMMAND test_parsing_python_function)
+
+add_executable(test_parsing_rust_function test_parsing_rust_function.c)
+target_link_libraries(test_parsing_rust_function ts_pack_ffi)
+add_test(NAME test_parsing_rust_function COMMAND test_parsing_rust_function)
+
+add_executable(test_registry_has_language_false test_registry_has_language_false.c)
+target_link_libraries(test_registry_has_language_false ts_pack_ffi)
+add_test(NAME test_registry_has_language_false COMMAND test_registry_has_language_false)
+
+add_executable(test_registry_has_language_true test_registry_has_language_true.c)
+target_link_libraries(test_registry_has_language_true ts_pack_ffi)
+add_test(NAME test_registry_has_language_true COMMAND test_registry_has_language_true)
+
+add_executable(test_registry_list_languages test_registry_list_languages.c)
+target_link_libraries(test_registry_list_languages ts_pack_ffi)
+add_test(NAME test_registry_list_languages COMMAND test_registry_list_languages)
+
+add_executable(test_smoke_c test_smoke_c.c)
+target_link_libraries(test_smoke_c ts_pack_ffi)
+add_test(NAME test_smoke_c COMMAND test_smoke_c)
+
+add_executable(test_smoke_cpp test_smoke_cpp.c)
+target_link_libraries(test_smoke_cpp ts_pack_ffi)
+add_test(NAME test_smoke_cpp COMMAND test_smoke_cpp)
+
+add_executable(test_smoke_go test_smoke_go.c)
+target_link_libraries(test_smoke_go ts_pack_ffi)
+add_test(NAME test_smoke_go COMMAND test_smoke_go)
+
+add_executable(test_smoke_html test_smoke_html.c)
+target_link_libraries(test_smoke_html ts_pack_ffi)
+add_test(NAME test_smoke_html COMMAND test_smoke_html)
+
+add_executable(test_smoke_java test_smoke_java.c)
+target_link_libraries(test_smoke_java ts_pack_ffi)
+add_test(NAME test_smoke_java COMMAND test_smoke_java)
+
+add_executable(test_smoke_javascript test_smoke_javascript.c)
+target_link_libraries(test_smoke_javascript ts_pack_ffi)
+add_test(NAME test_smoke_javascript COMMAND test_smoke_javascript)
+
+add_executable(test_smoke_python test_smoke_python.c)
+target_link_libraries(test_smoke_python ts_pack_ffi)
+add_test(NAME test_smoke_python COMMAND test_smoke_python)
+
+add_executable(test_smoke_ruby test_smoke_ruby.c)
+target_link_libraries(test_smoke_ruby ts_pack_ffi)
+add_test(NAME test_smoke_ruby COMMAND test_smoke_ruby)
+
+add_executable(test_smoke_rust test_smoke_rust.c)
+target_link_libraries(test_smoke_rust ts_pack_ffi)
+add_test(NAME test_smoke_rust COMMAND test_smoke_rust)
+
+add_executable(test_smoke_typescript test_smoke_typescript.c)
+target_link_libraries(test_smoke_typescript ts_pack_ffi)
+add_test(NAME test_smoke_typescript COMMAND test_smoke_typescript)
+

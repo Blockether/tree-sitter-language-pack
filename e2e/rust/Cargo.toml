@@ -10,8 +10,8 @@ publish = false
 
 [dependencies]
 ts-pack-core = { path = "../../crates/ts-pack-core" }
-tree-sitter = "0.25"
+tree-sitter = "0.26"
 
 [dev-dependencies]
 ts-pack-core = { path = "../../crates/ts-pack-core" }
-tree-sitter = "0.25"
+tree-sitter = "0.26"

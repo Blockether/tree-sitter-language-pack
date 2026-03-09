@@ -7,7 +7,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@tree-sitter-language-pack/node": "workspace:*"
+    "@kreuzberg/tree-sitter-language-pack": "workspace:*"
   },
   "devDependencies": {
     "vitest": "^3.0.0",

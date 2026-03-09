@@ -13,7 +13,7 @@ on:
         type: boolean
         default: false
       targets:
-        description: "Comma-separated targets (all, python, node, crates, go)"
+        description: "Comma-separated targets (all, python, node, crates, go, ruby, wasm)"
         required: false
         type: string
         default: "all"
@@ -41,6 +41,8 @@ jobs:
       publish_node: ${{ steps.targets.outputs.node }}
       publish_crates: ${{ steps.targets.outputs.crates }}
       publish_go: ${{ steps.targets.outputs.go }}
+      publish_ruby: ${{ steps.targets.outputs.ruby }}
+      publish_wasm: ${{ steps.targets.outputs.wasm }}
     steps:
       - name: Extract version and flags
         id: meta
@@ -57,7 +59,7 @@ jobs:
         id: targets
         run: |
           targets="${{ inputs.targets }}"
-          for target in python node crates go; do
+          for target in python node crates go ruby wasm; do
             if [[ "$targets" == "all" || "$targets" == *"$target"* ]]; then
               echo "$target=true" >> "$GITHUB_OUTPUT"
             else
@@ -157,6 +159,74 @@ jobs:
             if [[ "$STATUS" == "200" ]]; then
               echo "exists=true" >> "$GITHUB_OUTPUT"
               echo "@tree-sitter-language-pack/node $VERSION already published on npm"
+              exit 0
+            elif [[ "$STATUS" == "404" ]]; then
+              echo "exists=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Attempt $attempt: unexpected status $STATUS, retrying..."
+            sleep $((attempt * 5))
+          done
+          echo "exists=false" >> "$GITHUB_OUTPUT"
+
+  check-rubygems:
+    name: Check RubyGems
+    needs: prepare
+    if: needs.prepare.outputs.publish_ruby == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if version exists
+        id: check
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          MAX_ATTEMPTS=3
+          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+            BODY=$(curl -s --retry 2 --retry-delay 3 --connect-timeout 10 --max-time 30 \
+              -o /tmp/gem_response.json -w "%{http_code}" \
+              "https://rubygems.org/api/v1/gems/tree_sitter_language_pack.json")
+            STATUS="$BODY"
+            if [[ "$STATUS" == "200" ]]; then
+              GEM_VERSION=$(cat /tmp/gem_response.json | python3 -c "import sys,json; print(json.load(sys.stdin).get('version',''))" 2>/dev/null || true)
+              if [[ "$GEM_VERSION" == "$VERSION" ]]; then
+                echo "exists=true" >> "$GITHUB_OUTPUT"
+                echo "tree_sitter_language_pack $VERSION already published on RubyGems"
+                exit 0
+              else
+                echo "exists=false" >> "$GITHUB_OUTPUT"
+                echo "tree_sitter_language_pack on RubyGems is at $GEM_VERSION, not $VERSION"
+                exit 0
+              fi
+            elif [[ "$STATUS" == "404" ]]; then
+              echo "exists=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Attempt $attempt: unexpected status $STATUS, retrying..."
+            sleep $((attempt * 5))
+          done
+          echo "exists=false" >> "$GITHUB_OUTPUT"
+
+  check-npm-wasm:
+    name: Check npm (WASM)
+    needs: prepare
+    if: needs.prepare.outputs.publish_wasm == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if version exists
+        id: check
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          MAX_ATTEMPTS=3
+          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              --retry 2 --retry-delay 3 --connect-timeout 10 --max-time 30 \
+              "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack-wasm/$VERSION")
+            if [[ "$STATUS" == "200" ]]; then
+              echo "exists=true" >> "$GITHUB_OUTPUT"
+              echo "@kreuzberg/tree-sitter-language-pack-wasm $VERSION already published on npm"
               exit 0
             elif [[ "$STATUS" == "404" ]]; then
               echo "exists=false" >> "$GITHUB_OUTPUT"
@@ -478,6 +548,168 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+  # ─── Build & Publish Ruby ─────────────────────────────────────────
+  publish-ruby:
+    name: Publish Ruby gem
+    needs: [prepare, clone-vendors, check-rubygems]
+    if: |
+      always() &&
+      needs.prepare.outputs.publish_ruby == 'true' &&
+      needs.clone-vendors.result == 'success' &&
+      (needs.prepare.outputs.force_republish == 'true' || needs.check-rubygems.outputs.exists != 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+
+      - name: Build gem
+        working-directory: packages/ruby
+        run: gem build ./*.gemspec
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          {
+            echo "## RubyGems Dry Run"
+            echo "Gem staged for RubyGems:"
+            echo '```'
+            ls -1 packages/ruby/*.gem
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish to RubyGems
+        if: ${{ !inputs.dry_run }}
+        working-directory: packages/ruby
+        run: |
+          output=$(gem push ./*.gem 2>&1) || {
+            if echo "$output" | grep -qiE "(already been pushed|repushing)"; then
+              echo "::notice::Gem already published; skipping."
+            else
+              echo "$output"
+              exit 1
+            fi
+          }
+        env:
+          GEM_HOST_API_KEY: ${{ secrets.GEM_HOST_API_KEY }}
+
+  # ─── Build & Publish WASM ─────────────────────────────────────────
+  build-wasm:
+    name: Build WASM package
+    needs: [prepare, clone-vendors, check-npm-wasm]
+    if: |
+      always() &&
+      needs.prepare.outputs.publish_wasm == 'true' &&
+      needs.clone-vendors.result == 'success' &&
+      (needs.prepare.outputs.force_republish == 'true' || needs.check-npm-wasm.outputs.exists != 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build WASM (web target)
+        working-directory: crates/ts-pack-wasm
+        run: wasm-pack build --target web --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Upload WASM package
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-pkg
+          path: crates/ts-pack-wasm/pkg/
+
+  publish-wasm:
+    name: Publish WASM to npm
+    needs: [prepare, build-wasm]
+    if: |
+      always() &&
+      needs.prepare.outputs.publish_wasm == 'true' &&
+      needs.build-wasm.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Download WASM package
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-pkg
+          path: crates/ts-pack-wasm/pkg
+
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          {
+            echo "## npm WASM Dry Run"
+            echo "WASM package staged for npm:"
+            echo '```'
+            ls -1 crates/ts-pack-wasm/pkg/
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Re-check npm before publish
+        if: ${{ !inputs.dry_run }}
+        id: recheck
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack-wasm/$VERSION")
+          if [[ "$STATUS" == "200" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::WASM package already on npm; skipping publish."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to npm
+        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        working-directory: crates/ts-pack-wasm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
   # ─── Build Go FFI libraries ──────────────────────────────────────
   build-go-ffi:
     name: Build Go FFI (${{ matrix.label }})
@@ -549,6 +781,8 @@ jobs:
       - publish-crates
       - publish-python
       - publish-node
+      - publish-ruby
+      - publish-wasm
       - build-go-ffi
     if: always() && !cancelled()
     runs-on: ubuntu-latest
@@ -608,9 +842,13 @@ jobs:
           CHECK_CRATESIO_EXISTS: ${{ needs.publish-crates.result == 'skipped' && 'true' || '' }}
           CHECK_PYPI_EXISTS: ${{ needs.publish-python.result == 'skipped' && 'true' || '' }}
           CHECK_NPM_EXISTS: ${{ needs.publish-node.result == 'skipped' && 'true' || '' }}
+          CHECK_RUBYGEMS_EXISTS: ${{ needs.publish-ruby.result == 'skipped' && 'true' || '' }}
+          CHECK_NPM_WASM_EXISTS: ${{ needs.publish-wasm.result == 'skipped' && 'true' || '' }}
           RESULT_PUBLISH_CRATES: ${{ needs.publish-crates.result }}
           RESULT_PUBLISH_PYTHON: ${{ needs.publish-python.result }}
           RESULT_PUBLISH_NODE: ${{ needs.publish-node.result }}
+          RESULT_PUBLISH_RUBY: ${{ needs.publish-ruby.result }}
+          RESULT_PUBLISH_WASM: ${{ needs.publish-wasm.result }}
           RESULT_BUILD_GO_FFI: ${{ needs.build-go-ffi.result }}
         run: |
           {
@@ -623,14 +861,18 @@ jobs:
             results[crates]="${RESULT_PUBLISH_CRATES}"
             results[python]="${RESULT_PUBLISH_PYTHON}"
             results[node]="${RESULT_PUBLISH_NODE}"
+            results[ruby]="${RESULT_PUBLISH_RUBY}"
+            results[wasm]="${RESULT_PUBLISH_WASM}"
             results[go-ffi]="${RESULT_BUILD_GO_FFI}"
 
             declare -A checks
             checks[crates]="${CHECK_CRATESIO_EXISTS}"
             checks[python]="${CHECK_PYPI_EXISTS}"
             checks[node]="${CHECK_NPM_EXISTS}"
+            checks[ruby]="${CHECK_RUBYGEMS_EXISTS}"
+            checks[wasm]="${CHECK_NPM_WASM_EXISTS}"
 
-            for target in crates python node go-ffi; do
+            for target in crates python node ruby wasm go-ffi; do
               result="${results[$target]}"
               check="${checks[$target]:-}"
               if [[ "$result" == "success" ]]; then

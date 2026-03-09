@@ -37,7 +37,7 @@ fn write_package_json(dir: &Path) -> Result<(), String> {
     "test": "vitest run"
   },
   "dependencies": {
-    "@tree-sitter-language-pack/node": "workspace:*"
+    "@kreuzberg/tree-sitter-language-pack": "workspace:*"
   },
   "devDependencies": {
     "vitest": "^3.0.0",
@@ -103,7 +103,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
     writeln!(out, "import {{ describe, it, expect }} from \"vitest\";").unwrap();
     writeln!(
         out,
-        "import {{ availableLanguages, hasLanguage, getLanguagePtr }} from \"@tree-sitter-language-pack/node\";"
+        "import {{ availableLanguages, hasLanguage, getLanguagePtr }} from \"@kreuzberg/tree-sitter-language-pack\";"
     )
     .unwrap();
     writeln!(out).unwrap();

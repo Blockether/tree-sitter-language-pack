@@ -1,0 +1,21 @@
+[package]
+name = "ts-pack-ruby"
+version = "1.0.0-rc.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+description = "Ruby Magnus bindings for tree-sitter language pack"
+publish = false
+
+[lib]
+name = "ts_pack_ruby"
+crate-type = ["cdylib"]
+
+[dependencies]
+ts-pack-core = { package = "ts-pack-core-vendored", path = "vendor/ts-pack-core" }
+tree-sitter = "0.26"
+magnus = "0.8"
+rb-sys = "0.9"
+
+[package.metadata.cargo-machete]
+ignored = ["rb-sys"]

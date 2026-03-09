@@ -13,16 +13,16 @@ class ErrorHandlingTest {
     void error_handling_empty_source() {
         // Parsing an empty string should still produce a tree
         try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("python");
+            var langPtr = registry.getLanguage("javascript");
             assertNotNull(langPtr, "Language pointer should not be null");
         }
     }
 
     @Test
     void error_handling_invalid_syntax() {
-        // Parsing invalid Python syntax should produce a tree with error nodes
+        // Parsing invalid syntax should produce a tree with error nodes
         try (var registry = Helpers.createRegistry()) {
-            var langPtr = registry.getLanguage("python");
+            var langPtr = registry.getLanguage("javascript");
             assertNotNull(langPtr, "Language pointer should not be null");
         }
     }

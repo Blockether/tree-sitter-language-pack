@@ -1,0 +1,70 @@
+version: "3"
+
+tasks:
+  deps:
+    desc: Install Ruby dependencies
+    dir: crates/ts-pack-ruby
+    cmds:
+      - bundle install
+
+  vendor:
+    desc: Vendor ts-pack-core into Ruby package
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - python3 scripts/ci/ruby/vendor-core.py
+
+  build:
+    desc: Build Ruby native extension (requires Ruby 3.2-3.4 via rbenv)
+    dir: crates/ts-pack-ruby
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      CARGO_TARGET_DIR: "{{.PROJECT_ROOT}}/crates/ts-pack-ruby/target"
+    cmds:
+      - bundle exec rake compile
+
+  test:
+    desc: Run Ruby tests
+    dir: crates/ts-pack-ruby
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - bundle exec rspec
+
+  format:
+    desc: Format Ruby code
+    dir: crates/ts-pack-ruby
+    env:
+      RBENV_VERSION: "3.4.8"
+    cmds:
+      - eval "$(rbenv init - bash)" && bundle exec rubocop -a || true
+
+  lint:
+    desc: Lint Ruby code
+    dir: crates/ts-pack-ruby
+    env:
+      RBENV_VERSION: "3.4.8"
+    cmds:
+      - eval "$(rbenv init - bash)" && bundle exec rubocop
+
+  clean:
+    desc: Clean Ruby build artifacts
+    dir: crates/ts-pack-ruby
+    cmds:
+      - rm -rf tmp lib/tree_sitter_language_pack/ts_pack_ruby.* vendor/ts-pack-core vendor/Cargo.toml
+
+  e2e:generate:
+    desc: Generate Ruby E2E tests from fixtures
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - cargo run -p e2e-generator -- generate --lang ruby
+
+  e2e:test:
+    desc: Run Ruby E2E tests
+    dir: e2e/ruby
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - bundle install
+      - bundle exec rspec

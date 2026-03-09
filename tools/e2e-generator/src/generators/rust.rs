@@ -40,11 +40,11 @@ publish = false
 
 [dependencies]
 ts-pack-core = { path = "../../crates/ts-pack-core" }
-tree-sitter = "0.25"
+tree-sitter = "0.26"
 
 [dev-dependencies]
 ts-pack-core = { path = "../../crates/ts-pack-core" }
-tree-sitter = "0.25"
+tree-sitter = "0.26"
 "#;
     std::fs::write(dir.join("Cargo.toml"), content).map_err(|e| format!("Failed to write Cargo.toml: {e}"))
 }

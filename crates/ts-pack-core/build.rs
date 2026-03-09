@@ -235,6 +235,69 @@ fn compile_parser_dynamic(name: &str, parser_dir: &Path, output_dir: &Path) -> b
     }
 }
 
+/// Find the wasi-sysroot include path for wasm32 cross-compilation.
+/// Checks WASI_SYSROOT env, then common Homebrew/system paths.
+fn find_wasi_sysroot() -> Option<PathBuf> {
+    if let Ok(sysroot) = env::var("WASI_SYSROOT") {
+        let p = PathBuf::from(sysroot);
+        if p.exists() {
+            return Some(p);
+        }
+    }
+
+    // Homebrew wasi-libc paths
+    let candidates = [
+        "/opt/homebrew/share/wasi-sysroot",
+        "/usr/local/share/wasi-sysroot",
+        "/opt/wasi-sdk/share/wasi-sysroot",
+    ];
+    for candidate in &candidates {
+        let p = PathBuf::from(candidate);
+        if p.exists() {
+            return Some(p);
+        }
+    }
+
+    // Homebrew Cellar (version-independent glob)
+    if let Ok(entries) = fs::read_dir("/opt/homebrew/Cellar/wasi-libc") {
+        for entry in entries.flatten() {
+            let sysroot = entry.path().join("share/wasi-sysroot");
+            if sysroot.exists() {
+                return Some(sysroot);
+            }
+        }
+    }
+
+    None
+}
+
+/// Apply wasi-sysroot includes to a cc::Build for wasm32 targets.
+fn apply_wasm32_sysroot(build: &mut cc::Build) {
+    if env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_default() != "wasm32" {
+        return;
+    }
+
+    if let Some(sysroot) = find_wasi_sysroot() {
+        // Add wasi-specific include paths — the wasm32-wasi variant provides stdlib.h etc.
+        let wasi_include = sysroot.join("include/wasm32-wasi");
+        if wasi_include.exists() {
+            build.include(&wasi_include);
+        }
+        // Some sysroots have a flat include/ with headers directly
+        let flat_include = sysroot.join("include");
+        if flat_include.exists() {
+            build.include(&flat_include);
+        }
+        // Pass --sysroot so the compiler finds the full toolchain headers
+        build.flag(format!("--sysroot={}", sysroot.display()));
+    } else {
+        println!(
+            "cargo:warning=wasm32 target detected but no wasi-sysroot found. \
+                  Install wasi-libc (brew install wasi-libc) or set WASI_SYSROOT env var."
+        );
+    }
+}
+
 /// Compile a parser statically and link it into the main binary.
 fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
     let src_dir = parser_dir.join("src");
@@ -249,6 +312,9 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
 
     // cc crate handles std flag portability
     build.std("c11");
+
+    // For wasm32 targets, add wasi-sysroot so C standard library headers are available
+    apply_wasm32_sysroot(&mut build);
 
     let scanner_c = src_dir.join("scanner.c");
     if scanner_c.exists() {
@@ -275,6 +341,8 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
             .define("TREE_SITTER_HIDE_SYMBOLS", None)
             .warnings(false)
             .cpp(true);
+        // Also apply wasi sysroot for C++ scanners
+        apply_wasm32_sysroot(&mut cpp_build);
         if let Err(e) = cpp_build.try_compile(&format!("tree_sitter_{name}_scanner_cpp")) {
             println!("cargo:warning=Failed to compile C++ scanner for '{}': {}", name, e);
             return false;
@@ -372,7 +440,13 @@ fn main() {
     let selected = selected_languages(&definitions);
 
     // Determine link mode: "dynamic" (default), "static", or "both"
-    let link_mode = env::var("TSLP_LINK_MODE").unwrap_or_else(|_| "dynamic".to_string());
+    // Force static mode for wasm32 targets (no shared library support)
+    let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_default();
+    let link_mode = if target_arch == "wasm32" {
+        "static".to_string()
+    } else {
+        env::var("TSLP_LINK_MODE").unwrap_or_else(|_| "dynamic".to_string())
+    };
 
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let libs_dir = out_dir.join("libs");

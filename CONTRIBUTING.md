@@ -168,6 +168,24 @@ task elixir:test
 task elixir:deps
 ```
 
+**Ruby:**
+
+```bash
+task ruby:build        # Build Ruby native extension
+task ruby:test         # Run Ruby tests
+task ruby:format       # Format Ruby code
+task ruby:lint         # Lint Ruby code
+```
+
+**WebAssembly:**
+
+```bash
+task wasm:build         # Build WASM package (web target)
+task wasm:build:bundler # Build WASM package (bundler target)
+task wasm:build:node    # Build WASM package (Node.js target)
+task wasm:test          # Run WASM tests
+```
+
 **C:**
 
 ```bash
@@ -231,6 +249,7 @@ task e2e:generate:python
 task e2e:generate:go
 task e2e:generate:java
 task e2e:generate:elixir
+task e2e:generate:ruby
 task e2e:generate:c
 
 # Run Rust E2E tests

@@ -1,0 +1,30 @@
+[package]
+name = "ts-pack-wasm"
+version = "1.0.0-rc.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+description = "WebAssembly bindings for tree-sitter language pack"
+publish = false
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+ts-pack-core = { path = "../ts-pack-core", version = "1.0.0-rc.1", default-features = false, features = [
+  "web",
+] }
+tree-sitter = "0.26"
+wasm-bindgen = "0.2"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true

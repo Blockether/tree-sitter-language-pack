@@ -15,6 +15,10 @@ includes:
     taskfile: .task/elixir.yml
   c:
     taskfile: .task/c.yml
+  ruby:
+    taskfile: .task/ruby.yml
+  wasm:
+    taskfile: .task/wasm.yml
   version:
     taskfile: .task/version.yml
 
@@ -33,9 +37,15 @@ tasks:
   setup:
     desc: "Install all dependencies and initialize project. Idempotent - safe to re-run anytime."
     cmds:
+      - echo "Installing pre-commit hooks..."
+      - prek install
+      - prek install --hook-type commit-msg
       - echo "Installing language tools..."
       - task: rust:install
       - task: python:install
+      - task: ruby:deps
+      - task: node:deps
+      - task: elixir:deps
       - echo "Cloning parser sources..."
       - task: clone
       - echo "Generating AI rules..."
@@ -90,24 +100,39 @@ tasks:
     cmds:
       - task: rust:format
       - task: python:format
+      - task: ruby:format
+      - task: go:format
+      - task: java:format
+      - task: elixir:format
 
   clean:
     desc: Clean all build artifacts
     cmds:
       - task: rust:clean
       - task: python:clean
+      - task: ruby:clean
+      - task: wasm:clean
+      - task: elixir:clean
 
   update:
     desc: Update all dependencies to latest versions
     cmds:
+      - echo "Updating pre-commit hooks..."
+      - prek autoupdate
+      - prek install
+      - prek install --hook-type commit-msg
       - echo "Updating Rust dependencies..."
       - task: rust:update
       - echo "Updating Python dependencies..."
       - task: python:update
+      - echo "Updating Ruby dependencies..."
+      - task: ruby:deps
+      - echo "Updating Node.js dependencies..."
+      - task: node:deps
+      - echo "Updating Elixir dependencies..."
+      - task: elixir:deps
       - echo "Updating language grammar revisions..."
       - uv run --no-sync scripts/pin_vendors.py
-      - echo "Updating prek dependencies..."
-      - prek autoupdate
       - echo "All dependencies updated"
 
   update:grammars:
@@ -171,6 +196,21 @@ tasks:
     desc: Generate Elixir E2E tests
     cmds:
       - cargo run -p e2e-generator -- generate --lang elixir
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+
+  e2e:generate:ruby:
+    desc: Generate and format Ruby E2E tests
+    cmds:
+      - cargo run -p e2e-generator -- generate --lang ruby
+      - bundle exec rubocop -a e2e/ruby/ || true
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+
+  e2e:generate:wasm:
+    desc: Generate WASM E2E tests
+    cmds:
+      - cargo run -p e2e-generator -- generate --lang wasm
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
 

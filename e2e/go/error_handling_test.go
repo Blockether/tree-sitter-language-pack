@@ -7,24 +7,24 @@ import "testing"
 func TestErrorHandlingEmptySource(t *testing.T) {
 	// Parsing an empty string should still produce a tree
 	reg := newTestRegistry(t)
-	ptr, err := reg.GetLanguage("python")
+	ptr, err := reg.GetLanguage("javascript")
 	if err != nil {
-		t.Fatalf("Failed to get language %q: %v", "python", err)
+		t.Fatalf("Failed to get language %q: %v", "javascript", err)
 	}
 	if ptr == nil {
-		t.Fatalf("Language pointer for %q is nil", "python")
+		t.Fatalf("Language pointer for %q is nil", "javascript")
 	}
 }
 
 func TestErrorHandlingInvalidSyntax(t *testing.T) {
-	// Parsing invalid Python syntax should produce a tree with error nodes
+	// Parsing invalid syntax should produce a tree with error nodes
 	reg := newTestRegistry(t)
-	ptr, err := reg.GetLanguage("python")
+	ptr, err := reg.GetLanguage("javascript")
 	if err != nil {
-		t.Fatalf("Failed to get language %q: %v", "python", err)
+		t.Fatalf("Failed to get language %q: %v", "javascript", err)
 	}
 	if ptr == nil {
-		t.Fatalf("Language pointer for %q is nil", "python")
+		t.Fatalf("Language pointer for %q is nil", "javascript")
 	}
 }
 

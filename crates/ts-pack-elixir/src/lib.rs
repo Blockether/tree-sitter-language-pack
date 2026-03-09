@@ -32,7 +32,7 @@ fn language_count() -> usize {
 #[rustler::nif]
 fn get_language_ptr(name: String) -> NifResult<u64> {
     let language = ts_pack_core::get_language(&name)
-        .map_err(|_| Error::Term(Box::new((atoms::language_not_found(), name.clone()))))?;
+        .map_err(|_| Error::RaiseTerm(Box::new((atoms::language_not_found(), name.clone()))))?;
     let raw_ptr = language.into_raw();
     Ok(raw_ptr as u64)
 }
@@ -40,14 +40,14 @@ fn get_language_ptr(name: String) -> NifResult<u64> {
 #[rustler::nif]
 fn parse_string(language: String, source: String) -> NifResult<ResourceArc<TreeResource>> {
     let lang = ts_pack_core::get_language(&language)
-        .map_err(|_| Error::Term(Box::new((atoms::language_not_found(), language.clone()))))?;
+        .map_err(|_| Error::RaiseTerm(Box::new((atoms::language_not_found(), language.clone()))))?;
     let mut parser = tree_sitter::Parser::new();
     parser
         .set_language(&lang)
-        .map_err(|e| Error::Term(Box::new((atoms::parse_error(), format!("{e}")))))?;
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
     let tree = parser
         .parse(source.as_bytes(), None)
-        .ok_or_else(|| Error::Term(Box::new((atoms::parse_error(), "parsing returned no tree".to_string()))))?;
+        .ok_or_else(|| Error::RaiseTerm(Box::new((atoms::parse_error(), "parsing returned no tree".to_string()))))?;
     Ok(ResourceArc::new(TreeResource(Mutex::new(tree))))
 }
 
@@ -56,7 +56,7 @@ fn tree_root_node_type(tree: ResourceArc<TreeResource>) -> NifResult<String> {
     let guard = tree
         .0
         .lock()
-        .map_err(|_| Error::Term(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
+        .map_err(|_| Error::RaiseTerm(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
     Ok(guard.root_node().kind().to_string())
 }
 
@@ -65,7 +65,7 @@ fn tree_root_child_count(tree: ResourceArc<TreeResource>) -> NifResult<u32> {
     let guard = tree
         .0
         .lock()
-        .map_err(|_| Error::Term(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
+        .map_err(|_| Error::RaiseTerm(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
     Ok(guard.root_node().named_child_count() as u32)
 }
 
@@ -74,7 +74,7 @@ fn tree_contains_node_type(tree: ResourceArc<TreeResource>, node_type: String) -
     let guard = tree
         .0
         .lock()
-        .map_err(|_| Error::Term(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
+        .map_err(|_| Error::RaiseTerm(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
     let mut cursor = guard.walk();
     Ok(traverse_looking_for(&mut cursor, |node| node.kind() == node_type))
 }
@@ -84,7 +84,7 @@ fn tree_has_error_nodes(tree: ResourceArc<TreeResource>) -> NifResult<bool> {
     let guard = tree
         .0
         .lock()
-        .map_err(|_| Error::Term(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
+        .map_err(|_| Error::RaiseTerm(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
     let mut cursor = guard.walk();
     Ok(traverse_looking_for(&mut cursor, |node| {
         node.is_error() || node.is_missing()

@@ -9,16 +9,16 @@ from .helpers import tree_contains_node_type, tree_has_error_nodes
 
 def test_error_handling_empty_source():
     """Parsing an empty string should still produce a tree"""
-    parser = get_parser("python")
+    parser = get_parser("javascript")
     tree = parser.parse(b"")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
 
 
 def test_error_handling_invalid_syntax():
-    """Parsing invalid Python syntax should produce a tree with error nodes"""
-    parser = get_parser("python")
-    tree = parser.parse(b"def def def @@@ %%%")
+    """Parsing invalid syntax should produce a tree with error nodes"""
+    parser = get_parser("javascript")
+    tree = parser.parse(b"function function function @@@ %%%")
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert tree_has_error_nodes(root), "Tree should contain error nodes"

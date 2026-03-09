@@ -1,1 +1,0 @@
-{application,e2e_tests,[{modules,[]},{optional_applications,[]},{applications,[kernel,stdlib,elixir,tree_sitter_language_pack]},{description,"e2e_tests"},{registered,[]},{vsn,"0.0.0"}]}.

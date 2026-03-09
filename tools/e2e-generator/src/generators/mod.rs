@@ -3,8 +3,10 @@ pub mod elixir;
 pub mod go;
 pub mod java;
 pub mod python;
+pub mod ruby;
 pub mod rust;
 pub mod typescript;
+pub mod wasm;
 
 use crate::fixtures::Fixture;
 use std::path::Path;
@@ -27,7 +29,9 @@ pub fn generate_for_lang(lang: &str, fixtures: &[Fixture], output_dir: &Path) ->
         "go" => Box::new(go::GoGenerator),
         "java" => Box::new(java::JavaGenerator),
         "elixir" => Box::new(elixir::ElixirGenerator),
+        "ruby" => Box::new(ruby::RubyGenerator),
         "c" => Box::new(c::CGenerator),
+        "wasm" => Box::new(wasm::WasmGenerator),
         _ => return Err(format!("Unknown language target: {lang}")),
     };
 
@@ -39,4 +43,14 @@ pub fn generate_for_lang(lang: &str, fixtures: &[Fixture], output_dir: &Path) ->
 }
 
 /// All supported language targets.
-pub const ALL_TARGETS: &[&str] = &["rust", "python", "typescript", "go", "java", "elixir", "c"];
+pub const ALL_TARGETS: &[&str] = &[
+    "rust",
+    "python",
+    "typescript",
+    "go",
+    "java",
+    "elixir",
+    "ruby",
+    "c",
+    "wasm",
+];

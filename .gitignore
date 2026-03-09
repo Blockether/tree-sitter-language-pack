@@ -6,6 +6,7 @@
 *.log
 *.py[cod]
 *.so
+*.bundle
 *.suo
 *.user
 .coverage
@@ -28,6 +29,12 @@ parsers/
 requirements.txt
 vendor/
 wheelhouse/
+
+# Ruby native extension build artifacts
+crates/ts-pack-ruby/tmp/
+
+# Elixir build artifacts
+_build/
 
 # C E2E build artifacts
 e2e/c/build/

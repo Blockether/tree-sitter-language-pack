@@ -5,62 +5,82 @@ defmodule E2eTests.SmokeTest do
 
   test "smoke_c" do
     # Smoke test: load c and parse a simple snippet
-    ptr = TreeSitterLanguagePack.get_language_ptr("c")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("c", "int main() { return 0; }")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
   test "smoke_cpp" do
     # Smoke test: load cpp and parse a simple snippet
-    ptr = TreeSitterLanguagePack.get_language_ptr("cpp")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("cpp", "int main() { return 0; }")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
   test "smoke_go" do
     # Smoke test: load go and parse a simple snippet
-    ptr = TreeSitterLanguagePack.get_language_ptr("go")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("go", "package main")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
   test "smoke_html" do
     # Smoke test: load html and parse a simple snippet
-    ptr = TreeSitterLanguagePack.get_language_ptr("html")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("html", "<p>hello</p>")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
   test "smoke_java" do
     # Smoke test: load java and parse a simple snippet
-    ptr = TreeSitterLanguagePack.get_language_ptr("java")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("java", "class Main { public static void main(String[] args) {} }")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
   test "smoke_javascript" do
     # Smoke test: load javascript and parse a simple snippet
-    ptr = TreeSitterLanguagePack.get_language_ptr("javascript")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("javascript", "console.log('hello');")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
   test "smoke_python" do
     # Smoke test: load python and parse a simple snippet
-    ptr = TreeSitterLanguagePack.get_language_ptr("python")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("python", "print('hello')")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
   test "smoke_ruby" do
     # Smoke test: load ruby and parse a simple snippet
-    ptr = TreeSitterLanguagePack.get_language_ptr("ruby")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("ruby", "puts 'hello'")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
   test "smoke_rust" do
     # Smoke test: load rust and parse a simple snippet
-    ptr = TreeSitterLanguagePack.get_language_ptr("rust")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("rust", "fn main() {}")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
   test "smoke_typescript" do
     # Smoke test: load typescript and parse a simple snippet
-    ptr = TreeSitterLanguagePack.get_language_ptr("typescript")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("typescript", "const x: number = 42;")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
 end

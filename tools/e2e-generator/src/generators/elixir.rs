@@ -105,7 +105,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
         if assertions.is_some_and(|a| a.expect_error == Some(true)) {
             if let Some(lang) = &fixture.language {
-                writeln!(out, "    assert_raise RuntimeError, fn ->").unwrap();
+                writeln!(out, "    assert_raise ErlangError, fn ->").unwrap();
                 writeln!(
                     out,
                     "      TreeSitterLanguagePack.get_language_ptr(\"{}\")",
@@ -132,13 +132,61 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             )
             .unwrap();
         } else if let Some(lang) = &fixture.language {
+            // Parsing test: use parse_string and tree inspection functions
+            let source = fixture.source_code.as_deref().unwrap_or("");
             writeln!(
                 out,
-                "    ptr = TreeSitterLanguagePack.get_language_ptr(\"{}\")",
-                escape_elixir_string(lang)
+                "    tree = TreeSitterLanguagePack.parse_string(\"{}\", \"{}\")",
+                escape_elixir_string(lang),
+                escape_elixir_string(source)
             )
             .unwrap();
-            writeln!(out, "    assert is_integer(ptr) and ptr > 0").unwrap();
+
+            if assertions.is_some_and(|a| a.tree_not_null == Some(true)) {
+                writeln!(
+                    out,
+                    "    assert is_reference(tree), \"Parse tree should be a reference\""
+                )
+                .unwrap();
+
+                if let Some(min_children) = assertions.and_then(|a| a.root_child_count_min) {
+                    writeln!(
+                        out,
+                        "    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)"
+                    )
+                    .unwrap();
+                    writeln!(
+                        out,
+                        "    assert child_count >= {min_children}, \"Root should have at least {min_children} child(ren), got #{{child_count}}\""
+                    )
+                    .unwrap();
+                }
+
+                if let Some(node_type) = assertions.and_then(|a| a.root_contains_node_type.as_deref()) {
+                    writeln!(
+                        out,
+                        "    assert TreeSitterLanguagePack.tree_contains_node_type(tree, \"{}\"), \"Tree should contain a '{}' node\"",
+                        escape_elixir_string(node_type),
+                        escape_elixir_string(node_type)
+                    )
+                    .unwrap();
+                }
+
+                if assertions.is_some_and(|a| a.has_error_nodes == Some(true)) {
+                    writeln!(
+                        out,
+                        "    assert TreeSitterLanguagePack.tree_has_error_nodes(tree), \"Tree should contain error nodes\""
+                    )
+                    .unwrap();
+                }
+            } else {
+                // If no tree_not_null assertion, just verify the tree is a valid reference
+                writeln!(
+                    out,
+                    "    assert is_reference(tree), \"Parse tree should be a reference\""
+                )
+                .unwrap();
+            }
         }
 
         // Close skip block

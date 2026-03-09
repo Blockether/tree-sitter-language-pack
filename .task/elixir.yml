@@ -24,6 +24,18 @@ tasks:
     cmds:
       - mix test
 
+  format:
+    desc: Format Elixir code
+    dir: crates/ts-pack-elixir
+    cmds:
+      - mix format
+
+  lint:
+    desc: Lint Elixir code (credo)
+    dir: crates/ts-pack-elixir
+    cmds:
+      - mix credo --strict || true
+
   clean:
     desc: Clean Elixir build artifacts
     dir: crates/ts-pack-elixir

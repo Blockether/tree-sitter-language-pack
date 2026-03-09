@@ -1,0 +1,99 @@
+name: CI / WASM
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-wasm/**"
+      - "crates/ts-pack-core/**"
+      - ".github/workflows/ci-wasm.yaml"
+  push:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-wasm/**"
+      - "crates/ts-pack-core/**"
+      - ".github/workflows/ci-wasm.yaml"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-wasm-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  RUST_BACKTRACE: short
+
+jobs:
+  clone-vendors:
+    name: Clone vendors
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --no-install-project
+
+      - name: Clone vendors
+        run: |
+          mkdir -p parsers
+          uv run --no-sync scripts/clone_vendors.py
+
+      - name: Upload parsers
+        uses: actions/upload-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+          retention-days: 1
+
+  build-wasm:
+    name: Build WASM
+    needs: clone-vendors
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download parsers
+        uses: actions/download-artifact@v4
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build WASM (web target)
+        working-directory: crates/ts-pack-wasm
+        run: wasm-pack build --target web --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Build WASM (Node.js target)
+        working-directory: crates/ts-pack-wasm
+        run: wasm-pack build --target nodejs --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}

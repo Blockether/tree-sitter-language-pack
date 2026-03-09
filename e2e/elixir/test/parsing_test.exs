@@ -5,32 +5,37 @@ defmodule E2eTests.ParsingTest do
 
   test "parsing_go_function" do
     # Parse a Go function declaration and assert node type
-    ptr = TreeSitterLanguagePack.get_language_ptr("go")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("go", "package main\nfunc main() {}")
+    assert is_reference(tree), "Parse tree should be a reference"
+    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_declaration"), "Tree should contain a 'function_declaration' node"
   end
 
   test "parsing_html_element" do
     # Parse an HTML element and assert node type
-    ptr = TreeSitterLanguagePack.get_language_ptr("html")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("html", "<div>hello</div>")
+    assert is_reference(tree), "Parse tree should be a reference"
+    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "element"), "Tree should contain a 'element' node"
   end
 
   test "parsing_javascript_variable" do
     # Parse a JavaScript variable declaration and assert node type
-    ptr = TreeSitterLanguagePack.get_language_ptr("javascript")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("javascript", "const x = 1;")
+    assert is_reference(tree), "Parse tree should be a reference"
+    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "lexical_declaration"), "Tree should contain a 'lexical_declaration' node"
   end
 
   test "parsing_python_function" do
     # Parse a Python function definition and assert node type
-    ptr = TreeSitterLanguagePack.get_language_ptr("python")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("python", "def hello(): pass")
+    assert is_reference(tree), "Parse tree should be a reference"
+    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_definition"), "Tree should contain a 'function_definition' node"
   end
 
   test "parsing_rust_function" do
     # Parse a Rust function definition and assert node type
-    ptr = TreeSitterLanguagePack.get_language_ptr("rust")
-    assert is_integer(ptr) and ptr > 0
+    tree = TreeSitterLanguagePack.parse_string("rust", "fn main() {}")
+    assert is_reference(tree), "Parse tree should be a reference"
+    assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_item"), "Tree should contain a 'function_item' node"
   end
 
 end

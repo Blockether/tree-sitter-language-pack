@@ -180,6 +180,16 @@ pub fn escape_elixir_string(s: &str) -> String {
         .replace('#', "\\#")
 }
 
+/// Escape a string for embedding in a Ruby string literal.
+pub fn escape_ruby_string(s: &str) -> String {
+    s.replace('\\', "\\\\")
+        .replace('"', "\\\"")
+        .replace('\n', "\\n")
+        .replace('\r', "\\r")
+        .replace('\t', "\\t")
+        .replace('#', "\\#")
+}
+
 /// Escape a string for embedding in a C string literal.
 pub fn escape_c_string(s: &str) -> String {
     s.replace('\\', "\\\\")

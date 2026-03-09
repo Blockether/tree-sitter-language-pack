@@ -111,7 +111,8 @@ defmodule TreeSitterLanguagePack do
       ptr = TreeSitterLanguagePack.get_language_ptr("python")
       # => 140234567890
   """
-  @spec get_language_ptr(language_name()) :: non_neg_integer() | {:error, {:language_not_found, language_name()}}
+  @spec get_language_ptr(language_name()) ::
+          non_neg_integer() | {:error, {:language_not_found, language_name()}}
   def get_language_ptr(_name), do: :erlang.nif_error(:nif_not_loaded)
 
   @doc """

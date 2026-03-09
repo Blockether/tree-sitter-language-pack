@@ -3,10 +3,11 @@ Sync version from Cargo.toml workspace to all package manifests.
 
 This script reads the version from Cargo.toml [workspace.package] and updates:
 - Python pyproject.toml
-- Node.js package.json
+- Node.js package.json (ts-pack-node)
 - Elixir mix.exs
 - Java pom.xml
-- CHANGELOG.md unreleased header
+- Ruby gemspec
+- WASM Cargo.toml + package.json
 """
 
 import json
@@ -99,7 +100,6 @@ def update_mix_exs(file_path: Path, version: str) -> tuple[bool, str, str]:
 def update_pom_xml(file_path: Path, version: str) -> tuple[bool, str, str]:
     """Update Maven pom.xml version."""
     content = file_path.read_text()
-    # Match the project-level version (first <version> after <artifactId>)
     pattern = r"(<artifactId>tree-sitter-language-pack</artifactId>\s*\n\s*<version>)([^<]+)(</version>)"
     match = re.search(pattern, content, re.DOTALL)
     old_version = match.group(2) if match else "NOT FOUND"
@@ -111,6 +111,67 @@ def update_pom_xml(file_path: Path, version: str) -> tuple[bool, str, str]:
 
     if new_content != content:
         file_path.write_text(new_content)
+        return True, old_version, version
+
+    return False, old_version, version
+
+
+def update_gemspec(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update Ruby gemspec version field.
+
+    Ruby gem versions use dots instead of hyphens for pre-release:
+    1.0.0-rc.1 -> 1.0.0.rc.1
+    """
+    content = file_path.read_text()
+    match = re.search(r'spec\.version\s*=\s*"([^"]+)"', content)
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    # Convert Cargo pre-release format to Ruby gem format
+    gem_version = version.replace("-", ".")
+
+    if old_version == gem_version:
+        return False, old_version, gem_version
+
+    new_content = re.sub(
+        r'(spec\.version\s*=\s*)"[^"]+"',
+        rf'\1"{gem_version}"',
+        content,
+    )
+
+    if new_content != content:
+        file_path.write_text(new_content)
+        return True, old_version, gem_version
+
+    return False, old_version, gem_version
+
+
+def update_cargo_toml_version(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update version in a non-workspace Cargo.toml (e.g. WASM crate)."""
+    content = file_path.read_text()
+    original_content = content
+
+    # Update package version
+    match = re.search(r'^version\s*=\s*"([^"]+)"', content, re.MULTILINE)
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version != version:
+        content = re.sub(
+            r'^(version\s*=\s*)"[^"]+"',
+            rf'\1"{version}"',
+            content,
+            count=1,
+            flags=re.MULTILINE,
+        )
+
+    # Also update ts-pack-core version reference
+    content = re.sub(
+        r'(ts-pack-core\s*=\s*\{[^}]*version\s*=\s*)"[^"]+"',
+        rf'\1"{version}"',
+        content,
+    )
+
+    if content != original_content:
+        file_path.write_text(content)
         return True, old_version, version
 
     return False, old_version, version
@@ -133,8 +194,11 @@ def main() -> None:
     targets: list[tuple[Path, str]] = [
         (repo_root / "pyproject.toml", "pyproject"),
         (repo_root / "crates/ts-pack-node/package.json", "package_json"),
+        (repo_root / "crates/ts-pack-wasm/package.json", "package_json"),
         (repo_root / "crates/ts-pack-elixir/mix.exs", "mix_exs"),
         (repo_root / "crates/ts-pack-java/pom.xml", "pom_xml"),
+        (repo_root / "crates/ts-pack-ruby/tree_sitter_language_pack.gemspec", "gemspec"),
+        (repo_root / "crates/ts-pack-wasm/Cargo.toml", "cargo_toml_version"),
     ]
 
     update_funcs = {
@@ -142,6 +206,8 @@ def main() -> None:
         "package_json": update_package_json,
         "mix_exs": update_mix_exs,
         "pom_xml": update_pom_xml,
+        "gemspec": update_gemspec,
+        "cargo_toml_version": update_cargo_toml_version,
     }
 
     for file_path, file_type in targets:

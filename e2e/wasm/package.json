@@ -1,0 +1,15 @@
+{
+  "name": "e2e-wasm-tests",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@kreuzberg/tree-sitter-language-pack-wasm": "file:../../crates/ts-pack-wasm/pkg"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
+}

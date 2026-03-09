@@ -1,6 +1,12 @@
 version: "3"
 
 tasks:
+  deps:
+    desc: Install Node.js dependencies
+    dir: crates/ts-pack-node
+    cmds:
+      - pnpm install
+
   build:
     desc: Build NAPI-RS native module (release)
     dir: crates/ts-pack-node
@@ -28,3 +34,17 @@ tasks:
     dir: crates/ts-pack-node
     cmds:
       - rm -f *.node
+
+  e2e:generate:
+    desc: Generate TypeScript/Node E2E tests from fixtures
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+    cmds:
+      - cargo run -p e2e-generator -- generate --lang typescript
+
+  e2e:test:
+    desc: Run TypeScript/Node E2E tests
+    dir: e2e/typescript
+    cmds:
+      - pnpm install
+      - npx vitest run

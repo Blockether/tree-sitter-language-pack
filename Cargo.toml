@@ -1,6 +1,11 @@
 [workspace]
 members = ["crates/*", "tools/e2e-generator"]
-exclude = ["crates/ts-pack-go", "crates/ts-pack-java"]
+exclude = [
+  "crates/ts-pack-go",
+  "crates/ts-pack-java",
+  "crates/ts-pack-wasm",
+  "crates/ts-pack-ruby/vendor",
+]
 resolver = "2"
 
 [workspace.package]
@@ -26,3 +31,8 @@ napi-derive = "3"
 napi-build = "2"
 pyo3 = { version = "0.28", features = ["abi3-py310"] }
 rustler = "0.37"
+magnus = "0.8"
+rb-sys = "0.9"
+wasm-bindgen = "0.2"
+wasm-bindgen-test = "0.3"
+js-sys = "0.3"
