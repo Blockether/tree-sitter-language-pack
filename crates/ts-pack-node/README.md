@@ -7,21 +7,27 @@
     <img src="https://img.shields.io/crates/v/ts-pack-core?label=Rust&color=007ec6" alt="Rust">
   </a>  <a href="https://pypi.org/project/tree-sitter-language-pack/">
     <img src="https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6" alt="Python">
-  </a>  <a href="https://www.npmjs.com/package/@tree-sitter-language-pack/node">
-    <img src="https://img.shields.io/npm/v/@tree-sitter-language-pack/node?label=Node.js&color=007ec6" alt="Node">
-  </a>  <a href="https://github.com/Goldziher/tree-sitter-language-pack/tree/main/crates/ts-pack-go">
-    <img src="https://img.shields.io/github/v/tag/Goldziher/tree-sitter-language-pack?label=Go&color=007ec6" alt="Go">
-  </a>  <a href="https://central.sonatype.com/artifact/io.github.tree-sitter/tree-sitter-language-pack">
-    <img src="https://img.shields.io/maven-central/v/io.github.tree-sitter/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
+  </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack">
+    <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack?label=Node.js&color=007ec6" alt="Node">
+  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-go">
+    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6" alt="Go">
+  </a>  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack">
+    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
   </a>  <a href="https://hex.pm/packages/tree_sitter_language_pack">
     <img src="https://img.shields.io/hexpm/v/tree_sitter_language_pack?label=Elixir&color=007ec6" alt="Elixir">
   </a>
   <!-- Project Info -->
-  <a href="https://github.com/Goldziher/tree-sitter-language-pack/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/Goldziher/tree-sitter-language-pack/ci.yaml?branch=main&label=CI" alt="CI">
+  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci.yaml?branch=main&label=CI" alt="CI">
   </a>
-  <a href="https://github.com/Goldziher/tree-sitter-language-pack/blob/main/LICENSE">
+  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue" alt="License">
+  </a>
+</div>
+
+<div align="center">
+  <a href="https://discord.gg/xt9WY3GnKR">
+    <img height="22" src="https://img.shields.io/badge/Discord-Join%20our%20community-7289da?logo=discord&logoColor=white" alt="Discord">
   </a>
 </div>
 
@@ -30,21 +36,21 @@ Node.js NAPI bindings for tree-sitter-language-pack.
 ## Installation
 
 ```sh
-npm install @tree-sitter-language-pack/node
+npm install @kreuzberg/tree-sitter-language-pack
 ```
 
 ```sh
-pnpm add @tree-sitter-language-pack/node
+pnpm add @kreuzberg/tree-sitter-language-pack
 ```
 
 ```sh
-yarn add @tree-sitter-language-pack/node
+yarn add @kreuzberg/tree-sitter-language-pack
 ```
 
 ## Quick Start
 
 ```javascript
-const { availableLanguages, hasLanguage, getLanguagePtr } = require("@tree-sitter-language-pack/node");
+const { availableLanguages, hasLanguage, getLanguagePtr } = require("@kreuzberg/tree-sitter-language-pack");
 
 console.log(availableLanguages());
 console.log(hasLanguage("python")); // true
@@ -52,12 +58,12 @@ console.log(hasLanguage("python")); // true
 
 ## API Reference
 
-For detailed API documentation, see the [Node.js package](https://github.com/Goldziher/tree-sitter-language-pack/tree/main/crates/ts-pack-node).
+For detailed API documentation, see the [Node.js package](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-node).
 
 ## License
 
-MIT OR Apache-2.0 -- see [LICENSE](https://github.com/Goldziher/tree-sitter-language-pack/blob/main/LICENSE) for details.
+MIT OR Apache-2.0 -- see [LICENSE](https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE) for details.
 
 ---
 
-Part of [tree-sitter-language-pack](https://github.com/Goldziher/tree-sitter-language-pack) -- A comprehensive collection of tree-sitter language parsers with polyglot bindings.
+Part of [tree-sitter-language-pack](https://github.com/kreuzberg-dev/tree-sitter-language-pack) -- A comprehensive collection of tree-sitter language parsers with polyglot bindings.

@@ -9,10 +9,7 @@ fn parsing_go_function() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        e2e_tests::tree_contains_node_type(root, "function_declaration"),
-        "Tree should contain a 'function_declaration' node"
-    );
+    assert!(e2e_tests::tree_contains_node_type(root, "function_declaration"), "Tree should contain a 'function_declaration' node");
 }
 
 #[test]
@@ -23,10 +20,7 @@ fn parsing_html_element() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        e2e_tests::tree_contains_node_type(root, "element"),
-        "Tree should contain a 'element' node"
-    );
+    assert!(e2e_tests::tree_contains_node_type(root, "element"), "Tree should contain a 'element' node");
 }
 
 #[test]
@@ -37,10 +31,7 @@ fn parsing_javascript_variable() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        e2e_tests::tree_contains_node_type(root, "lexical_declaration"),
-        "Tree should contain a 'lexical_declaration' node"
-    );
+    assert!(e2e_tests::tree_contains_node_type(root, "lexical_declaration"), "Tree should contain a 'lexical_declaration' node");
 }
 
 #[test]
@@ -51,10 +42,7 @@ fn parsing_python_function() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        e2e_tests::tree_contains_node_type(root, "function_definition"),
-        "Tree should contain a 'function_definition' node"
-    );
+    assert!(e2e_tests::tree_contains_node_type(root, "function_definition"), "Tree should contain a 'function_definition' node");
 }
 
 #[test]
@@ -65,8 +53,5 @@ fn parsing_rust_function() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        e2e_tests::tree_contains_node_type(root, "function_item"),
-        "Tree should contain a 'function_item' node"
-    );
+    assert!(e2e_tests::tree_contains_node_type(root, "function_item"), "Tree should contain a 'function_item' node");
 }

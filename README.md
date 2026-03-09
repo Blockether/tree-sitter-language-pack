@@ -7,21 +7,31 @@
     <img src="https://img.shields.io/crates/v/ts-pack-core?label=Rust&color=007ec6" alt="Rust">
   </a>  <a href="https://pypi.org/project/tree-sitter-language-pack/">
     <img src="https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6" alt="Python">
-  </a>  <a href="https://www.npmjs.com/package/@tree-sitter-language-pack/node">
-    <img src="https://img.shields.io/npm/v/@tree-sitter-language-pack/node?label=Node.js&color=007ec6" alt="Node">
-  </a>  <a href="https://github.com/Goldziher/tree-sitter-language-pack/tree/main/crates/ts-pack-go">
-    <img src="https://img.shields.io/github/v/tag/Goldziher/tree-sitter-language-pack?label=Go&color=007ec6" alt="Go">
-  </a>  <a href="https://central.sonatype.com/artifact/io.github.tree-sitter/tree-sitter-language-pack">
-    <img src="https://img.shields.io/maven-central/v/io.github.tree-sitter/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
+  </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack">
+    <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack?label=Node.js&color=007ec6" alt="Node">
+  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-go">
+    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6" alt="Go">
+  </a>  <a href="https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack">
+    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
   </a>  <a href="https://hex.pm/packages/tree_sitter_language_pack">
     <img src="https://img.shields.io/hexpm/v/tree_sitter_language_pack?label=Elixir&color=007ec6" alt="Elixir">
   </a>
   <!-- Project Info -->
-  <a href="https://github.com/Goldziher/tree-sitter-language-pack/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/Goldziher/tree-sitter-language-pack/ci.yaml?branch=main&label=CI" alt="CI">
+  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci.yaml?branch=main&label=CI" alt="CI">
   </a>
-  <a href="https://github.com/Goldziher/tree-sitter-language-pack/blob/main/LICENSE">
+  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue" alt="License">
+  </a>
+</div>
+
+<div align="center">
+  <img width="3384" height="573" alt="Banner" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
+</div>
+
+<div align="center">
+  <a href="https://discord.gg/xt9WY3GnKR">
+    <img height="22" src="https://img.shields.io/badge/Discord-Join%20our%20community-7289da?logo=discord&logoColor=white" alt="Discord">
   </a>
 </div>
 
@@ -73,15 +83,15 @@ See [Python README](crates/ts-pack-python/README.md) for full documentation.
 ### Node.js
 
 ```sh
-npm install @tree-sitter-language-pack/node
+npm install @kreuzberg/tree-sitter-language-pack
 ```
 
 ```sh
-pnpm add @tree-sitter-language-pack/node
+pnpm add @kreuzberg/tree-sitter-language-pack
 ```
 
 ```sh
-yarn add @tree-sitter-language-pack/node
+yarn add @kreuzberg/tree-sitter-language-pack
 ```
 
 See [Node.js README](crates/ts-pack-node/README.md) for full documentation.
@@ -89,7 +99,7 @@ See [Node.js README](crates/ts-pack-node/README.md) for full documentation.
 ### Go
 
 ```sh
-go get github.com/Goldziher/tree-sitter-language-pack/go
+go get github.com/kreuzberg-dev/tree-sitter-language-pack/go
 ```
 
 See [Go README](crates/ts-pack-go/README.md) for full documentation.
@@ -98,14 +108,14 @@ See [Go README](crates/ts-pack-go/README.md) for full documentation.
 
 ```xml
 <dependency>
-  <groupId>io.github.tree-sitter</groupId>
+  <groupId>dev.kreuzberg</groupId>
   <artifactId>tree-sitter-language-pack</artifactId>
-  <version>2.0.0-alpha.1</version>
+  <version>1.0.0-rc.1</version>
 </dependency>
 ```
 
 ```groovy
-implementation("io.github.tree-sitter:tree-sitter-language-pack:2.0.0-alpha.1")
+implementation("dev.kreuzberg:tree-sitter-language-pack:1.0.0-rc.1")
 ```
 
 See [Java README](crates/ts-pack-java/README.md) for full documentation.
@@ -114,7 +124,7 @@ See [Java README](crates/ts-pack-java/README.md) for full documentation.
 
 ```elixir
 # In mix.exs
-{:tree_sitter_language_pack, "~> 2.0"}
+{:tree_sitter_language_pack, "~> 1.0"}
 ```
 
 See [Elixir README](crates/ts-pack-elixir/README.md) for full documentation.
@@ -162,6 +172,8 @@ This pack includes 170+ languages. See the [Rust core Cargo.toml](crates/ts-pack
 ## Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+Join our [Discord community](https://discord.gg/xt9WY3GnKR) for questions and discussion.
 
 ## License
 

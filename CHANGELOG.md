@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0-rc.1] - 2026-XX-XX
+## [1.0.0-rc.1] - 2026-03-09
 
 Complete rewrite from Python to Rust with polyglot language bindings.
 
@@ -37,6 +37,11 @@ Complete rewrite from Python to Rust with polyglot language bindings.
 - Parser compilation: pure Python with tree-sitter CLI → Rust `build.rs` with `cc` crate
 - Language registry: dictionary-based → typed `LanguageRegistry` with thread-safe `LazyLock` access
 - Error handling: Python exceptions → Rust `Result<T, E>` with cross-language error conversion
+- Repository moved from `Goldziher/tree-sitter-language-pack` to `kreuzberg-dev/tree-sitter-language-pack`
+- Node.js package renamed to `@kreuzberg/tree-sitter-language-pack`
+- Java groupId changed from `io.github.tree-sitter` to `dev.kreuzberg`
+- Go module path updated to `github.com/kreuzberg-dev/tree-sitter-language-pack/go`
+- README branding updated with kreuzberg.dev banner and Discord community link
 
 ### Removed
 

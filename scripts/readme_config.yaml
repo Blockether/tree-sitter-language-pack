@@ -1,18 +1,20 @@
 project:
   name: tree-sitter-language-pack
-  version: "2.0.0-alpha.1"
+  version: "1.0.0-rc.1"
   description: "A comprehensive collection of tree-sitter language parsers with polyglot bindings"
-  repository: "https://github.com/Goldziher/tree-sitter-language-pack"
+  repository: "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
   license: "MIT OR Apache-2.0"
   language_count: 170
+  discord: "https://discord.gg/xt9WY3GnKR"
+  banner_url: "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8"
 
 badges:
   ci:
-    url: "https://img.shields.io/github/actions/workflow/status/Goldziher/tree-sitter-language-pack/ci.yaml?branch=main&label=CI"
-    link: "https://github.com/Goldziher/tree-sitter-language-pack/actions"
+    url: "https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci.yaml?branch=main&label=CI"
+    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions"
   license:
     url: "https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue"
-    link: "https://github.com/Goldziher/tree-sitter-language-pack/blob/main/LICENSE"
+    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE"
   rust:
     url: "https://img.shields.io/crates/v/ts-pack-core?label=Rust&color=007ec6"
     link: "https://crates.io/crates/ts-pack-core"
@@ -20,14 +22,14 @@ badges:
     url: "https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6"
     link: "https://pypi.org/project/tree-sitter-language-pack/"
   node:
-    url: "https://img.shields.io/npm/v/@tree-sitter-language-pack/node?label=Node.js&color=007ec6"
-    link: "https://www.npmjs.com/package/@tree-sitter-language-pack/node"
+    url: "https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack?label=Node.js&color=007ec6"
+    link: "https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack"
   go:
-    url: "https://img.shields.io/github/v/tag/Goldziher/tree-sitter-language-pack?label=Go&color=007ec6"
-    link: "https://github.com/Goldziher/tree-sitter-language-pack/tree/main/crates/ts-pack-go"
+    url: "https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6"
+    link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-go"
   java:
-    url: "https://img.shields.io/maven-central/v/io.github.tree-sitter/tree-sitter-language-pack?label=Java&color=007ec6"
-    link: "https://central.sonatype.com/artifact/io.github.tree-sitter/tree-sitter-language-pack"
+    url: "https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6"
+    link: "https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack"
   elixir:
     url: "https://img.shields.io/hexpm/v/tree_sitter_language_pack?label=Elixir&color=007ec6"
     link: "https://hex.pm/packages/tree_sitter_language_pack"
@@ -86,15 +88,15 @@ languages:
     name: "Node.js"
     template: language_package.md.jinja
     output_path: crates/ts-pack-node/README.md
-    package_name: "@tree-sitter-language-pack/node"
+    package_name: "@kreuzberg/tree-sitter-language-pack"
     package_manager: [npm, pnpm, yarn]
     description: "Node.js NAPI bindings for tree-sitter-language-pack."
     install_commands:
-      npm: "npm install @tree-sitter-language-pack/node"
-      pnpm: "pnpm add @tree-sitter-language-pack/node"
-      yarn: "yarn add @tree-sitter-language-pack/node"
+      npm: "npm install @kreuzberg/tree-sitter-language-pack"
+      pnpm: "pnpm add @kreuzberg/tree-sitter-language-pack"
+      yarn: "yarn add @kreuzberg/tree-sitter-language-pack"
     quick_start: |
-      const { availableLanguages, hasLanguage, getLanguagePtr } = require("@tree-sitter-language-pack/node");
+      const { availableLanguages, hasLanguage, getLanguagePtr } = require("@kreuzberg/tree-sitter-language-pack");
 
       console.log(availableLanguages());
       console.log(hasLanguage("python")); // true
@@ -103,16 +105,16 @@ languages:
     name: "Go"
     template: language_package.md.jinja
     output_path: crates/ts-pack-go/README.md
-    package_name: "github.com/Goldziher/tree-sitter-language-pack/go"
+    package_name: "github.com/kreuzberg-dev/tree-sitter-language-pack/go"
     package_manager: [go]
     description: "Go bindings for tree-sitter-language-pack using cgo."
-    install_command: "go get github.com/Goldziher/tree-sitter-language-pack/go"
+    install_command: "go get github.com/kreuzberg-dev/tree-sitter-language-pack/go"
     quick_start: |
       package main
 
       import (
           "fmt"
-          tspack "github.com/Goldziher/tree-sitter-language-pack/go"
+          tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/go"
       )
 
       func main() {
@@ -127,20 +129,20 @@ languages:
     name: "Java"
     template: language_package.md.jinja
     output_path: crates/ts-pack-java/README.md
-    package_name: "io.github.tree-sitter:tree-sitter-language-pack"
+    package_name: "dev.kreuzberg:tree-sitter-language-pack"
     package_manager: [maven, gradle]
     description: "Java bindings for tree-sitter-language-pack using Panama FFI (JDK 22+)."
     install_commands:
       maven: |
         <dependency>
-          <groupId>io.github.tree-sitter</groupId>
+          <groupId>dev.kreuzberg</groupId>
           <artifactId>tree-sitter-language-pack</artifactId>
-          <version>2.0.0-alpha.1</version>
+          <version>1.0.0-rc.1</version>
         </dependency>
       gradle: |
-        implementation("io.github.tree-sitter:tree-sitter-language-pack:2.0.0-alpha.1")
+        implementation("dev.kreuzberg:tree-sitter-language-pack:1.0.0-rc.1")
     quick_start: |
-      import io.github.treesitter.languagepack.TsPackRegistry;
+      import dev.kreuzberg.treesitter.languagepack.TsPackRegistry;
 
       try (var registry = new TsPackRegistry()) {
           var languages = registry.availableLanguages();
@@ -159,7 +161,7 @@ languages:
     description: "Elixir bindings for tree-sitter-language-pack using Rustler NIFs."
     install_command: |
       # In mix.exs
-      {:tree_sitter_language_pack, "~> 2.0"}
+      {:tree_sitter_language_pack, "~> 1.0"}
     quick_start: |
       # List all available languages
       TreeSitterLanguagePack.available_languages()

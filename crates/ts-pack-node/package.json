@@ -1,5 +1,5 @@
 {
-  "name": "@tree-sitter-language-pack/node",
+  "name": "@kreuzberg/tree-sitter-language-pack",
   "version": "1.0.0-rc.1",
   "description": "Tree-sitter language pack - pre-compiled parsers for 170+ languages (Node.js NAPI bindings)",
   "main": "index.js",
@@ -24,14 +24,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Goldziher/tree-sitter-language-pack"
+    "url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
   },
   "keywords": [
     "tree-sitter",
     "parser",
     "syntax",
     "napi",
-    "language-pack"
+    "language-pack",
+    "kreuzberg"
   ],
   "license": "MIT OR Apache-2.0"
 }

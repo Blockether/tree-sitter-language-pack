@@ -1,3 +1,3 @@
-module github.com/Goldziher/tree-sitter-language-pack/go
+module github.com/kreuzberg-dev/tree-sitter-language-pack/go
 
 go 1.21

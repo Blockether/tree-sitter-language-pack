@@ -5,7 +5,7 @@ package e2e_tests
 import (
 	"testing"
 
-	tspack "github.com/Goldziher/tree-sitter-language-pack/crates/ts-pack-go"
+	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/crates/ts-pack-go"
 )
 
 // newTestRegistry creates a registry for testing and registers cleanup.

@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.tree-sitter</groupId>
+    <groupId>dev.kreuzberg</groupId>
     <artifactId>tree-sitter-language-pack</artifactId>
     <version>1.0.0-rc.1</version>
     <packaging>jar</packaging>
 
     <name>Tree-Sitter Language Pack</name>
     <description>Java bindings for tree-sitter-language-pack via Panama FFI</description>
-    <url>https://github.com/Goldziher/tree-sitter-language-pack</url>
+    <url>https://github.com/kreuzberg-dev/tree-sitter-language-pack</url>
 
     <licenses>
         <license>
@@ -22,15 +22,15 @@
 
     <developers>
         <developer>
-            <name>Goldziher</name>
-            <url>https://github.com/Goldziher</url>
+            <name>kreuzberg-dev</name>
+            <url>https://github.com/kreuzberg-dev</url>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/Goldziher/tree-sitter-language-pack.git</connection>
-        <developerConnection>scm:git:ssh://github.com:Goldziher/tree-sitter-language-pack.git</developerConnection>
-        <url>https://github.com/Goldziher/tree-sitter-language-pack</url>
+        <connection>scm:git:git://github.com/kreuzberg-dev/tree-sitter-language-pack.git</connection>
+        <developerConnection>scm:git:ssh://github.com:kreuzberg-dev/tree-sitter-language-pack.git</developerConnection>
+        <url>https://github.com/kreuzberg-dev/tree-sitter-language-pack</url>
     </scm>
 
     <distributionManagement>

@@ -17,7 +17,7 @@ Thank you for your interest in contributing to tree-sitter-language-pack! This d
 
 Before contributing, please:
 
-1. Check existing [issues](https://github.com/Goldziher/tree-sitter-language-pack/issues) and [pull requests](https://github.com/Goldziher/tree-sitter-language-pack/pulls) to avoid duplicating work
+1. Check existing [issues](https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues) and [pull requests](https://github.com/kreuzberg-dev/tree-sitter-language-pack/pulls) to avoid duplicating work
 1. For significant changes, open an issue first to discuss your proposal
 1. Ensure you have Python 3.10+ installed
 1. Install [uv](https://github.com/astral-sh/uv) for dependency management

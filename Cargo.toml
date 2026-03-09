@@ -7,7 +7,8 @@ resolver = "2"
 version = "1.0.0-rc.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/Goldziher/tree-sitter-language-pack"
+repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+keywords = ["tree-sitter", "parser", "syntax", "language-pack", "kreuzberg"]
 
 [workspace.dependencies]
 tree-sitter = "0.26"

@@ -6,6 +6,7 @@ readme = "README.md"
 keywords = [
   "ast",
   "code",
+  "kreuzberg",
   "parser",
   "parsing",
   "syntax",
@@ -29,10 +30,10 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Typing :: Typed",
 ]
-urls.documentation = "https://github.com/Goldziher/tree-sitter-language-pack#readme"
-urls.homepage = "https://github.com/Goldziher/tree-sitter-language-pack"
-urls.issues = "https://github.com/Goldziher/tree-sitter-language-pack/issues"
-urls.repository = "https://github.com/Goldziher/tree-sitter-language-pack"
+urls.documentation = "https://github.com/kreuzberg-dev/tree-sitter-language-pack#readme"
+urls.homepage = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+urls.issues = "https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues"
+urls.repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 
 [dependency-groups]
 dev = [

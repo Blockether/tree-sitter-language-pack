@@ -1,7 +1,7 @@
 use super::config_path;
 
 const TEMPLATE: &str = r#"# tree-sitter language pack configuration
-# See: https://github.com/Goldziher/tree-sitter-language-pack
+# See: https://github.com/kreuzberg-dev/tree-sitter-language-pack
 
 [language-pack]
 # cache_dir = ".ts-cache"

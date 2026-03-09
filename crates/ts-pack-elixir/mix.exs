@@ -12,16 +12,16 @@ defmodule TreeSitterLanguagePack.MixProject do
       deps: deps(),
       description: "Elixir bindings for tree-sitter-language-pack, providing access to 165+ language parsers",
       package: package(),
-      source_url: "https://github.com/Goldziher/tree-sitter-language-pack"
+      source_url: "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
     ]
   end
 
   defp package do
     [
-      maintainers: ["Goldziher"],
+      maintainers: ["kreuzberg-dev"],
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/Goldziher/tree-sitter-language-pack"
+        "GitHub" => "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
       },
       files: ~w(lib native mix.exs README.md LICENSE)
     ]
