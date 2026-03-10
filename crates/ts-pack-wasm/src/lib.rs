@@ -72,15 +72,8 @@ pub struct WasmTree {
 /// Throws an error if the language is not found or parsing fails.
 #[wasm_bindgen(js_name = "parseString")]
 pub fn parse_string(language: &str, source: &str) -> Result<WasmTree, JsValue> {
-    let lang = ts_pack_core::get_language(language)
+    let tree = ts_pack_core::parse_string(language, source.as_bytes())
         .map_err(|e| JsValue::from_str(&format!("{e}")))?;
-    let mut parser = tree_sitter::Parser::new();
-    parser
-        .set_language(&lang)
-        .map_err(|e| JsValue::from_str(&format!("failed to set language: {e}")))?;
-    let tree = parser
-        .parse(source.as_bytes(), None)
-        .ok_or_else(|| JsValue::from_str("parsing returned no tree"))?;
     Ok(WasmTree {
         inner: Mutex::new(tree),
     })
@@ -113,10 +106,7 @@ pub fn tree_contains_node_type(tree: &WasmTree, node_type: &str) -> Result<bool,
         .inner
         .lock()
         .map_err(|e| JsValue::from_str(&format!("lock error: {e}")))?;
-    let mut cursor = guard.walk();
-    Ok(traverse_looking_for(&mut cursor, |node| {
-        node.kind() == node_type
-    }))
+    Ok(ts_pack_core::tree_contains_node_type(&guard, node_type))
 }
 
 /// Check whether the tree contains any ERROR or MISSING nodes.
@@ -126,10 +116,7 @@ pub fn tree_has_error_nodes(tree: &WasmTree) -> Result<bool, JsValue> {
         .inner
         .lock()
         .map_err(|e| JsValue::from_str(&format!("lock error: {e}")))?;
-    let mut cursor = guard.walk();
-    Ok(traverse_looking_for(&mut cursor, |node| {
-        node.is_error() || node.is_missing()
-    }))
+    Ok(ts_pack_core::tree_has_error_nodes(&guard))
 }
 
 /// Free the tree handle (called automatically by JS GC, but can be called manually).
@@ -138,24 +125,30 @@ pub fn free_tree(_tree: WasmTree) {
     // Dropping the WasmTree frees the underlying tree_sitter::Tree
 }
 
-fn traverse_looking_for(
-    cursor: &mut tree_sitter::TreeCursor,
-    predicate: impl Fn(tree_sitter::Node) -> bool,
-) -> bool {
-    loop {
-        if predicate(cursor.node()) {
-            return true;
-        }
-        if cursor.goto_first_child() {
-            continue;
-        }
-        loop {
-            if cursor.goto_next_sibling() {
-                break;
-            }
-            if !cursor.goto_parent() {
-                return false;
-            }
-        }
-    }
+// ---------------------------------------------------------------------------
+// Intel: process / processAndChunk
+// ---------------------------------------------------------------------------
+
+/// Process source code and extract file intelligence as a JSON string.
+#[wasm_bindgen(js_name = "process")]
+pub fn process(source: &str, language: &str) -> Result<String, JsValue> {
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let intel = registry
+        .process(source, language)
+        .map_err(|e| JsValue::from_str(&format!("{e}")))?;
+    serde_json::to_string(&intel).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))
+}
+
+/// Process and chunk source code, returning intelligence + chunks as a JSON string.
+#[wasm_bindgen(js_name = "processAndChunk")]
+pub fn process_and_chunk(source: &str, language: &str, max_chunk_size: usize) -> Result<String, JsValue> {
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let (intel, chunks) = registry
+        .process_and_chunk(source, language, max_chunk_size)
+        .map_err(|e| JsValue::from_str(&format!("{e}")))?;
+    let result = serde_json::json!({
+        "intelligence": intel,
+        "chunks": chunks,
+    });
+    serde_json::to_string(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))
 }

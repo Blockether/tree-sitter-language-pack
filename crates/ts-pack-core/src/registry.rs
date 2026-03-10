@@ -66,14 +66,29 @@ mod dynamic {
             self.libs_dir.join(format!("{prefix}{lib_name}.{ext}"))
         }
 
-        pub(crate) fn load(&self, name: &str) -> Result<Language, Error> {
-            let mut dynamic = self.inner.write().map_err(|e| Error::LockPoisoned(e.to_string()))?;
-
-            // Another thread may have loaded it between our read and write lock
-            if let Some((_, lang)) = dynamic.libs.get(name) {
-                return Ok(lang.clone());
+        /// Load a language from a specific directory (e.g. download cache).
+        /// The loaded library is stored in the shared cache.
+        pub(crate) fn load_from_dir(&self, name: &str, dir: &std::path::Path) -> Result<Language, Error> {
+            let lib_name = format!("tree_sitter_{name}");
+            let (prefix, ext) = if cfg!(target_os = "macos") {
+                ("lib", "dylib")
+            } else if cfg!(target_os = "windows") {
+                ("", "dll")
+            } else {
+                ("lib", "so")
+            };
+            let lib_path = dir.join(format!("{prefix}{lib_name}.{ext}"));
+            if !lib_path.exists() {
+                return Err(Error::LanguageNotFound(format!(
+                    "Dynamic library for '{}' not found at {}",
+                    name,
+                    lib_path.display()
+                )));
             }
+            self.load_from_path(name, &lib_path)
+        }
 
+        pub(crate) fn load(&self, name: &str) -> Result<Language, Error> {
             let lib_path = self.lib_path(name);
             if !lib_path.exists() {
                 return Err(Error::LanguageNotFound(format!(
@@ -82,12 +97,22 @@ mod dynamic {
                     lib_path.display()
                 )));
             }
+            self.load_from_path(name, &lib_path)
+        }
+
+        fn load_from_path(&self, name: &str, lib_path: &std::path::Path) -> Result<Language, Error> {
+            let mut dynamic = self.inner.write().map_err(|e| Error::LockPoisoned(e.to_string()))?;
+
+            // Another thread may have loaded it between our read and write lock
+            if let Some((_, lang)) = dynamic.libs.get(name) {
+                return Ok(lang.clone());
+            }
 
             let func_name = format!("tree_sitter_{name}");
 
             // SAFETY: We are loading a known tree-sitter grammar shared library that exports
             // a `tree_sitter_<name>` function returning a pointer to a TSLanguage struct.
-            let lib = unsafe { libloading::Library::new(&lib_path) }
+            let lib = unsafe { libloading::Library::new(lib_path) }
                 .map_err(|e| Error::DynamicLoad(format!("Failed to load library {}: {}", lib_path.display(), e)))?;
 
             let language = unsafe {
@@ -117,6 +142,9 @@ pub struct LanguageRegistry {
     static_lookup: HashMap<&'static str, fn() -> Language>,
     #[cfg(feature = "dynamic-loading")]
     dynamic_loader: dynamic::DynamicLoader,
+    /// Additional library directories to search (e.g. download cache).
+    #[cfg(feature = "dynamic-loading")]
+    extra_lib_dirs: Vec<PathBuf>,
 }
 
 impl LanguageRegistry {
@@ -130,6 +158,8 @@ impl LanguageRegistry {
             static_lookup,
             #[cfg(feature = "dynamic-loading")]
             dynamic_loader: dynamic::DynamicLoader::new(PathBuf::from(LIBS_DIR), DYNAMIC_LANGUAGE_NAMES.to_vec()),
+            #[cfg(feature = "dynamic-loading")]
+            extra_lib_dirs: Vec::new(),
         }
     }
 
@@ -139,6 +169,15 @@ impl LanguageRegistry {
         let mut reg = Self::new();
         reg.dynamic_loader.libs_dir = libs_dir;
         reg
+    }
+
+    /// Add an additional directory to search for dynamic libraries.
+    /// This is used by the download system to register its cache directory.
+    #[cfg(feature = "dynamic-loading")]
+    pub fn add_extra_libs_dir(&mut self, dir: PathBuf) {
+        if !self.extra_lib_dirs.contains(&dir) {
+            self.extra_lib_dirs.push(dir);
+        }
     }
 
     pub fn get_language(&self, name: &str) -> Result<Language, Error> {
@@ -154,9 +193,19 @@ impl LanguageRegistry {
                 return Ok(lang);
             }
 
-            // Try loading dynamically
+            // Try loading from build-time libs dir
             if self.dynamic_loader.dynamic_names.contains(&name) || self.dynamic_loader.lib_file_exists(name) {
                 return self.dynamic_loader.load(name);
+            }
+
+            // Try loading from extra dirs (e.g. download cache)
+            for extra_dir in &self.extra_lib_dirs {
+                if self.dynamic_loader.load_from_dir(name, extra_dir).is_ok() {
+                    // Re-fetch from cache — load_from_dir inserted it
+                    if let Some(lang) = self.dynamic_loader.get_cached(name)? {
+                        return Ok(lang);
+                    }
+                }
             }
         }
 
@@ -191,6 +240,20 @@ impl LanguageRegistry {
             if self.dynamic_loader.dynamic_names.contains(&name) || self.dynamic_loader.lib_file_exists(name) {
                 return true;
             }
+
+            for extra_dir in &self.extra_lib_dirs {
+                let lib_name = format!("tree_sitter_{name}");
+                let (prefix, ext) = if cfg!(target_os = "macos") {
+                    ("lib", "dylib")
+                } else if cfg!(target_os = "windows") {
+                    ("", "dll")
+                } else {
+                    ("lib", "so")
+                };
+                if extra_dir.join(format!("{prefix}{lib_name}.{ext}")).exists() {
+                    return true;
+                }
+            }
         }
 
         false
@@ -210,10 +273,96 @@ impl LanguageRegistry {
 
         count
     }
+
+    /// Parse source code and extract full file intelligence in a single pass.
+    pub fn process(&self, source: &str, language: &str) -> Result<crate::intel::types::FileIntelligence, Error> {
+        crate::intel::process(source, language, self)
+    }
+
+    /// Parse, extract intelligence, and chunk source code in a single pass.
+    pub fn process_and_chunk(
+        &self,
+        source: &str,
+        language: &str,
+        max_chunk_size: usize,
+    ) -> Result<
+        (
+            crate::intel::types::FileIntelligence,
+            Vec<crate::intel::types::IntelligentChunk>,
+        ),
+        Error,
+    > {
+        crate::intel::process_and_chunk(source, language, max_chunk_size, self)
+    }
 }
 
 impl Default for LanguageRegistry {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn first_available_lang() -> Option<String> {
+        let langs = crate::available_languages();
+        langs.into_iter().next()
+    }
+
+    #[test]
+    fn test_registry_process() {
+        let Some(lang) = first_available_lang() else { return };
+        let registry = LanguageRegistry::new();
+        let result = registry.process("x", &lang);
+        assert!(result.is_ok(), "registry.process() should succeed");
+        let intel = result.unwrap();
+        assert_eq!(intel.language, lang);
+        assert!(intel.metrics.total_lines >= 1);
+    }
+
+    #[test]
+    fn test_registry_process_and_chunk() {
+        let Some(lang) = first_available_lang() else { return };
+        let registry = LanguageRegistry::new();
+        let result = registry.process_and_chunk("x", &lang, 1000);
+        assert!(result.is_ok(), "registry.process_and_chunk() should succeed");
+        let (intel, chunks) = result.unwrap();
+        assert_eq!(intel.language, lang);
+        assert!(!chunks.is_empty());
+    }
+
+    #[test]
+    fn test_registry_process_invalid_language() {
+        let registry = LanguageRegistry::new();
+        let result = registry.process("x", "nonexistent_lang_xyz");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_registry_has_language_and_count() {
+        let registry = LanguageRegistry::new();
+        let langs = registry.available_languages();
+        assert_eq!(registry.language_count(), langs.len());
+        if let Some(lang) = langs.first() {
+            assert!(registry.has_language(lang));
+        }
+        assert!(!registry.has_language("nonexistent_lang_xyz"));
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn test_file_intelligence_serde_roundtrip() {
+        let Some(lang) = first_available_lang() else { return };
+        let registry = LanguageRegistry::new();
+        let source = "x";
+        let intel = registry.process(source, &lang).unwrap();
+        let json = serde_json::to_string(&intel).expect("serialize should succeed");
+        let deserialized: crate::intel::types::FileIntelligence =
+            serde_json::from_str(&json).expect("deserialize should succeed");
+        assert_eq!(deserialized.language, intel.language);
+        assert_eq!(deserialized.metrics.total_lines, intel.metrics.total_lines);
+        assert_eq!(deserialized.metrics.total_bytes, intel.metrics.total_bytes);
     }
 }

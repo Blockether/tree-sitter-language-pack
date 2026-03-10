@@ -39,15 +39,8 @@ fn get_language_ptr(name: String) -> NifResult<u64> {
 
 #[rustler::nif]
 fn parse_string(language: String, source: String) -> NifResult<ResourceArc<TreeResource>> {
-    let lang = ts_pack_core::get_language(&language)
-        .map_err(|_| Error::RaiseTerm(Box::new((atoms::language_not_found(), language.clone()))))?;
-    let mut parser = tree_sitter::Parser::new();
-    parser
-        .set_language(&lang)
+    let tree = ts_pack_core::parse_string(&language, source.as_bytes())
         .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
-    let tree = parser
-        .parse(source.as_bytes(), None)
-        .ok_or_else(|| Error::RaiseTerm(Box::new((atoms::parse_error(), "parsing returned no tree".to_string()))))?;
     Ok(ResourceArc::new(TreeResource(Mutex::new(tree))))
 }
 
@@ -75,8 +68,7 @@ fn tree_contains_node_type(tree: ResourceArc<TreeResource>, node_type: String) -
         .0
         .lock()
         .map_err(|_| Error::RaiseTerm(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
-    let mut cursor = guard.walk();
-    Ok(traverse_looking_for(&mut cursor, |node| node.kind() == node_type))
+    Ok(ts_pack_core::tree_contains_node_type(&guard, &node_type))
 }
 
 #[rustler::nif]
@@ -85,29 +77,35 @@ fn tree_has_error_nodes(tree: ResourceArc<TreeResource>) -> NifResult<bool> {
         .0
         .lock()
         .map_err(|_| Error::RaiseTerm(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
-    let mut cursor = guard.walk();
-    Ok(traverse_looking_for(&mut cursor, |node| {
-        node.is_error() || node.is_missing()
-    }))
+    Ok(ts_pack_core::tree_has_error_nodes(&guard))
 }
 
-fn traverse_looking_for(cursor: &mut tree_sitter::TreeCursor, predicate: impl Fn(tree_sitter::Node) -> bool) -> bool {
-    loop {
-        if predicate(cursor.node()) {
-            return true;
-        }
-        if cursor.goto_first_child() {
-            continue;
-        }
-        loop {
-            if cursor.goto_next_sibling() {
-                break;
-            }
-            if !cursor.goto_parent() {
-                return false;
-            }
-        }
-    }
+// ---------------------------------------------------------------------------
+// Intel: process / process_and_chunk
+// ---------------------------------------------------------------------------
+
+#[rustler::nif]
+fn process(source: String, language: String) -> NifResult<String> {
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let intel = registry
+        .process(&source, &language)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
+    serde_json::to_string(&intel)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("serialization failed: {e}")))))
+}
+
+#[rustler::nif]
+fn process_and_chunk(source: String, language: String, max_chunk_size: u64) -> NifResult<String> {
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let (intel, chunks) = registry
+        .process_and_chunk(&source, &language, max_chunk_size as usize)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
+    let result = serde_json::json!({
+        "intelligence": intel,
+        "chunks": chunks,
+    });
+    serde_json::to_string(&result)
+        .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("serialization failed: {e}")))))
 }
 
 rustler::init!("Elixir.TreeSitterLanguagePack");

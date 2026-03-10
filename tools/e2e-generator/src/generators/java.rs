@@ -103,7 +103,29 @@ final class Helpers {
     std::fs::write(pkg_dir.join("Helpers.java"), content).map_err(|e| format!("Failed to write Helpers.java: {e}"))
 }
 
+fn has_intel_assertions(fixture: &Fixture) -> bool {
+    fixture.assertions.as_ref().is_some_and(|a| {
+        a.intel_language.is_some()
+            || a.intel_structure_count_min.is_some()
+            || a.intel_structure_contains_kind.is_some()
+            || a.intel_imports_count_min.is_some()
+            || a.intel_metrics_total_lines_min.is_some()
+            || a.intel_metrics_error_count.is_some()
+            || a.intel_diagnostics_not_empty.is_some()
+            || a.intel_chunk_count_min.is_some()
+    })
+}
+
+fn has_chunk_assertions(fixture: &Fixture) -> bool {
+    fixture
+        .assertions
+        .as_ref()
+        .is_some_and(|a| a.intel_chunk_count_min.is_some())
+}
+
 fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
+    let needs_json = fixtures.iter().any(|f| has_intel_assertions(f));
+
     let mut out = String::new();
     let class_name = to_java_class_name(category);
 
@@ -115,8 +137,18 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
     writeln!(out).unwrap();
     writeln!(out, "import io.github.treesitter.languagepack.TsPackRegistry;").unwrap();
     writeln!(out, "import org.junit.jupiter.api.Test;").unwrap();
+    if needs_json {
+        writeln!(out).unwrap();
+        writeln!(out, "import com.google.gson.Gson;").unwrap();
+        writeln!(out, "import com.google.gson.JsonObject;").unwrap();
+        writeln!(out, "import com.google.gson.JsonArray;").unwrap();
+    }
     writeln!(out).unwrap();
     writeln!(out, "class {class_name}Test {{").unwrap();
+    if needs_json {
+        writeln!(out).unwrap();
+        writeln!(out, "    private static final Gson GSON = new Gson();").unwrap();
+    }
     writeln!(out).unwrap();
 
     for fixture in fixtures {
@@ -171,6 +203,146 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                 escape_java_string(lang)
             )
             .unwrap();
+            writeln!(out, "        }}").unwrap();
+        } else if has_intel_assertions(fixture) {
+            let lang = fixture.language.as_deref().unwrap_or("unknown");
+            let source = fixture.source_code.as_deref().unwrap_or("");
+            let assertions = assertions.unwrap();
+
+            writeln!(out, "        try (var registry = Helpers.createRegistry()) {{").unwrap();
+
+            if has_chunk_assertions(fixture) {
+                let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
+                writeln!(
+                    out,
+                    "            String resultJson = registry.processAndChunk(\"{}\", \"{}\", {});",
+                    escape_java_string(source),
+                    escape_java_string(lang),
+                    max_chunk_size
+                )
+                .unwrap();
+            } else {
+                writeln!(
+                    out,
+                    "            String resultJson = registry.process(\"{}\", \"{}\");",
+                    escape_java_string(source),
+                    escape_java_string(lang)
+                )
+                .unwrap();
+            }
+
+            writeln!(
+                out,
+                "            JsonObject intel = GSON.fromJson(resultJson, JsonObject.class);"
+            )
+            .unwrap();
+
+            if has_chunk_assertions(fixture) {
+                if let Some(min_chunks) = assertions.intel_chunk_count_min {
+                    writeln!(out, "            JsonArray chunks = intel.getAsJsonArray(\"chunks\");").unwrap();
+                    writeln!(
+                        out,
+                        "            assertTrue(chunks.size() >= {}, \"Should have at least {} chunk(s), got \" + chunks.size());",
+                        min_chunks,
+                        min_chunks
+                    )
+                    .unwrap();
+                }
+                writeln!(out, "            intel = intel.getAsJsonObject(\"intelligence\");").unwrap();
+            }
+
+            if let Some(expected_lang) = &assertions.intel_language {
+                writeln!(
+                    out,
+                    "            assertEquals(\"{}\", intel.get(\"language\").getAsString());",
+                    escape_java_string(expected_lang)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_structures) = assertions.intel_structure_count_min {
+                writeln!(
+                    out,
+                    "            assertTrue(intel.getAsJsonArray(\"structure\").size() >= {}, \"Should have at least {} structure(s)\");",
+                    min_structures,
+                    min_structures
+                )
+                .unwrap();
+            }
+
+            if let Some(expected_kind) = &assertions.intel_structure_contains_kind {
+                writeln!(out, "            boolean foundKind = false;").unwrap();
+                writeln!(
+                    out,
+                    "            for (var elem : intel.getAsJsonArray(\"structure\")) {{"
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "                if (elem.getAsJsonObject().get(\"kind\").getAsString().equals(\"{}\")) {{",
+                    escape_java_string(expected_kind)
+                )
+                .unwrap();
+                writeln!(out, "                    foundKind = true;").unwrap();
+                writeln!(out, "                    break;").unwrap();
+                writeln!(out, "                }}").unwrap();
+                writeln!(out, "            }}").unwrap();
+                writeln!(
+                    out,
+                    "            assertTrue(foundKind, \"Structure should contain a '{}' kind node\");",
+                    escape_java_string(expected_kind)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_imports) = assertions.intel_imports_count_min {
+                writeln!(
+                    out,
+                    "            assertTrue(intel.getAsJsonArray(\"imports\").size() >= {}, \"Should have at least {} import(s)\");",
+                    min_imports,
+                    min_imports
+                )
+                .unwrap();
+            }
+
+            if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+                writeln!(
+                    out,
+                    "            JsonObject metrics = intel.getAsJsonObject(\"metrics\");"
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "            assertTrue(metrics.get(\"total_lines\").getAsInt() >= {}, \"Should have at least {} total line(s)\");",
+                    min_lines,
+                    min_lines
+                )
+                .unwrap();
+            }
+
+            if let Some(expected_error_count) = assertions.intel_metrics_error_count {
+                writeln!(
+                    out,
+                    "            JsonObject metricsObj = intel.getAsJsonObject(\"metrics\");"
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "            assertEquals({}, metricsObj.get(\"error_count\").getAsInt(), \"Expected error_count {}\");",
+                    expected_error_count,
+                    expected_error_count
+                )
+                .unwrap();
+            }
+
+            if assertions.intel_diagnostics_not_empty == Some(true) {
+                writeln!(
+                    out,
+                    "            assertFalse(intel.getAsJsonArray(\"diagnostics\").isEmpty(), \"Diagnostics should not be empty\");"
+                )
+                .unwrap();
+            }
+
             writeln!(out, "        }}").unwrap();
         } else if let Some(lang) = &fixture.language {
             writeln!(out, "        try (var registry = Helpers.createRegistry()) {{").unwrap();

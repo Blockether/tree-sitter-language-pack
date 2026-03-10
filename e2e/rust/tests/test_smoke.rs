@@ -2,6 +2,149 @@
 #![allow(clippy::too_many_lines)]
 
 #[test]
+fn smoke_actionscript() {
+    // Smoke test: load actionscript and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("actionscript").expect("Failed to get parser for 'actionscript'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_ada() {
+    // Smoke test: load ada and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("ada").expect("Failed to get parser for 'ada'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_agda() {
+    // Smoke test: load agda and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("agda").expect("Failed to get parser for 'agda'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_apex() {
+    // Smoke test: load apex and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("apex").expect("Failed to get parser for 'apex'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_arduino() {
+    // Smoke test: load arduino and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("arduino").expect("Failed to get parser for 'arduino'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_asm() {
+    // Smoke test: load asm and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("asm").expect("Failed to get parser for 'asm'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_astro() {
+    // Smoke test: load astro and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("astro").expect("Failed to get parser for 'astro'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_bash() {
+    // Smoke test: load bash and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("bash").expect("Failed to get parser for 'bash'");
+    let tree = parser.parse("echo hello", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_beancount() {
+    // Smoke test: load beancount and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("beancount").expect("Failed to get parser for 'beancount'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_bibtex() {
+    // Smoke test: load bibtex and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("bibtex").expect("Failed to get parser for 'bibtex'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_bicep() {
+    // Smoke test: load bicep and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("bicep").expect("Failed to get parser for 'bicep'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_bitbake() {
+    // Smoke test: load bitbake and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("bitbake").expect("Failed to get parser for 'bitbake'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_bsl() {
+    // Smoke test: load bsl and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("bsl").expect("Failed to get parser for 'bsl'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
 fn smoke_c() {
     // Smoke test: load c and parse a simple snippet
     let mut parser = ts_pack_core::get_parser("c").expect("Failed to get parser for 'c'");
@@ -9,11 +152,117 @@ fn smoke_c() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        root.child_count() >= 1,
-        "Root should have at least 1 child(ren), got {}",
-        root.child_count()
-    );
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_cairo() {
+    // Smoke test: load cairo and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("cairo").expect("Failed to get parser for 'cairo'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_capnp() {
+    // Smoke test: load capnp and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("capnp").expect("Failed to get parser for 'capnp'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_chatito() {
+    // Smoke test: load chatito and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("chatito").expect("Failed to get parser for 'chatito'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_clarity() {
+    // Smoke test: load clarity and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("clarity").expect("Failed to get parser for 'clarity'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_clojure() {
+    // Smoke test: load clojure and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("clojure").expect("Failed to get parser for 'clojure'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_cmake() {
+    // Smoke test: load cmake and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("cmake").expect("Failed to get parser for 'cmake'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_cobol() {
+    // Smoke test: load cobol and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("cobol").expect("Failed to get parser for 'cobol'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_comment() {
+    // Smoke test: load comment and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("comment").expect("Failed to get parser for 'comment'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_commonlisp() {
+    // Smoke test: load commonlisp and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("commonlisp").expect("Failed to get parser for 'commonlisp'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_cpon() {
+    // Smoke test: load cpon and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("cpon").expect("Failed to get parser for 'cpon'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
 }
 
 #[test]
@@ -24,11 +273,293 @@ fn smoke_cpp() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        root.child_count() >= 1,
-        "Root should have at least 1 child(ren), got {}",
-        root.child_count()
-    );
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_css() {
+    // Smoke test: load css and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("css").expect("Failed to get parser for 'css'");
+    let tree = parser.parse("body { color: red; }", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_csv() {
+    // Smoke test: load csv and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("csv").expect("Failed to get parser for 'csv'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_cuda() {
+    // Smoke test: load cuda and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("cuda").expect("Failed to get parser for 'cuda'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_d() {
+    // Smoke test: load d and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("d").expect("Failed to get parser for 'd'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_dart() {
+    // Smoke test: load dart and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("dart").expect("Failed to get parser for 'dart'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_dockerfile() {
+    // Smoke test: load dockerfile and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("dockerfile").expect("Failed to get parser for 'dockerfile'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_doxygen() {
+    // Smoke test: load doxygen and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("doxygen").expect("Failed to get parser for 'doxygen'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_dtd() {
+    // Smoke test: load dtd and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("dtd").expect("Failed to get parser for 'dtd'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_elisp() {
+    // Smoke test: load elisp and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("elisp").expect("Failed to get parser for 'elisp'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_elixir() {
+    // Smoke test: load elixir and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("elixir").expect("Failed to get parser for 'elixir'");
+    let tree = parser.parse("IO.puts(\"hello\")", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_elm() {
+    // Smoke test: load elm and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("elm").expect("Failed to get parser for 'elm'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_erlang() {
+    // Smoke test: load erlang and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("erlang").expect("Failed to get parser for 'erlang'");
+    let tree = parser.parse("main() -> ok.", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_fennel() {
+    // Smoke test: load fennel and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("fennel").expect("Failed to get parser for 'fennel'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_firrtl() {
+    // Smoke test: load firrtl and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("firrtl").expect("Failed to get parser for 'firrtl'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_fish() {
+    // Smoke test: load fish and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("fish").expect("Failed to get parser for 'fish'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_fortran() {
+    // Smoke test: load fortran and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("fortran").expect("Failed to get parser for 'fortran'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_fsharp() {
+    // Smoke test: load fsharp and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("fsharp").expect("Failed to get parser for 'fsharp'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_fsharp_signature() {
+    // Smoke test: load fsharp_signature and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("fsharp_signature").expect("Failed to get parser for 'fsharp_signature'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_func() {
+    // Smoke test: load func and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("func").expect("Failed to get parser for 'func'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_gdscript() {
+    // Smoke test: load gdscript and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("gdscript").expect("Failed to get parser for 'gdscript'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_gitattributes() {
+    // Smoke test: load gitattributes and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("gitattributes").expect("Failed to get parser for 'gitattributes'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_gitcommit() {
+    // Smoke test: load gitcommit and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("gitcommit").expect("Failed to get parser for 'gitcommit'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_gitignore() {
+    // Smoke test: load gitignore and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("gitignore").expect("Failed to get parser for 'gitignore'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_gleam() {
+    // Smoke test: load gleam and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("gleam").expect("Failed to get parser for 'gleam'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_glsl() {
+    // Smoke test: load glsl and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("glsl").expect("Failed to get parser for 'glsl'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_gn() {
+    // Smoke test: load gn and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("gn").expect("Failed to get parser for 'gn'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
 }
 
 #[test]
@@ -39,11 +570,139 @@ fn smoke_go() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        root.child_count() >= 1,
-        "Root should have at least 1 child(ren), got {}",
-        root.child_count()
-    );
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_gomod() {
+    // Smoke test: load gomod and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("gomod").expect("Failed to get parser for 'gomod'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_gosum() {
+    // Smoke test: load gosum and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("gosum").expect("Failed to get parser for 'gosum'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_graphql() {
+    // Smoke test: load graphql and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("graphql").expect("Failed to get parser for 'graphql'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_groovy() {
+    // Smoke test: load groovy and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("groovy").expect("Failed to get parser for 'groovy'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_gstlaunch() {
+    // Smoke test: load gstlaunch and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("gstlaunch").expect("Failed to get parser for 'gstlaunch'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_hack() {
+    // Smoke test: load hack and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("hack").expect("Failed to get parser for 'hack'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_hare() {
+    // Smoke test: load hare and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("hare").expect("Failed to get parser for 'hare'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_haskell() {
+    // Smoke test: load haskell and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("haskell").expect("Failed to get parser for 'haskell'");
+    let tree = parser.parse("main = putStrLn \"hello\"", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_haxe() {
+    // Smoke test: load haxe and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("haxe").expect("Failed to get parser for 'haxe'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_hcl() {
+    // Smoke test: load hcl and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("hcl").expect("Failed to get parser for 'hcl'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_heex() {
+    // Smoke test: load heex and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("heex").expect("Failed to get parser for 'heex'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_hlsl() {
+    // Smoke test: load hlsl and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("hlsl").expect("Failed to get parser for 'hlsl'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
 }
 
 #[test]
@@ -54,26 +713,62 @@ fn smoke_html() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        root.child_count() >= 1,
-        "Root should have at least 1 child(ren), got {}",
-        root.child_count()
-    );
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_hyprlang() {
+    // Smoke test: load hyprlang and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("hyprlang").expect("Failed to get parser for 'hyprlang'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_ini() {
+    // Smoke test: load ini and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("ini").expect("Failed to get parser for 'ini'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_ispc() {
+    // Smoke test: load ispc and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("ispc").expect("Failed to get parser for 'ispc'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_janet() {
+    // Smoke test: load janet and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("janet").expect("Failed to get parser for 'janet'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
 }
 
 #[test]
 fn smoke_java() {
     // Smoke test: load java and parse a simple snippet
     let mut parser = ts_pack_core::get_parser("java").expect("Failed to get parser for 'java'");
-    let tree = parser.parse("class Main { public static void main(String[] args) {} }", None);
+    let tree = parser.parse("class Main {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        root.child_count() >= 1,
-        "Root should have at least 1 child(ren), got {}",
-        root.child_count()
-    );
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
 }
 
 #[test]
@@ -84,11 +779,524 @@ fn smoke_javascript() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        root.child_count() >= 1,
-        "Root should have at least 1 child(ren), got {}",
-        root.child_count()
-    );
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_jsdoc() {
+    // Smoke test: load jsdoc and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("jsdoc").expect("Failed to get parser for 'jsdoc'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_json() {
+    // Smoke test: load json and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("json").expect("Failed to get parser for 'json'");
+    let tree = parser.parse("{\"key\": \"value\"}", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_jsonnet() {
+    // Smoke test: load jsonnet and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("jsonnet").expect("Failed to get parser for 'jsonnet'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_julia() {
+    // Smoke test: load julia and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("julia").expect("Failed to get parser for 'julia'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_kconfig() {
+    // Smoke test: load kconfig and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("kconfig").expect("Failed to get parser for 'kconfig'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_kdl() {
+    // Smoke test: load kdl and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("kdl").expect("Failed to get parser for 'kdl'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_kotlin() {
+    // Smoke test: load kotlin and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("kotlin").expect("Failed to get parser for 'kotlin'");
+    let tree = parser.parse("fun main() {}", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_latex() {
+    // Smoke test: load latex and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("latex").expect("Failed to get parser for 'latex'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_linkerscript() {
+    // Smoke test: load linkerscript and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("linkerscript").expect("Failed to get parser for 'linkerscript'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_llvm() {
+    // Smoke test: load llvm and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("llvm").expect("Failed to get parser for 'llvm'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_lua() {
+    // Smoke test: load lua and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("lua").expect("Failed to get parser for 'lua'");
+    let tree = parser.parse("print('hello')", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_luadoc() {
+    // Smoke test: load luadoc and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("luadoc").expect("Failed to get parser for 'luadoc'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_luap() {
+    // Smoke test: load luap and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("luap").expect("Failed to get parser for 'luap'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_luau() {
+    // Smoke test: load luau and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("luau").expect("Failed to get parser for 'luau'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_magik() {
+    // Smoke test: load magik and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("magik").expect("Failed to get parser for 'magik'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_make() {
+    // Smoke test: load make and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("make").expect("Failed to get parser for 'make'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_markdown() {
+    // Smoke test: load markdown and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("markdown").expect("Failed to get parser for 'markdown'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_markdown_inline() {
+    // Smoke test: load markdown_inline and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("markdown_inline").expect("Failed to get parser for 'markdown_inline'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_matlab() {
+    // Smoke test: load matlab and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("matlab").expect("Failed to get parser for 'matlab'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_mermaid() {
+    // Smoke test: load mermaid and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("mermaid").expect("Failed to get parser for 'mermaid'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_meson() {
+    // Smoke test: load meson and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("meson").expect("Failed to get parser for 'meson'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_netlinx() {
+    // Smoke test: load netlinx and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("netlinx").expect("Failed to get parser for 'netlinx'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_nim() {
+    // Smoke test: load nim and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("nim").expect("Failed to get parser for 'nim'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_ninja() {
+    // Smoke test: load ninja and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("ninja").expect("Failed to get parser for 'ninja'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_nix() {
+    // Smoke test: load nix and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("nix").expect("Failed to get parser for 'nix'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_nqc() {
+    // Smoke test: load nqc and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("nqc").expect("Failed to get parser for 'nqc'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_objc() {
+    // Smoke test: load objc and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("objc").expect("Failed to get parser for 'objc'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_ocaml() {
+    // Smoke test: load ocaml and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("ocaml").expect("Failed to get parser for 'ocaml'");
+    let tree = parser.parse("let () = print_endline \"hello\"", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_ocaml_interface() {
+    // Smoke test: load ocaml_interface and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("ocaml_interface").expect("Failed to get parser for 'ocaml_interface'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_odin() {
+    // Smoke test: load odin and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("odin").expect("Failed to get parser for 'odin'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_org() {
+    // Smoke test: load org and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("org").expect("Failed to get parser for 'org'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_pascal() {
+    // Smoke test: load pascal and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("pascal").expect("Failed to get parser for 'pascal'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_pem() {
+    // Smoke test: load pem and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("pem").expect("Failed to get parser for 'pem'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_perl() {
+    // Smoke test: load perl and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("perl").expect("Failed to get parser for 'perl'");
+    let tree = parser.parse("print 'hello';", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_pgn() {
+    // Smoke test: load pgn and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("pgn").expect("Failed to get parser for 'pgn'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_php() {
+    // Smoke test: load php and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("php").expect("Failed to get parser for 'php'");
+    let tree = parser.parse("<?php echo 'hello'; ?>", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_po() {
+    // Smoke test: load po and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("po").expect("Failed to get parser for 'po'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_pony() {
+    // Smoke test: load pony and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("pony").expect("Failed to get parser for 'pony'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_powershell() {
+    // Smoke test: load powershell and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("powershell").expect("Failed to get parser for 'powershell'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_printf() {
+    // Smoke test: load printf and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("printf").expect("Failed to get parser for 'printf'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_prisma() {
+    // Smoke test: load prisma and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("prisma").expect("Failed to get parser for 'prisma'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_properties() {
+    // Smoke test: load properties and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("properties").expect("Failed to get parser for 'properties'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_proto() {
+    // Smoke test: load proto and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("proto").expect("Failed to get parser for 'proto'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_psv() {
+    // Smoke test: load psv and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("psv").expect("Failed to get parser for 'psv'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_puppet() {
+    // Smoke test: load puppet and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("puppet").expect("Failed to get parser for 'puppet'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_purescript() {
+    // Smoke test: load purescript and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("purescript").expect("Failed to get parser for 'purescript'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_pymanifest() {
+    // Smoke test: load pymanifest and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("pymanifest").expect("Failed to get parser for 'pymanifest'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
 }
 
 #[test]
@@ -99,11 +1307,128 @@ fn smoke_python() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        root.child_count() >= 1,
-        "Root should have at least 1 child(ren), got {}",
-        root.child_count()
-    );
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_qmldir() {
+    // Smoke test: load qmldir and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("qmldir").expect("Failed to get parser for 'qmldir'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_qmljs() {
+    // Smoke test: load qmljs and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("qmljs").expect("Failed to get parser for 'qmljs'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_query() {
+    // Smoke test: load query and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("query").expect("Failed to get parser for 'query'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_r() {
+    // Smoke test: load r and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("r").expect("Failed to get parser for 'r'");
+    let tree = parser.parse("print('hello')", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_racket() {
+    // Smoke test: load racket and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("racket").expect("Failed to get parser for 'racket'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_re2c() {
+    // Smoke test: load re2c and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("re2c").expect("Failed to get parser for 're2c'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_readline() {
+    // Smoke test: load readline and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("readline").expect("Failed to get parser for 'readline'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_rego() {
+    // Smoke test: load rego and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("rego").expect("Failed to get parser for 'rego'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_requirements() {
+    // Smoke test: load requirements and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("requirements").expect("Failed to get parser for 'requirements'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_ron() {
+    // Smoke test: load ron and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("ron").expect("Failed to get parser for 'ron'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_rst() {
+    // Smoke test: load rst and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("rst").expect("Failed to get parser for 'rst'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
 }
 
 #[test]
@@ -114,11 +1439,7 @@ fn smoke_ruby() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        root.child_count() >= 1,
-        "Root should have at least 1 child(ren), got {}",
-        root.child_count()
-    );
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
 }
 
 #[test]
@@ -129,11 +1450,238 @@ fn smoke_rust() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        root.child_count() >= 1,
-        "Root should have at least 1 child(ren), got {}",
-        root.child_count()
-    );
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_scala() {
+    // Smoke test: load scala and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("scala").expect("Failed to get parser for 'scala'");
+    let tree = parser.parse("object Main", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_scheme() {
+    // Smoke test: load scheme and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("scheme").expect("Failed to get parser for 'scheme'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_scss() {
+    // Smoke test: load scss and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("scss").expect("Failed to get parser for 'scss'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_smali() {
+    // Smoke test: load smali and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("smali").expect("Failed to get parser for 'smali'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_smithy() {
+    // Smoke test: load smithy and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("smithy").expect("Failed to get parser for 'smithy'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_solidity() {
+    // Smoke test: load solidity and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("solidity").expect("Failed to get parser for 'solidity'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_sparql() {
+    // Smoke test: load sparql and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("sparql").expect("Failed to get parser for 'sparql'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_sql() {
+    // Smoke test: load sql and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("sql").expect("Failed to get parser for 'sql'");
+    let tree = parser.parse("SELECT 1;", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_squirrel() {
+    // Smoke test: load squirrel and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("squirrel").expect("Failed to get parser for 'squirrel'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_starlark() {
+    // Smoke test: load starlark and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("starlark").expect("Failed to get parser for 'starlark'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_svelte() {
+    // Smoke test: load svelte and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("svelte").expect("Failed to get parser for 'svelte'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_swift() {
+    // Smoke test: load swift and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("swift").expect("Failed to get parser for 'swift'");
+    let tree = parser.parse("print(\"hello\")", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_tablegen() {
+    // Smoke test: load tablegen and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("tablegen").expect("Failed to get parser for 'tablegen'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_tcl() {
+    // Smoke test: load tcl and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("tcl").expect("Failed to get parser for 'tcl'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_terraform() {
+    // Smoke test: load terraform and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("terraform").expect("Failed to get parser for 'terraform'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_test() {
+    // Smoke test: load test and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("test").expect("Failed to get parser for 'test'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_thrift() {
+    // Smoke test: load thrift and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("thrift").expect("Failed to get parser for 'thrift'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_toml() {
+    // Smoke test: load toml and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("toml").expect("Failed to get parser for 'toml'");
+    let tree = parser.parse("key = \"value\"", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_tsv() {
+    // Smoke test: load tsv and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("tsv").expect("Failed to get parser for 'tsv'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_tsx() {
+    // Smoke test: load tsx and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("tsx").expect("Failed to get parser for 'tsx'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_twig() {
+    // Smoke test: load twig and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("twig").expect("Failed to get parser for 'twig'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
 }
 
 #[test]
@@ -144,9 +1692,181 @@ fn smoke_typescript() {
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
-    assert!(
-        root.child_count() >= 1,
-        "Root should have at least 1 child(ren), got {}",
-        root.child_count()
-    );
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_typst() {
+    // Smoke test: load typst and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("typst").expect("Failed to get parser for 'typst'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_udev() {
+    // Smoke test: load udev and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("udev").expect("Failed to get parser for 'udev'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_ungrammar() {
+    // Smoke test: load ungrammar and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("ungrammar").expect("Failed to get parser for 'ungrammar'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_uxntal() {
+    // Smoke test: load uxntal and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("uxntal").expect("Failed to get parser for 'uxntal'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_v() {
+    // Smoke test: load v and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("v").expect("Failed to get parser for 'v'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_verilog() {
+    // Smoke test: load verilog and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("verilog").expect("Failed to get parser for 'verilog'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_vhdl() {
+    // Smoke test: load vhdl and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("vhdl").expect("Failed to get parser for 'vhdl'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_vim() {
+    // Smoke test: load vim and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("vim").expect("Failed to get parser for 'vim'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_vue() {
+    // Smoke test: load vue and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("vue").expect("Failed to get parser for 'vue'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_wast() {
+    // Smoke test: load wast and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("wast").expect("Failed to get parser for 'wast'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_wat() {
+    // Smoke test: load wat and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("wat").expect("Failed to get parser for 'wat'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_wgsl() {
+    // Smoke test: load wgsl and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("wgsl").expect("Failed to get parser for 'wgsl'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_xcompose() {
+    // Smoke test: load xcompose and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("xcompose").expect("Failed to get parser for 'xcompose'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_xml() {
+    // Smoke test: load xml and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("xml").expect("Failed to get parser for 'xml'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_yuck() {
+    // Smoke test: load yuck and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("yuck").expect("Failed to get parser for 'yuck'");
+    let tree = parser.parse("x", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
+}
+
+#[test]
+fn smoke_zig() {
+    // Smoke test: load zig and parse a simple snippet
+    let mut parser = ts_pack_core::get_parser("zig").expect("Failed to get parser for 'zig'");
+    let tree = parser.parse("pub fn main() void {}", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(root.child_count() >= 1, "Root should have at least 1 child(ren), got {}", root.child_count());
 }

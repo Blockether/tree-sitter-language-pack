@@ -43,7 +43,8 @@ defmodule E2eTests.MixProject do
 
   defp deps do
     [
-      {:tree_sitter_language_pack, path: "../../crates/ts-pack-elixir"}
+      {:tree_sitter_language_pack, path: "../../crates/ts-pack-elixir"},
+      {:jason, "~> 1.4"}
     ]
   end
 end
@@ -58,6 +59,29 @@ ExUnit.start()
 "#;
     std::fs::write(dir.join("test").join("test_helper.exs"), content)
         .map_err(|e| format!("Failed to write test_helper.exs: {e}"))
+}
+
+fn has_intel_assertions(fixture: &Fixture) -> bool {
+    if let Some(assertions) = &fixture.assertions {
+        assertions.intel_language.is_some()
+            || assertions.intel_structure_count_min.is_some()
+            || assertions.intel_structure_contains_kind.is_some()
+            || assertions.intel_imports_count_min.is_some()
+            || assertions.intel_metrics_total_lines_min.is_some()
+            || assertions.intel_metrics_error_count.is_some()
+            || assertions.intel_diagnostics_not_empty.is_some()
+            || assertions.intel_chunk_count_min.is_some()
+    } else {
+        false
+    }
+}
+
+fn has_chunk_assertions(fixture: &Fixture) -> bool {
+    if let Some(assertions) = &fixture.assertions {
+        assertions.intel_chunk_count_min.is_some() || assertions.intel_chunk_max_size.is_some()
+    } else {
+        false
+    }
 }
 
 fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
@@ -131,6 +155,77 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 expected
             )
             .unwrap();
+        } else if has_intel_assertions(fixture) {
+            let lang = fixture.language.as_deref().unwrap_or("unknown");
+            let source = fixture.source_code.as_deref().unwrap_or("");
+
+            if has_chunk_assertions(fixture) {
+                let chunk_size = assertions.and_then(|a| a.intel_chunk_max_size).unwrap_or(1024);
+                writeln!(
+                    out,
+                    "    result_json = TreeSitterLanguagePack.process_and_chunk(\"{}\", \"{}\", {})",
+                    escape_elixir_string(source),
+                    escape_elixir_string(lang),
+                    chunk_size
+                )
+                .unwrap();
+                writeln!(out, "    result = Jason.decode!(result_json)").unwrap();
+                writeln!(out, "    intel = result[\"intelligence\"]").unwrap();
+                writeln!(out, "    chunks = result[\"chunks\"]").unwrap();
+            } else {
+                writeln!(
+                    out,
+                    "    result_json = TreeSitterLanguagePack.process(\"{}\", \"{}\")",
+                    escape_elixir_string(source),
+                    escape_elixir_string(lang)
+                )
+                .unwrap();
+                writeln!(out, "    intel = Jason.decode!(result_json)").unwrap();
+            }
+
+            if let Some(expected_lang) = assertions.and_then(|a| a.intel_language.as_deref()) {
+                writeln!(
+                    out,
+                    "    assert intel[\"language\"] == \"{}\"",
+                    escape_elixir_string(expected_lang)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_count) = assertions.and_then(|a| a.intel_structure_count_min) {
+                writeln!(out, "    assert length(intel[\"structure\"]) >= {}", min_count).unwrap();
+            }
+
+            if let Some(kind) = assertions.and_then(|a| a.intel_structure_contains_kind.as_deref()) {
+                writeln!(
+                    out,
+                    "    assert Enum.any?(intel[\"structure\"], fn s -> s[\"kind\"] == \"{}\" end)",
+                    escape_elixir_string(kind)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_count) = assertions.and_then(|a| a.intel_imports_count_min) {
+                writeln!(out, "    assert length(intel[\"imports\"]) >= {}", min_count).unwrap();
+            }
+
+            if let Some(min_lines) = assertions.and_then(|a| a.intel_metrics_total_lines_min) {
+                writeln!(out, "    assert intel[\"metrics\"][\"total_lines\"] >= {}", min_lines).unwrap();
+            }
+
+            if let Some(error_count) = assertions.and_then(|a| a.intel_metrics_error_count) {
+                writeln!(out, "    assert intel[\"metrics\"][\"error_count\"] == {}", error_count).unwrap();
+            }
+
+            if assertions.is_some_and(|a| a.intel_diagnostics_not_empty == Some(true)) {
+                writeln!(out, "    assert length(intel[\"diagnostics\"]) > 0").unwrap();
+            }
+
+            if has_chunk_assertions(fixture)
+                && let Some(min_chunks) = assertions.and_then(|a| a.intel_chunk_count_min)
+            {
+                writeln!(out, "    assert length(chunks) >= {}", min_chunks).unwrap();
+            }
         } else if let Some(lang) = &fixture.language {
             // Parsing test: use parse_string and tree inspection functions
             let source = fixture.source_code.as_deref().unwrap_or("");

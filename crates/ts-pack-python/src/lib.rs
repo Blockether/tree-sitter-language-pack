@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
-use pyo3::types::PyList;
+use pyo3::types::{PyDict, PyList};
+use std::sync::Mutex;
 
 pyo3::create_exception!(
     tree_sitter_language_pack,
@@ -7,8 +8,16 @@ pyo3::create_exception!(
     pyo3::exceptions::PyValueError
 );
 
+pyo3::create_exception!(tree_sitter_language_pack, ParseError, pyo3::exceptions::PyRuntimeError);
+
+pyo3::create_exception!(tree_sitter_language_pack, QueryError, pyo3::exceptions::PyValueError);
+
 /// The PyCapsule name used by the tree-sitter Python package.
 const CAPSULE_NAME: &std::ffi::CStr = c"tree_sitter.Language";
+
+// ---------------------------------------------------------------------------
+// Language discovery
+// ---------------------------------------------------------------------------
 
 /// Returns a PyCapsule wrapping the raw TSLanguage pointer.
 /// The capsule name is "tree_sitter.Language\0" for compatibility with the
@@ -72,13 +81,228 @@ fn has_language(name: &str) -> bool {
     ts_pack_core::has_language(name)
 }
 
+/// Returns the number of available languages.
+#[pyfunction]
+fn language_count() -> usize {
+    ts_pack_core::language_count()
+}
+
+// ---------------------------------------------------------------------------
+// Opaque tree handle
+// ---------------------------------------------------------------------------
+
+/// Wraps a tree-sitter Tree for safe sharing across the Python boundary.
+#[pyclass]
+struct TreeHandle {
+    inner: Mutex<tree_sitter::Tree>,
+    source: Vec<u8>,
+}
+
+#[pymethods]
+impl TreeHandle {
+    /// Returns the type name of the root node.
+    fn root_node_type(&self) -> PyResult<String> {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        Ok(guard.root_node().kind().to_string())
+    }
+
+    /// Returns the number of named children of the root node.
+    fn root_child_count(&self) -> PyResult<u32> {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        Ok(guard.root_node().named_child_count() as u32)
+    }
+
+    /// Check whether any node in the tree has the given type name.
+    fn contains_node_type(&self, node_type: &str) -> PyResult<bool> {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        Ok(ts_pack_core::tree_contains_node_type(&guard, node_type))
+    }
+
+    /// Check whether the tree contains any ERROR or MISSING nodes.
+    fn has_error_nodes(&self) -> PyResult<bool> {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        Ok(ts_pack_core::tree_has_error_nodes(&guard))
+    }
+
+    /// Returns the S-expression representation of the tree.
+    fn to_sexp(&self) -> PyResult<String> {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        Ok(ts_pack_core::tree_to_sexp(&guard))
+    }
+
+    /// Returns the count of ERROR and MISSING nodes in the tree.
+    fn error_count(&self) -> PyResult<usize> {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        Ok(ts_pack_core::tree_error_count(&guard))
+    }
+
+    /// Returns information about the root node as a dict.
+    fn root_node_info(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        let info = ts_pack_core::root_node_info(&guard);
+        node_info_to_dict(py, &info)
+    }
+
+    /// Finds all nodes matching the given type and returns their info as a list of dicts.
+    fn find_nodes_by_type(&self, py: Python<'_>, node_type: &str) -> PyResult<Py<PyAny>> {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        let nodes = ts_pack_core::find_nodes_by_type(&guard, node_type);
+        let py_list: Vec<Py<PyAny>> = nodes
+            .iter()
+            .map(|info| node_info_to_dict(py, info))
+            .collect::<PyResult<_>>()?;
+        let list = PyList::new(py, &py_list)?;
+        Ok(list.into_any().unbind())
+    }
+
+    /// Returns info for all named children of the root node.
+    fn named_children_info(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        let nodes = ts_pack_core::named_children_info(&guard);
+        let py_list: Vec<Py<PyAny>> = nodes
+            .iter()
+            .map(|info| node_info_to_dict(py, info))
+            .collect::<PyResult<_>>()?;
+        let list = PyList::new(py, &py_list)?;
+        Ok(list.into_any().unbind())
+    }
+
+    /// Extracts source text for a node given its start_byte and end_byte.
+    fn extract_text(&self, start_byte: usize, end_byte: usize) -> PyResult<String> {
+        let info = ts_pack_core::NodeInfo {
+            kind: String::new(),
+            is_named: false,
+            start_byte,
+            end_byte,
+            start_row: 0,
+            start_col: 0,
+            end_row: 0,
+            end_col: 0,
+            named_child_count: 0,
+            is_error: false,
+            is_missing: false,
+        };
+        ts_pack_core::extract_text(&self.source, &info)
+            .map(|s| s.to_string())
+            .map_err(|e| ParseError::new_err(format!("{e}")))
+    }
+
+    /// Runs a tree-sitter query and returns matches as a list of dicts.
+    fn run_query(&self, py: Python<'_>, language: &str, query_source: &str) -> PyResult<Py<PyAny>> {
+        let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
+        let matches = ts_pack_core::run_query(&guard, language, query_source, &self.source)
+            .map_err(|e| QueryError::new_err(format!("{e}")))?;
+
+        let py_matches: Vec<Py<PyAny>> = matches
+            .iter()
+            .map(|m| query_match_to_dict(py, m))
+            .collect::<PyResult<_>>()?;
+        let list = PyList::new(py, &py_matches)?;
+        Ok(list.into_any().unbind())
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Parsing
+// ---------------------------------------------------------------------------
+
+/// Parse source code with the named language, returning a TreeHandle.
+#[pyfunction]
+fn parse_string(language: &str, source: &str) -> PyResult<TreeHandle> {
+    let source_bytes = source.as_bytes();
+    let tree = ts_pack_core::parse_string(language, source_bytes).map_err(|e| ParseError::new_err(format!("{e}")))?;
+    Ok(TreeHandle {
+        inner: Mutex::new(tree),
+        source: source_bytes.to_vec(),
+    })
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+fn node_info_to_dict(py: Python<'_>, info: &ts_pack_core::NodeInfo) -> PyResult<Py<PyAny>> {
+    let dict = PyDict::new(py);
+    dict.set_item("kind", &info.kind)?;
+    dict.set_item("is_named", info.is_named)?;
+    dict.set_item("start_byte", info.start_byte)?;
+    dict.set_item("end_byte", info.end_byte)?;
+    dict.set_item("start_row", info.start_row)?;
+    dict.set_item("start_column", info.start_col)?;
+    dict.set_item("end_row", info.end_row)?;
+    dict.set_item("end_column", info.end_col)?;
+    dict.set_item("named_child_count", info.named_child_count)?;
+    dict.set_item("is_error", info.is_error)?;
+    dict.set_item("is_missing", info.is_missing)?;
+    Ok(dict.into_any().unbind())
+}
+
+fn query_match_to_dict(py: Python<'_>, qm: &ts_pack_core::QueryMatch) -> PyResult<Py<PyAny>> {
+    let dict = PyDict::new(py);
+    dict.set_item("pattern_index", qm.pattern_index)?;
+
+    let captures: Vec<Py<PyAny>> = qm
+        .captures
+        .iter()
+        .map(|(name, info)| {
+            let capture_dict = PyDict::new(py);
+            capture_dict.set_item("name", name)?;
+            capture_dict.set_item("node", node_info_to_dict(py, info)?)?;
+            Ok(capture_dict.into_any().unbind())
+        })
+        .collect::<PyResult<_>>()?;
+
+    let captures_list = PyList::new(py, &captures)?;
+    dict.set_item("captures", captures_list)?;
+    Ok(dict.into_any().unbind())
+}
+
+// ---------------------------------------------------------------------------
+// Intel: process / process_and_chunk
+// ---------------------------------------------------------------------------
+
+/// Process source code and extract file intelligence as a JSON string.
+#[pyfunction]
+fn process(source: &str, language: &str) -> PyResult<String> {
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let intel = registry
+        .process(source, language)
+        .map_err(|e| ParseError::new_err(format!("{e}")))?;
+    serde_json::to_string(&intel).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))
+}
+
+/// Process and chunk source code, returning intelligence + chunks as a JSON string.
+#[pyfunction]
+fn process_and_chunk(source: &str, language: &str, max_chunk_size: usize) -> PyResult<String> {
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let (intel, chunks) = registry
+        .process_and_chunk(source, language, max_chunk_size)
+        .map_err(|e| ParseError::new_err(format!("{e}")))?;
+    let result = serde_json::json!({
+        "intelligence": intel,
+        "chunks": chunks,
+    });
+    serde_json::to_string(&result).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))
+}
+
+// ---------------------------------------------------------------------------
+// Module registration
+// ---------------------------------------------------------------------------
+
 #[pymodule]
 fn _native(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("LanguageNotFoundError", py.get_type::<LanguageNotFoundError>())?;
+    m.add("ParseError", py.get_type::<ParseError>())?;
+    m.add("QueryError", py.get_type::<QueryError>())?;
+    m.add_class::<TreeHandle>()?;
     m.add_function(wrap_pyfunction!(get_binding, m)?)?;
     m.add_function(wrap_pyfunction!(get_language, m)?)?;
     m.add_function(wrap_pyfunction!(get_parser, m)?)?;
     m.add_function(wrap_pyfunction!(available_languages, m)?)?;
     m.add_function(wrap_pyfunction!(has_language, m)?)?;
+    m.add_function(wrap_pyfunction!(language_count, m)?)?;
+    m.add_function(wrap_pyfunction!(parse_string, m)?)?;
+    m.add_function(wrap_pyfunction!(process, m)?)?;
+    m.add_function(wrap_pyfunction!(process_and_chunk, m)?)?;
     Ok(())
 }

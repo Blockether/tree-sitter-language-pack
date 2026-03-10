@@ -110,10 +110,32 @@ export {
   treeContainsNodeType,
   treeHasErrorNodes,
   freeTree,
+  process,
+  processAndChunk,
 } from "@kreuzberg/tree-sitter-language-pack-wasm";
 "#;
     std::fs::write(dir.join("tests").join("helpers.ts"), content)
         .map_err(|e| format!("Failed to write helpers.ts: {e}"))
+}
+
+fn has_intel_assertions(fixture: &Fixture) -> bool {
+    fixture.assertions.as_ref().is_some_and(|a| {
+        a.intel_language.is_some()
+            || a.intel_structure_count_min.is_some()
+            || a.intel_structure_contains_kind.is_some()
+            || a.intel_imports_count_min.is_some()
+            || a.intel_metrics_total_lines_min.is_some()
+            || a.intel_metrics_error_count.is_some()
+            || a.intel_diagnostics_not_empty.is_some()
+            || a.intel_chunk_count_min.is_some()
+    })
+}
+
+fn has_chunk_assertions(fixture: &Fixture) -> bool {
+    fixture
+        .assertions
+        .as_ref()
+        .is_some_and(|a| a.intel_chunk_count_min.is_some())
 }
 
 fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
@@ -134,6 +156,8 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
   treeContainsNodeType,
   treeHasErrorNodes,
   freeTree,
+  process,
+  processAndChunk,
 }} from \"./helpers\";"
     )
     .unwrap();
@@ -186,6 +210,109 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 expected
             )
             .unwrap();
+        } else if has_intel_assertions(fixture) {
+            let lang = fixture.language.as_deref().unwrap_or("unknown");
+            let source = fixture.source_code.as_deref().unwrap_or("");
+            let assertions = assertions.unwrap();
+
+            if has_chunk_assertions(fixture) {
+                if let Some(max_chunk_size) = assertions.intel_chunk_count_min {
+                    writeln!(
+                        out,
+                        "    const resultJson = processAndChunk(\"{}\", \"{}\", {});",
+                        escape_js_string(source),
+                        escape_js_string(lang),
+                        max_chunk_size
+                    )
+                    .unwrap();
+                }
+            } else {
+                writeln!(
+                    out,
+                    "    const resultJson = process(\"{}\", \"{}\");",
+                    escape_js_string(source),
+                    escape_js_string(lang)
+                )
+                .unwrap();
+            }
+
+            writeln!(out, "    const result = JSON.parse(resultJson);").unwrap();
+
+            if has_chunk_assertions(fixture) {
+                writeln!(out, "    const intel = result.intelligence;").unwrap();
+                writeln!(out, "    const chunks = result.chunks;").unwrap();
+            } else {
+                writeln!(out, "    const intel = result;").unwrap();
+            }
+
+            if let Some(expected_lang) = &assertions.intel_language {
+                writeln!(
+                    out,
+                    "    expect(intel.language).toBe(\"{}\");",
+                    escape_js_string(expected_lang)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_structures) = assertions.intel_structure_count_min {
+                writeln!(
+                    out,
+                    "    expect((intel.structure || []).length).toBeGreaterThanOrEqual({});",
+                    min_structures
+                )
+                .unwrap();
+            }
+
+            if let Some(expected_kind) = &assertions.intel_structure_contains_kind {
+                writeln!(
+                    out,
+                    "    expect((intel.structure || []).some((s: any) => s.kind === \"{}\")).toBe(true);",
+                    escape_js_string(expected_kind)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_imports) = assertions.intel_imports_count_min {
+                writeln!(
+                    out,
+                    "    expect((intel.imports || []).length).toBeGreaterThanOrEqual({});",
+                    min_imports
+                )
+                .unwrap();
+            }
+
+            if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+                writeln!(
+                    out,
+                    "    expect((intel.metrics || {{}}).total_lines || 0).toBeGreaterThanOrEqual({});",
+                    min_lines
+                )
+                .unwrap();
+            }
+
+            if let Some(expected_error_count) = assertions.intel_metrics_error_count {
+                writeln!(
+                    out,
+                    "    expect((intel.metrics || {{}}).error_count || 0).toBe({});",
+                    expected_error_count
+                )
+                .unwrap();
+            }
+
+            if assertions.intel_diagnostics_not_empty == Some(true) {
+                writeln!(out, "    expect((intel.diagnostics || []).length).toBeGreaterThan(0);").unwrap();
+            }
+
+            if has_chunk_assertions(fixture)
+                && let Some(min_chunks) = assertions.intel_chunk_count_min
+            {
+                writeln!(
+                    out,
+                    "    expect((chunks || []).length).toBeGreaterThanOrEqual({});",
+                    min_chunks
+                )
+                .unwrap();
+            }
         } else if let Some(lang) = &fixture.language {
             // WASM has full parse API — use parseString + tree inspection
             writeln!(

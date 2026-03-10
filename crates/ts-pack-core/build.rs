@@ -74,7 +74,7 @@ fn selected_languages(definitions: &BTreeMap<String, LanguageDefinition>) -> Vec
     }
 
     if selected.is_empty() {
-        return definitions.keys().cloned().collect();
+        return Vec::new();
     }
 
     selected

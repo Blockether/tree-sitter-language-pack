@@ -38,13 +38,20 @@ publish = false
 
 [workspace]
 
-[dependencies]
-ts-pack-core = { path = "../../crates/ts-pack-core" }
+[workspace.dependencies]
+ts-pack-core = { path = "../../crates/ts-pack-core", features = ["serde"] }
 tree-sitter = "0.26"
+serde_json = "1"
+
+[dependencies]
+ts-pack-core = { workspace = true }
+tree-sitter = { workspace = true }
+serde_json = { workspace = true }
 
 [dev-dependencies]
-ts-pack-core = { path = "../../crates/ts-pack-core" }
-tree-sitter = "0.26"
+ts-pack-core = { workspace = true }
+tree-sitter = { workspace = true }
+serde_json = { workspace = true }
 "#;
     std::fs::write(dir.join("Cargo.toml"), content).map_err(|e| format!("Failed to write Cargo.toml: {e}"))
 }
@@ -82,6 +89,147 @@ pub fn tree_has_error_nodes(node: tree_sitter::Node) -> bool {
 }
 "#;
     std::fs::write(dir.join("src").join("lib.rs"), content).map_err(|e| format!("Failed to write lib.rs: {e}"))
+}
+
+/// Check if a fixture has any intel-related assertions.
+fn has_intel_assertions(fixture: &Fixture) -> bool {
+    fixture.assertions.as_ref().is_some_and(|a| {
+        a.intel_language.is_some()
+            || a.intel_structure_count_min.is_some()
+            || a.intel_structure_contains_kind.is_some()
+            || a.intel_imports_count_min.is_some()
+            || a.intel_metrics_total_lines_min.is_some()
+            || a.intel_metrics_error_count.is_some()
+            || a.intel_diagnostics_not_empty.is_some()
+            || a.intel_chunk_count_min.is_some()
+    })
+}
+
+/// Check if a fixture has chunk-related assertions (requires process_and_chunk).
+fn has_chunk_assertions(fixture: &Fixture) -> bool {
+    fixture
+        .assertions
+        .as_ref()
+        .is_some_and(|a| a.intel_chunk_count_min.is_some())
+}
+
+/// Map a fixture kind string to a Rust StructureKind variant expression.
+fn structure_kind_variant(kind: &str) -> String {
+    match kind {
+        "function" => "ts_pack_core::StructureKind::Function".to_string(),
+        "method" => "ts_pack_core::StructureKind::Method".to_string(),
+        "class" => "ts_pack_core::StructureKind::Class".to_string(),
+        "struct" => "ts_pack_core::StructureKind::Struct".to_string(),
+        "interface" => "ts_pack_core::StructureKind::Interface".to_string(),
+        "enum" => "ts_pack_core::StructureKind::Enum".to_string(),
+        "module" => "ts_pack_core::StructureKind::Module".to_string(),
+        "trait" => "ts_pack_core::StructureKind::Trait".to_string(),
+        "impl" => "ts_pack_core::StructureKind::Impl".to_string(),
+        "namespace" => "ts_pack_core::StructureKind::Namespace".to_string(),
+        other => format!(
+            "ts_pack_core::StructureKind::Other(\"{}\".to_string())",
+            escape_rust_string(other)
+        ),
+    }
+}
+
+/// Write intel assertion code for a fixture.
+fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
+    let assertions = fixture.assertions.as_ref().unwrap();
+    let lang = fixture.language.as_deref().unwrap_or("unknown");
+    let source = fixture.source_code.as_deref().unwrap_or("");
+
+    writeln!(out, "    // {}", fixture.description).unwrap();
+    writeln!(out, "    let registry = ts_pack_core::LanguageRegistry::new();").unwrap();
+
+    if has_chunk_assertions(fixture) {
+        let max_size = assertions.intel_chunk_max_size.unwrap_or(1000);
+        writeln!(
+            out,
+            "    let (intel, chunks) = registry.process_and_chunk(\"{}\", \"{}\", {}).expect(\"process_and_chunk failed\");",
+            escape_rust_string(source),
+            escape_rust_string(lang),
+            max_size
+        )
+        .unwrap();
+
+        // Chunk assertions
+        if let Some(min_chunks) = assertions.intel_chunk_count_min {
+            writeln!(
+                out,
+                "    assert!(chunks.len() >= {min_chunks}, \"Expected at least {min_chunks} chunk(s), got {{}}\", chunks.len());"
+            )
+            .unwrap();
+        }
+    } else {
+        writeln!(
+            out,
+            "    let intel = registry.process(\"{}\", \"{}\").expect(\"process failed\");",
+            escape_rust_string(source),
+            escape_rust_string(lang)
+        )
+        .unwrap();
+    }
+
+    // Intel field assertions
+    if let Some(expected_lang) = &assertions.intel_language {
+        writeln!(
+            out,
+            "    assert_eq!(intel.language, \"{}\", \"intel.language mismatch\");",
+            escape_rust_string(expected_lang)
+        )
+        .unwrap();
+    }
+
+    if let Some(min_count) = assertions.intel_structure_count_min {
+        writeln!(
+            out,
+            "    assert!(intel.structure.len() >= {min_count}, \"Expected at least {min_count} structure item(s), got {{}}\", intel.structure.len());"
+        )
+        .unwrap();
+    }
+
+    if let Some(kind) = &assertions.intel_structure_contains_kind {
+        let variant = structure_kind_variant(kind);
+        writeln!(
+            out,
+            "    assert!(intel.structure.iter().any(|s| s.kind == {variant}), \"Structure should contain a '{}' item\");",
+            escape_rust_string(kind)
+        )
+        .unwrap();
+    }
+
+    if let Some(min_imports) = assertions.intel_imports_count_min {
+        writeln!(
+            out,
+            "    assert!(intel.imports.len() >= {min_imports}, \"Expected at least {min_imports} import(s), got {{}}\", intel.imports.len());"
+        )
+        .unwrap();
+    }
+
+    if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+        writeln!(
+            out,
+            "    assert!(intel.metrics.total_lines >= {min_lines}, \"Expected at least {min_lines} total line(s), got {{}}\", intel.metrics.total_lines);"
+        )
+        .unwrap();
+    }
+
+    if let Some(expected_errors) = assertions.intel_metrics_error_count {
+        writeln!(
+            out,
+            "    assert_eq!(intel.metrics.error_count, {expected_errors}, \"Expected error_count == {expected_errors}, got {{}}\", intel.metrics.error_count);"
+        )
+        .unwrap();
+    }
+
+    if assertions.intel_diagnostics_not_empty == Some(true) {
+        writeln!(
+            out,
+            "    assert!(!intel.diagnostics.is_empty(), \"diagnostics should not be empty\");"
+        )
+        .unwrap();
+    }
 }
 
 fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
@@ -150,6 +298,9 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 escape_rust_string(lang)
             )
             .unwrap();
+        } else if has_intel_assertions(fixture) {
+            // Intel test: call process() or process_and_chunk()
+            write_intel_assertions(&mut out, fixture);
         } else {
             // Parsing test
             if let Some(lang) = &fixture.language {

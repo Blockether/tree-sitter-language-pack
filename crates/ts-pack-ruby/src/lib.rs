@@ -25,16 +25,12 @@ impl TreeWrapper {
 
     fn contains_node_type(&self, node_type: String) -> Result<bool, Error> {
         let guard = self.0.lock().map_err(|_| lock_error())?;
-        let mut cursor = guard.walk();
-        Ok(traverse_looking_for(&mut cursor, |node| node.kind() == node_type))
+        Ok(ts_pack_core::tree_contains_node_type(&guard, &node_type))
     }
 
     fn has_error_nodes(&self) -> Result<bool, Error> {
         let guard = self.0.lock().map_err(|_| lock_error())?;
-        let mut cursor = guard.walk();
-        Ok(traverse_looking_for(&mut cursor, |node| {
-            node.is_error() || node.is_missing()
-        }))
+        Ok(ts_pack_core::tree_has_error_nodes(&guard))
     }
 }
 
@@ -58,39 +54,31 @@ fn get_language_ptr(ruby: &Ruby, name: String) -> Result<u64, Error> {
 }
 
 fn parse_string(ruby: &Ruby, language: String, source: String) -> Result<TreeWrapper, Error> {
-    let lang = ts_pack_core::get_language(&language).map_err(|_| {
-        Error::new(
-            ruby.exception_runtime_error(),
-            format!("language not found: {language}"),
-        )
-    })?;
-    let mut parser = tree_sitter::Parser::new();
-    parser
-        .set_language(&lang)
-        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("failed to set language: {e}")))?;
-    let tree = parser
-        .parse(source.as_bytes(), None)
-        .ok_or_else(|| Error::new(ruby.exception_runtime_error(), "parsing returned no tree".to_string()))?;
+    let tree = ts_pack_core::parse_string(&language, source.as_bytes())
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
     Ok(TreeWrapper(Mutex::new(tree)))
 }
 
-fn traverse_looking_for(cursor: &mut tree_sitter::TreeCursor, predicate: impl Fn(tree_sitter::Node) -> bool) -> bool {
-    loop {
-        if predicate(cursor.node()) {
-            return true;
-        }
-        if cursor.goto_first_child() {
-            continue;
-        }
-        loop {
-            if cursor.goto_next_sibling() {
-                break;
-            }
-            if !cursor.goto_parent() {
-                return false;
-            }
-        }
-    }
+fn process(ruby: &Ruby, source: String, language: String) -> Result<String, Error> {
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let intel = registry
+        .process(&source, &language)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
+    serde_json::to_string(&intel)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
+}
+
+fn process_and_chunk(ruby: &Ruby, source: String, language: String, max_chunk_size: usize) -> Result<String, Error> {
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let (intel, chunks) = registry
+        .process_and_chunk(&source, &language, max_chunk_size)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
+    let result = serde_json::json!({
+        "intelligence": intel,
+        "chunks": chunks,
+    });
+    serde_json::to_string(&result)
+        .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("serialization failed: {e}")))
 }
 
 #[magnus::init]
@@ -102,6 +90,8 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     module.define_module_function("language_count", function!(language_count, 0))?;
     module.define_module_function("get_language_ptr", function!(get_language_ptr, 1))?;
     module.define_module_function("parse_string", function!(parse_string, 2))?;
+    module.define_module_function("process", function!(process, 2))?;
+    module.define_module_function("process_and_chunk", function!(process_and_chunk, 3))?;
 
     let tree_class = module.define_class("Tree", ruby.class_object())?;
     tree_class.define_method("root_node_type", method!(TreeWrapper::root_node_type, 0))?;

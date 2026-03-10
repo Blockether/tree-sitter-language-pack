@@ -11,9 +11,38 @@ import {
   treeContainsNodeType,
   treeHasErrorNodes,
   freeTree,
+  process,
+  processAndChunk,
 } from "./helpers";
 
 describe("smoke", () => {
+  it("smoke_astro", () => {
+    // Smoke test: load astro and parse a simple snippet
+    const tree = parseString("astro", `x`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_css", () => {
+    // Smoke test: load css and parse a simple snippet
+    const tree = parseString("css", `body { color: red; }`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_graphql", () => {
+    // Smoke test: load graphql and parse a simple snippet
+    const tree = parseString("graphql", `x`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
   it("smoke_html", () => {
     // Smoke test: load html and parse a simple snippet
     const tree = parseString("html", `<p>hello</p>`);
@@ -32,9 +61,81 @@ describe("smoke", () => {
     freeTree(tree);
   });
 
+  it("smoke_jsdoc", () => {
+    // Smoke test: load jsdoc and parse a simple snippet
+    const tree = parseString("jsdoc", `x`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_json", () => {
+    // Smoke test: load json and parse a simple snippet
+    const tree = parseString("json", `{\"key\": \"value\"}`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_prisma", () => {
+    // Smoke test: load prisma and parse a simple snippet
+    const tree = parseString("prisma", `x`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_scss", () => {
+    // Smoke test: load scss and parse a simple snippet
+    const tree = parseString("scss", `x`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_svelte", () => {
+    // Smoke test: load svelte and parse a simple snippet
+    const tree = parseString("svelte", `x`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_tsx", () => {
+    // Smoke test: load tsx and parse a simple snippet
+    const tree = parseString("tsx", `x`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_twig", () => {
+    // Smoke test: load twig and parse a simple snippet
+    const tree = parseString("twig", `x`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
   it("smoke_typescript", () => {
     // Smoke test: load typescript and parse a simple snippet
     const tree = parseString("typescript", `const x: number = 42;`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);
+    freeTree(tree);
+  });
+
+  it("smoke_vue", () => {
+    // Smoke test: load vue and parse a simple snippet
+    const tree = parseString("vue", `x`);
     expect(tree).toBeTruthy();
     expect(tree).not.toBeNull();
     expect(treeRootChildCount(tree)).toBeGreaterThanOrEqual(1);

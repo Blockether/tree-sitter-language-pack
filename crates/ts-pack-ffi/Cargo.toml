@@ -10,7 +10,8 @@ description = "C FFI bindings for tree-sitter language pack"
 crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
-ts-pack-core = { path = "../ts-pack-core" }
+ts-pack-core = { path = "../ts-pack-core", features = ["serde"] }
+serde_json = { workspace = true }
 tree-sitter = { workspace = true }
 
 [build-dependencies]

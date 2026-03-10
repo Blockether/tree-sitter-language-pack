@@ -13,6 +13,11 @@ libloading = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 toml = { workspace = true, optional = true }
+ureq = { workspace = true, optional = true }
+sha2 = { workspace = true, optional = true }
+tar = { workspace = true, optional = true }
+zstd = { workspace = true, optional = true }
+dirs = { workspace = true, optional = true }
 
 [build-dependencies]
 cc = { workspace = true }
@@ -20,9 +25,20 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 
 [features]
-default = ["all", "dynamic-loading"]
+default = ["dynamic-loading", "download"]
 dynamic-loading = ["dep:libloading"]
+serde = ["dep:serde"]
 config = ["dep:serde", "dep:serde_json", "dep:toml"]
+download = [
+  "dep:ureq",
+  "dep:sha2",
+  "dep:tar",
+  "dep:zstd",
+  "dep:dirs",
+  "dep:serde",
+  "dep:serde_json",
+  "dynamic-loading",
+]
 all = [
   "lang-actionscript",
   "lang-ada",

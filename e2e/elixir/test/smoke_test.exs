@@ -3,9 +3,193 @@
 defmodule E2eTests.SmokeTest do
   use ExUnit.Case, async: true
 
+  test "smoke_actionscript" do
+    # Smoke test: load actionscript and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("actionscript", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_ada" do
+    # Smoke test: load ada and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ada", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_agda" do
+    # Smoke test: load agda and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("agda", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_apex" do
+    # Smoke test: load apex and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("apex", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_arduino" do
+    # Smoke test: load arduino and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("arduino", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_asm" do
+    # Smoke test: load asm and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("asm", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_astro" do
+    # Smoke test: load astro and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("astro", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_bash" do
+    # Smoke test: load bash and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("bash", "echo hello")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_beancount" do
+    # Smoke test: load beancount and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("beancount", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_bibtex" do
+    # Smoke test: load bibtex and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("bibtex", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_bicep" do
+    # Smoke test: load bicep and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("bicep", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_bitbake" do
+    # Smoke test: load bitbake and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("bitbake", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_bsl" do
+    # Smoke test: load bsl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("bsl", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
   test "smoke_c" do
     # Smoke test: load c and parse a simple snippet
     tree = TreeSitterLanguagePack.parse_string("c", "int main() { return 0; }")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_cairo" do
+    # Smoke test: load cairo and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("cairo", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_capnp" do
+    # Smoke test: load capnp and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("capnp", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_chatito" do
+    # Smoke test: load chatito and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("chatito", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_clarity" do
+    # Smoke test: load clarity and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("clarity", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_clojure" do
+    # Smoke test: load clojure and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("clojure", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_cmake" do
+    # Smoke test: load cmake and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("cmake", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_cobol" do
+    # Smoke test: load cobol and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("cobol", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_comment" do
+    # Smoke test: load comment and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("comment", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_commonlisp" do
+    # Smoke test: load commonlisp and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("commonlisp", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_cpon" do
+    # Smoke test: load cpon and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("cpon", "x")
     assert is_reference(tree), "Parse tree should be a reference"
     child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
     assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
@@ -19,9 +203,313 @@ defmodule E2eTests.SmokeTest do
     assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
+  test "smoke_css" do
+    # Smoke test: load css and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("css", "body { color: red; }")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_csv" do
+    # Smoke test: load csv and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("csv", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_cuda" do
+    # Smoke test: load cuda and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("cuda", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_d" do
+    # Smoke test: load d and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("d", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_dart" do
+    # Smoke test: load dart and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("dart", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_dockerfile" do
+    # Smoke test: load dockerfile and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("dockerfile", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_doxygen" do
+    # Smoke test: load doxygen and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("doxygen", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_dtd" do
+    # Smoke test: load dtd and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("dtd", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_elisp" do
+    # Smoke test: load elisp and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("elisp", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_elixir" do
+    # Smoke test: load elixir and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("elixir", "IO.puts(\"hello\")")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_elm" do
+    # Smoke test: load elm and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("elm", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_erlang" do
+    # Smoke test: load erlang and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("erlang", "main() -> ok.")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_fennel" do
+    # Smoke test: load fennel and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("fennel", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_firrtl" do
+    # Smoke test: load firrtl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("firrtl", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_fish" do
+    # Smoke test: load fish and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("fish", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_fortran" do
+    # Smoke test: load fortran and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("fortran", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_fsharp" do
+    # Smoke test: load fsharp and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("fsharp", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_fsharp_signature" do
+    # Smoke test: load fsharp_signature and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("fsharp_signature", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_func" do
+    # Smoke test: load func and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("func", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_gdscript" do
+    # Smoke test: load gdscript and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gdscript", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_gitattributes" do
+    # Smoke test: load gitattributes and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gitattributes", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_gitcommit" do
+    # Smoke test: load gitcommit and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gitcommit", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_gitignore" do
+    # Smoke test: load gitignore and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gitignore", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_gleam" do
+    # Smoke test: load gleam and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gleam", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_glsl" do
+    # Smoke test: load glsl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("glsl", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_gn" do
+    # Smoke test: load gn and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gn", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
   test "smoke_go" do
     # Smoke test: load go and parse a simple snippet
     tree = TreeSitterLanguagePack.parse_string("go", "package main")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_gomod" do
+    # Smoke test: load gomod and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gomod", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_gosum" do
+    # Smoke test: load gosum and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gosum", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_graphql" do
+    # Smoke test: load graphql and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("graphql", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_groovy" do
+    # Smoke test: load groovy and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("groovy", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_gstlaunch" do
+    # Smoke test: load gstlaunch and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gstlaunch", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_hack" do
+    # Smoke test: load hack and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("hack", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_hare" do
+    # Smoke test: load hare and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("hare", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_haskell" do
+    # Smoke test: load haskell and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("haskell", "main = putStrLn \"hello\"")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_haxe" do
+    # Smoke test: load haxe and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("haxe", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_hcl" do
+    # Smoke test: load hcl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("hcl", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_heex" do
+    # Smoke test: load heex and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("heex", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_hlsl" do
+    # Smoke test: load hlsl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("hlsl", "x")
     assert is_reference(tree), "Parse tree should be a reference"
     child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
     assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
@@ -35,9 +523,41 @@ defmodule E2eTests.SmokeTest do
     assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
+  test "smoke_hyprlang" do
+    # Smoke test: load hyprlang and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("hyprlang", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_ini" do
+    # Smoke test: load ini and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ini", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_ispc" do
+    # Smoke test: load ispc and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ispc", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_janet" do
+    # Smoke test: load janet and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("janet", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
   test "smoke_java" do
     # Smoke test: load java and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("java", "class Main { public static void main(String[] args) {} }")
+    tree = TreeSitterLanguagePack.parse_string("java", "class Main {}")
     assert is_reference(tree), "Parse tree should be a reference"
     child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
     assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
@@ -51,9 +571,473 @@ defmodule E2eTests.SmokeTest do
     assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
+  test "smoke_jsdoc" do
+    # Smoke test: load jsdoc and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("jsdoc", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_json" do
+    # Smoke test: load json and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("json", "{\"key\": \"value\"}")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_jsonnet" do
+    # Smoke test: load jsonnet and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("jsonnet", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_julia" do
+    # Smoke test: load julia and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("julia", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_kconfig" do
+    # Smoke test: load kconfig and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("kconfig", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_kdl" do
+    # Smoke test: load kdl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("kdl", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_kotlin" do
+    # Smoke test: load kotlin and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("kotlin", "fun main() {}")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_latex" do
+    # Smoke test: load latex and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("latex", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_linkerscript" do
+    # Smoke test: load linkerscript and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("linkerscript", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_llvm" do
+    # Smoke test: load llvm and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("llvm", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_lua" do
+    # Smoke test: load lua and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("lua", "print('hello')")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_luadoc" do
+    # Smoke test: load luadoc and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("luadoc", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_luap" do
+    # Smoke test: load luap and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("luap", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_luau" do
+    # Smoke test: load luau and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("luau", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_magik" do
+    # Smoke test: load magik and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("magik", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_make" do
+    # Smoke test: load make and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("make", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_markdown" do
+    # Smoke test: load markdown and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("markdown", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_markdown_inline" do
+    # Smoke test: load markdown_inline and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("markdown_inline", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_matlab" do
+    # Smoke test: load matlab and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("matlab", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_mermaid" do
+    # Smoke test: load mermaid and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("mermaid", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_meson" do
+    # Smoke test: load meson and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("meson", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_netlinx" do
+    # Smoke test: load netlinx and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("netlinx", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_nim" do
+    # Smoke test: load nim and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("nim", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_ninja" do
+    # Smoke test: load ninja and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ninja", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_nix" do
+    # Smoke test: load nix and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("nix", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_nqc" do
+    # Smoke test: load nqc and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("nqc", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_objc" do
+    # Smoke test: load objc and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("objc", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_ocaml" do
+    # Smoke test: load ocaml and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ocaml", "let () = print_endline \"hello\"")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_ocaml_interface" do
+    # Smoke test: load ocaml_interface and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ocaml_interface", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_odin" do
+    # Smoke test: load odin and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("odin", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_org" do
+    # Smoke test: load org and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("org", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_pascal" do
+    # Smoke test: load pascal and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("pascal", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_pem" do
+    # Smoke test: load pem and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("pem", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_perl" do
+    # Smoke test: load perl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("perl", "print 'hello';")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_pgn" do
+    # Smoke test: load pgn and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("pgn", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_php" do
+    # Smoke test: load php and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("php", "<?php echo 'hello'; ?>")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_po" do
+    # Smoke test: load po and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("po", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_pony" do
+    # Smoke test: load pony and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("pony", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_powershell" do
+    # Smoke test: load powershell and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("powershell", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_printf" do
+    # Smoke test: load printf and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("printf", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_prisma" do
+    # Smoke test: load prisma and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("prisma", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_properties" do
+    # Smoke test: load properties and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("properties", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_proto" do
+    # Smoke test: load proto and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("proto", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_psv" do
+    # Smoke test: load psv and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("psv", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_puppet" do
+    # Smoke test: load puppet and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("puppet", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_purescript" do
+    # Smoke test: load purescript and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("purescript", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_pymanifest" do
+    # Smoke test: load pymanifest and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("pymanifest", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
   test "smoke_python" do
     # Smoke test: load python and parse a simple snippet
     tree = TreeSitterLanguagePack.parse_string("python", "print('hello')")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_qmldir" do
+    # Smoke test: load qmldir and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("qmldir", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_qmljs" do
+    # Smoke test: load qmljs and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("qmljs", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_query" do
+    # Smoke test: load query and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("query", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_r" do
+    # Smoke test: load r and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("r", "print('hello')")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_racket" do
+    # Smoke test: load racket and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("racket", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_re2c" do
+    # Smoke test: load re2c and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("re2c", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_readline" do
+    # Smoke test: load readline and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("readline", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_rego" do
+    # Smoke test: load rego and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("rego", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_requirements" do
+    # Smoke test: load requirements and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("requirements", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_ron" do
+    # Smoke test: load ron and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ron", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_rst" do
+    # Smoke test: load rst and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("rst", "x")
     assert is_reference(tree), "Parse tree should be a reference"
     child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
     assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
@@ -75,9 +1059,305 @@ defmodule E2eTests.SmokeTest do
     assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
   end
 
+  test "smoke_scala" do
+    # Smoke test: load scala and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("scala", "object Main")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_scheme" do
+    # Smoke test: load scheme and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("scheme", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_scss" do
+    # Smoke test: load scss and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("scss", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_smali" do
+    # Smoke test: load smali and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("smali", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_smithy" do
+    # Smoke test: load smithy and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("smithy", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_solidity" do
+    # Smoke test: load solidity and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("solidity", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_sparql" do
+    # Smoke test: load sparql and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("sparql", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_sql" do
+    # Smoke test: load sql and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("sql", "SELECT 1;")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_squirrel" do
+    # Smoke test: load squirrel and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("squirrel", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_starlark" do
+    # Smoke test: load starlark and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("starlark", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_svelte" do
+    # Smoke test: load svelte and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("svelte", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_swift" do
+    # Smoke test: load swift and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("swift", "print(\"hello\")")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_tablegen" do
+    # Smoke test: load tablegen and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("tablegen", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_tcl" do
+    # Smoke test: load tcl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("tcl", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_terraform" do
+    # Smoke test: load terraform and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("terraform", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_test" do
+    # Smoke test: load test and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("test", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_thrift" do
+    # Smoke test: load thrift and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("thrift", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_toml" do
+    # Smoke test: load toml and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("toml", "key = \"value\"")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_tsv" do
+    # Smoke test: load tsv and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("tsv", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_tsx" do
+    # Smoke test: load tsx and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("tsx", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_twig" do
+    # Smoke test: load twig and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("twig", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
   test "smoke_typescript" do
     # Smoke test: load typescript and parse a simple snippet
     tree = TreeSitterLanguagePack.parse_string("typescript", "const x: number = 42;")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_typst" do
+    # Smoke test: load typst and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("typst", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_udev" do
+    # Smoke test: load udev and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("udev", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_ungrammar" do
+    # Smoke test: load ungrammar and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ungrammar", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_uxntal" do
+    # Smoke test: load uxntal and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("uxntal", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_v" do
+    # Smoke test: load v and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("v", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_verilog" do
+    # Smoke test: load verilog and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("verilog", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_vhdl" do
+    # Smoke test: load vhdl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("vhdl", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_vim" do
+    # Smoke test: load vim and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("vim", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_vue" do
+    # Smoke test: load vue and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("vue", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_wast" do
+    # Smoke test: load wast and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("wast", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_wat" do
+    # Smoke test: load wat and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("wat", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_wgsl" do
+    # Smoke test: load wgsl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("wgsl", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_xcompose" do
+    # Smoke test: load xcompose and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("xcompose", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_xml" do
+    # Smoke test: load xml and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("xml", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_yuck" do
+    # Smoke test: load yuck and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("yuck", "x")
+    assert is_reference(tree), "Parse tree should be a reference"
+    child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+    assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+  end
+
+  test "smoke_zig" do
+    # Smoke test: load zig and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("zig", "pub fn main() void {}")
     assert is_reference(tree), "Parse tree should be a reference"
     child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
     assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"

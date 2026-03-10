@@ -326,3 +326,71 @@ func (t *Tree) HasErrorNodes() (bool, error) {
 
 	return bool(C.ts_pack_tree_has_error_nodes(t.ptr)), nil
 }
+
+// Process extracts file intelligence from the given source code and returns
+// the result as a JSON string.
+//
+// Returns an error if the language is not found or processing fails.
+func (r *Registry) Process(source, language string) (string, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if err := r.ensureOpen(); err != nil {
+		return "", err
+	}
+
+	csource := C.CString(source)
+	defer C.free(unsafe.Pointer(csource))
+
+	clang := C.CString(language)
+	defer C.free(unsafe.Pointer(clang))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	result := C.ts_pack_process(r.ptr, csource, C.uintptr_t(len(source)), clang)
+
+	if result == nil {
+		if err := lastError(); err != nil {
+			return "", fmt.Errorf("tspack: process %q: %w", language, err)
+		}
+		return "", fmt.Errorf("tspack: process %q failed", language)
+	}
+	defer C.ts_pack_free_string(result)
+
+	return C.GoString(result), nil
+}
+
+// ProcessAndChunk extracts file intelligence and performs AST-aware chunking,
+// returning the result as a JSON string containing both intelligence and chunks.
+//
+// Returns an error if the language is not found or processing fails.
+func (r *Registry) ProcessAndChunk(source, language string, maxChunkSize int) (string, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if err := r.ensureOpen(); err != nil {
+		return "", err
+	}
+
+	csource := C.CString(source)
+	defer C.free(unsafe.Pointer(csource))
+
+	clang := C.CString(language)
+	defer C.free(unsafe.Pointer(clang))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	result := C.ts_pack_process_and_chunk(r.ptr, csource, C.uintptr_t(len(source)), clang, C.uintptr_t(maxChunkSize))
+
+	if result == nil {
+		if err := lastError(); err != nil {
+			return "", fmt.Errorf("tspack: process_and_chunk %q: %w", language, err)
+		}
+		return "", fmt.Errorf("tspack: process_and_chunk %q failed", language)
+	}
+	defer C.ts_pack_free_string(result)
+
+	return C.GoString(result), nil
+}

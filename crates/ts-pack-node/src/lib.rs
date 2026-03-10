@@ -38,14 +38,8 @@ pub fn get_language_ptr(name: String) -> napi::Result<i64> {
 /// Throws an error if the language is not found or parsing fails.
 #[napi(js_name = "parseString")]
 pub fn parse_string(language: String, source: String) -> napi::Result<External<tree_sitter::Tree>> {
-    let lang = ts_pack_core::get_language(&language).map_err(|e| napi::Error::from_reason(format!("{e}")))?;
-    let mut parser = tree_sitter::Parser::new();
-    parser
-        .set_language(&lang)
-        .map_err(|e| napi::Error::from_reason(format!("failed to set language: {e}")))?;
-    let tree = parser
-        .parse(source.as_bytes(), None)
-        .ok_or_else(|| napi::Error::from_reason("parsing returned no tree"))?;
+    let tree = ts_pack_core::parse_string(&language, source.as_bytes())
+        .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
     Ok(External::new(tree))
 }
 
@@ -64,32 +58,39 @@ pub fn tree_root_child_count(tree: &External<tree_sitter::Tree>) -> u32 {
 /// Check whether any node in the tree has the given type name.
 #[napi(js_name = "treeContainsNodeType")]
 pub fn tree_contains_node_type(tree: &External<tree_sitter::Tree>, node_type: String) -> bool {
-    let mut cursor = tree.walk();
-    traverse_looking_for(&mut cursor, |node| node.kind() == node_type)
+    ts_pack_core::tree_contains_node_type(tree, &node_type)
 }
 
 /// Check whether the tree contains any ERROR or MISSING nodes.
 #[napi(js_name = "treeHasErrorNodes")]
 pub fn tree_has_error_nodes(tree: &External<tree_sitter::Tree>) -> bool {
-    let mut cursor = tree.walk();
-    traverse_looking_for(&mut cursor, |node| node.is_error() || node.is_missing())
+    ts_pack_core::tree_has_error_nodes(tree)
 }
 
-fn traverse_looking_for(cursor: &mut tree_sitter::TreeCursor, predicate: impl Fn(tree_sitter::Node) -> bool) -> bool {
-    loop {
-        if predicate(cursor.node()) {
-            return true;
-        }
-        if cursor.goto_first_child() {
-            continue;
-        }
-        loop {
-            if cursor.goto_next_sibling() {
-                break;
-            }
-            if !cursor.goto_parent() {
-                return false;
-            }
-        }
-    }
+// ---------------------------------------------------------------------------
+// Intel: process / processAndChunk
+// ---------------------------------------------------------------------------
+
+/// Process source code and extract file intelligence as a JSON string.
+#[napi(js_name = "process")]
+pub fn process(source: String, language: String) -> napi::Result<String> {
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let intel = registry
+        .process(&source, &language)
+        .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
+    serde_json::to_string(&intel).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))
+}
+
+/// Process and chunk source code, returning intelligence + chunks as a JSON string.
+#[napi(js_name = "processAndChunk")]
+pub fn process_and_chunk(source: String, language: String, max_chunk_size: u32) -> napi::Result<String> {
+    let registry = ts_pack_core::LanguageRegistry::new();
+    let (intel, chunks) = registry
+        .process_and_chunk(&source, &language, max_chunk_size as usize)
+        .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
+    let result = serde_json::json!({
+        "intelligence": intel,
+        "chunks": chunks,
+    });
+    serde_json::to_string(&result).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))
 }

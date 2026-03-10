@@ -20,14 +20,35 @@ pub enum Error {
     #[error("Configuration error: {0}")]
     Config(String),
 
+    #[error("Parse failed: parsing returned no tree")]
+    ParseFailed,
+
+    #[error("Query error: {0}")]
+    QueryError(String),
+
+    #[error("Invalid byte range: {0}")]
+    InvalidRange(String),
+
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
 
-    #[cfg(feature = "config")]
+    #[cfg(any(feature = "config", feature = "download"))]
     #[error("JSON parse error: {0}")]
     Json(#[from] serde_json::Error),
 
     #[cfg(feature = "config")]
     #[error("TOML parse error: {0}")]
     Toml(#[from] toml::de::Error),
+
+    #[cfg(feature = "download")]
+    #[error("Download error: {0}")]
+    Download(String),
+
+    #[cfg(feature = "download")]
+    #[error("Checksum mismatch for '{file}': expected {expected}, got {actual}")]
+    ChecksumMismatch {
+        file: String,
+        expected: String,
+        actual: String,
+    },
 }

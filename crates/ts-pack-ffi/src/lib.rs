@@ -461,7 +461,7 @@ pub unsafe extern "C" fn ts_pack_tree_contains_node_type(tree: *const TsPackTree
                 return false;
             }
         };
-        tree_contains_kind(&t.inner, target)
+        ts_pack_core::tree_contains_node_type(&t.inner, target)
     })
 }
 
@@ -479,41 +479,189 @@ pub unsafe extern "C" fn ts_pack_tree_has_error_nodes(tree: *const TsPackTree) -
             return false;
         }
         let t = unsafe { &*tree };
-        tree_has_errors(&t.inner)
+        ts_pack_core::tree_has_error_nodes(&t.inner)
+    })
+}
+
+/// Return the S-expression representation of the tree.
+///
+/// Returns a newly-allocated C string that the caller must free with
+/// `ts_pack_free_string`. Returns null if the tree pointer is null.
+///
+/// # Safety
+///
+/// `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_tree_to_sexp(tree: *const TsPackTree) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if tree.is_null() {
+            set_last_error("tree pointer is null");
+            return ptr::null_mut();
+        }
+        let t = unsafe { &*tree };
+        let sexp = ts_pack_core::tree_to_sexp(&t.inner);
+        match CString::new(sexp) {
+            Ok(c) => CString::into_raw(c),
+            Err(e) => {
+                set_last_error(&format!("sexp contains null byte: {e}"));
+                ptr::null_mut()
+            }
+        }
+    })
+}
+
+/// Return the count of ERROR and MISSING nodes in the tree.
+///
+/// Returns 0 if the tree pointer is null.
+///
+/// # Safety
+///
+/// `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_tree_error_count(tree: *const TsPackTree) -> usize {
+    ffi_guard!(0, {
+        clear_last_error();
+        if tree.is_null() {
+            set_last_error("tree pointer is null");
+            return 0;
+        }
+        let t = unsafe { &*tree };
+        ts_pack_core::tree_error_count(&t.inner)
     })
 }
 
 // ---------------------------------------------------------------------------
-// Internal tree traversal helpers
+// Intel: process / process_and_chunk
 // ---------------------------------------------------------------------------
 
-fn tree_contains_kind(tree: &tree_sitter::Tree, target: &str) -> bool {
-    let mut cursor = tree.walk();
-    traverse_looking_for(&mut cursor, |node| node.kind() == target)
+/// Process source code and extract file intelligence as a JSON C string.
+///
+/// Returns a newly-allocated C string that the caller must free with
+/// `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
+///
+/// # Safety
+///
+/// `registry` must be a valid pointer returned by `ts_pack_registry_new`.
+/// `source` must be a valid pointer to `source_len` bytes.
+/// `language` must be a valid null-terminated UTF-8 C string.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_process(
+    registry: *const TsPackRegistry,
+    source: *const c_char,
+    source_len: usize,
+    language: *const c_char,
+) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if registry.is_null() || source.is_null() || language.is_null() {
+            set_last_error("null pointer argument");
+            return ptr::null_mut();
+        }
+        let reg = unsafe { &*registry };
+        let lang_str = match unsafe { CStr::from_ptr(language) }.to_str() {
+            Ok(s) => s,
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in language: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        let source_bytes = unsafe { std::slice::from_raw_parts(source as *const u8, source_len) };
+        let source_str = match std::str::from_utf8(source_bytes) {
+            Ok(s) => s,
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in source: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        match reg.inner.process(source_str, lang_str) {
+            Ok(intel) => match serde_json::to_string(&intel) {
+                Ok(json) => match CString::new(json) {
+                    Ok(c) => CString::into_raw(c),
+                    Err(e) => {
+                        set_last_error(&format!("null byte in JSON: {e}"));
+                        ptr::null_mut()
+                    }
+                },
+                Err(e) => {
+                    set_last_error(&format!("serialization failed: {e}"));
+                    ptr::null_mut()
+                }
+            },
+            Err(e) => {
+                set_last_error(&e.to_string());
+                ptr::null_mut()
+            }
+        }
+    })
 }
 
-fn tree_has_errors(tree: &tree_sitter::Tree) -> bool {
-    let mut cursor = tree.walk();
-    traverse_looking_for(&mut cursor, |node| node.is_error() || node.is_missing())
-}
-
-fn traverse_looking_for(cursor: &mut tree_sitter::TreeCursor, predicate: impl Fn(tree_sitter::Node) -> bool) -> bool {
-    loop {
-        if predicate(cursor.node()) {
-            return true;
+/// Process and chunk source code, returning intelligence + chunks as a JSON C string.
+///
+/// Returns a newly-allocated C string that the caller must free with
+/// `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
+///
+/// # Safety
+///
+/// `registry` must be a valid pointer returned by `ts_pack_registry_new`.
+/// `source` must be a valid pointer to `source_len` bytes.
+/// `language` must be a valid null-terminated UTF-8 C string.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ts_pack_process_and_chunk(
+    registry: *const TsPackRegistry,
+    source: *const c_char,
+    source_len: usize,
+    language: *const c_char,
+    max_chunk_size: usize,
+) -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
+        clear_last_error();
+        if registry.is_null() || source.is_null() || language.is_null() {
+            set_last_error("null pointer argument");
+            return ptr::null_mut();
         }
-        if cursor.goto_first_child() {
-            continue;
-        }
-        loop {
-            if cursor.goto_next_sibling() {
-                break;
+        let reg = unsafe { &*registry };
+        let lang_str = match unsafe { CStr::from_ptr(language) }.to_str() {
+            Ok(s) => s,
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in language: {e}"));
+                return ptr::null_mut();
             }
-            if !cursor.goto_parent() {
-                return false;
+        };
+        let source_bytes = unsafe { std::slice::from_raw_parts(source as *const u8, source_len) };
+        let source_str = match std::str::from_utf8(source_bytes) {
+            Ok(s) => s,
+            Err(e) => {
+                set_last_error(&format!("invalid UTF-8 in source: {e}"));
+                return ptr::null_mut();
+            }
+        };
+        match reg.inner.process_and_chunk(source_str, lang_str, max_chunk_size) {
+            Ok((intel, chunks)) => {
+                let result = serde_json::json!({
+                    "intelligence": intel,
+                    "chunks": chunks,
+                });
+                match serde_json::to_string(&result) {
+                    Ok(json) => match CString::new(json) {
+                        Ok(c) => CString::into_raw(c),
+                        Err(e) => {
+                            set_last_error(&format!("null byte in JSON: {e}"));
+                            ptr::null_mut()
+                        }
+                    },
+                    Err(e) => {
+                        set_last_error(&format!("serialization failed: {e}"));
+                        ptr::null_mut()
+                    }
+                }
+            }
+            Err(e) => {
+                set_last_error(&e.to_string());
+                ptr::null_mut()
             }
         }
-    }
+    })
 }
 
 // ---------------------------------------------------------------------------

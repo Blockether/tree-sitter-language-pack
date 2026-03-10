@@ -38,6 +38,25 @@ pub struct Assertions {
     pub language_available: Option<bool>,
     #[serde(default)]
     pub languages_not_empty: Option<bool>,
+    // Intel assertions (process / process_and_chunk)
+    #[serde(default)]
+    pub intel_language: Option<String>,
+    #[serde(default)]
+    pub intel_structure_count_min: Option<usize>,
+    #[serde(default)]
+    pub intel_structure_contains_kind: Option<String>,
+    #[serde(default)]
+    pub intel_imports_count_min: Option<usize>,
+    #[serde(default)]
+    pub intel_metrics_total_lines_min: Option<usize>,
+    #[serde(default)]
+    pub intel_metrics_error_count: Option<usize>,
+    #[serde(default)]
+    pub intel_diagnostics_not_empty: Option<bool>,
+    #[serde(default)]
+    pub intel_chunk_count_min: Option<usize>,
+    #[serde(default)]
+    pub intel_chunk_max_size: Option<usize>,
 }
 
 /// Configuration for when a test should be skipped.

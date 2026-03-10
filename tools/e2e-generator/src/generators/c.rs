@@ -126,6 +126,26 @@ fn write_helpers_h(dir: &Path) -> Result<(), String> {
     std::fs::write(dir.join("helpers.h"), content).map_err(|e| format!("Failed to write helpers.h: {e}"))
 }
 
+fn has_intel_assertions(fixture: &Fixture) -> bool {
+    fixture.assertions.as_ref().is_some_and(|a| {
+        a.intel_language.is_some()
+            || a.intel_structure_count_min.is_some()
+            || a.intel_structure_contains_kind.is_some()
+            || a.intel_imports_count_min.is_some()
+            || a.intel_metrics_total_lines_min.is_some()
+            || a.intel_metrics_error_count.is_some()
+            || a.intel_diagnostics_not_empty.is_some()
+            || a.intel_chunk_count_min.is_some()
+    })
+}
+
+fn has_chunk_assertions(fixture: &Fixture) -> bool {
+    fixture
+        .assertions
+        .as_ref()
+        .is_some_and(|a| a.intel_chunk_count_min.is_some())
+}
+
 fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
     let mut out = String::new();
     let fn_name = format!("test_{}", sanitize_name(&fixture.id));
@@ -187,6 +207,40 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
         )
         .unwrap();
         writeln!(out, "    ASSERT_EQ_BOOL(result, {}, \"has_language check\");", expected).unwrap();
+    } else if has_intel_assertions(fixture) {
+        let lang = fixture.language.as_deref().unwrap_or("unknown");
+        let source = fixture.source_code.as_deref().unwrap_or("");
+        let source_escaped = escape_c_string(source);
+
+        if has_chunk_assertions(fixture) {
+            let max_chunk_size = assertions.unwrap().intel_chunk_max_size.unwrap_or(512);
+            writeln!(
+                out,
+                "    char *result = ts_pack_process_and_chunk(reg, \"{}\", {}, \"{}\", {});",
+                source_escaped,
+                source.len(),
+                escape_c_string(lang),
+                max_chunk_size
+            )
+            .unwrap();
+        } else {
+            writeln!(
+                out,
+                "    char *result = ts_pack_process(reg, \"{}\", {}, \"{}\");",
+                source_escaped,
+                source.len(),
+                escape_c_string(lang)
+            )
+            .unwrap();
+        }
+        writeln!(out, "    ASSERT_NOT_NULL(result, \"process returned NULL\");").unwrap();
+        writeln!(out, "    /* Verify JSON string is non-empty */").unwrap();
+        writeln!(
+            out,
+            "    ASSERT_TRUE(strlen(result) > 2, \"JSON result should not be empty\");"
+        )
+        .unwrap();
+        writeln!(out, "    ts_pack_free_string(result);").unwrap();
     } else if let Some(lang) = &fixture.language {
         writeln!(
             out,

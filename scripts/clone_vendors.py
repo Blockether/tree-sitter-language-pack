@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import os
 import platform
 import re
 import sys
 from functools import partial
-from json import loads
+from json import dumps, loads
 from pathlib import Path
 from shutil import move, rmtree, which
 
@@ -16,10 +17,29 @@ from anyio.to_thread import run_sync
 from git import Repo
 from typing_extensions import NotRequired, TypedDict
 
-vendor_directory = Path(__file__).parent.parent / "vendor"
-parsers_directory = Path(__file__).parent.parent / "parsers"
+# ---------------------------------------------------------------------------
+# Configuration via environment variables
+# ---------------------------------------------------------------------------
+# TSLP_CACHE_DIR    — Override the default parsers directory location.
+# TSLP_NO_CACHE     — Set to "1" or "true" to force a full re-clone, ignoring
+#                      the cache manifest.
+# TSLP_VENDOR_DIR   — Override the default vendor directory location.
+# ---------------------------------------------------------------------------
+
+_project_root = Path(__file__).parent.parent
+
+vendor_directory = Path(os.environ.get("TSLP_VENDOR_DIR", _project_root / "vendor"))
+parsers_directory = Path(os.environ.get("TSLP_CACHE_DIR", _project_root / "parsers"))
+
+CACHE_MANIFEST_FILE = parsers_directory / ".cache_manifest.json"
 
 COMMON_RE_PATTERN = re.compile(r"\.\.[/\\](?:\.\.[/\\])*common[/\\]")
+
+
+def _no_cache() -> bool:
+    """Check if caching is disabled via environment variable."""
+    val = os.environ.get("TSLP_NO_CACHE", "").lower()
+    return val in ("1", "true", "yes")
 
 
 class LanguageDict(TypedDict):
@@ -34,15 +54,87 @@ class LanguageDict(TypedDict):
     abi_version: NotRequired[int]
 
 
+# ---------------------------------------------------------------------------
+# Cache manifest helpers
+# ---------------------------------------------------------------------------
+
+
+def _load_cache_manifest() -> dict[str, str]:
+    """Load the cache manifest mapping language names to their cached revisions.
+
+    Returns an empty dict if no manifest exists or caching is disabled.
+    """
+    if _no_cache():
+        return {}
+
+    if CACHE_MANIFEST_FILE.exists():
+        try:
+            return loads(CACHE_MANIFEST_FILE.read_text())
+        except (ValueError, OSError):
+            return {}
+    return {}
+
+
+def _save_cache_manifest(manifest: dict[str, str]) -> None:
+    """Persist the cache manifest to disk."""
+    CACHE_MANIFEST_FILE.parent.mkdir(parents=True, exist_ok=True)
+    CACHE_MANIFEST_FILE.write_text(dumps(manifest, indent=2, sort_keys=True) + "\n")
+
+
+def _language_cache_key(language_definition: LanguageDict) -> str:
+    """Produce a deterministic cache key for a language definition.
+
+    Includes repo URL, rev, branch, directory, generate flag, and ABI version
+    so that any configuration change invalidates the cache entry.
+    """
+    parts = [
+        language_definition["repo"],
+        language_definition.get("rev", ""),
+        language_definition.get("branch", ""),
+        language_definition.get("directory", ""),
+        str(language_definition.get("generate", False)),
+        str(language_definition.get("abi_version", 14)),
+    ]
+    return hashlib.sha256("|".join(parts).encode()).hexdigest()[:16]
+
+
+def _is_language_cached(language_name: str, language_definition: LanguageDict, manifest: dict[str, str]) -> bool:
+    """Check whether a language's parser files are already cached and up-to-date."""
+    if _no_cache():
+        return False
+
+    cached_key = manifest.get(language_name)
+    if not cached_key:
+        return False
+
+    expected_key = _language_cache_key(language_definition)
+    if cached_key != expected_key:
+        return False
+
+    # Verify the parser directory actually contains files
+    parser_dir = parsers_directory / language_name / "src"
+    return parser_dir.exists() and any(parser_dir.iterdir())
+
+
+# ---------------------------------------------------------------------------
+# Language definitions
+# ---------------------------------------------------------------------------
+
+
 def get_language_definitions() -> tuple[dict[str, LanguageDict], list[str]]:
     """Get the language definitions."""
     print("Loading language definitions")
     language_definitions: dict[str, LanguageDict] = loads(
-        (Path(__file__).parent.parent / "sources" / "language_definitions.json").read_text()
+        (_project_root / "sources" / "language_definitions.json").read_text()
     )
 
     language_names = list(language_definitions.keys())
     return language_definitions, language_names
+
+
+# ---------------------------------------------------------------------------
+# Clone / generate / move
+# ---------------------------------------------------------------------------
 
 
 async def clone_repository(repo_url: str, branch: str | None, language_name: str, rev: str | None = None) -> None:
@@ -61,7 +153,13 @@ async def clone_repository(repo_url: str, branch: str | None, language_name: str
         Repo: The cloned repository.
     """
     print(f"Cloning {repo_url}")
-    kwargs = {"url": repo_url, "to_path": vendor_directory / language_name}
+    clone_target = vendor_directory / language_name
+
+    # Clean up any stale vendor directory for this language
+    if clone_target.exists():
+        await run_sync(rmtree, clone_target)
+
+    kwargs = {"url": repo_url, "to_path": clone_target}
     if branch:
         kwargs["branch"] = branch
     if not rev:
@@ -179,27 +277,64 @@ async def main() -> None:
     parsers_directory.mkdir(exist_ok=True, parents=True)
 
     language_definitions, language_names = get_language_definitions()
+    manifest = _load_cache_manifest()
+
+    # Partition languages into cached (skip) and stale (need processing)
+    to_process: list[str] = []
+    cached_count = 0
+    for name in language_names:
+        if _is_language_cached(name, language_definitions[name], manifest):
+            cached_count += 1
+        else:
+            to_process.append(name)
+
+    if cached_count > 0:
+        print(f"Cache hit: {cached_count} language(s) already up-to-date, skipping")
+    if not to_process:
+        print("All languages cached — nothing to do")
+        return
+
+    print(f"Processing {len(to_process)} language(s)...")
+
     await asyncio.gather(
         *[
             process_repo(
                 language_name=language_name,
                 language_definition=language_definitions[language_name],
             )
-            for language_name in language_names
+            for language_name in to_process
         ]
     )
+
+    # Update manifest with newly processed languages
+    for name in to_process:
+        manifest[name] = _language_cache_key(language_definitions[name])
+
+    # Remove manifest entries for languages no longer in definitions
+    for stale in set(manifest) - set(language_names):
+        del manifest[stale]
+        stale_dir = parsers_directory / stale
+        if stale_dir.exists():
+            rmtree(stale_dir)
+            print(f"Removed stale parser: {stale}")
+
+    _save_cache_manifest(manifest)
+    print(f"Cache manifest updated ({len(manifest)} entries)")
 
 
 if __name__ == "__main__":
     if not which("tree-sitter"):
         sys.exit("tree-sitter is a required system dependency. Please install it with 'npm i -g tree-sitter-cli'")
 
-    if vendor_directory.exists():
-        print("vendor directory already exists, removing")
+    if _no_cache():
+        print("Caching disabled (TSLP_NO_CACHE=1) — performing full clone")
+        if vendor_directory.exists():
+            rmtree(vendor_directory)
+        if parsers_directory.exists():
+            rmtree(parsers_directory)
+    # Only clean vendor (temporary clones); parsers directory is the cache
+    elif vendor_directory.exists():
+        print("Cleaning vendor directory")
         rmtree(vendor_directory)
-
-    if parsers_directory.exists():
-        print("parsers directory already exists, removing")
-        rmtree(parsers_directory)
 
     asyncio.run(main())

@@ -196,4 +196,62 @@ bool ts_pack_tree_contains_node_type(const struct TsPackTree *tree, const char *
  */
 bool ts_pack_tree_has_error_nodes(const struct TsPackTree *tree);
 
+/**
+ * Return the S-expression representation of the tree.
+ *
+ * Returns a newly-allocated C string that the caller must free with
+ * `ts_pack_free_string`. Returns null if the tree pointer is null.
+ *
+ * # Safety
+ *
+ * `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+ */
+char *ts_pack_tree_to_sexp(const struct TsPackTree *tree);
+
+/**
+ * Return the count of ERROR and MISSING nodes in the tree.
+ *
+ * Returns 0 if the tree pointer is null.
+ *
+ * # Safety
+ *
+ * `tree` must be a valid pointer returned by `ts_pack_parse_string`, or null.
+ */
+uintptr_t ts_pack_tree_error_count(const struct TsPackTree *tree);
+
+/**
+ * Process source code and extract file intelligence as a JSON C string.
+ *
+ * Returns a newly-allocated C string that the caller must free with
+ * `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
+ *
+ * # Safety
+ *
+ * `registry` must be a valid pointer returned by `ts_pack_registry_new`.
+ * `source` must be a valid pointer to `source_len` bytes.
+ * `language` must be a valid null-terminated UTF-8 C string.
+ */
+char *ts_pack_process(const struct TsPackRegistry *registry,
+                      const char *source,
+                      uintptr_t source_len,
+                      const char *language);
+
+/**
+ * Process and chunk source code, returning intelligence + chunks as a JSON C string.
+ *
+ * Returns a newly-allocated C string that the caller must free with
+ * `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
+ *
+ * # Safety
+ *
+ * `registry` must be a valid pointer returned by `ts_pack_registry_new`.
+ * `source` must be a valid pointer to `source_len` bytes.
+ * `language` must be a valid null-terminated UTF-8 C string.
+ */
+char *ts_pack_process_and_chunk(const struct TsPackRegistry *registry,
+                                const char *source,
+                                uintptr_t source_len,
+                                const char *language,
+                                uintptr_t max_chunk_size);
+
 #endif  /* TS_PACK_H */

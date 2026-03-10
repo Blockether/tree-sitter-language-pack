@@ -1,0 +1,154 @@
+use crate::Error;
+
+/// Parse source code with the named language, returning the syntax tree.
+///
+/// Uses the global registry to look up the language by name.
+///
+/// # Examples
+///
+/// ```no_run
+/// let tree = ts_pack_core::parse::parse_string("python", b"def hello(): pass").unwrap();
+/// assert_eq!(tree.root_node().kind(), "module");
+/// ```
+pub fn parse_string(language: &str, source: &[u8]) -> Result<tree_sitter::Tree, Error> {
+    let mut parser = crate::get_parser(language)?;
+    parser.parse(source, None).ok_or(Error::ParseFailed)
+}
+
+/// Check whether any node in the tree matches the given type name.
+///
+/// Performs a depth-first traversal using `TreeCursor`.
+pub fn tree_contains_node_type(tree: &tree_sitter::Tree, node_type: &str) -> bool {
+    let mut cursor = tree.walk();
+    traverse_with_cursor(&mut cursor, |node| node.kind() == node_type)
+}
+
+/// Check whether the tree contains any ERROR or MISSING nodes.
+///
+/// Useful for determining if the parse was clean or had syntax errors.
+pub fn tree_has_error_nodes(tree: &tree_sitter::Tree) -> bool {
+    let mut cursor = tree.walk();
+    traverse_with_cursor(&mut cursor, |node| node.is_error() || node.is_missing())
+}
+
+/// Return the S-expression representation of the entire tree.
+///
+/// This is the standard tree-sitter debug format, useful for logging,
+/// snapshot testing, and debugging grammars.
+pub fn tree_to_sexp(tree: &tree_sitter::Tree) -> String {
+    tree.root_node().to_sexp()
+}
+
+/// Count the number of ERROR and MISSING nodes in the tree.
+///
+/// Returns 0 for a clean parse.
+pub fn tree_error_count(tree: &tree_sitter::Tree) -> usize {
+    let mut count = 0;
+    let mut cursor = tree.walk();
+    traverse_with_cursor(&mut cursor, |node| {
+        if node.is_error() || node.is_missing() {
+            count += 1;
+        }
+        false // never short-circuit, visit all nodes
+    });
+    count
+}
+
+/// Depth-first traversal with a cursor, calling `predicate` on each node.
+///
+/// Returns `true` as soon as the predicate returns `true` (short-circuit).
+/// Returns `false` if no node matches.
+pub(crate) fn traverse_with_cursor(
+    cursor: &mut tree_sitter::TreeCursor,
+    mut predicate: impl FnMut(tree_sitter::Node) -> bool,
+) -> bool {
+    loop {
+        if predicate(cursor.node()) {
+            return true;
+        }
+        if cursor.goto_first_child() {
+            continue;
+        }
+        loop {
+            if cursor.goto_next_sibling() {
+                break;
+            }
+            if !cursor.goto_parent() {
+                return false;
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn skip_if_no_languages() -> bool {
+        crate::available_languages().is_empty()
+    }
+
+    #[test]
+    fn test_parse_string_success() {
+        if skip_if_no_languages() {
+            return;
+        }
+        let langs = crate::available_languages();
+        let first = &langs[0];
+        let tree = parse_string(first, b"x");
+        assert!(tree.is_ok(), "parse_string should succeed for '{first}'");
+    }
+
+    #[test]
+    fn test_parse_string_invalid_language() {
+        let result = parse_string("nonexistent_xyz", b"x");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_tree_to_sexp() {
+        if skip_if_no_languages() {
+            return;
+        }
+        let langs = crate::available_languages();
+        let tree = parse_string(&langs[0], b"x").unwrap();
+        let sexp = tree_to_sexp(&tree);
+        assert!(!sexp.is_empty());
+    }
+
+    #[test]
+    fn test_tree_contains_node_type() {
+        if skip_if_no_languages() {
+            return;
+        }
+        let langs = crate::available_languages();
+        let tree = parse_string(&langs[0], b"x").unwrap();
+        let root_kind = tree.root_node().kind().to_string();
+        assert!(tree_contains_node_type(&tree, &root_kind));
+        assert!(!tree_contains_node_type(&tree, "nonexistent_node_type_xyz"));
+    }
+
+    #[test]
+    fn test_tree_has_error_nodes_clean() {
+        if skip_if_no_languages() {
+            return;
+        }
+        // Most parsers handle single-token inputs without error
+        let langs = crate::available_languages();
+        let tree = parse_string(&langs[0], b"x").unwrap();
+        // Just verify it runs without panic; result depends on grammar
+        let _ = tree_has_error_nodes(&tree);
+    }
+
+    #[test]
+    fn test_tree_error_count() {
+        if skip_if_no_languages() {
+            return;
+        }
+        let langs = crate::available_languages();
+        let tree = parse_string(&langs[0], b"x").unwrap();
+        let count = tree_error_count(&tree);
+        // Just verify it returns a reasonable number
+        assert!(count < 1000);
+    }
+}

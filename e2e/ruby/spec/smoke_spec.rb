@@ -4,9 +4,170 @@ require_relative "spec_helper"
 
 RSpec.describe "smoke" do
 
+  it "smoke_actionscript" do
+    # Smoke test: load actionscript and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("actionscript", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_ada" do
+    # Smoke test: load ada and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ada", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_agda" do
+    # Smoke test: load agda and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("agda", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_apex" do
+    # Smoke test: load apex and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("apex", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_arduino" do
+    # Smoke test: load arduino and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("arduino", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_asm" do
+    # Smoke test: load asm and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("asm", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_astro" do
+    # Smoke test: load astro and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("astro", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_bash" do
+    # Smoke test: load bash and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("bash", "echo hello")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_beancount" do
+    # Smoke test: load beancount and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("beancount", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_bibtex" do
+    # Smoke test: load bibtex and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("bibtex", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_bicep" do
+    # Smoke test: load bicep and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("bicep", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_bitbake" do
+    # Smoke test: load bitbake and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("bitbake", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_bsl" do
+    # Smoke test: load bsl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("bsl", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
   it "smoke_c" do
     # Smoke test: load c and parse a simple snippet
     tree = TreeSitterLanguagePack.parse_string("c", "int main() { return 0; }")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_cairo" do
+    # Smoke test: load cairo and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("cairo", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_capnp" do
+    # Smoke test: load capnp and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("capnp", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_chatito" do
+    # Smoke test: load chatito and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("chatito", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_clarity" do
+    # Smoke test: load clarity and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("clarity", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_clojure" do
+    # Smoke test: load clojure and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("clojure", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_cmake" do
+    # Smoke test: load cmake and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("cmake", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_cobol" do
+    # Smoke test: load cobol and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("cobol", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_comment" do
+    # Smoke test: load comment and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("comment", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_commonlisp" do
+    # Smoke test: load commonlisp and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("commonlisp", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_cpon" do
+    # Smoke test: load cpon and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("cpon", "x")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
   end
@@ -18,9 +179,275 @@ RSpec.describe "smoke" do
     expect(tree.root_child_count).to be >= 1
   end
 
+  it "smoke_css" do
+    # Smoke test: load css and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("css", "body { color: red; }")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_csv" do
+    # Smoke test: load csv and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("csv", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_cuda" do
+    # Smoke test: load cuda and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("cuda", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_d" do
+    # Smoke test: load d and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("d", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_dart" do
+    # Smoke test: load dart and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("dart", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_dockerfile" do
+    # Smoke test: load dockerfile and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("dockerfile", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_doxygen" do
+    # Smoke test: load doxygen and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("doxygen", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_dtd" do
+    # Smoke test: load dtd and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("dtd", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_elisp" do
+    # Smoke test: load elisp and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("elisp", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_elixir" do
+    # Smoke test: load elixir and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("elixir", "IO.puts(\"hello\")")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_elm" do
+    # Smoke test: load elm and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("elm", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_erlang" do
+    # Smoke test: load erlang and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("erlang", "main() -> ok.")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_fennel" do
+    # Smoke test: load fennel and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("fennel", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_firrtl" do
+    # Smoke test: load firrtl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("firrtl", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_fish" do
+    # Smoke test: load fish and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("fish", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_fortran" do
+    # Smoke test: load fortran and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("fortran", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_fsharp" do
+    # Smoke test: load fsharp and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("fsharp", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_fsharp_signature" do
+    # Smoke test: load fsharp_signature and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("fsharp_signature", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_func" do
+    # Smoke test: load func and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("func", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_gdscript" do
+    # Smoke test: load gdscript and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gdscript", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_gitattributes" do
+    # Smoke test: load gitattributes and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gitattributes", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_gitcommit" do
+    # Smoke test: load gitcommit and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gitcommit", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_gitignore" do
+    # Smoke test: load gitignore and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gitignore", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_gleam" do
+    # Smoke test: load gleam and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gleam", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_glsl" do
+    # Smoke test: load glsl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("glsl", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_gn" do
+    # Smoke test: load gn and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gn", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
   it "smoke_go" do
     # Smoke test: load go and parse a simple snippet
     tree = TreeSitterLanguagePack.parse_string("go", "package main")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_gomod" do
+    # Smoke test: load gomod and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gomod", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_gosum" do
+    # Smoke test: load gosum and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gosum", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_graphql" do
+    # Smoke test: load graphql and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("graphql", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_groovy" do
+    # Smoke test: load groovy and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("groovy", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_gstlaunch" do
+    # Smoke test: load gstlaunch and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("gstlaunch", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_hack" do
+    # Smoke test: load hack and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("hack", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_hare" do
+    # Smoke test: load hare and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("hare", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_haskell" do
+    # Smoke test: load haskell and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("haskell", "main = putStrLn \"hello\"")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_haxe" do
+    # Smoke test: load haxe and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("haxe", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_hcl" do
+    # Smoke test: load hcl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("hcl", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_heex" do
+    # Smoke test: load heex and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("heex", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_hlsl" do
+    # Smoke test: load hlsl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("hlsl", "x")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
   end
@@ -32,9 +459,37 @@ RSpec.describe "smoke" do
     expect(tree.root_child_count).to be >= 1
   end
 
+  it "smoke_hyprlang" do
+    # Smoke test: load hyprlang and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("hyprlang", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_ini" do
+    # Smoke test: load ini and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ini", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_ispc" do
+    # Smoke test: load ispc and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ispc", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_janet" do
+    # Smoke test: load janet and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("janet", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
   it "smoke_java" do
     # Smoke test: load java and parse a simple snippet
-    tree = TreeSitterLanguagePack.parse_string("java", "class Main { public static void main(String[] args) {} }")
+    tree = TreeSitterLanguagePack.parse_string("java", "class Main {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
   end
@@ -46,9 +501,415 @@ RSpec.describe "smoke" do
     expect(tree.root_child_count).to be >= 1
   end
 
+  it "smoke_jsdoc" do
+    # Smoke test: load jsdoc and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("jsdoc", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_json" do
+    # Smoke test: load json and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("json", "{\"key\": \"value\"}")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_jsonnet" do
+    # Smoke test: load jsonnet and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("jsonnet", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_julia" do
+    # Smoke test: load julia and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("julia", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_kconfig" do
+    # Smoke test: load kconfig and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("kconfig", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_kdl" do
+    # Smoke test: load kdl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("kdl", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_kotlin" do
+    # Smoke test: load kotlin and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("kotlin", "fun main() {}")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_latex" do
+    # Smoke test: load latex and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("latex", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_linkerscript" do
+    # Smoke test: load linkerscript and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("linkerscript", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_llvm" do
+    # Smoke test: load llvm and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("llvm", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_lua" do
+    # Smoke test: load lua and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("lua", "print('hello')")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_luadoc" do
+    # Smoke test: load luadoc and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("luadoc", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_luap" do
+    # Smoke test: load luap and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("luap", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_luau" do
+    # Smoke test: load luau and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("luau", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_magik" do
+    # Smoke test: load magik and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("magik", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_make" do
+    # Smoke test: load make and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("make", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_markdown" do
+    # Smoke test: load markdown and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("markdown", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_markdown_inline" do
+    # Smoke test: load markdown_inline and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("markdown_inline", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_matlab" do
+    # Smoke test: load matlab and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("matlab", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_mermaid" do
+    # Smoke test: load mermaid and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("mermaid", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_meson" do
+    # Smoke test: load meson and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("meson", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_netlinx" do
+    # Smoke test: load netlinx and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("netlinx", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_nim" do
+    # Smoke test: load nim and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("nim", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_ninja" do
+    # Smoke test: load ninja and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ninja", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_nix" do
+    # Smoke test: load nix and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("nix", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_nqc" do
+    # Smoke test: load nqc and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("nqc", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_objc" do
+    # Smoke test: load objc and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("objc", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_ocaml" do
+    # Smoke test: load ocaml and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ocaml", "let () = print_endline \"hello\"")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_ocaml_interface" do
+    # Smoke test: load ocaml_interface and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ocaml_interface", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_odin" do
+    # Smoke test: load odin and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("odin", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_org" do
+    # Smoke test: load org and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("org", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_pascal" do
+    # Smoke test: load pascal and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("pascal", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_pem" do
+    # Smoke test: load pem and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("pem", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_perl" do
+    # Smoke test: load perl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("perl", "print 'hello';")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_pgn" do
+    # Smoke test: load pgn and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("pgn", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_php" do
+    # Smoke test: load php and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("php", "<?php echo 'hello'; ?>")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_po" do
+    # Smoke test: load po and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("po", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_pony" do
+    # Smoke test: load pony and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("pony", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_powershell" do
+    # Smoke test: load powershell and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("powershell", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_printf" do
+    # Smoke test: load printf and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("printf", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_prisma" do
+    # Smoke test: load prisma and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("prisma", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_properties" do
+    # Smoke test: load properties and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("properties", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_proto" do
+    # Smoke test: load proto and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("proto", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_psv" do
+    # Smoke test: load psv and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("psv", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_puppet" do
+    # Smoke test: load puppet and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("puppet", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_purescript" do
+    # Smoke test: load purescript and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("purescript", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_pymanifest" do
+    # Smoke test: load pymanifest and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("pymanifest", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
   it "smoke_python" do
     # Smoke test: load python and parse a simple snippet
     tree = TreeSitterLanguagePack.parse_string("python", "print('hello')")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_qmldir" do
+    # Smoke test: load qmldir and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("qmldir", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_qmljs" do
+    # Smoke test: load qmljs and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("qmljs", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_query" do
+    # Smoke test: load query and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("query", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_r" do
+    # Smoke test: load r and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("r", "print('hello')")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_racket" do
+    # Smoke test: load racket and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("racket", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_re2c" do
+    # Smoke test: load re2c and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("re2c", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_readline" do
+    # Smoke test: load readline and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("readline", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_rego" do
+    # Smoke test: load rego and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("rego", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_requirements" do
+    # Smoke test: load requirements and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("requirements", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_ron" do
+    # Smoke test: load ron and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ron", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_rst" do
+    # Smoke test: load rst and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("rst", "x")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
   end
@@ -67,9 +928,268 @@ RSpec.describe "smoke" do
     expect(tree.root_child_count).to be >= 1
   end
 
+  it "smoke_scala" do
+    # Smoke test: load scala and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("scala", "object Main")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_scheme" do
+    # Smoke test: load scheme and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("scheme", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_scss" do
+    # Smoke test: load scss and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("scss", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_smali" do
+    # Smoke test: load smali and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("smali", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_smithy" do
+    # Smoke test: load smithy and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("smithy", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_solidity" do
+    # Smoke test: load solidity and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("solidity", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_sparql" do
+    # Smoke test: load sparql and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("sparql", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_sql" do
+    # Smoke test: load sql and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("sql", "SELECT 1;")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_squirrel" do
+    # Smoke test: load squirrel and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("squirrel", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_starlark" do
+    # Smoke test: load starlark and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("starlark", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_svelte" do
+    # Smoke test: load svelte and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("svelte", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_swift" do
+    # Smoke test: load swift and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("swift", "print(\"hello\")")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_tablegen" do
+    # Smoke test: load tablegen and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("tablegen", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_tcl" do
+    # Smoke test: load tcl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("tcl", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_terraform" do
+    # Smoke test: load terraform and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("terraform", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_test" do
+    # Smoke test: load test and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("test", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_thrift" do
+    # Smoke test: load thrift and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("thrift", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_toml" do
+    # Smoke test: load toml and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("toml", "key = \"value\"")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_tsv" do
+    # Smoke test: load tsv and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("tsv", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_tsx" do
+    # Smoke test: load tsx and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("tsx", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_twig" do
+    # Smoke test: load twig and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("twig", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
   it "smoke_typescript" do
     # Smoke test: load typescript and parse a simple snippet
     tree = TreeSitterLanguagePack.parse_string("typescript", "const x: number = 42;")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_typst" do
+    # Smoke test: load typst and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("typst", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_udev" do
+    # Smoke test: load udev and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("udev", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_ungrammar" do
+    # Smoke test: load ungrammar and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("ungrammar", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_uxntal" do
+    # Smoke test: load uxntal and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("uxntal", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_v" do
+    # Smoke test: load v and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("v", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_verilog" do
+    # Smoke test: load verilog and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("verilog", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_vhdl" do
+    # Smoke test: load vhdl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("vhdl", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_vim" do
+    # Smoke test: load vim and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("vim", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_vue" do
+    # Smoke test: load vue and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("vue", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_wast" do
+    # Smoke test: load wast and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("wast", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_wat" do
+    # Smoke test: load wat and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("wat", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_wgsl" do
+    # Smoke test: load wgsl and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("wgsl", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_xcompose" do
+    # Smoke test: load xcompose and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("xcompose", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_xml" do
+    # Smoke test: load xml and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("xml", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_yuck" do
+    # Smoke test: load yuck and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("yuck", "x")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
+  it "smoke_zig" do
+    # Smoke test: load zig and parse a simple snippet
+    tree = TreeSitterLanguagePack.parse_string("zig", "pub fn main() void {}")
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
   end

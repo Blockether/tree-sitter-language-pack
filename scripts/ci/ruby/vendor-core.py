@@ -258,6 +258,13 @@ def _update_copied_cargo_tomls(
         if crate_toml.exists():
             content = crate_toml.read_text()
             content = _replace_workspace_inheritance(content, core_version, pkg)
+            # Rename vendored package to avoid conflicts with workspace crate
+            content = re.sub(
+                r'^name = "ts-pack-core"$',
+                'name = "ts-pack-core-vendored"',
+                content,
+                flags=re.MULTILINE,
+            )
             crate_toml.write_text(content)
             replace_workspace_deps_in_toml(crate_toml, workspace_deps)
             print(f"Updated {crate_dir}/Cargo.toml")
@@ -268,10 +275,12 @@ def _update_ruby_cargo_toml(ruby_dir: Path) -> None:
     ruby_cargo_toml = ruby_dir / "Cargo.toml"
     if ruby_cargo_toml.exists():
         content = ruby_cargo_toml.read_text()
+        # Replace any existing ts-pack-core dependency line with the vendored path
         content = re.sub(
-            r'ts-pack-core = \{ path = "\.\./ts-pack-core" \}',
-            'ts-pack-core = { path = "vendor/ts-pack-core" }',
+            r"^ts-pack-core = \{.*\}$",
+            'ts-pack-core = { package = "ts-pack-core-vendored", path = "vendor/ts-pack-core" }',
             content,
+            flags=re.MULTILINE,
         )
         ruby_cargo_toml.write_text(content)
         print("Updated ts-pack-ruby/Cargo.toml to use vendored core")

@@ -79,6 +79,14 @@ jobs:
       - name: Install dependencies
         run: uv sync --no-install-project
 
+      - name: Cache parsers
+        uses: actions/cache@v4
+        with:
+          path: parsers
+          key: parsers-${{ hashFiles('sources/language_definitions.json') }}
+          restore-keys: |
+            parsers-
+
       - name: Clone vendors
         run: |
           mkdir -p parsers
