@@ -116,24 +116,15 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo registry and build
-        uses: actions/cache@v4
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-go-ffi-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-go-ffi-
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          version: 3.x
+        uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Build FFI library
         run: task go:build:ffi
@@ -187,9 +178,7 @@ jobs:
           cache-dependency-path: crates/ts-pack-go/go.sum
 
       - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          version: 3.x
+        uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Run Go tests
         run: task go:test
@@ -233,19 +222,12 @@ jobs:
           mkdir -p crates/ts-pack-ffi/include
           cp -r ffi-artifacts/crates/ts-pack-ffi/include/* crates/ts-pack-ffi/include/ 2>/dev/null || true
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo registry and build
-        uses: actions/cache@v4
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-go-e2e-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-go-e2e-
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -254,9 +236,7 @@ jobs:
           cache-dependency-path: crates/ts-pack-go/go.sum
 
       - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          version: 3.x
+        uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Generate E2E tests
         run: task go:e2e:generate

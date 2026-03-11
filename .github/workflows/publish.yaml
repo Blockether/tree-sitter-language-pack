@@ -373,8 +373,12 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Dry run - verify crate packaging
         if: ${{ inputs.dry_run }}
@@ -463,8 +467,12 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Install maturin
         run: pip install maturin
@@ -555,8 +563,12 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -677,8 +689,12 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -897,10 +913,13 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          targets: wasm32-unknown-unknown
+          target: wasm32-unknown-unknown
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
@@ -1040,8 +1059,12 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Build FFI library
         run: cargo build -p ts-pack-ffi --release

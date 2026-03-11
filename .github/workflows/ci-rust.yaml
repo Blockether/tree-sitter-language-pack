@@ -112,26 +112,14 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          components: rustfmt, clippy
-
-      - name: Cache cargo registry and build
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-lint-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-lint-
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          version: 3.x
+        uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Check formatting
         run: task rust:format:check
@@ -163,24 +151,15 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo registry and build
-        uses: actions/cache@v4
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-test-
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          version: 3.x
+        uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Run workspace tests
         run: task rust:test
@@ -204,24 +183,15 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo registry and build
-        uses: actions/cache@v4
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-e2e-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-e2e-
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          version: 3.x
+        uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Generate E2E tests
         run: task rust:e2e:generate

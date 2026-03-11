@@ -114,19 +114,12 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo registry and build
-        uses: actions/cache@v4
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-elixir-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-elixir-
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Setup Elixir
         uses: erlef/setup-elixir@v1
@@ -136,9 +129,7 @@ jobs:
           version-type: strict
 
       - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          version: 3.x
+        uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Cache Elixir dependencies
         uses: actions/cache@v4
@@ -181,19 +172,12 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo registry and build
-        uses: actions/cache@v4
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-elixir-e2e-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-elixir-e2e-
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Setup Elixir
         uses: erlef/setup-elixir@v1
@@ -203,9 +187,7 @@ jobs:
           version-type: strict
 
       - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          version: 3.x
+        uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Generate E2E tests
         run: task elixir:e2e:generate
