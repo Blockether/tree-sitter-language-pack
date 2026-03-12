@@ -161,5 +161,8 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Check README generation
-        run: python3 scripts/generate_readme.py --validate
+        run: uv run scripts/generate_readme.py --validate
