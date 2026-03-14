@@ -224,10 +224,21 @@ jobs:
           SIZE=$(stat --format=%s "$WASM_FILE" 2>/dev/null || stat -f%z "$WASM_FILE")
           echo "WASM binary size: $SIZE bytes ($(( SIZE / 1024 )) KB)"
 
+      - name: Upload WASM Node.js artifacts
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: wasm-node-pkg
+          path: |
+            crates/ts-pack-wasm/pkg/*.wasm
+            crates/ts-pack-wasm/pkg/*.js
+            crates/ts-pack-wasm/pkg/*.ts
+            crates/ts-pack-wasm/pkg/package.json
+          retention-days: 7
+
   e2e-tests:
     name: E2E Tests (WASM)
     if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
-    needs: build-wasm
+    needs: build-wasm-node
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -237,7 +248,7 @@ jobs:
       - name: Download WASM artifacts
         uses: actions/download-artifact@v8.0.1
         with:
-          name: wasm-pkg
+          name: wasm-node-pkg
           path: crates/ts-pack-wasm/pkg/
 
       - name: Setup Node
