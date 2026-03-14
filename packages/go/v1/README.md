@@ -40,7 +40,7 @@ Go bindings for tree-sitter-language-pack using cgo.
 ## Installation
 
 ```sh
-go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1
+go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
 ```
 
 ## Quick Start
@@ -50,7 +50,7 @@ package main
 
 import (
     "fmt"
-    tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
+    tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
 func main() {

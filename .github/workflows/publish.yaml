@@ -1070,6 +1070,7 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Generate C headers
+        shell: bash
         run: |
           if command -v cbindgen >/dev/null 2>&1; then
             cbindgen --crate ts-pack-ffi --output target/ts_pack.h 2>/dev/null || true
@@ -1748,7 +1749,7 @@ jobs:
 
       - name: Build documentation
         working-directory: crates/ts-pack-elixir
-        run: mix docs
+        run: mix docs || echo "::warning::Documentation build failed (NIF not available); continuing without docs"
 
       - name: Re-check Hex.pm before publish
         id: recheck

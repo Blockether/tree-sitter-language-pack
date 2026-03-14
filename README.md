@@ -53,11 +53,12 @@ tree-sitter-language-pack/
 │   ├── ts-pack-core/       # Rust core library
 │   ├── ts-pack-python/     # Python (maturin/PyO3) bindings
 │   ├── ts-pack-node/       # Node.js (NAPI-RS) bindings
-│   ├── ts-pack-go/         # Go (cgo) bindings
 │   ├── ts-pack-java/       # Java (Panama FFI) bindings
 │   ├── ts-pack-elixir/     # Elixir (Rustler NIF) bindings
 │   ├── ts-pack-ffi/        # C-compatible FFI library
 │   └── ts-pack-cli/        # CLI tool
+├── packages/
+│   └── go/v1/              # Go (cgo) bindings
 ├── grammars/               # Tree-sitter grammar sources
 └── scripts/                # Build and maintenance scripts
 ```
@@ -103,7 +104,7 @@ See [Node.js README](crates/ts-pack-node/README.md) for full documentation.
 ### Go
 
 ```sh
-go get github.com/kreuzberg-dev/tree-sitter-language-pack/go
+go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
 ```
 
 See [Go README](packages/go/v1/README.md) for full documentation.
