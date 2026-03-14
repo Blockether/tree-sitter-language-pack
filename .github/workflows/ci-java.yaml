@@ -261,6 +261,7 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSPACK_LIB_PATH: ${{ github.workspace }}/target/release/libts_pack_ffi.so
+          MAVEN_OPTS: "--enable-native-access=ALL-UNNAMED -Dsun.misc.unsafe.memory.access=allow"
 
       - name: Upload E2E test reports
         if: always()

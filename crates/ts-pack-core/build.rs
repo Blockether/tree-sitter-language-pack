@@ -272,25 +272,26 @@ fn find_wasi_sysroot() -> Option<PathBuf> {
 }
 
 /// Apply wasi-sysroot includes to a cc::Build for wasm32 targets.
+///
+/// When install-wasi-sdk sets CC_wasm32_unknown_unknown, cc-rs uses that
+/// compiler which already knows its sysroot — skip manual configuration.
+/// Only add sysroot flags when using the system compiler (e.g. local dev
+/// with `brew install wasi-libc`).
 fn apply_wasm32_sysroot(build: &mut cc::Build) {
     if env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_default() != "wasm32" {
         return;
     }
 
+    // If a cross-compiler is configured via CC env var, it handles sysroot itself.
+    if env::var("CC_wasm32_unknown_unknown").is_ok() || env::var("CC_wasm32-unknown-unknown").is_ok() {
+        return;
+    }
+
     if let Some(sysroot) = find_wasi_sysroot() {
-        // The wasm32-wasi include dir has stdlib.h etc. that parsers need.
-        // Define __wasi__ so wasi/api.h's platform guard passes — parsers
-        // only use basic C headers (malloc, string), not actual WASI APIs.
-        let wasi_include = sysroot.join("include/wasm32-wasi");
-        if wasi_include.exists() {
-            build.define("__wasi__", None);
-            build.include(&wasi_include);
-        }
         let flat_include = sysroot.join("include");
         if flat_include.exists() {
             build.include(&flat_include);
         }
-        // Pass --sysroot so the compiler finds the full toolchain headers
         build.flag(format!("--sysroot={}", sysroot.display()));
     } else {
         println!(
