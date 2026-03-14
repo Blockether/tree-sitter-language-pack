@@ -236,6 +236,14 @@ jobs:
           java-version: "24"
           cache: "maven"
 
+      - name: Build Java jar
+        working-directory: crates/ts-pack-java
+        run: mvn package -DskipTests
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+          TSLP_LINK_MODE: static
+
       - name: Generate E2E tests
         run: cargo run -p e2e-generator -- generate --lang java
         env:
