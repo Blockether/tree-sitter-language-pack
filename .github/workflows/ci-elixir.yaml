@@ -148,6 +148,7 @@ jobs:
         run: cargo build -p ts-pack-elixir --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Stage NIF for Elixir
         run: |
@@ -203,6 +204,7 @@ jobs:
         run: cargo build -p ts-pack-elixir --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Stage NIF for Elixir
         run: |
@@ -213,6 +215,7 @@ jobs:
         run: task elixir:e2e:generate
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Run E2E tests
         run: task elixir:e2e:test

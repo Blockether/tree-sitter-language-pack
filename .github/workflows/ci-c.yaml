@@ -128,10 +128,12 @@ jobs:
         run: task c:e2e:generate
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Build and run C tests
         run: task c:e2e:test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: dynamic
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
           LD_LIBRARY_PATH: ${{ github.workspace }}/target/release

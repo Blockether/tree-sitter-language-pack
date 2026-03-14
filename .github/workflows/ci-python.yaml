@@ -137,6 +137,7 @@ jobs:
         run: cargo clippy -p ts-pack-python -- -D warnings
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Install maturin
         run: pip install maturin
@@ -145,6 +146,7 @@ jobs:
         run: maturin build --release --manifest-path crates/ts-pack-python/Cargo.toml --out dist
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Upload wheel
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
@@ -214,8 +216,10 @@ jobs:
         run: cargo run -p e2e-generator -- generate --lang python
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Run E2E tests
         run: cd e2e/python && pip install -e . && pytest tests/ -v
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"

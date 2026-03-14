@@ -133,12 +133,14 @@ jobs:
         run: python3 scripts/ci/ruby/vendor-core.py
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Clippy (ts-pack-ruby)
         if: matrix.ruby-version == '3.2'
         run: cargo clippy --manifest-path crates/ts-pack-ruby/Cargo.toml -- -D warnings
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@4eb9f110bac952a8b68ecf92e3b5c7a987594ba6 # v1.292.0
@@ -157,12 +159,14 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           CARGO_TARGET_DIR: ${{ github.workspace }}/crates/ts-pack-ruby/target
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Run RSpec tests
         working-directory: crates/ts-pack-ruby
         run: bundle exec rspec
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
   e2e-ruby:
     name: E2E Ruby
@@ -202,6 +206,7 @@ jobs:
         run: python3 scripts/ci/ruby/vendor-core.py
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Build native extension
         working-directory: crates/ts-pack-ruby
@@ -211,11 +216,13 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           CARGO_TARGET_DIR: ${{ github.workspace }}/crates/ts-pack-ruby/target
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Generate E2E tests
         run: cargo run -p e2e-generator -- generate --lang ruby
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Run E2E tests
         working-directory: e2e/ruby
@@ -224,3 +231,4 @@ jobs:
           bundle exec rspec
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"

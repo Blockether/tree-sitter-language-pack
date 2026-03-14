@@ -127,6 +127,7 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: dynamic
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Upload FFI artifacts
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
@@ -239,6 +240,7 @@ jobs:
         run: cargo run -p e2e-generator -- generate --lang java
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Set library paths for JNI
         shell: bash

@@ -166,6 +166,7 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: dynamic
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
   e2e:
     name: Rust E2E Tests
@@ -197,9 +198,11 @@ jobs:
         run: task rust:e2e:generate
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Run E2E tests
         run: task rust:e2e:test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: dynamic
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
