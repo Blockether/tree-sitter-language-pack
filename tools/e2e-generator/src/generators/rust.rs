@@ -315,14 +315,16 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
 
                 let source = fixture.source_code.as_deref().unwrap_or("");
+                let has_tree_assertions = assertions.is_some_and(|a| a.tree_not_null == Some(true));
+                let tree_binding = if has_tree_assertions { "tree" } else { "_tree" };
                 writeln!(
                     out,
-                    "    let tree = parser.parse(\"{}\", None);",
+                    "    let {tree_binding} = parser.parse(\"{}\", None);",
                     escape_rust_string(source)
                 )
                 .unwrap();
 
-                if assertions.is_some_and(|a| a.tree_not_null == Some(true)) {
+                if has_tree_assertions {
                     writeln!(out, "    assert!(tree.is_some(), \"Parse tree should not be None\");").unwrap();
 
                     let needs_root = assertions.is_some_and(|a| {

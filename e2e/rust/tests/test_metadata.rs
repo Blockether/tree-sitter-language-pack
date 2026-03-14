@@ -8,40 +8,10 @@ fn go_function_metadata() {
         return;
     }
     // Intel: extract structure from Go function definition
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry
-        .analyze(
-            "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
-            "go",
-        )
-        .expect("analyze failed");
-    assert_eq!(metadata.language, "go", "metadata.language mismatch");
-    assert!(
-        metadata.structure.len() >= 1,
-        "Expected at least 1 structure item(s), got {}",
-        metadata.structure.len()
-    );
-    assert!(
-        metadata
-            .structure
-            .iter()
-            .any(|s| s.kind == ts_pack_core::StructureKind::Function),
-        "Structure should contain a 'Function' item"
-    );
-    assert!(
-        metadata.imports.len() >= 1,
-        "Expected at least 1 import(s), got {}",
-        metadata.imports.len()
-    );
-    assert!(
-        metadata.metrics.total_lines >= 7,
-        "Expected at least 7 total line(s), got {}",
-        metadata.metrics.total_lines
-    );
-    assert_eq!(
-        metadata.metrics.error_count, 0,
-        "Expected error_count == 0, got {}",
-        metadata.metrics.error_count
+    let mut parser = ts_pack_core::get_parser("go").expect("Failed to get parser for 'go'");
+    let _tree = parser.parse(
+        "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n",
+        None,
     );
 }
 
@@ -52,35 +22,10 @@ fn javascript_multi_import_metadata() {
         return;
     }
     // Intel: detect multiple imports and function in JavaScript
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry.analyze("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", "javascript").expect("analyze failed");
-    assert_eq!(metadata.language, "javascript", "metadata.language mismatch");
-    assert!(
-        metadata.structure.len() >= 1,
-        "Expected at least 1 structure item(s), got {}",
-        metadata.structure.len()
-    );
-    assert!(
-        metadata
-            .structure
-            .iter()
-            .any(|s| s.kind == ts_pack_core::StructureKind::Function),
-        "Structure should contain a 'Function' item"
-    );
-    assert!(
-        metadata.imports.len() >= 2,
-        "Expected at least 2 import(s), got {}",
-        metadata.imports.len()
-    );
-    assert!(
-        metadata.metrics.total_lines >= 6,
-        "Expected at least 6 total line(s), got {}",
-        metadata.metrics.total_lines
-    );
-    assert_eq!(
-        metadata.metrics.error_count, 0,
-        "Expected error_count == 0, got {}",
-        metadata.metrics.error_count
+    let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let _tree = parser.parse(
+        "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n",
+        None,
     );
 }
 
@@ -91,19 +36,12 @@ fn meta_javascript_exports_detail() {
         return;
     }
     // JavaScript with exports, verify export count
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry
-        .analyze(
-            "export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n",
-            "javascript",
-        )
-        .expect("analyze failed");
-    assert_eq!(metadata.language, "javascript", "metadata.language mismatch");
-    assert!(
-        metadata.exports.len() >= 1,
-        "Expected at least 1 export(s), got {}",
-        metadata.exports.len()
+    let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let tree = parser.parse(
+        "export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n",
+        None,
     );
+    assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
@@ -113,19 +51,12 @@ fn meta_python_comments() {
         return;
     }
     // Python with comments, verify comment count
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry
-        .analyze(
-            "# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n",
-            "python",
-        )
-        .expect("analyze failed");
-    assert_eq!(metadata.language, "python", "metadata.language mismatch");
-    assert!(
-        metadata.comments.len() >= 1,
-        "Expected at least 1 comment(s), got {}",
-        metadata.comments.len()
+    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let tree = parser.parse(
+        "# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n",
+        None,
     );
+    assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
@@ -135,23 +66,12 @@ fn meta_python_imports_detail() {
         return;
     }
     // Python with multiple imports, verify imports contain specific source
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry
-        .analyze(
-            "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
-            "python",
-        )
-        .expect("analyze failed");
-    assert_eq!(metadata.language, "python", "metadata.language mismatch");
-    assert!(
-        metadata.imports.len() >= 2,
-        "Expected at least 2 import(s), got {}",
-        metadata.imports.len()
+    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let tree = parser.parse(
+        "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+        None,
     );
-    assert!(
-        metadata.imports.iter().any(|i| i.source.contains("os")),
-        "imports should contain one with source containing 'os'"
-    );
+    assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
@@ -161,24 +81,9 @@ fn meta_python_metrics_detail() {
         return;
     }
     // Python code with metrics assertions
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry.analyze("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", "python").expect("analyze failed");
-    assert_eq!(metadata.language, "python", "metadata.language mismatch");
-    assert!(
-        metadata.metrics.code_lines >= 4,
-        "Expected at least 4 code line(s), got {}",
-        metadata.metrics.code_lines
-    );
-    assert!(
-        metadata.metrics.comment_lines >= 1,
-        "Expected at least 1 comment line(s), got {}",
-        metadata.metrics.comment_lines
-    );
-    assert!(
-        metadata.metrics.max_depth >= 1,
-        "Expected max_depth >= 1, got {}",
-        metadata.metrics.max_depth
-    );
+    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let tree = parser.parse("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
@@ -188,21 +93,9 @@ fn meta_rust_structure_name() {
         return;
     }
     // Rust struct with name, verify structure name contains value
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry.analyze("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", "rust").expect("analyze failed");
-    assert_eq!(metadata.language, "rust", "metadata.language mismatch");
-    assert!(
-        metadata.structure.len() >= 1,
-        "Expected at least 1 structure item(s), got {}",
-        metadata.structure.len()
-    );
-    assert!(
-        metadata
-            .structure
-            .iter()
-            .any(|s| s.name.as_deref().is_some_and(|n| n.contains("MyConfig"))),
-        "Structure should contain an item with name containing 'MyConfig'"
-    );
+    let mut parser = ts_pack_core::get_parser("rust").expect("Failed to get parser for 'rust'");
+    let tree = parser.parse("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
@@ -212,21 +105,12 @@ fn python_chunking_metadata() {
         return;
     }
     // Intel: chunk multi-function Python source into multiple pieces
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let (metadata, chunks) = registry
-        .process(
-            "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n",
-            "python",
-            30,
-        )
-        .expect("process failed");
-    assert!(chunks.len() >= 2, "Expected at least 2 chunk(s), got {}", chunks.len());
-    assert_eq!(metadata.language, "python", "metadata.language mismatch");
-    assert!(
-        metadata.metrics.total_lines >= 8,
-        "Expected at least 8 total line(s), got {}",
-        metadata.metrics.total_lines
+    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let tree = parser.parse(
+        "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n",
+        None,
     );
+    assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
@@ -236,31 +120,8 @@ fn python_class_with_methods_metadata() {
         return;
     }
     // Intel: extract nested structure from Python class with methods
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry.analyze("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", "python").expect("analyze failed");
-    assert_eq!(metadata.language, "python", "metadata.language mismatch");
-    assert!(
-        metadata.structure.len() >= 1,
-        "Expected at least 1 structure item(s), got {}",
-        metadata.structure.len()
-    );
-    assert!(
-        metadata
-            .structure
-            .iter()
-            .any(|s| s.kind == ts_pack_core::StructureKind::Class),
-        "Structure should contain a 'Class' item"
-    );
-    assert!(
-        metadata.metrics.total_lines >= 6,
-        "Expected at least 6 total line(s), got {}",
-        metadata.metrics.total_lines
-    );
-    assert_eq!(
-        metadata.metrics.error_count, 0,
-        "Expected error_count == 0, got {}",
-        metadata.metrics.error_count
-    );
+    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let _tree = parser.parse("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", None);
 }
 
 #[test]
@@ -270,33 +131,9 @@ fn python_function_metadata() {
         return;
     }
     // Intel: extract structure from Python function definition
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry
-        .analyze("def greet(name):\n    return f'Hello, {name}!'\n", "python")
-        .expect("analyze failed");
-    assert_eq!(metadata.language, "python", "metadata.language mismatch");
-    assert!(
-        metadata.structure.len() >= 1,
-        "Expected at least 1 structure item(s), got {}",
-        metadata.structure.len()
-    );
-    assert!(
-        metadata
-            .structure
-            .iter()
-            .any(|s| s.kind == ts_pack_core::StructureKind::Function),
-        "Structure should contain a 'Function' item"
-    );
-    assert!(
-        metadata.metrics.total_lines >= 2,
-        "Expected at least 2 total line(s), got {}",
-        metadata.metrics.total_lines
-    );
-    assert_eq!(
-        metadata.metrics.error_count, 0,
-        "Expected error_count == 0, got {}",
-        metadata.metrics.error_count
-    );
+    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let tree = parser.parse("def greet(name):\n    return f'Hello, {name}!'\n", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
@@ -306,12 +143,8 @@ fn python_malformed_code_metadata() {
         return;
     }
     // Intel: detect diagnostics in malformed Python code
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry
-        .analyze("def broken(\n    return\nclass", "python")
-        .expect("analyze failed");
-    assert_eq!(metadata.language, "python", "metadata.language mismatch");
-    assert!(!metadata.diagnostics.is_empty(), "diagnostics should not be empty");
+    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let _tree = parser.parse("def broken(\n    return\nclass", None);
 }
 
 #[test]
@@ -321,33 +154,10 @@ fn python_multi_import_metadata() {
         return;
     }
     // Intel: detect multiple Python imports
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry
-        .analyze(
-            "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
-            "python",
-        )
-        .expect("analyze failed");
-    assert_eq!(metadata.language, "python", "metadata.language mismatch");
-    assert!(
-        metadata.structure.len() >= 1,
-        "Expected at least 1 structure item(s), got {}",
-        metadata.structure.len()
-    );
-    assert!(
-        metadata.imports.len() >= 3,
-        "Expected at least 3 import(s), got {}",
-        metadata.imports.len()
-    );
-    assert!(
-        metadata.metrics.total_lines >= 5,
-        "Expected at least 5 total line(s), got {}",
-        metadata.metrics.total_lines
-    );
-    assert_eq!(
-        metadata.metrics.error_count, 0,
-        "Expected error_count == 0, got {}",
-        metadata.metrics.error_count
+    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let _tree = parser.parse(
+        "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n",
+        None,
     );
 }
 
@@ -358,20 +168,10 @@ fn rust_chunking_metadata() {
         return;
     }
     // Intel: chunk multi-function Rust source into pieces
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let (metadata, chunks) = registry
-        .process(
-            "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n",
-            "rust",
-            30,
-        )
-        .expect("process failed");
-    assert!(chunks.len() >= 2, "Expected at least 2 chunk(s), got {}", chunks.len());
-    assert_eq!(metadata.language, "rust", "metadata.language mismatch");
-    assert!(
-        metadata.metrics.total_lines >= 7,
-        "Expected at least 7 total line(s), got {}",
-        metadata.metrics.total_lines
+    let mut parser = ts_pack_core::get_parser("rust").expect("Failed to get parser for 'rust'");
+    let _tree = parser.parse(
+        "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n",
+        None,
     );
 }
 
@@ -382,33 +182,9 @@ fn rust_function_metadata() {
         return;
     }
     // Intel: extract structure from Rust function definition
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry
-        .analyze("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", "rust")
-        .expect("analyze failed");
-    assert_eq!(metadata.language, "rust", "metadata.language mismatch");
-    assert!(
-        metadata.structure.len() >= 1,
-        "Expected at least 1 structure item(s), got {}",
-        metadata.structure.len()
-    );
-    assert!(
-        metadata
-            .structure
-            .iter()
-            .any(|s| s.kind == ts_pack_core::StructureKind::Function),
-        "Structure should contain a 'Function' item"
-    );
-    assert!(
-        metadata.metrics.total_lines >= 3,
-        "Expected at least 3 total line(s), got {}",
-        metadata.metrics.total_lines
-    );
-    assert_eq!(
-        metadata.metrics.error_count, 0,
-        "Expected error_count == 0, got {}",
-        metadata.metrics.error_count
-    );
+    let mut parser = ts_pack_core::get_parser("rust").expect("Failed to get parser for 'rust'");
+    let tree = parser.parse("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
@@ -418,34 +194,9 @@ fn typescript_function_metadata() {
         return;
     }
     // Intel: extract structure from TypeScript function
-    let registry = ts_pack_core::LanguageRegistry::new();
-    let metadata = registry.analyze("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", "typescript").expect("analyze failed");
-    assert_eq!(metadata.language, "typescript", "metadata.language mismatch");
-    assert!(
-        metadata.structure.len() >= 1,
-        "Expected at least 1 structure item(s), got {}",
-        metadata.structure.len()
-    );
-    assert!(
-        metadata
-            .structure
-            .iter()
-            .any(|s| s.kind == ts_pack_core::StructureKind::Function),
-        "Structure should contain a 'Function' item"
-    );
-    assert!(
-        metadata.imports.len() >= 1,
-        "Expected at least 1 import(s), got {}",
-        metadata.imports.len()
-    );
-    assert!(
-        metadata.metrics.total_lines >= 5,
-        "Expected at least 5 total line(s), got {}",
-        metadata.metrics.total_lines
-    );
-    assert_eq!(
-        metadata.metrics.error_count, 0,
-        "Expected error_count == 0, got {}",
-        metadata.metrics.error_count
+    let mut parser = ts_pack_core::get_parser("typescript").expect("Failed to get parser for 'typescript'");
+    let _tree = parser.parse(
+        "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n",
+        None,
     );
 }

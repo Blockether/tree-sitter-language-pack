@@ -18,6 +18,10 @@ fn smoke_actionscript() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "variable_declaration"),
+        "Tree should contain a 'variable_declaration' node"
+    );
 }
 
 #[test]
@@ -36,6 +40,10 @@ fn smoke_ada() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "compilation_unit"),
+        "Tree should contain a 'compilation_unit' node"
     );
 }
 
@@ -56,6 +64,10 @@ fn smoke_agda() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "module"),
+        "Tree should contain a 'module' node"
+    );
 }
 
 #[test]
@@ -74,6 +86,10 @@ fn smoke_apex() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "class_declaration"),
+        "Tree should contain a 'class_declaration' node"
     );
 }
 
@@ -94,6 +110,10 @@ fn smoke_arduino() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
+    );
 }
 
 #[test]
@@ -112,6 +132,10 @@ fn smoke_asm() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "instruction"),
+        "Tree should contain a 'instruction' node"
     );
 }
 
@@ -132,6 +156,10 @@ fn smoke_astro() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "frontmatter"),
+        "Tree should contain a 'frontmatter' node"
+    );
 }
 
 #[test]
@@ -150,6 +178,10 @@ fn smoke_bash() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "command"),
+        "Tree should contain a 'command' node"
     );
 }
 
@@ -170,6 +202,10 @@ fn smoke_beancount() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "open"),
+        "Tree should contain a 'open' node"
+    );
 }
 
 #[test]
@@ -188,6 +224,10 @@ fn smoke_bibtex() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "entry"),
+        "Tree should contain a 'entry' node"
     );
 }
 
@@ -208,6 +248,10 @@ fn smoke_bicep() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "parameter_declaration"),
+        "Tree should contain a 'parameter_declaration' node"
+    );
 }
 
 #[test]
@@ -227,6 +271,10 @@ fn smoke_bitbake() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "variable_assignment"),
+        "Tree should contain a 'variable_assignment' node"
+    );
 }
 
 #[test]
@@ -245,6 +293,10 @@ fn smoke_bsl() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "procedure_definition"),
+        "Tree should contain a 'procedure_definition' node"
     );
 }
 
@@ -284,6 +336,10 @@ fn smoke_cairo() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "cairo_1_file"),
+        "Tree should contain a 'cairo_1_file' node"
+    );
 }
 
 #[test]
@@ -302,6 +358,10 @@ fn smoke_capnp() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "unique_id_statement"),
+        "Tree should contain a 'unique_id_statement' node"
     );
 }
 
@@ -322,6 +382,10 @@ fn smoke_chatito() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "intent_def"),
+        "Tree should contain a 'intent_def' node"
+    );
 }
 
 #[test]
@@ -340,6 +404,10 @@ fn smoke_clarity() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
     );
 }
 
@@ -360,6 +428,10 @@ fn smoke_clojure() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "list_lit"),
+        "Tree should contain a 'list_lit' node"
+    );
 }
 
 #[test]
@@ -378,6 +450,10 @@ fn smoke_cmake() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "normal_command"),
+        "Tree should contain a 'normal_command' node"
     );
 }
 
@@ -398,6 +474,10 @@ fn smoke_cobol() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "program_definition"),
+        "Tree should contain a 'program_definition' node"
+    );
 }
 
 #[test]
@@ -416,6 +496,10 @@ fn smoke_comment() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "tag"),
+        "Tree should contain a 'tag' node"
     );
 }
 
@@ -436,6 +520,10 @@ fn smoke_commonlisp() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "list_lit"),
+        "Tree should contain a 'list_lit' node"
+    );
 }
 
 #[test]
@@ -454,6 +542,10 @@ fn smoke_cpon() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "map"),
+        "Tree should contain a 'map' node"
     );
 }
 
@@ -493,6 +585,10 @@ fn smoke_css() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "rule_set"),
+        "Tree should contain a 'rule_set' node"
+    );
 }
 
 #[test]
@@ -511,6 +607,10 @@ fn smoke_csv() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "row"),
+        "Tree should contain a 'row' node"
     );
 }
 
@@ -531,6 +631,10 @@ fn smoke_cuda() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
+    );
 }
 
 #[test]
@@ -549,6 +653,10 @@ fn smoke_d() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_declaration"),
+        "Tree should contain a 'function_declaration' node"
     );
 }
 
@@ -569,6 +677,10 @@ fn smoke_dart() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_signature"),
+        "Tree should contain a 'function_signature' node"
+    );
 }
 
 #[test]
@@ -587,6 +699,10 @@ fn smoke_dockerfile() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "from_instruction"),
+        "Tree should contain a 'from_instruction' node"
     );
 }
 
@@ -607,6 +723,10 @@ fn smoke_doxygen() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "brief_header"),
+        "Tree should contain a 'brief_header' node"
+    );
 }
 
 #[test]
@@ -625,6 +745,10 @@ fn smoke_dtd() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "elementdecl"),
+        "Tree should contain a 'elementdecl' node"
     );
 }
 
@@ -645,6 +769,10 @@ fn smoke_elisp() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
+    );
 }
 
 #[test]
@@ -663,6 +791,10 @@ fn smoke_elixir() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "call"),
+        "Tree should contain a 'call' node"
     );
 }
 
@@ -683,6 +815,10 @@ fn smoke_elm() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "module_declaration"),
+        "Tree should contain a 'module_declaration' node"
+    );
 }
 
 #[test]
@@ -701,6 +837,10 @@ fn smoke_erlang() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "fun_decl"),
+        "Tree should contain a 'fun_decl' node"
     );
 }
 
@@ -721,6 +861,10 @@ fn smoke_fennel() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "fn"),
+        "Tree should contain a 'fn' node"
+    );
 }
 
 #[test]
@@ -739,6 +883,10 @@ fn smoke_firrtl() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "circuit"),
+        "Tree should contain a 'circuit' node"
     );
 }
 
@@ -759,6 +907,7 @@ fn smoke_fish() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(e2e_tests::tree_has_error_nodes(root), "Tree should contain error nodes");
 }
 
 #[test]
@@ -777,6 +926,10 @@ fn smoke_fortran() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "program"),
+        "Tree should contain a 'program' node"
     );
 }
 
@@ -797,6 +950,10 @@ fn smoke_fsharp() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "declaration_expression"),
+        "Tree should contain a 'declaration_expression' node"
+    );
 }
 
 #[test]
@@ -815,6 +972,10 @@ fn smoke_fsharp_signature() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "value_definition"),
+        "Tree should contain a 'value_definition' node"
     );
 }
 
@@ -835,6 +996,10 @@ fn smoke_func() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
+    );
 }
 
 #[test]
@@ -853,6 +1018,10 @@ fn smoke_gdscript() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "extends_statement"),
+        "Tree should contain a 'extends_statement' node"
     );
 }
 
@@ -873,6 +1042,10 @@ fn smoke_gitattributes() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "pattern"),
+        "Tree should contain a 'pattern' node"
+    );
 }
 
 #[test]
@@ -891,6 +1064,10 @@ fn smoke_gitcommit() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "subject"),
+        "Tree should contain a 'subject' node"
     );
 }
 
@@ -911,6 +1088,10 @@ fn smoke_gitignore() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "pattern"),
+        "Tree should contain a 'pattern' node"
+    );
 }
 
 #[test]
@@ -929,6 +1110,10 @@ fn smoke_gleam() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function"),
+        "Tree should contain a 'function' node"
     );
 }
 
@@ -949,6 +1134,10 @@ fn smoke_glsl() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
+    );
 }
 
 #[test]
@@ -967,6 +1156,10 @@ fn smoke_gn() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "primary_expression"),
+        "Tree should contain a 'primary_expression' node"
     );
 }
 
@@ -1006,6 +1199,10 @@ fn smoke_gomod() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "module_directive"),
+        "Tree should contain a 'module_directive' node"
+    );
 }
 
 #[test]
@@ -1024,6 +1221,10 @@ fn smoke_gosum() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "checksum"),
+        "Tree should contain a 'checksum' node"
     );
 }
 
@@ -1044,6 +1245,10 @@ fn smoke_graphql() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "document"),
+        "Tree should contain a 'document' node"
+    );
 }
 
 #[test]
@@ -1062,6 +1267,10 @@ fn smoke_groovy() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "command"),
+        "Tree should contain a 'command' node"
     );
 }
 
@@ -1082,6 +1291,10 @@ fn smoke_gstlaunch() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "fragment"),
+        "Tree should contain a 'fragment' node"
+    );
 }
 
 #[test]
@@ -1100,6 +1313,10 @@ fn smoke_hack() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_declaration"),
+        "Tree should contain a 'function_declaration' node"
     );
 }
 
@@ -1120,6 +1337,10 @@ fn smoke_hare() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "declarations"),
+        "Tree should contain a 'declarations' node"
+    );
 }
 
 #[test]
@@ -1138,6 +1359,10 @@ fn smoke_haskell() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "declarations"),
+        "Tree should contain a 'declarations' node"
     );
 }
 
@@ -1158,6 +1383,10 @@ fn smoke_haxe() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "class_declaration"),
+        "Tree should contain a 'class_declaration' node"
+    );
 }
 
 #[test]
@@ -1176,6 +1405,10 @@ fn smoke_hcl() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "body"),
+        "Tree should contain a 'body' node"
     );
 }
 
@@ -1196,6 +1429,10 @@ fn smoke_heex() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "directive"),
+        "Tree should contain a 'directive' node"
+    );
 }
 
 #[test]
@@ -1214,6 +1451,10 @@ fn smoke_hlsl() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
     );
 }
 
@@ -1253,6 +1494,7 @@ fn smoke_hyprlang() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(e2e_tests::tree_has_error_nodes(root), "Tree should contain error nodes");
 }
 
 #[test]
@@ -1271,6 +1513,10 @@ fn smoke_ini() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "section"),
+        "Tree should contain a 'section' node"
     );
 }
 
@@ -1291,6 +1537,10 @@ fn smoke_ispc() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
+    );
 }
 
 #[test]
@@ -1310,6 +1560,10 @@ fn smoke_janet() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "tuple"),
+        "Tree should contain a 'tuple' node"
+    );
 }
 
 #[test]
@@ -1320,7 +1574,7 @@ fn smoke_java() {
     }
     // Smoke test: load java and parse a simple snippet
     let mut parser = ts_pack_core::get_parser("java").expect("Failed to get parser for 'java'");
-    let tree = parser.parse("class Main {}", None);
+    let tree = parser.parse("class Main { public static void main(String[] args) {} }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
     let root = tree.root_node();
@@ -1367,6 +1621,10 @@ fn smoke_jsdoc() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "tag_name"),
+        "Tree should contain a 'tag_name' node"
+    );
 }
 
 #[test]
@@ -1385,6 +1643,10 @@ fn smoke_json() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "object"),
+        "Tree should contain a 'object' node"
     );
 }
 
@@ -1405,6 +1667,10 @@ fn smoke_jsonnet() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "object"),
+        "Tree should contain a 'object' node"
+    );
 }
 
 #[test]
@@ -1423,6 +1689,10 @@ fn smoke_julia() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
     );
 }
 
@@ -1443,6 +1713,10 @@ fn smoke_kconfig() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "config"),
+        "Tree should contain a 'config' node"
+    );
 }
 
 #[test]
@@ -1462,6 +1736,10 @@ fn smoke_kdl() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "node"),
+        "Tree should contain a 'node' node"
+    );
 }
 
 #[test]
@@ -1480,6 +1758,10 @@ fn smoke_kotlin() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_declaration"),
+        "Tree should contain a 'function_declaration' node"
     );
 }
 
@@ -1503,6 +1785,10 @@ fn smoke_latex() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "class_include"),
+        "Tree should contain a 'class_include' node"
+    );
 }
 
 #[test]
@@ -1521,6 +1807,10 @@ fn smoke_linkerscript() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "sections_command"),
+        "Tree should contain a 'sections_command' node"
     );
 }
 
@@ -1541,6 +1831,10 @@ fn smoke_llvm() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "fn_define"),
+        "Tree should contain a 'fn_define' node"
+    );
 }
 
 #[test]
@@ -1559,6 +1853,10 @@ fn smoke_lua() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_call"),
+        "Tree should contain a 'function_call' node"
     );
 }
 
@@ -1579,6 +1877,10 @@ fn smoke_luadoc() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "comment"),
+        "Tree should contain a 'comment' node"
+    );
 }
 
 #[test]
@@ -1597,6 +1899,10 @@ fn smoke_luap() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "set"),
+        "Tree should contain a 'set' node"
     );
 }
 
@@ -1617,6 +1923,10 @@ fn smoke_luau() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "variable_declaration"),
+        "Tree should contain a 'variable_declaration' node"
+    );
 }
 
 #[test]
@@ -1635,6 +1945,10 @@ fn smoke_magik() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "fragment"),
+        "Tree should contain a 'fragment' node"
     );
 }
 
@@ -1655,6 +1969,10 @@ fn smoke_make() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "rule"),
+        "Tree should contain a 'rule' node"
+    );
 }
 
 #[test]
@@ -1673,6 +1991,10 @@ fn smoke_markdown() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "section"),
+        "Tree should contain a 'section' node"
     );
 }
 
@@ -1693,6 +2015,10 @@ fn smoke_markdown_inline() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "strong_emphasis"),
+        "Tree should contain a 'strong_emphasis' node"
+    );
 }
 
 #[test]
@@ -1711,6 +2037,10 @@ fn smoke_matlab() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
     );
 }
 
@@ -1731,6 +2061,7 @@ fn smoke_mermaid() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(e2e_tests::tree_has_error_nodes(root), "Tree should contain error nodes");
 }
 
 #[test]
@@ -1749,6 +2080,10 @@ fn smoke_meson() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "normal_command"),
+        "Tree should contain a 'normal_command' node"
     );
 }
 
@@ -1769,6 +2104,10 @@ fn smoke_netlinx() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "program_name"),
+        "Tree should contain a 'program_name' node"
+    );
 }
 
 #[test]
@@ -1787,6 +2126,10 @@ fn smoke_nim() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "call"),
+        "Tree should contain a 'call' node"
     );
 }
 
@@ -1807,6 +2150,10 @@ fn smoke_ninja() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "rule"),
+        "Tree should contain a 'rule' node"
+    );
 }
 
 #[test]
@@ -1825,6 +2172,10 @@ fn smoke_nix() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_expression"),
+        "Tree should contain a 'function_expression' node"
     );
 }
 
@@ -1845,6 +2196,10 @@ fn smoke_nqc() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "task_definition"),
+        "Tree should contain a 'task_definition' node"
+    );
 }
 
 #[test]
@@ -1863,6 +2218,10 @@ fn smoke_objc() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "class_interface"),
+        "Tree should contain a 'class_interface' node"
     );
 }
 
@@ -1883,6 +2242,10 @@ fn smoke_ocaml() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "value_definition"),
+        "Tree should contain a 'value_definition' node"
+    );
 }
 
 #[test]
@@ -1901,6 +2264,10 @@ fn smoke_ocaml_interface() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "value_specification"),
+        "Tree should contain a 'value_specification' node"
     );
 }
 
@@ -1921,6 +2288,10 @@ fn smoke_odin() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "package_declaration"),
+        "Tree should contain a 'package_declaration' node"
+    );
 }
 
 #[test]
@@ -1939,6 +2310,10 @@ fn smoke_org() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "section"),
+        "Tree should contain a 'section' node"
     );
 }
 
@@ -1959,6 +2334,10 @@ fn smoke_pascal() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "program"),
+        "Tree should contain a 'program' node"
+    );
 }
 
 #[test]
@@ -1977,6 +2356,10 @@ fn smoke_pem() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "content"),
+        "Tree should contain a 'content' node"
     );
 }
 
@@ -1997,6 +2380,10 @@ fn smoke_perl() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "expression_statement"),
+        "Tree should contain a 'expression_statement' node"
+    );
 }
 
 #[test]
@@ -2015,6 +2402,10 @@ fn smoke_pgn() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "game"),
+        "Tree should contain a 'game' node"
     );
 }
 
@@ -2035,6 +2426,10 @@ fn smoke_php() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "php_tag"),
+        "Tree should contain a 'php_tag' node"
+    );
 }
 
 #[test]
@@ -2053,6 +2448,10 @@ fn smoke_po() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "message"),
+        "Tree should contain a 'message' node"
     );
 }
 
@@ -2073,6 +2472,10 @@ fn smoke_pony() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "actor_definition"),
+        "Tree should contain a 'actor_definition' node"
+    );
 }
 
 #[test]
@@ -2091,6 +2494,10 @@ fn smoke_powershell() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "statement_list"),
+        "Tree should contain a 'statement_list' node"
     );
 }
 
@@ -2111,6 +2518,10 @@ fn smoke_printf() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "format"),
+        "Tree should contain a 'format' node"
+    );
 }
 
 #[test]
@@ -2129,6 +2540,10 @@ fn smoke_prisma() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "model_block"),
+        "Tree should contain a 'model_block' node"
     );
 }
 
@@ -2149,6 +2564,10 @@ fn smoke_properties() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "property"),
+        "Tree should contain a 'property' node"
+    );
 }
 
 #[test]
@@ -2167,6 +2586,10 @@ fn smoke_proto() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "syntax"),
+        "Tree should contain a 'syntax' node"
     );
 }
 
@@ -2187,6 +2610,10 @@ fn smoke_psv() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "row"),
+        "Tree should contain a 'row' node"
+    );
 }
 
 #[test]
@@ -2205,6 +2632,10 @@ fn smoke_puppet() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "resource_declaration"),
+        "Tree should contain a 'resource_declaration' node"
     );
 }
 
@@ -2225,6 +2656,10 @@ fn smoke_purescript() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "qualified_module"),
+        "Tree should contain a 'qualified_module' node"
+    );
 }
 
 #[test]
@@ -2243,6 +2678,10 @@ fn smoke_pymanifest() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "command"),
+        "Tree should contain a 'command' node"
     );
 }
 
@@ -2282,6 +2721,10 @@ fn smoke_qmldir() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "command"),
+        "Tree should contain a 'command' node"
+    );
 }
 
 #[test]
@@ -2300,6 +2743,10 @@ fn smoke_qmljs() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "ui_import"),
+        "Tree should contain a 'ui_import' node"
     );
 }
 
@@ -2320,6 +2767,10 @@ fn smoke_query() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "named_node"),
+        "Tree should contain a 'named_node' node"
+    );
 }
 
 #[test]
@@ -2338,6 +2789,10 @@ fn smoke_r() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "call"),
+        "Tree should contain a 'call' node"
     );
 }
 
@@ -2358,6 +2813,10 @@ fn smoke_racket() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "extension"),
+        "Tree should contain a 'extension' node"
+    );
 }
 
 #[test]
@@ -2376,6 +2835,10 @@ fn smoke_re2c() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "global_block"),
+        "Tree should contain a 'global_block' node"
     );
 }
 
@@ -2396,6 +2859,10 @@ fn smoke_readline() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "variable_setting"),
+        "Tree should contain a 'variable_setting' node"
+    );
 }
 
 #[test]
@@ -2414,6 +2881,10 @@ fn smoke_rego() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "module"),
+        "Tree should contain a 'module' node"
     );
 }
 
@@ -2434,6 +2905,7 @@ fn smoke_requirements() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(e2e_tests::tree_has_error_nodes(root), "Tree should contain error nodes");
 }
 
 #[test]
@@ -2453,6 +2925,10 @@ fn smoke_ron() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "struct"),
+        "Tree should contain a 'struct' node"
+    );
 }
 
 #[test]
@@ -2471,6 +2947,10 @@ fn smoke_rst() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "section"),
+        "Tree should contain a 'section' node"
     );
 }
 
@@ -2529,6 +3009,10 @@ fn smoke_scala() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "object_definition"),
+        "Tree should contain a 'object_definition' node"
+    );
 }
 
 #[test]
@@ -2547,6 +3031,10 @@ fn smoke_scheme() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "list"),
+        "Tree should contain a 'list' node"
     );
 }
 
@@ -2567,6 +3055,10 @@ fn smoke_scss() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "declaration"),
+        "Tree should contain a 'declaration' node"
+    );
 }
 
 #[test]
@@ -2585,6 +3077,10 @@ fn smoke_smali() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "class_directive"),
+        "Tree should contain a 'class_directive' node"
     );
 }
 
@@ -2605,6 +3101,10 @@ fn smoke_smithy() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "shape_section"),
+        "Tree should contain a 'shape_section' node"
+    );
 }
 
 #[test]
@@ -2623,6 +3123,10 @@ fn smoke_solidity() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "pragma_directive"),
+        "Tree should contain a 'pragma_directive' node"
     );
 }
 
@@ -2643,6 +3147,10 @@ fn smoke_sparql() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "select_query"),
+        "Tree should contain a 'select_query' node"
+    );
 }
 
 #[test]
@@ -2661,6 +3169,10 @@ fn smoke_sql() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "statement"),
+        "Tree should contain a 'statement' node"
     );
 }
 
@@ -2681,6 +3193,10 @@ fn smoke_squirrel() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_declaration"),
+        "Tree should contain a 'function_declaration' node"
+    );
 }
 
 #[test]
@@ -2700,6 +3216,10 @@ fn smoke_starlark() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_definition"),
+        "Tree should contain a 'function_definition' node"
+    );
 }
 
 #[test]
@@ -2712,6 +3232,12 @@ fn smoke_svelte() {
     let mut parser = ts_pack_core::get_parser("svelte").expect("Failed to get parser for 'svelte'");
     let tree = parser.parse("<p>hello</p>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "element"),
+        "Tree should contain a 'element' node"
+    );
 }
 
 #[test]
@@ -2730,6 +3256,10 @@ fn smoke_swift() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "call_expression"),
+        "Tree should contain a 'call_expression' node"
     );
 }
 
@@ -2750,6 +3280,10 @@ fn smoke_tablegen() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "statement"),
+        "Tree should contain a 'statement' node"
+    );
 }
 
 #[test]
@@ -2769,6 +3303,7 @@ fn smoke_tcl() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(e2e_tests::tree_has_error_nodes(root), "Tree should contain error nodes");
 }
 
 #[test]
@@ -2787,6 +3322,10 @@ fn smoke_terraform() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "body"),
+        "Tree should contain a 'body' node"
     );
 }
 
@@ -2807,6 +3346,10 @@ fn smoke_test() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "test"),
+        "Tree should contain a 'test' node"
+    );
 }
 
 #[test]
@@ -2825,6 +3368,10 @@ fn smoke_thrift() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "service_definition"),
+        "Tree should contain a 'service_definition' node"
     );
 }
 
@@ -2845,6 +3392,10 @@ fn smoke_toml() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "pair"),
+        "Tree should contain a 'pair' node"
+    );
 }
 
 #[test]
@@ -2863,6 +3414,10 @@ fn smoke_tsv() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "row"),
+        "Tree should contain a 'row' node"
     );
 }
 
@@ -2883,6 +3438,10 @@ fn smoke_tsx() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "lexical_declaration"),
+        "Tree should contain a 'lexical_declaration' node"
+    );
 }
 
 #[test]
@@ -2901,6 +3460,10 @@ fn smoke_twig() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "output_directive"),
+        "Tree should contain a 'output_directive' node"
     );
 }
 
@@ -2940,6 +3503,10 @@ fn smoke_typst() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "code"),
+        "Tree should contain a 'code' node"
+    );
 }
 
 #[test]
@@ -2959,6 +3526,7 @@ fn smoke_udev() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(e2e_tests::tree_has_error_nodes(root), "Tree should contain error nodes");
 }
 
 #[test]
@@ -2977,6 +3545,10 @@ fn smoke_ungrammar() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "node"),
+        "Tree should contain a 'node' node"
     );
 }
 
@@ -2997,6 +3569,10 @@ fn smoke_uxntal() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "memory_execution"),
+        "Tree should contain a 'memory_execution' node"
+    );
 }
 
 #[test]
@@ -3015,6 +3591,10 @@ fn smoke_v() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_declaration"),
+        "Tree should contain a 'function_declaration' node"
     );
 }
 
@@ -3035,6 +3615,10 @@ fn smoke_verilog() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "module_declaration"),
+        "Tree should contain a 'module_declaration' node"
+    );
 }
 
 #[test]
@@ -3053,6 +3637,10 @@ fn smoke_vhdl() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "design_unit"),
+        "Tree should contain a 'design_unit' node"
     );
 }
 
@@ -3073,6 +3661,10 @@ fn smoke_vim() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "echo_statement"),
+        "Tree should contain a 'echo_statement' node"
+    );
 }
 
 #[test]
@@ -3091,6 +3683,10 @@ fn smoke_vue() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "template_element"),
+        "Tree should contain a 'template_element' node"
     );
 }
 
@@ -3111,6 +3707,10 @@ fn smoke_wast() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "command"),
+        "Tree should contain a 'command' node"
+    );
 }
 
 #[test]
@@ -3129,6 +3729,10 @@ fn smoke_wat() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "module"),
+        "Tree should contain a 'module' node"
     );
 }
 
@@ -3152,6 +3756,10 @@ fn smoke_wgsl() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "function_declaration"),
+        "Tree should contain a 'function_declaration' node"
+    );
 }
 
 #[test]
@@ -3170,6 +3778,10 @@ fn smoke_xcompose() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "sequence"),
+        "Tree should contain a 'sequence' node"
     );
 }
 
@@ -3190,6 +3802,10 @@ fn smoke_xml() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "prolog"),
+        "Tree should contain a 'prolog' node"
+    );
 }
 
 #[test]
@@ -3209,6 +3825,10 @@ fn smoke_yuck() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "list"),
+        "Tree should contain a 'list' node"
+    );
 }
 
 #[test]
@@ -3227,5 +3847,9 @@ fn smoke_zig() {
         root.child_count() >= 1,
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
+    );
+    assert!(
+        e2e_tests::tree_contains_node_type(root, "Decl"),
+        "Tree should contain a 'Decl' node"
     );
 }

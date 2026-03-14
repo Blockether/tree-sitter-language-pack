@@ -2,6 +2,13 @@
 #![allow(clippy::too_many_lines)]
 
 #[test]
+fn error_empty_language_name() {
+    // Parsing with empty language name should error
+    let result = ts_pack_core::get_language("");
+    assert!(result.is_err(), "Expected error loading language ''");
+}
+
+#[test]
 fn error_handling_empty_source() {
     if !ts_pack_core::has_language("javascript") {
         eprintln!("Skipping: language 'javascript' not available");
