@@ -116,12 +116,15 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@975ce032c6b75d04b438c8dc980b37b586d8c2c1 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
         with:
           target: wasm32-unknown-unknown
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
+
+      - name: Install WASI SDK
+        uses: kreuzberg-dev/actions/install-wasi-sdk@0bfa0fc19b347b4aa1aba452ce0cbca16237634b
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
@@ -194,12 +197,15 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@975ce032c6b75d04b438c8dc980b37b586d8c2c1 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
         with:
           target: wasm32-unknown-unknown
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
+
+      - name: Install WASI SDK
+        uses: kreuzberg-dev/actions/install-wasi-sdk@0bfa0fc19b347b4aa1aba452ce0cbca16237634b
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh

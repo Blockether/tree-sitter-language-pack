@@ -115,7 +115,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@975ce032c6b75d04b438c8dc980b37b586d8c2c1 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -129,7 +129,7 @@ jobs:
           version-type: strict
 
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@975ce032c6b75d04b438c8dc980b37b586d8c2c1 # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
 
       - name: Cache Elixir dependencies
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
@@ -173,7 +173,7 @@ jobs:
           path: parsers
 
       - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@975ce032c6b75d04b438c8dc980b37b586d8c2c1 # v1.0.0
+        uses: kreuzberg-dev/actions/setup-rust@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
         with:
           components: ""
           use-sccache: "false"
@@ -187,7 +187,7 @@ jobs:
           version-type: strict
 
       - name: Install Task
-        uses: kreuzberg-dev/actions/install-task@975ce032c6b75d04b438c8dc980b37b586d8c2c1 # v1.0.0
+        uses: kreuzberg-dev/actions/install-task@0bfa0fc19b347b4aa1aba452ce0cbca16237634b # v1.0.0
 
       - name: Generate E2E tests
         run: task elixir:e2e:generate
