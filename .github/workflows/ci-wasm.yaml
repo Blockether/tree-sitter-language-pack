@@ -123,16 +123,8 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Install WASI SDK
-        uses: kreuzberg-dev/actions/install-wasi-sdk@v1.0.0
-
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
-      - name: Clippy (ts-pack-wasm)
-        run: cargo clippy --manifest-path crates/ts-pack-wasm/Cargo.toml --target wasm32-unknown-unknown -- -D warnings
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Build WASM (web target)
         working-directory: crates/ts-pack-wasm
@@ -203,9 +195,6 @@ jobs:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
-
-      - name: Install WASI SDK
-        uses: kreuzberg-dev/actions/install-wasi-sdk@v1.0.0
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh

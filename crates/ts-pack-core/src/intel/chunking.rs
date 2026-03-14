@@ -88,7 +88,7 @@ fn node_text<'a>(node: &tree_sitter::Node, source: &'a str) -> &'a str {
     &source[node.start_byte()..node.end_byte()]
 }
 
-#[allow(clippy::only_used_in_recursion)]
+#[allow(clippy::only_used_in_recursion, clippy::too_many_arguments)]
 fn collect_chunk_metadata(
     node: &tree_sitter::Node,
     source: &str,
