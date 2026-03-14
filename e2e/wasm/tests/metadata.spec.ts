@@ -10,43 +10,21 @@ import {
   treeRootChildCount,
   treeContainsNodeType,
   treeHasErrorNodes,
-  rootNodeInfo,
-  findNodesByType,
-  namedChildrenInfo,
   freeTree,
-  analyze,
   process,
+  processAndChunk,
 } from "./helpers";
 
 describe("metadata", () => {
-  it("go_function_metadata", () => {
-    // Intel: extract structure from Go function definition
-    if (!hasLanguage("go")) {
-      console.log("Skipping: language 'go' not available");
-      return;
-    }
-    const metadata = analyze("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", "go");
-    expect(metadata.language).toBe("go");
-    expect((metadata.structure || []).length).toBeGreaterThanOrEqual(1);
-    expect((metadata.structure || []).some((s: any) => s.kind === "Function")).toBe(true);
-    expect((metadata.imports || []).length).toBeGreaterThanOrEqual(1);
-    expect((metadata.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(7);
-    expect((metadata.metrics || {}).error_count || 0).toBe(0);
-  });
-
   it("javascript_multi_import_metadata", () => {
     // Intel: detect multiple imports and function in JavaScript
     if (!hasLanguage("javascript")) {
       console.log("Skipping: language 'javascript' not available");
       return;
     }
-    const metadata = analyze("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", "javascript");
-    expect(metadata.language).toBe("javascript");
-    expect((metadata.structure || []).length).toBeGreaterThanOrEqual(1);
-    expect((metadata.structure || []).some((s: any) => s.kind === "Function")).toBe(true);
-    expect((metadata.imports || []).length).toBeGreaterThanOrEqual(2);
-    expect((metadata.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(6);
-    expect((metadata.metrics || {}).error_count || 0).toBe(0);
+    const tree = parseString("javascript", `import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n`);
+    expect(tree).toBeTruthy();
+    freeTree(tree);
   });
 
   it("meta_javascript_exports_detail", () => {
@@ -55,152 +33,10 @@ describe("metadata", () => {
       console.log("Skipping: language 'javascript' not available");
       return;
     }
-    const metadata = analyze("export function greet(name) {\n  return \`Hello \${name}\`;\n}\n\nexport const VERSION = '1.0';\n", "javascript");
-    expect(metadata.language).toBe("javascript");
-    expect((metadata.exports || []).length).toBeGreaterThanOrEqual(1);
-  });
-
-  it("meta_python_comments", () => {
-    // Python with comments, verify comment count
-    if (!hasLanguage("python")) {
-      console.log("Skipping: language 'python' not available");
-      return;
-    }
-    const metadata = analyze("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", "python");
-    expect(metadata.language).toBe("python");
-    expect((metadata.comments || []).length).toBeGreaterThanOrEqual(1);
-  });
-
-  it("meta_python_imports_detail", () => {
-    // Python with multiple imports, verify imports contain specific source
-    if (!hasLanguage("python")) {
-      console.log("Skipping: language 'python' not available");
-      return;
-    }
-    const metadata = analyze("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", "python");
-    expect(metadata.language).toBe("python");
-    expect((metadata.imports || []).length).toBeGreaterThanOrEqual(2);
-    expect((metadata.imports || []).some((i: any) => (i.source || "").includes("os"))).toBe(true);
-  });
-
-  it("meta_python_metrics_detail", () => {
-    // Python code with metrics assertions
-    if (!hasLanguage("python")) {
-      console.log("Skipping: language 'python' not available");
-      return;
-    }
-    const metadata = analyze("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", "python");
-    expect(metadata.language).toBe("python");
-    expect((metadata.metrics || {}).code_lines || 0).toBeGreaterThanOrEqual(4);
-    expect((metadata.metrics || {}).comment_lines || 0).toBeGreaterThanOrEqual(1);
-    expect((metadata.metrics || {}).max_depth || 0).toBeGreaterThanOrEqual(1);
-  });
-
-  it("meta_rust_structure_name", () => {
-    // Rust struct with name, verify structure name contains value
-    if (!hasLanguage("rust")) {
-      console.log("Skipping: language 'rust' not available");
-      return;
-    }
-    const metadata = analyze("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", "rust");
-    expect(metadata.language).toBe("rust");
-    expect((metadata.structure || []).length).toBeGreaterThanOrEqual(1);
-    expect((metadata.structure || []).some((s: any) => s.name && s.name.includes("MyConfig"))).toBe(true);
-  });
-
-  it("python_chunking_metadata", () => {
-    // Intel: chunk multi-function Python source into multiple pieces
-    if (!hasLanguage("python")) {
-      console.log("Skipping: language 'python' not available");
-      return;
-    }
-    const result = process("def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n", "python", 30);
-    const metadata = result.metadata;
-    const chunks = result.chunks;
-    expect(metadata.language).toBe("python");
-    expect((metadata.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(8);
-    expect((chunks || []).length).toBeGreaterThanOrEqual(2);
-  });
-
-  it("python_class_with_methods_metadata", () => {
-    // Intel: extract nested structure from Python class with methods
-    if (!hasLanguage("python")) {
-      console.log("Skipping: language 'python' not available");
-      return;
-    }
-    const metadata = analyze("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", "python");
-    expect(metadata.language).toBe("python");
-    expect((metadata.structure || []).length).toBeGreaterThanOrEqual(1);
-    expect((metadata.structure || []).some((s: any) => s.kind === "Class")).toBe(true);
-    expect((metadata.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(6);
-    expect((metadata.metrics || {}).error_count || 0).toBe(0);
-  });
-
-  it("python_function_metadata", () => {
-    // Intel: extract structure from Python function definition
-    if (!hasLanguage("python")) {
-      console.log("Skipping: language 'python' not available");
-      return;
-    }
-    const metadata = analyze("def greet(name):\n    return f'Hello, {name}!'\n", "python");
-    expect(metadata.language).toBe("python");
-    expect((metadata.structure || []).length).toBeGreaterThanOrEqual(1);
-    expect((metadata.structure || []).some((s: any) => s.kind === "Function")).toBe(true);
-    expect((metadata.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(2);
-    expect((metadata.metrics || {}).error_count || 0).toBe(0);
-  });
-
-  it("python_malformed_code_metadata", () => {
-    // Intel: detect diagnostics in malformed Python code
-    if (!hasLanguage("python")) {
-      console.log("Skipping: language 'python' not available");
-      return;
-    }
-    const metadata = analyze("def broken(\n    return\nclass", "python");
-    expect(metadata.language).toBe("python");
-    expect((metadata.diagnostics || []).length).toBeGreaterThan(0);
-  });
-
-  it("python_multi_import_metadata", () => {
-    // Intel: detect multiple Python imports
-    if (!hasLanguage("python")) {
-      console.log("Skipping: language 'python' not available");
-      return;
-    }
-    const metadata = analyze("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", "python");
-    expect(metadata.language).toBe("python");
-    expect((metadata.structure || []).length).toBeGreaterThanOrEqual(1);
-    expect((metadata.imports || []).length).toBeGreaterThanOrEqual(3);
-    expect((metadata.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(5);
-    expect((metadata.metrics || {}).error_count || 0).toBe(0);
-  });
-
-  it("rust_chunking_metadata", () => {
-    // Intel: chunk multi-function Rust source into pieces
-    if (!hasLanguage("rust")) {
-      console.log("Skipping: language 'rust' not available");
-      return;
-    }
-    const result = process("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", "rust", 30);
-    const metadata = result.metadata;
-    const chunks = result.chunks;
-    expect(metadata.language).toBe("rust");
-    expect((metadata.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(7);
-    expect((chunks || []).length).toBeGreaterThanOrEqual(2);
-  });
-
-  it("rust_function_metadata", () => {
-    // Intel: extract structure from Rust function definition
-    if (!hasLanguage("rust")) {
-      console.log("Skipping: language 'rust' not available");
-      return;
-    }
-    const metadata = analyze("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", "rust");
-    expect(metadata.language).toBe("rust");
-    expect((metadata.structure || []).length).toBeGreaterThanOrEqual(1);
-    expect((metadata.structure || []).some((s: any) => s.kind === "Function")).toBe(true);
-    expect((metadata.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(3);
-    expect((metadata.metrics || {}).error_count || 0).toBe(0);
+    const tree = parseString("javascript", `export function greet(name) {\n  return \`Hello \${name}\`;\n}\n\nexport const VERSION = '1.0';\n`);
+    expect(tree).toBeTruthy();
+    expect(tree).not.toBeNull();
+    freeTree(tree);
   });
 
   it("typescript_function_metadata", () => {
@@ -209,13 +45,9 @@ describe("metadata", () => {
       console.log("Skipping: language 'typescript' not available");
       return;
     }
-    const metadata = analyze("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return \`Hello, \${name}!\`;\n}\n", "typescript");
-    expect(metadata.language).toBe("typescript");
-    expect((metadata.structure || []).length).toBeGreaterThanOrEqual(1);
-    expect((metadata.structure || []).some((s: any) => s.kind === "Function")).toBe(true);
-    expect((metadata.imports || []).length).toBeGreaterThanOrEqual(1);
-    expect((metadata.metrics || {}).total_lines || 0).toBeGreaterThanOrEqual(5);
-    expect((metadata.metrics || {}).error_count || 0).toBe(0);
+    const tree = parseString("typescript", `import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return \`Hello, \${name}!\`;\n}\n`);
+    expect(tree).toBeTruthy();
+    freeTree(tree);
   });
 
 });

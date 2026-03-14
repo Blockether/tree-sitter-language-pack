@@ -4,6 +4,11 @@ import { describe, it, expect } from "vitest";
 import { availableLanguages, hasLanguage, getLanguagePtr, process, processAndChunk } from "./helpers";
 
 describe("error_handling", () => {
+  it("error_empty_language_name", () => {
+    // Parsing with empty language name should error
+    expect(() => getLanguagePtr("")).toThrow();
+  });
+
   it("error_handling_empty_source", () => {
     // Parsing an empty string should still produce a tree.
     if (!hasLanguage("javascript")) {
