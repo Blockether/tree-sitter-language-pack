@@ -75,7 +75,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6.2.0
         with:
-          python-version: "3.12"
+          python-version: "3.14"
 
       - name: Install dependencies
         run: uv sync --no-install-project
@@ -170,7 +170,7 @@ jobs:
         uses: actions/setup-java@v5.2.0
         with:
           distribution: "temurin"
-          java-version: "22"
+          java-version: "24"
           cache: "maven"
 
       - name: Set library paths for JNI
@@ -233,7 +233,7 @@ jobs:
         uses: actions/setup-java@v5.2.0
         with:
           distribution: "temurin"
-          java-version: "22"
+          java-version: "24"
           cache: "maven"
 
       - name: Generate E2E tests

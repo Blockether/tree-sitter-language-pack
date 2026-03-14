@@ -64,7 +64,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6.3.0
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: Install tree-sitter CLI
         run: npm install -g tree-sitter-cli
@@ -77,7 +77,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6.2.0
         with:
-          python-version: "3.12"
+          python-version: "3.14"
 
       - name: Install dependencies
         run: uv sync --no-install-project
@@ -141,7 +141,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6.3.0
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: Install NAPI-RS CLI
         run: npm install -g @napi-rs/cli
@@ -201,7 +201,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6.3.0
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: Install pnpm
         run: npm install -g pnpm
