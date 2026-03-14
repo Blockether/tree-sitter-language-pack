@@ -147,6 +147,7 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+          TSLP_LINK_MODE: static
 
       - name: Upload wheel
         uses: actions/upload-artifact@v7.0.0

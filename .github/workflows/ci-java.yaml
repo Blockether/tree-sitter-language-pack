@@ -238,7 +238,9 @@ jobs:
 
       - name: Build Java jar
         working-directory: crates/ts-pack-java
-        run: mvn package -DskipTests
+        run: |
+          mvn package -DskipTests
+          ln -sf target/tree-sitter-language-pack-*.jar target/tree-sitter-language-pack.jar
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"

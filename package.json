@@ -1,5 +1,6 @@
 {
 	"private": true,
+	"packageManager": "pnpm@10.32.1",
 	"workspaces": [
 		"crates/ts-pack-node",
 		"e2e/typescript"
