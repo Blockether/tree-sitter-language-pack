@@ -26,7 +26,7 @@ vars:
   PROJECT_ROOT:
     sh: pwd
   VERSION:
-    sh: grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)"/\1/'
+    sh: grep '^version' Cargo.toml | head -1 | sed 's/.*"//;s/".*//'
 
 tasks:
   default:
