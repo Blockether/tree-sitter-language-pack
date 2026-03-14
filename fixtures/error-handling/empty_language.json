@@ -1,0 +1,11 @@
+{
+	"id": "error_empty_language_name",
+	"category": "error-handling",
+	"description": "Parsing with empty language name should error",
+	"language": "",
+	"source_code": "hello",
+	"assertions": {
+		"expect_error": true
+	},
+	"tags": ["error-handling"]
+}

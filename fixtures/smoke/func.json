@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "function_definition",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load func and parse a simple snippet",
+	"id": "smoke_func",
+	"language": "func",
+	"source_code": "() recv_internal() {}",
+	"tags": ["smoke"]
+}

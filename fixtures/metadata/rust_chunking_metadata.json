@@ -1,0 +1,17 @@
+{
+	"id": "rust_chunking_metadata",
+	"category": "metadata",
+	"description": "Intel: chunk multi-function Rust source into pieces",
+	"language": "rust",
+	"source_code": "fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n",
+	"assertions": {
+		"meta_language": "rust",
+		"meta_chunk_count_min": 2,
+		"meta_chunk_max_size": 30,
+		"meta_metrics_total_lines_min": 7
+	},
+	"skip": {
+		"requires_language": "rust"
+	},
+	"tags": ["metadata", "chunking"]
+}

@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "actor_definition",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load pony and parse a simple snippet",
+	"id": "smoke_pony",
+	"language": "pony",
+	"source_code": "actor Main\n  new create(env: Env) => None",
+	"tags": ["smoke"]
+}

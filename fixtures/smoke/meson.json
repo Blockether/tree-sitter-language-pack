@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "normal_command",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load meson and parse a simple snippet",
+	"id": "smoke_meson",
+	"language": "meson",
+	"source_code": "project('hello', 'c')",
+	"tags": ["smoke"]
+}

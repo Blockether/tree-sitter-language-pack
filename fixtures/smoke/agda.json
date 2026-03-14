@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "module",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load agda and parse a simple snippet",
+	"id": "smoke_agda",
+	"language": "agda",
+	"source_code": "module Main where",
+	"tags": ["smoke"]
+}

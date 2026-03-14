@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "strong_emphasis",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load markdown_inline and parse a simple snippet",
+	"id": "smoke_markdown_inline",
+	"language": "markdown_inline",
+	"source_code": "**bold** and *italic*",
+	"tags": ["smoke"]
+}

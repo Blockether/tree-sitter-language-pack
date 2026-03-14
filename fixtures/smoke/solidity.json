@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "pragma_directive",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load solidity and parse a simple snippet",
+	"id": "smoke_solidity",
+	"language": "solidity",
+	"source_code": "pragma solidity ^0.8.0;\ncontract Main {}",
+	"tags": ["smoke"]
+}

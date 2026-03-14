@@ -1,5 +1,4 @@
 /// Types for content intelligence extracted from source code via tree-sitter.
-
 /// Byte and line/column range in source code.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

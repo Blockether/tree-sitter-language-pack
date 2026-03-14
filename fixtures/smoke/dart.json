@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "function_signature",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load dart and parse a simple snippet",
+	"id": "smoke_dart",
+	"language": "dart",
+	"source_code": "void main() {}",
+	"tags": ["smoke"]
+}

@@ -1,0 +1,12 @@
+{
+	"id": "tree_root_node_info_python",
+	"category": "tree-inspection",
+	"description": "Parse Python source and verify root node info",
+	"language": "python",
+	"source_code": "def hello():\n    pass\n",
+	"assertions": {
+		"tree_not_null": true,
+		"tree_root_node_type": "module"
+	},
+	"tags": ["tree-inspection"]
+}

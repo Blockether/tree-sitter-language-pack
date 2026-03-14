@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"has_error_nodes": true,
+		"root_child_count_min": 1,
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load tcl and parse a simple snippet",
+	"id": "smoke_tcl",
+	"language": "tcl",
+	"source_code": "puts hello",
+	"tags": ["smoke"]
+}

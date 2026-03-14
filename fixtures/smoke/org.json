@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "section",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load org and parse a simple snippet",
+	"id": "smoke_org",
+	"language": "org",
+	"source_code": "* Hello\nWorld",
+	"tags": ["smoke"]
+}

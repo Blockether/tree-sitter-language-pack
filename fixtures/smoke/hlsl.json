@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "function_definition",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load hlsl and parse a simple snippet",
+	"id": "smoke_hlsl",
+	"language": "hlsl",
+	"source_code": "float4 main() : SV_Target { return 0; }",
+	"tags": ["smoke"]
+}

@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "class_declaration",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load haxe and parse a simple snippet",
+	"id": "smoke_haxe",
+	"language": "haxe",
+	"source_code": "class Main { static function main() {} }",
+	"tags": ["smoke"]
+}

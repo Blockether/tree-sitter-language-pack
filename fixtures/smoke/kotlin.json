@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "function_declaration",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load kotlin and parse a simple snippet",
+	"id": "smoke_kotlin",
+	"language": "kotlin",
+	"source_code": "fun main() {}",
+	"tags": ["smoke"]
+}

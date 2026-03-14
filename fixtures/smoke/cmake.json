@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "normal_command",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load cmake and parse a simple snippet",
+	"id": "smoke_cmake",
+	"language": "cmake",
+	"source_code": "cmake_minimum_required(VERSION 3.0)",
+	"tags": ["smoke"]
+}

@@ -1,0 +1,14 @@
+{
+	"id": "meta_rust_structure_name",
+	"category": "metadata",
+	"description": "Rust struct with name, verify structure name contains value",
+	"language": "rust",
+	"source_code": "pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n",
+	"assertions": {
+		"tree_not_null": true,
+		"meta_language": "rust",
+		"meta_structure_count_min": 1,
+		"meta_structure_name_contains": "MyConfig"
+	},
+	"tags": ["metadata"]
+}

@@ -1,0 +1,12 @@
+{
+	"id": "tree_error_count_valid",
+	"category": "tree-inspection",
+	"description": "Parse valid Python code and verify zero error count",
+	"language": "python",
+	"source_code": "x = 1\ny = 2\n",
+	"assertions": {
+		"tree_not_null": true,
+		"tree_error_count": 0
+	},
+	"tags": ["tree-inspection"]
+}

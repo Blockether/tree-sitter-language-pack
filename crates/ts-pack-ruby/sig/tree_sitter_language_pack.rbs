@@ -1,0 +1,21 @@
+module TreeSitterLanguagePack
+  def self.available_languages: () -> Array[String]
+  def self.has_language: (String name) -> bool
+  def self.get_language_ptr: (String name) -> Integer
+  def self.parse_string: (String language, String source) -> Tree
+  def self.analyze: (String source, String language) -> Hash[String, untyped]
+  def self.chunk: (String source, String language, Integer max_chunk_size) -> Array[Hash[String, untyped]]
+  def self.process: (String source, String language, Integer max_chunk_size) -> Hash[String, untyped]
+
+  class Tree
+    def root_node_type: () -> String
+    def root_child_count: () -> Integer
+    def contains_node_type: (String node_type) -> bool
+    def has_error_nodes: () -> bool
+    def root_node_info: () -> Hash[String, untyped]
+    def find_nodes_by_type: (String node_type) -> Array[Hash[String, untyped]]
+    def named_children_info: () -> Array[Hash[String, untyped]]
+    def extract_text: (Integer start_byte, Integer end_byte) -> String
+    def run_query: (String language, String query_source) -> Array[Hash[String, untyped]]
+  end
+end

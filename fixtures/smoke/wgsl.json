@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "function_declaration",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load wgsl and parse a simple snippet",
+	"id": "smoke_wgsl",
+	"language": "wgsl",
+	"source_code": "@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }",
+	"tags": ["smoke"]
+}

@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "module",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load rego and parse a simple snippet",
+	"id": "smoke_rego",
+	"language": "rego",
+	"source_code": "package main\ndefault allow = false",
+	"tags": ["smoke"]
+}

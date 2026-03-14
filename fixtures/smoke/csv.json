@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "row",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load csv and parse a simple snippet",
+	"id": "smoke_csv",
+	"language": "csv",
+	"source_code": "a,b,c\n1,2,3",
+	"tags": ["smoke"]
+}

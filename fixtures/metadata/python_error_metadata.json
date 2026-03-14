@@ -1,0 +1,15 @@
+{
+	"id": "python_malformed_code_metadata",
+	"category": "metadata",
+	"description": "Intel: detect diagnostics in malformed Python code",
+	"language": "python",
+	"source_code": "def broken(\n    return\nclass",
+	"assertions": {
+		"meta_language": "python",
+		"meta_diagnostics_not_empty": true
+	},
+	"skip": {
+		"requires_language": "python"
+	},
+	"tags": ["metadata", "error", "diagnostics"]
+}

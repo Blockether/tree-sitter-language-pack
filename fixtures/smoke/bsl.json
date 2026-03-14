@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "procedure_definition",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load bsl and parse a simple snippet",
+	"id": "smoke_bsl",
+	"language": "bsl",
+	"source_code": "Procedure Main() EndProcedure",
+	"tags": ["smoke"]
+}

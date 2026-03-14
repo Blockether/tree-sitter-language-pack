@@ -31,7 +31,7 @@ repos:
 
   # TOML formatting
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.16.2
+    rev: v2.18.1
     hooks:
       - id: pyproject-fmt
 
@@ -43,7 +43,7 @@ repos:
 
   # Python: ruff (linting + formatting) + mypy (type checking)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.5
+    rev: v0.15.6
     hooks:
       - id: ruff
         args: ["--fix", "--unsafe-fixes"]
@@ -105,13 +105,13 @@ repos:
 
   # AI Rules
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v3.8.3
+    rev: v3.9.0
     hooks:
       - id: ai-rulez-generate
 
   # JavaScript/TypeScript/JSON: biome (formatting + linting)
   - repo: https://github.com/biomejs/pre-commit
-    rev: v2.4.6
+    rev: v2.4.7
     hooks:
       - id: biome-format
       - id: biome-lint

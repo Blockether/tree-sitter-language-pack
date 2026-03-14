@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "output_directive",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load twig and parse a simple snippet",
+	"id": "smoke_twig",
+	"language": "twig",
+	"source_code": "{{ variable }}",
+	"tags": ["smoke"]
+}

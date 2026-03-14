@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "program",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load pascal and parse a simple snippet",
+	"id": "smoke_pascal",
+	"language": "pascal",
+	"source_code": "program Hello; begin end.",
+	"tags": ["smoke"]
+}

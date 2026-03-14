@@ -1,0 +1,15 @@
+{
+	"id": "tree_find_nodes_two_functions",
+	"category": "tree-inspection",
+	"description": "Parse Python with 2 functions and verify find_nodes_by_type count",
+	"language": "python",
+	"source_code": "def foo():\n    pass\n\ndef bar():\n    pass\n",
+	"assertions": {
+		"tree_not_null": true,
+		"find_nodes_count_min": {
+			"node_type": "function_definition",
+			"min_count": 2
+		}
+	},
+	"tags": ["tree-inspection"]
+}

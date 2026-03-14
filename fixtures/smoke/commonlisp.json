@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "list_lit",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load commonlisp and parse a simple snippet",
+	"id": "smoke_commonlisp",
+	"language": "commonlisp",
+	"source_code": "(defun hello () (print \"hello\"))",
+	"tags": ["smoke"]
+}

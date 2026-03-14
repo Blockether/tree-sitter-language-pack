@@ -1,0 +1,15 @@
+{
+	"id": "meta_python_metrics_detail",
+	"category": "metadata",
+	"description": "Python code with metrics assertions",
+	"language": "python",
+	"source_code": "# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n",
+	"assertions": {
+		"tree_not_null": true,
+		"meta_language": "python",
+		"meta_metrics_code_lines_min": 4,
+		"meta_metrics_comment_lines_min": 1,
+		"meta_metrics_max_depth_min": 1
+	},
+	"tags": ["metadata"]
+}

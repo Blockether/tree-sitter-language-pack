@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "compilation_unit",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load ada and parse a simple snippet",
+	"id": "smoke_ada",
+	"language": "ada",
+	"source_code": "procedure Main is begin null; end Main;",
+	"tags": ["smoke"]
+}

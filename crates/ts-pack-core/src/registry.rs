@@ -246,7 +246,7 @@ impl LanguageRegistry {
             }
         }
         for &(alias, target) in LANGUAGE_ALIASES {
-            if langs.iter().any(|lang| lang.as_ref() == target) {
+            if langs.iter().any(|lang| lang.as_str() == target) {
                 langs.push(alias.to_string());
             }
         }

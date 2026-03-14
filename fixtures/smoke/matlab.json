@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "function_definition",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load matlab and parse a simple snippet",
+	"id": "smoke_matlab",
+	"language": "matlab",
+	"source_code": "function y = hello(x)\ny = x;\nend",
+	"tags": ["smoke"]
+}

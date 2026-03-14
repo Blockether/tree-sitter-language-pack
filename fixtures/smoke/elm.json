@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "module_declaration",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load elm and parse a simple snippet",
+	"id": "smoke_elm",
+	"language": "elm",
+	"source_code": "module Main exposing (..)",
+	"tags": ["smoke"]
+}

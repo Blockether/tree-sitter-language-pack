@@ -1,0 +1,13 @@
+{
+	"assertions": {
+		"root_child_count_min": 1,
+		"root_contains_node_type": "fn",
+		"tree_not_null": true
+	},
+	"category": "smoke",
+	"description": "Smoke test: load fennel and parse a simple snippet",
+	"id": "smoke_fennel",
+	"language": "fennel",
+	"source_code": "(fn hello [] (print :hello))",
+	"tags": ["smoke"]
+}
