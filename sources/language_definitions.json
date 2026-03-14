@@ -263,7 +263,7 @@
 	"groovy": {
 		"branch": "gh-pages",
 		"repo": "https://github.com/Decodetalkers/tree-sitter-groovy",
-		"rev": "679459be70d7fbac175fb19f668948d57b3825ef"
+		"rev": "a6cf8f80dd3d5246398ad4011c2e2caf995ee17f"
 	},
 	"gstlaunch": {
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-gstlaunch",
@@ -487,7 +487,7 @@
 	"perl": {
 		"branch": "release",
 		"repo": "https://github.com/tree-sitter-perl/tree-sitter-perl",
-		"rev": "ad74e6db234c35d537de9358799a8e0cc4f5dee0"
+		"rev": "0c24d001dd1921e418fb933d208a7bd7dd3f923a"
 	},
 	"pgn": {
 		"branch": "master",
