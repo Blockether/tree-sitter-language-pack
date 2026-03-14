@@ -111,16 +111,16 @@ languages:
     name: "Go"
     template: language_package.md.jinja
     output_path: packages/go/v1/README.md
-    package_name: "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
+    package_name: "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
     package_manager: [go]
     description: "Go bindings for tree-sitter-language-pack using cgo."
-    install_command: "go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
+    install_command: "go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
     quick_start: |
       package main
 
       import (
           "fmt"
-          tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
+          tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
       )
 
       func main() {

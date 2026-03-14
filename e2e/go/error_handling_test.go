@@ -4,6 +4,15 @@ package e2e_tests
 
 import "testing"
 
+func TestErrorEmptyLanguageName(t *testing.T) {
+	// Parsing with empty language name should error
+	reg := newTestRegistry(t)
+	_, err := reg.GetLanguage("")
+	if err == nil {
+		t.Fatalf("Expected error loading language %q, got nil", "")
+	}
+}
+
 func TestErrorHandlingEmptySource(t *testing.T) {
 	// Parsing an empty string should still produce a tree.
 	reg := newTestRegistry(t)

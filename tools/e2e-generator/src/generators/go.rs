@@ -42,9 +42,9 @@ module e2e_tests
 
 go 1.26
 
-require github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1 v0.0.0
+require github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go v0.0.0
 
-replace github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1 => ../../packages/go/v1
+replace github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go => ../../packages/go/v1
 "#;
     std::fs::write(dir.join("go.mod"), content).map_err(|e| format!("Failed to write go.mod: {e}"))
 }
@@ -57,7 +57,7 @@ package e2e_tests
 import (
 	"testing"
 
-	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
+	tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
 // newTestRegistry creates a registry for testing and registers cleanup.

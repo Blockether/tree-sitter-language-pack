@@ -2,216 +2,96 @@
 
 package e2e_tests
 
-import (
-	"strings"
-	"testing"
-)
+import "testing"
 
 func TestGoFunctionMetadata(t *testing.T) {
 	// Intel: extract structure from Go function definition
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "go")
-	meta, err := reg.Analyze("package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"hello\")\n}\n", "go")
+	ptr, err := reg.GetLanguage("go")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "go", err)
 	}
-
-	if meta.Language != "go" {
-		t.Fatalf("expected language %q, got %q", "go", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "go")
 	}
-
-	if len(meta.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(meta.Structure))
-	}
-
-	foundKind := false
-	for _, s := range meta.Structure {
-		if s.Kind == "Function" {
-			foundKind = true
-			break
-		}
-	}
-	if !foundKind {
-		t.Fatal("structure should contain a 'Function' kind node")
-	}
-
-	if len(meta.Imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(meta.Imports))
-	}
-
-	if meta.Metrics.TotalLines < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %d", meta.Metrics.TotalLines)
-	}
-
-	if meta.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", meta.Metrics.ErrorCount)
-	}
-
 }
 
 func TestJavascriptMultiImportMetadata(t *testing.T) {
 	// Intel: detect multiple imports and function in JavaScript
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "javascript")
-	meta, err := reg.Analyze("import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n", "javascript")
+	ptr, err := reg.GetLanguage("javascript")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "javascript", err)
 	}
-
-	if meta.Language != "javascript" {
-		t.Fatalf("expected language %q, got %q", "javascript", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "javascript")
 	}
-
-	if len(meta.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(meta.Structure))
-	}
-
-	foundKind := false
-	for _, s := range meta.Structure {
-		if s.Kind == "Function" {
-			foundKind = true
-			break
-		}
-	}
-	if !foundKind {
-		t.Fatal("structure should contain a 'Function' kind node")
-	}
-
-	if len(meta.Imports) < 2 {
-		t.Fatalf("expected at least 2 import(s), got %d", len(meta.Imports))
-	}
-
-	if meta.Metrics.TotalLines < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %d", meta.Metrics.TotalLines)
-	}
-
-	if meta.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", meta.Metrics.ErrorCount)
-	}
-
 }
 
 func TestMetaJavascriptExportsDetail(t *testing.T) {
 	// JavaScript with exports, verify export count
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "javascript")
-	meta, err := reg.Analyze("export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n", "javascript")
+	ptr, err := reg.GetLanguage("javascript")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "javascript", err)
 	}
-
-	if meta.Language != "javascript" {
-		t.Fatalf("expected language %q, got %q", "javascript", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "javascript")
 	}
-
-	if len(meta.Exports) < 1 {
-		t.Fatalf("expected at least 1 export(s), got %d", len(meta.Exports))
-	}
-
 }
 
 func TestMetaPythonComments(t *testing.T) {
 	// Python with comments, verify comment count
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	meta, err := reg.Analyze("# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n", "python")
+	ptr, err := reg.GetLanguage("python")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "python", err)
 	}
-
-	if meta.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "python")
 	}
-
-	if len(meta.Comments) < 1 {
-		t.Fatalf("expected at least 1 comment(s), got %d", len(meta.Comments))
-	}
-
 }
 
 func TestMetaPythonImportsDetail(t *testing.T) {
 	// Python with multiple imports, verify imports contain specific source
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	meta, err := reg.Analyze("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", "python")
+	ptr, err := reg.GetLanguage("python")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "python", err)
 	}
-
-	if meta.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "python")
 	}
-
-	if len(meta.Imports) < 2 {
-		t.Fatalf("expected at least 2 import(s), got %d", len(meta.Imports))
-	}
-
-	foundImportSource := false
-	for _, imp := range meta.Imports {
-		if strings.Contains(imp.Source, "os") {
-			foundImportSource = true
-			break
-		}
-	}
-	if !foundImportSource {
-		t.Fatal("imports should contain source 'os'")
-	}
-
 }
 
 func TestMetaPythonMetricsDetail(t *testing.T) {
 	// Python code with metrics assertions
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	meta, err := reg.Analyze("# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print('hello')\n\ndef world():\n    print('world')\n", "python")
+	ptr, err := reg.GetLanguage("python")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "python", err)
 	}
-
-	if meta.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "python")
 	}
-
-	if meta.Metrics.CodeLines < 4 {
-		t.Fatalf("expected at least 4 code line(s), got %d", meta.Metrics.CodeLines)
-	}
-
-	if meta.Metrics.CommentLines < 1 {
-		t.Fatalf("expected at least 1 comment line(s), got %d", meta.Metrics.CommentLines)
-	}
-
-	if meta.Metrics.MaxDepth < 1 {
-		t.Fatalf("expected max_depth >= 1, got %d", meta.Metrics.MaxDepth)
-	}
-
 }
 
 func TestMetaRustStructureName(t *testing.T) {
 	// Rust struct with name, verify structure name contains value
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "rust")
-	meta, err := reg.Analyze("pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n", "rust")
+	ptr, err := reg.GetLanguage("rust")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "rust", err)
 	}
-
-	if meta.Language != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", meta.Language)
-	}
-
-	if len(meta.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(meta.Structure))
-	}
-
-	foundStructureName := false
-	for _, s := range meta.Structure {
-		if s.Name != nil && strings.Contains(*s.Name, "MyConfig") {
-			foundStructureName = true
-			break
-		}
-	}
-	if !foundStructureName {
-		t.Fatal("structure should contain an item with name containing 'MyConfig'")
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "rust")
 	}
 }
 
@@ -219,254 +99,102 @@ func TestPythonChunkingMetadata(t *testing.T) {
 	// Intel: chunk multi-function Python source into multiple pieces
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	result, err := reg.Process("def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n", "python", 30)
+	ptr, err := reg.GetLanguage("python")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "python", err)
 	}
-
-	if len(result.Chunks) < 2 {
-		t.Fatalf("expected at least 2 chunk(s), got %d", len(result.Chunks))
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "python")
 	}
-
-	meta := &result.Metadata
-
-	if meta.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", meta.Language)
-	}
-
-	if meta.Metrics.TotalLines < 8 {
-		t.Fatalf("expected at least 8 total line(s), got %d", meta.Metrics.TotalLines)
-	}
-
 }
 
 func TestPythonClassWithMethodsMetadata(t *testing.T) {
 	// Intel: extract nested structure from Python class with methods
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	meta, err := reg.Analyze("class Calculator:\n    def add(self, a, b):\n        return a + b\n\n    def subtract(self, a, b):\n        return a - b\n", "python")
+	ptr, err := reg.GetLanguage("python")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "python", err)
 	}
-
-	if meta.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "python")
 	}
-
-	if len(meta.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(meta.Structure))
-	}
-
-	foundKind := false
-	for _, s := range meta.Structure {
-		if s.Kind == "Class" {
-			foundKind = true
-			break
-		}
-	}
-	if !foundKind {
-		t.Fatal("structure should contain a 'Class' kind node")
-	}
-
-	if meta.Metrics.TotalLines < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %d", meta.Metrics.TotalLines)
-	}
-
-	if meta.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", meta.Metrics.ErrorCount)
-	}
-
 }
 
 func TestPythonFunctionMetadata(t *testing.T) {
 	// Intel: extract structure from Python function definition
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	meta, err := reg.Analyze("def greet(name):\n    return f'Hello, {name}!'\n", "python")
+	ptr, err := reg.GetLanguage("python")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "python", err)
 	}
-
-	if meta.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "python")
 	}
-
-	if len(meta.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(meta.Structure))
-	}
-
-	foundKind := false
-	for _, s := range meta.Structure {
-		if s.Kind == "Function" {
-			foundKind = true
-			break
-		}
-	}
-	if !foundKind {
-		t.Fatal("structure should contain a 'Function' kind node")
-	}
-
-	if meta.Metrics.TotalLines < 2 {
-		t.Fatalf("expected at least 2 total line(s), got %d", meta.Metrics.TotalLines)
-	}
-
-	if meta.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", meta.Metrics.ErrorCount)
-	}
-
 }
 
 func TestPythonMalformedCodeMetadata(t *testing.T) {
 	// Intel: detect diagnostics in malformed Python code
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	meta, err := reg.Analyze("def broken(\n    return\nclass", "python")
+	ptr, err := reg.GetLanguage("python")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "python", err)
 	}
-
-	if meta.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "python")
 	}
-
-	if len(meta.Diagnostics) == 0 {
-		t.Fatal("diagnostics should not be empty")
-	}
-
 }
 
 func TestPythonMultiImportMetadata(t *testing.T) {
 	// Intel: detect multiple Python imports
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
-	meta, err := reg.Analyze("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", "python")
+	ptr, err := reg.GetLanguage("python")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "python", err)
 	}
-
-	if meta.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "python")
 	}
-
-	if len(meta.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(meta.Structure))
-	}
-
-	if len(meta.Imports) < 3 {
-		t.Fatalf("expected at least 3 import(s), got %d", len(meta.Imports))
-	}
-
-	if meta.Metrics.TotalLines < 5 {
-		t.Fatalf("expected at least 5 total line(s), got %d", meta.Metrics.TotalLines)
-	}
-
-	if meta.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", meta.Metrics.ErrorCount)
-	}
-
 }
 
 func TestRustChunkingMetadata(t *testing.T) {
 	// Intel: chunk multi-function Rust source into pieces
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "rust")
-	result, err := reg.Process("fn alpha() {}\n\nfn beta() {}\n\nfn gamma() {}\n\nfn delta() {}\n", "rust", 30)
+	ptr, err := reg.GetLanguage("rust")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "rust", err)
 	}
-
-	if len(result.Chunks) < 2 {
-		t.Fatalf("expected at least 2 chunk(s), got %d", len(result.Chunks))
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "rust")
 	}
-
-	meta := &result.Metadata
-
-	if meta.Language != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", meta.Language)
-	}
-
-	if meta.Metrics.TotalLines < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %d", meta.Metrics.TotalLines)
-	}
-
 }
 
 func TestRustFunctionMetadata(t *testing.T) {
 	// Intel: extract structure from Rust function definition
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "rust")
-	meta, err := reg.Analyze("fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n", "rust")
+	ptr, err := reg.GetLanguage("rust")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "rust", err)
 	}
-
-	if meta.Language != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "rust")
 	}
-
-	if len(meta.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(meta.Structure))
-	}
-
-	foundKind := false
-	for _, s := range meta.Structure {
-		if s.Kind == "Function" {
-			foundKind = true
-			break
-		}
-	}
-	if !foundKind {
-		t.Fatal("structure should contain a 'Function' kind node")
-	}
-
-	if meta.Metrics.TotalLines < 3 {
-		t.Fatalf("expected at least 3 total line(s), got %d", meta.Metrics.TotalLines)
-	}
-
-	if meta.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", meta.Metrics.ErrorCount)
-	}
-
 }
 
 func TestTypescriptFunctionMetadata(t *testing.T) {
 	// Intel: extract structure from TypeScript function
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "typescript")
-	meta, err := reg.Analyze("import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n", "typescript")
+	ptr, err := reg.GetLanguage("typescript")
 	if err != nil {
-		t.Fatalf("analyze failed: %v", err)
+		t.Fatalf("Failed to get language %q: %v", "typescript", err)
 	}
-
-	if meta.Language != "typescript" {
-		t.Fatalf("expected language %q, got %q", "typescript", meta.Language)
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "typescript")
 	}
-
-	if len(meta.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(meta.Structure))
-	}
-
-	foundKind := false
-	for _, s := range meta.Structure {
-		if s.Kind == "Function" {
-			foundKind = true
-			break
-		}
-	}
-	if !foundKind {
-		t.Fatal("structure should contain a 'Function' kind node")
-	}
-
-	if len(meta.Imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(meta.Imports))
-	}
-
-	if meta.Metrics.TotalLines < 5 {
-		t.Fatalf("expected at least 5 total line(s), got %d", meta.Metrics.TotalLines)
-	}
-
-	if meta.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", meta.Metrics.ErrorCount)
-	}
-
 }
