@@ -237,6 +237,9 @@ async def move_src_folder(language_name: str, directory: str | None) -> None:
 
     if await AsyncPath(common_source_dir).exists():
         print(f"Moving {language_name} common files")
+        target_common = target_source_dir / "common"
+        if target_common.exists():
+            await run_sync(rmtree, target_common)
         await run_sync(move, common_source_dir, target_source_dir)
         print(f"Moved {language_name} common files successfully")
 
@@ -300,11 +303,18 @@ async def main() -> None:
 
     print(f"Processing {len(to_process)} language(s)...")
 
+    # Limit concurrent clones to avoid GitHub rate-limiting and resource exhaustion
+    semaphore = asyncio.Semaphore(16)
+
+    async def bounded_process(name: str, defn: LanguageDict) -> None:
+        async with semaphore:
+            await process_repo(language_name=name, language_definition=defn)
+
     await asyncio.gather(
         *[
-            process_repo(
-                language_name=language_name,
-                language_definition=language_definitions[language_name],
+            bounded_process(
+                name=language_name,
+                defn=language_definitions[language_name],
             )
             for language_name in to_process
         ]
