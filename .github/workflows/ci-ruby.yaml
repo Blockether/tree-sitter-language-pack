@@ -117,20 +117,12 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo
-        uses: actions/cache@v4
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-ruby-${{ matrix.ruby-version }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-ruby-${{ matrix.ruby-version }}-
-            ${{ runner.os }}-cargo-ruby-
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Clippy (ts-pack-ruby)
         if: matrix.ruby-version == '3.2'
@@ -187,19 +179,12 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo
-        uses: actions/cache@v4
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-ruby-e2e-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-ruby-e2e-
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Set up Python
         uses: actions/setup-python@v5

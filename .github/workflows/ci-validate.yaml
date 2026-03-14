@@ -65,20 +65,10 @@ jobs:
 
       # --- Rust ---
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          components: rustfmt, clippy
-
-      - name: Cache Cargo
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: cargo-validate-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
-          restore-keys: cargo-validate-${{ runner.os }}-
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       # --- Python ---
       - name: Install uv
@@ -149,9 +139,7 @@ jobs:
 
       # --- Task runner ---
       - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          version: "3.x"
+        uses: kreuzberg-dev/actions/install-task@v1
 
       # --- Prek ---
       - name: Run prek hooks
@@ -173,5 +161,8 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Check README generation
-        run: python3 scripts/generate_readme.py --validate
+        run: uv run scripts/generate_readme.py --validate

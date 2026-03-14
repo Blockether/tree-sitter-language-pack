@@ -131,19 +131,12 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache Rust build artifacts
-        uses: actions/cache@v4
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          path: |
-            ~/.cargo/registry/
-            ~/.cargo/git/
-            target/
-          key: rust-node-${{ matrix.platform }}-${{ hashFiles('Cargo.lock') }}
-          restore-keys: |
-            rust-node-${{ matrix.platform }}-
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

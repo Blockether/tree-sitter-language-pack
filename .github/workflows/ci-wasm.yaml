@@ -115,20 +115,13 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          targets: wasm32-unknown-unknown
-
-      - name: Cache Cargo
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry/
-            ~/.cargo/git/
-            target/
-          key: cargo-wasm-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
-          restore-keys: cargo-wasm-${{ runner.os }}-
+          target: wasm32-unknown-unknown
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
@@ -200,20 +193,13 @@ jobs:
           name: language-parsers
           path: parsers
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          targets: wasm32-unknown-unknown
-
-      - name: Cache Cargo
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry/
-            ~/.cargo/git/
-            target/
-          key: cargo-wasm-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
-          restore-keys: cargo-wasm-${{ runner.os }}-
+          target: wasm32-unknown-unknown
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
 
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
