@@ -45,7 +45,7 @@ gem install tree_sitter_language_pack
 
 ## Quick Start
 
-```text
+```ruby
 require 'tree_sitter_language_pack'
 
 # List all available languages

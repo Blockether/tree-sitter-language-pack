@@ -53,7 +53,7 @@ yarn add @kreuzberg/tree-sitter-language-pack-wasm
 
 ## Quick Start
 
-```text
+```javascript
 import init, { availableLanguages, hasLanguage, parseString } from "@kreuzberg/tree-sitter-language-pack-wasm";
 
 await init();

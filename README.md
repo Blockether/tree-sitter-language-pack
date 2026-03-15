@@ -177,7 +177,7 @@ See [CLI README](crates/ts-pack-cli/README.md) for full documentation.
 All bindings expose a unified `process()` function for extracting structured intelligence from source code:
 
 | Language | Function |
-|----------|----------|
+| -------- | -------- |
 | Rust | `ts_pack_core::process(source, &config)` |
 | Python | `process(source, ProcessConfig(...))` |
 | Node.js | `process(source, { language: '...' })` |
