@@ -25,7 +25,8 @@ tasks:
       - go test -tags tspack_dev -v ./...
 
   lint:
-    desc: Lint and vet Go code
+    desc: Lint and vet Go code (requires FFI built first)
+    deps: [build:ffi]
     dir: packages/go/v1
     cmds:
       - go vet -tags tspack_dev ./...
