@@ -5,6 +5,7 @@ exclude = [
   "crates/ts-pack-java",
   "crates/ts-pack-wasm",
   "crates/ts-pack-ruby",
+  "crates/ts-pack-php",
 ]
 resolver = "2"
 

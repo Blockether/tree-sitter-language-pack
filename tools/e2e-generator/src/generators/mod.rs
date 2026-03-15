@@ -1,7 +1,9 @@
 pub mod c;
+pub mod csharp;
 pub mod elixir;
 pub mod go;
 pub mod java;
+pub mod php;
 pub mod python;
 pub mod ruby;
 pub mod rust;
@@ -32,6 +34,8 @@ pub fn generate_for_lang(lang: &str, fixtures: &[Fixture], output_dir: &Path) ->
         "ruby" => Box::new(ruby::RubyGenerator),
         "c" => Box::new(c::CGenerator),
         "wasm" => Box::new(wasm::WasmGenerator),
+        "php" => Box::new(php::PhpGenerator),
+        "csharp" => Box::new(csharp::CSharpGenerator),
         _ => return Err(format!("Unknown language target: {lang}")),
     };
 
@@ -53,4 +57,6 @@ pub const ALL_TARGETS: &[&str] = &[
     "ruby",
     "c",
     "wasm",
+    "php",
+    "csharp",
 ];

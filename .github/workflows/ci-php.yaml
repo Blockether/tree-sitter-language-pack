@@ -1,0 +1,241 @@
+name: CI PHP
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-php/**"
+      - "crates/ts-pack-core/**"
+      - "packages/php/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".cargo/config.toml"
+      - "rust-toolchain.toml"
+      - ".task/php.yml"
+      - "Taskfile.yml"
+      - "e2e/php/**"
+      - "fixtures/**"
+      - "tools/e2e-generator/**"
+      - "scripts/ci/php/**"
+      - ".github/workflows/ci-php.yaml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-php/**"
+      - "crates/ts-pack-core/**"
+      - "packages/php/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".cargo/config.toml"
+      - "rust-toolchain.toml"
+      - ".task/php.yml"
+      - "Taskfile.yml"
+      - "e2e/php/**"
+      - "fixtures/**"
+      - "tools/e2e-generator/**"
+      - "scripts/ci/php/**"
+      - ".github/workflows/ci-php.yaml"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-php-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
+  RUST_BACKTRACE: short
+  BUILD_PROFILE: ci
+
+jobs:
+  clone-vendors:
+    name: Clone vendors
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v6.3.0
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7.5.0
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: uv sync --no-install-project
+
+      - name: Cache parsers
+        uses: actions/cache@v5.0.3
+        with:
+          path: parsers
+          key: parsers-${{ hashFiles('sources/language_definitions.json') }}
+          restore-keys: |
+            parsers-
+
+      - name: Clone vendors
+        run: |
+          mkdir -p parsers
+          uv run --no-sync scripts/clone_vendors.py
+
+      - name: Upload parsers
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: language-parsers
+          path: parsers
+          retention-days: 1
+
+  build-php:
+    name: Build PHP (${{ matrix.os }}, PHP ${{ matrix.php-version }})
+    needs: clone-vendors
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        php-version: ["8.4"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.14"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: ffi
+          tools: composer
+
+      - name: Export PHP build config
+        shell: bash
+        run: |
+          PHP_CONFIG_BIN="$(command -v php-config || true)"
+          if [ -z "$PHP_CONFIG_BIN" ]; then
+            echo "php-config not found in PATH" >&2
+            exit 1
+          fi
+          echo "PHP_CONFIG=$PHP_CONFIG_BIN" >> "$GITHUB_ENV"
+
+      - name: Export macOS PHP linker flags
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          EXTRA_FLAGS="-C link-arg=-Wl,-undefined,dynamic_lookup"
+          if [ -n "${RUSTFLAGS:-}" ]; then
+            echo "RUSTFLAGS=${RUSTFLAGS} ${EXTRA_FLAGS}" >> "$GITHUB_ENV"
+          else
+            echo "RUSTFLAGS=${EXTRA_FLAGS}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Vendor core
+        run: python3 scripts/ci/php/vendor-core.py
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+
+      - name: Clippy (ts-pack-php)
+        if: matrix.php-version == '8.4' && matrix.os == 'ubuntu-latest'
+        run: cargo clippy --manifest-path crates/ts-pack-php/Cargo.toml -- -D warnings
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+
+      - name: Build PHP extension
+        run: cargo build --release --manifest-path crates/ts-pack-php/Cargo.toml
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+
+  e2e-php:
+    name: E2E PHP
+    needs: clone-vendors
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.14"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
+        with:
+          php-version: "8.4"
+          extensions: ffi
+          tools: composer
+
+      - name: Vendor core
+        run: python3 scripts/ci/php/vendor-core.py
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+
+      - name: Build PHP extension
+        run: cargo build --release --manifest-path crates/ts-pack-php/Cargo.toml
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+
+      - name: Generate E2E tests
+        run: cargo run -p e2e-generator -- generate --lang php
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
+
+      - name: Run E2E tests
+        working-directory: e2e/php
+        run: |
+          composer install --no-progress --prefer-dist
+          composer exec -- phpunit
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"

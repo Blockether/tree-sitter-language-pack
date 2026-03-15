@@ -19,6 +19,10 @@
     <img src="https://img.shields.io/gem/v/tree_sitter_language_pack?label=Ruby&color=007ec6" alt="Ruby">
   </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm">
     <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack-wasm?label=WASM&color=007ec6" alt="Wasm">
+  </a>  <a href="https://packagist.org/packages/kreuzberg/tree-sitter-language-pack">
+    <img src="https://img.shields.io/packagist/v/kreuzberg/tree-sitter-language-pack?label=PHP&color=007ec6" alt="Php">
+  </a>  <a href="https://www.nuget.org/packages/TreeSitterLanguagePack">
+    <img src="https://img.shields.io/nuget/v/TreeSitterLanguagePack?label=C%23&color=007ec6" alt="Csharp">
   </a>
   <!-- Project Info -->
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions">

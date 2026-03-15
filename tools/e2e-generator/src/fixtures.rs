@@ -218,6 +218,24 @@ pub fn escape_c_string(s: &str) -> String {
         .replace('\t', "\\t")
 }
 
+/// Escape a string for embedding in a PHP string literal.
+pub fn escape_php_string(s: &str) -> String {
+    s.replace('\\', "\\\\")
+        .replace('\'', "\\'")
+        .replace('\n', "\\n")
+        .replace('\r', "\\r")
+        .replace('\t', "\\t")
+}
+
+/// Escape a string for embedding in a C# string literal.
+pub fn escape_csharp_string(s: &str) -> String {
+    s.replace('\\', "\\\\")
+        .replace('"', "\\\"")
+        .replace('\n', "\\n")
+        .replace('\r', "\\r")
+        .replace('\t', "\\t")
+}
+
 /// Check if a fixture has any intel-related assertions.
 pub fn has_intel_assertions(fixture: &Fixture) -> bool {
     fixture.assertions.as_ref().is_some_and(|a| {

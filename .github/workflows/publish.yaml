@@ -54,6 +54,8 @@ jobs:
       release_java: ${{ steps.targets.outputs.java }}
       release_elixir: ${{ steps.targets.outputs.elixir }}
       release_c_ffi: ${{ steps.targets.outputs.c_ffi }}
+      release_php: ${{ steps.targets.outputs.php }}
+      release_csharp: ${{ steps.targets.outputs.csharp }}
     steps:
       - name: Extract version and flags
         id: meta
@@ -70,7 +72,7 @@ jobs:
         id: targets
         run: |
           targets="${{ inputs.targets }}"
-          for target in crates python node wasm ruby go java elixir c_ffi; do
+          for target in crates python node wasm ruby go java elixir c_ffi php csharp; do
             if [[ "$targets" == "all" || "$targets" == *"$target"* ]]; then
               echo "$target=true" >> "$GITHUB_OUTPUT"
             else
@@ -298,6 +300,40 @@ jobs:
         with:
           registry: hex
           package: tree_sitter_language_pack
+          version: ${{ needs.prepare.outputs.version }}
+
+  check-packagist:
+    name: Check Packagist
+    needs: prepare
+    if: needs.prepare.outputs.release_php == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if version exists
+        id: check
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        with:
+          registry: packagist
+          package: kreuzberg/tree-sitter-language-pack
+          version: ${{ needs.prepare.outputs.version }}
+
+  check-nuget:
+    name: Check NuGet
+    needs: prepare
+    if: needs.prepare.outputs.release_csharp == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if version exists
+        id: check
+        uses: kreuzberg-dev/actions/check-registry@v1.0.0
+        with:
+          registry: nuget
+          package: TreeSitterLanguagePack
           version: ${{ needs.prepare.outputs.version }}
 
   # ─── Clone vendors ────────────────────────────────────────────────
@@ -1106,6 +1142,188 @@ jobs:
           path: c-ffi-${{ matrix.label }}.tar.gz
           retention-days: 14
 
+  # ─── Build PHP extension ────────────────────────────────────────────
+  build-php-extension:
+    name: Build PHP extension (${{ matrix.label }})
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_php == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+          - os: ubuntu-24.04-arm
+            label: linux-aarch64
+          - os: macos-latest
+            label: macos-arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Set up Python (for vendor script)
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.14"
+
+      - name: Vendor ts-pack-core into PHP package
+        run: python3 scripts/ci/php/vendor-core.py
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Build PHP extension
+        run: cargo build --release --manifest-path crates/ts-pack-php/Cargo.toml
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Stage PHP extension artifacts
+        run: |
+          mkdir -p staging
+          cp target/release/libts_pack_php.so staging/ 2>/dev/null || true
+          cp target/release/libts_pack_php.dylib staging/ 2>/dev/null || true
+          cd staging && tar -czf "../php-ext-${{ matrix.label }}.tar.gz" .
+
+      - name: Upload PHP extension artifact
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: php-ext-${{ matrix.label }}
+          path: php-ext-${{ matrix.label }}.tar.gz
+          retention-days: 14
+
+  # ─── Build C# native libraries ──────────────────────────────────────
+  build-csharp-native:
+    name: Build C# native (${{ matrix.label }})
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_csharp == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux-x86_64
+            rid: linux-x64
+          - os: ubuntu-24.04-arm
+            label: linux-aarch64
+            rid: linux-arm64
+          - os: macos-latest
+            label: macos-arm64
+            rid: osx-arm64
+          - os: windows-latest
+            label: windows-x86_64
+            rid: win-x64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1.0.0
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Build FFI library
+        run: cargo build -p ts-pack-ffi --release
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Collect native artifacts (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p csharp-natives/${{ matrix.rid }}
+          cp target/release/libts_pack_ffi.so csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
+          cp target/release/libts_pack_ffi.dylib csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
+
+      - name: Collect native artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p csharp-natives/${{ matrix.rid }}
+          cp target/release/ts_pack_ffi.dll csharp-natives/${{ matrix.rid }}/ 2>/dev/null || true
+
+      - name: Upload native artifact
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: csharp-natives-${{ matrix.label }}
+          path: csharp-natives/${{ matrix.rid }}
+          retention-days: 14
+
+  # ─── Build C# NuGet package ─────────────────────────────────────────
+  build-csharp-package:
+    name: Build C# NuGet package
+    needs: [prepare, validate-versions, build-csharp-native]
+    if: needs.prepare.outputs.release_csharp == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0"
+
+      - name: Download C# native artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          pattern: csharp-natives-*
+          path: artifacts/csharp-natives
+          merge-multiple: false
+
+      - name: Stage native assets
+        shell: bash
+        run: |
+          RUNTIMES_DIR="packages/csharp/TreeSitterLanguagePack/runtimes"
+          mkdir -p "$RUNTIMES_DIR"
+          for dir in artifacts/csharp-natives/*/; do
+            rid=$(basename "$dir")
+            mkdir -p "$RUNTIMES_DIR/$rid/native"
+            cp "$dir"/* "$RUNTIMES_DIR/$rid/native/" 2>/dev/null || true
+          done
+          echo "=== Staged native runtimes ==="
+          find "$RUNTIMES_DIR" -type f | head -20
+
+      - name: Build and pack NuGet
+        working-directory: packages/csharp/TreeSitterLanguagePack
+        run: dotnet pack -c Release
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: nuget-packages
+          path: packages/csharp/TreeSitterLanguagePack/bin/Release/*.nupkg
+          retention-days: 14
+
   # ─── Upload to GitHub Release: parser binaries ─────────────────────
   upload-parser-binaries:
     name: Upload parser binaries to GitHub Release
@@ -1777,6 +1995,103 @@ jobs:
         if: ${{ inputs.dry_run }}
         run: echo "Dry run requested; Hex.pm publish skipped." >> "$GITHUB_STEP_SUMMARY"
 
+  # ─── Publish PHP to Packagist ────────────────────────────────────
+  publish-packagist:
+    name: Publish PHP to Packagist
+    needs: [prepare, validate-versions, check-packagist, build-php-extension]
+    if: |
+      always() &&
+      needs.prepare.outputs.release_php == 'true' &&
+      needs.build-php-extension.result == 'success' &&
+      (needs.check-packagist.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download PHP extension artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          pattern: php-ext-*
+          path: dist/php
+          merge-multiple: true
+
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          {
+            echo "## Packagist Dry Run"
+            echo "PHP extension artifacts staged:"
+            echo '```'
+            ls -1 dist/php/ 2>/dev/null || echo "(no artifacts)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish to Packagist
+        if: ${{ !inputs.dry_run }}
+        uses: kreuzberg-dev/actions/publish-packagist@v1.0.0
+        with:
+          package-dir: packages/php
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          PACKAGIST_API_TOKEN: ${{ secrets.PACKAGIST_API_TOKEN }}
+
+  # ─── Publish C# to NuGet ─────────────────────────────────────────
+  publish-nuget:
+    name: Publish C# to NuGet
+    needs: [prepare, validate-versions, check-nuget, build-csharp-package]
+    if: |
+      always() &&
+      needs.prepare.outputs.release_csharp == 'true' &&
+      needs.build-csharp-package.result == 'success' &&
+      (needs.check-nuget.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0"
+
+      - name: Download NuGet package
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: nuget-packages
+          path: dist/nuget
+
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          {
+            echo "## NuGet Dry Run"
+            echo "NuGet packages staged:"
+            echo '```'
+            ls -1 dist/nuget/*.nupkg 2>/dev/null || echo "(no packages)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish to NuGet
+        if: ${{ !inputs.dry_run }}
+        uses: kreuzberg-dev/actions/publish-nuget@v1.0.0
+        with:
+          packages-dir: dist/nuget
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
   # ─── Smoke tests ──────────────────────────────────────────────────
   smoke-rust:
     name: Smoke test (Rust)
@@ -1898,6 +2213,40 @@ jobs:
           module: github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
           version: ${{ needs.prepare.outputs.version }}
 
+  smoke-php:
+    name: Smoke test (PHP)
+    needs: [prepare, publish-packagist]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_php == 'true' &&
+      needs.publish-packagist.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Smoke test PHP package
+        uses: kreuzberg-dev/actions/smoke-php@v1.0.0
+        with:
+          package: kreuzberg/tree-sitter-language-pack
+          version: ${{ needs.prepare.outputs.version }}
+
+  smoke-csharp:
+    name: Smoke test (C#)
+    needs: [prepare, publish-nuget]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.prepare.outputs.release_csharp == 'true' &&
+      needs.publish-nuget.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Smoke test C# package
+        uses: kreuzberg-dev/actions/smoke-csharp@v1.0.0
+        with:
+          package: TreeSitterLanguagePack
+          version: ${{ needs.prepare.outputs.version }}
+
   # ─── Release finalize ──────────────────────────────────────────────
   release-finalize:
     name: Finalize release
@@ -1922,6 +2271,10 @@ jobs:
       - publish-rubygems
       - publish-maven
       - publish-hex
+      - publish-packagist
+      - publish-nuget
+      - check-packagist
+      - check-nuget
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -1969,6 +2322,8 @@ jobs:
           CHECK_RUBYGEMS_EXISTS: ${{ needs.check-rubygems.outputs.exists || '' }}
           CHECK_MAVEN_EXISTS: ${{ needs.check-maven.outputs.exists || '' }}
           CHECK_HEX_EXISTS: ${{ needs.check-hex.outputs.exists || '' }}
+          CHECK_PACKAGIST_EXISTS: ${{ needs.check-packagist.outputs.exists || '' }}
+          CHECK_NUGET_EXISTS: ${{ needs.check-nuget.outputs.exists || '' }}
           RESULT_VALIDATE: ${{ needs.validate-versions.result }}
           RESULT_PUBLISH_CRATES: ${{ needs.publish-crates.result }}
           RESULT_PUBLISH_PYPI: ${{ needs.publish-pypi.result }}
@@ -1977,6 +2332,8 @@ jobs:
           RESULT_PUBLISH_RUBYGEMS: ${{ needs.publish-rubygems.result }}
           RESULT_PUBLISH_MAVEN: ${{ needs.publish-maven.result }}
           RESULT_PUBLISH_HEX: ${{ needs.publish-hex.result }}
+          RESULT_PUBLISH_PACKAGIST: ${{ needs.publish-packagist.result }}
+          RESULT_PUBLISH_NUGET: ${{ needs.publish-nuget.result }}
           RESULT_UPLOAD_PARSERS: ${{ needs.upload-parser-binaries.result }}
           RESULT_UPLOAD_GO: ${{ needs.upload-go-release.result }}
           RESULT_UPLOAD_C_FFI: ${{ needs.upload-c-ffi-release.result }}
@@ -2006,6 +2363,8 @@ jobs:
             results[go-ffi]="${RESULT_UPLOAD_GO}"
             results[c-ffi]="${RESULT_UPLOAD_C_FFI}"
             results[elixir-nifs]="${RESULT_UPLOAD_ELIXIR}"
+            results[packagist]="${RESULT_PUBLISH_PACKAGIST}"
+            results[nuget]="${RESULT_PUBLISH_NUGET}"
 
             declare -A checks
             checks[crates]="${CHECK_CRATESIO_EXISTS}"
@@ -2015,8 +2374,10 @@ jobs:
             checks[ruby]="${CHECK_RUBYGEMS_EXISTS}"
             checks[maven]="${CHECK_MAVEN_EXISTS}"
             checks[hex]="${CHECK_HEX_EXISTS}"
+            checks[packagist]="${CHECK_PACKAGIST_EXISTS}"
+            checks[nuget]="${CHECK_NUGET_EXISTS}"
 
-            for target in crates python node wasm ruby maven hex parser-binaries go-ffi c-ffi elixir-nifs; do
+            for target in crates python node wasm ruby maven hex packagist nuget parser-binaries go-ffi c-ffi elixir-nifs; do
               result="${results[$target]}"
               check="${checks[$target]:-}"
               if [[ "$result" == "success" ]]; then

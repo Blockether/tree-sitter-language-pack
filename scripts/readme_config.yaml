@@ -39,6 +39,12 @@ badges:
   wasm:
     url: "https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack-wasm?label=WASM&color=007ec6"
     link: "https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm"
+  php:
+    url: "https://img.shields.io/packagist/v/kreuzberg/tree-sitter-language-pack?label=PHP&color=007ec6"
+    link: "https://packagist.org/packages/kreuzberg/tree-sitter-language-pack"
+  csharp:
+    url: "https://img.shields.io/nuget/v/TreeSitterLanguagePack?label=C%23&color=007ec6"
+    link: "https://www.nuget.org/packages/TreeSitterLanguagePack"
 
 languages:
   rust:
@@ -263,6 +269,52 @@ languages:
       import { process } from '@kreuzberg/tree-sitter-language-pack-wasm';
       const result = process(source, { language: 'javascript' });
       console.log('Structure:', result.structure);
+
+  php:
+    name: "PHP"
+    template: language_package.md.jinja
+    output_path: crates/ts-pack-php/README.md
+    package_name: "kreuzberg/tree-sitter-language-pack"
+    package_manager: [composer]
+    description: "PHP extension via ext-php-rs providing access to 170+ tree-sitter parsers."
+    install_command: "composer require kreuzberg/tree-sitter-language-pack"
+    quick_start: |
+      <?php
+      $languages = ts_pack_available_languages();
+      echo "Languages: " . count($languages) . "\n";
+
+      // Check if a language is available
+      if (ts_pack_has_language("php")) {
+          echo "PHP language available!\n";
+      }
+
+      // Process source code
+      $result = json_decode(ts_pack_process($source, json_encode([
+          'language' => 'php',
+      ])), true);
+      echo "Structure: " . count($result['structure']) . "\n";
+
+  csharp:
+    name: "C#"
+    template: language_package.md.jinja
+    output_path: packages/csharp/TreeSitterLanguagePack/README.md
+    package_name: "TreeSitterLanguagePack"
+    package_manager: [dotnet]
+    description: ".NET P/Invoke bindings for tree-sitter-language-pack."
+    install_command: "dotnet add package TreeSitterLanguagePack"
+    quick_start: |
+      using TreeSitterLanguagePack;
+
+      // List all available languages
+      var languages = TsPackClient.AvailableLanguages();
+      Console.WriteLine($"Languages: {languages.Length}");
+
+      // Check if a language is available
+      Console.WriteLine(TsPackClient.HasLanguage("csharp")); // true
+
+      // Process source code
+      var result = TsPackClient.Process(source, new ProcessConfig { Language = "csharp" });
+      Console.WriteLine($"Structure: {result.Structure.Count}");
 
   ffi:
     name: "C/C++ (FFI)"

@@ -19,6 +19,10 @@
     <img src="https://img.shields.io/gem/v/tree_sitter_language_pack?label=Ruby&color=007ec6" alt="Ruby">
   </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm">
     <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack-wasm?label=WASM&color=007ec6" alt="Wasm">
+  </a>  <a href="https://packagist.org/packages/kreuzberg/tree-sitter-language-pack">
+    <img src="https://img.shields.io/packagist/v/kreuzberg/tree-sitter-language-pack?label=PHP&color=007ec6" alt="Php">
+  </a>  <a href="https://www.nuget.org/packages/TreeSitterLanguagePack">
+    <img src="https://img.shields.io/nuget/v/TreeSitterLanguagePack?label=C%23&color=007ec6" alt="Csharp">
   </a>
   <!-- Project Info -->
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions">
@@ -158,6 +162,24 @@ yarn add @kreuzberg/tree-sitter-language-pack-wasm
 
 See [WebAssembly README](crates/ts-pack-wasm/README.md) for full documentation.
 
+### PHP
+
+```sh
+composer require kreuzberg/tree-sitter-language-pack
+```
+
+See [PHP README](crates/ts-pack-php/README.md) for full documentation.
+
+### C
+
+#
+
+```sh
+dotnet add package TreeSitterLanguagePack
+```
+
+See [C# README](packages/csharp/TreeSitterLanguagePack/README.md) for full documentation.
+
 ### C/C++ (FFI)
 
 Build from source as part of this workspace.
@@ -215,6 +237,8 @@ This pack includes 170+ languages. See the [Rust core Cargo.toml](crates/ts-pack
 - [Elixir](crates/ts-pack-elixir/README.md) -- Elixir bindings for tree-sitter-language-pack using Rustler NIFs.
 - [Ruby](crates/ts-pack-ruby/README.md) -- Ruby bindings for tree-sitter-language-pack using Magnus native extensions.
 - [WebAssembly](crates/ts-pack-wasm/README.md) -- WebAssembly bindings for tree-sitter-language-pack using wasm-bindgen.
+- [PHP](crates/ts-pack-php/README.md) -- PHP extension via ext-php-rs providing access to 170+ tree-sitter parsers.
+- [C#](packages/csharp/TreeSitterLanguagePack/README.md) -- .NET P/Invoke bindings for tree-sitter-language-pack.
 - [C/C++ (FFI)](crates/ts-pack-ffi/README.md) -- C-compatible FFI bindings for tree-sitter-language-pack. Use from any language with C interop.
 - [CLI](crates/ts-pack-cli/README.md) -- Command-line tool for managing tree-sitter language parsers.
 

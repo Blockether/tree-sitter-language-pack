@@ -1,0 +1,308 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+
+namespace TreeSitterLanguagePack;
+
+/// <summary>
+/// P/Invoke declarations for the ts_pack_ffi native library.
+/// </summary>
+internal static partial class NativeMethods
+{
+    private const string LibraryName = "ts_pack_ffi";
+
+    /// <summary>
+    /// Lazy-initialized cache for the native library handle.
+    /// Uses ExecutionAndPublication mode to ensure thread-safe, one-time initialization.
+    /// </summary>
+    private static readonly Lazy<IntPtr> LibraryHandle =
+        new(() => LoadNativeLibrary(), LazyThreadSafetyMode.ExecutionAndPublication);
+
+    [ModuleInitializer]
+    [SuppressMessage("Usage", "CA2255:The 'ModuleInitializer' attribute should not be used in libraries",
+        Justification = "Required for native library resolution before P/Invoke calls.")]
+    internal static void InitResolver()
+    {
+        NativeLibrary.SetDllImportResolver(typeof(NativeMethods).Assembly, ResolveLibrary);
+    }
+
+    // -----------------------------------------------------------------------
+    // Registry lifecycle
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Create a new language registry. The caller must free it with <see cref="RegistryFree"/>.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_registry_new", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr RegistryNew();
+
+    /// <summary>
+    /// Free a registry created with <see cref="RegistryNew"/>. Passing <see cref="IntPtr.Zero"/> is a safe no-op.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_registry_free", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void RegistryFree(IntPtr registry);
+
+    // -----------------------------------------------------------------------
+    // Registry queries
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Return the number of available languages in the registry.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_language_count", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern UIntPtr LanguageCount(IntPtr registry);
+
+    /// <summary>
+    /// Get the language name at the given index. The caller must free the returned string
+    /// with <see cref="FreeString"/>.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_language_name_at", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr LanguageNameAt(IntPtr registry, UIntPtr index);
+
+    /// <summary>
+    /// Check whether the registry contains a language with the given name.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_has_language", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static extern bool HasLanguage(IntPtr registry, IntPtr name);
+
+    /// <summary>
+    /// Get a raw TSLanguage pointer for the given language name.
+    /// Returns <see cref="IntPtr.Zero"/> on error.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_get_language", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr GetLanguage(IntPtr registry, IntPtr name);
+
+    // -----------------------------------------------------------------------
+    // Parsing
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Parse source code and return an opaque tree handle.
+    /// The caller must free the tree with <see cref="TreeFree"/>.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_parse_string", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr ParseString(IntPtr registry, IntPtr name, IntPtr source, UIntPtr sourceLen);
+
+    /// <summary>
+    /// Free a tree created with <see cref="ParseString"/>. Passing <see cref="IntPtr.Zero"/> is a safe no-op.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_tree_free", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void TreeFree(IntPtr tree);
+
+    /// <summary>
+    /// Get the type name of the root node. Caller must free with <see cref="FreeString"/>.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_tree_root_node_type", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr TreeRootNodeType(IntPtr tree);
+
+    /// <summary>
+    /// Get the number of named children of the root node.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_tree_root_child_count", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern uint TreeRootChildCount(IntPtr tree);
+
+    /// <summary>
+    /// Check whether the tree contains a node with the given type name.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_tree_contains_node_type", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static extern bool TreeContainsNodeType(IntPtr tree, IntPtr nodeType);
+
+    /// <summary>
+    /// Check whether the tree contains any ERROR or MISSING nodes.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_tree_has_error_nodes", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static extern bool TreeHasErrorNodes(IntPtr tree);
+
+    /// <summary>
+    /// Return the S-expression representation of the tree. Caller must free with <see cref="FreeString"/>.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_tree_to_sexp", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr TreeToSexp(IntPtr tree);
+
+    /// <summary>
+    /// Return the count of ERROR and MISSING nodes in the tree.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_tree_error_count", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern UIntPtr TreeErrorCount(IntPtr tree);
+
+    // -----------------------------------------------------------------------
+    // Process (unified API)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Process source code and return a JSON string with analysis results.
+    /// Caller must free the returned string with <see cref="FreeString"/>.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_process", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr Process(IntPtr registry, IntPtr source, UIntPtr sourceLen, IntPtr configJson);
+
+    // -----------------------------------------------------------------------
+    // Error handling
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Get the last error message, or null if no error occurred.
+    /// The caller must NOT free this pointer.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_last_error", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern IntPtr LastError();
+
+    /// <summary>
+    /// Clear the last error.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_clear_error", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void ClearError();
+
+    // -----------------------------------------------------------------------
+    // Memory management
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Free a string allocated by the native library.
+    /// </summary>
+    [DllImport(LibraryName, EntryPoint = "ts_pack_free_string", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void FreeString(IntPtr ptr);
+
+    // -----------------------------------------------------------------------
+    // Library resolution
+    // -----------------------------------------------------------------------
+
+    private static IntPtr ResolveLibrary(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+    {
+        if (!string.Equals(libraryName, LibraryName, StringComparison.Ordinal))
+        {
+            return IntPtr.Zero;
+        }
+
+        var effectiveSearchPath = searchPath ?? DllImportSearchPath.AssemblyDirectory;
+        if (NativeLibrary.TryLoad(libraryName, assembly, effectiveSearchPath, out var defaultHandle))
+        {
+            return defaultHandle;
+        }
+
+        return LibraryHandle.Value;
+    }
+
+    private static IntPtr LoadNativeLibrary()
+    {
+        var fileName = GetLibraryFileName();
+        var probePaths = GetProbePaths(fileName).ToList();
+
+        foreach (var path in probePaths)
+        {
+            if (NativeLibrary.TryLoad(path, out var handle))
+            {
+                return handle;
+            }
+        }
+
+        var pathsStr = string.Join(", ", probePaths);
+        throw new DllNotFoundException(
+            $"Unable to locate {fileName}. Checked: {pathsStr}. " +
+            "Set TSPACK_FFI_DIR or place the library in target/release.");
+    }
+
+    private static IEnumerable<string> GetProbePaths(string fileName)
+    {
+        var envDir = Environment.GetEnvironmentVariable("TSPACK_FFI_DIR");
+        if (!string.IsNullOrWhiteSpace(envDir))
+        {
+            yield return Path.Combine(envDir, fileName);
+        }
+
+        yield return Path.Combine(AppContext.BaseDirectory, fileName);
+
+        var rid = GetStableRuntimeIdentifier();
+        if (!string.IsNullOrWhiteSpace(rid))
+        {
+            yield return Path.Combine(AppContext.BaseDirectory, "runtimes", rid!, "native", fileName);
+        }
+
+        var cwd = Directory.GetCurrentDirectory();
+        yield return Path.Combine(cwd, fileName);
+
+        var cwdRelease = Path.Combine(cwd, "target", "release", fileName);
+        if (File.Exists(cwdRelease))
+        {
+            yield return cwdRelease;
+        }
+
+        var cwdDebug = Path.Combine(cwd, "target", "debug", fileName);
+        if (File.Exists(cwdDebug))
+        {
+            yield return cwdDebug;
+        }
+
+        string? dir = AppContext.BaseDirectory;
+        for (var i = 0; i < 5 && dir != null; i++)
+        {
+            var release = Path.Combine(dir, "target", "release", fileName);
+            if (File.Exists(release))
+            {
+                yield return release;
+            }
+
+            var debugPath = Path.Combine(dir, "target", "debug", fileName);
+            if (File.Exists(debugPath))
+            {
+                yield return debugPath;
+            }
+
+            dir = Directory.GetParent(dir)?.FullName;
+        }
+    }
+
+    private static string? GetStableRuntimeIdentifier()
+    {
+        var arch = RuntimeInformation.ProcessArchitecture switch
+        {
+            Architecture.X64 => "x64",
+            Architecture.Arm64 => "arm64",
+            _ => null,
+        };
+
+        if (arch is null)
+        {
+            return null;
+        }
+
+        if (OperatingSystem.IsWindows())
+        {
+            return $"win-{arch}";
+        }
+
+        if (OperatingSystem.IsMacOS())
+        {
+            return $"osx-{arch}";
+        }
+
+        if (OperatingSystem.IsLinux())
+        {
+            return $"linux-{arch}";
+        }
+
+        return null;
+    }
+
+    private static string GetLibraryFileName()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            return "ts_pack_ffi.dll";
+        }
+
+        if (OperatingSystem.IsMacOS())
+        {
+            return "libts_pack_ffi.dylib";
+        }
+
+        return "libts_pack_ffi.so";
+    }
+}
