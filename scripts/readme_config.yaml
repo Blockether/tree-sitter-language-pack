@@ -294,7 +294,7 @@ languages:
       echo "Structure: " . count($result['structure']) . "\n";
 
   csharp:
-    name: "C#"
+    name: ".NET (C#)"
     template: language_package.md.jinja
     output_path: packages/csharp/TreeSitterLanguagePack/README.md
     package_name: "TreeSitterLanguagePack"

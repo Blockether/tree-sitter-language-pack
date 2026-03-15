@@ -169,15 +169,13 @@ composer require kreuzberg/tree-sitter-language-pack
 
 See [PHP README](crates/ts-pack-php/README.md) for full documentation.
 
-### C
-
-#
+### .NET (C#)
 
 ```sh
 dotnet add package TreeSitterLanguagePack
 ```
 
-See [C# README](packages/csharp/TreeSitterLanguagePack/README.md) for full documentation.
+See [.NET (C#) README](packages/csharp/TreeSitterLanguagePack/README.md) for full documentation.
 
 ### C/C++ (FFI)
 
@@ -237,7 +235,7 @@ This pack includes 170+ languages. See the [Rust core Cargo.toml](crates/ts-pack
 - [Ruby](crates/ts-pack-ruby/README.md) -- Ruby bindings for tree-sitter-language-pack using Magnus native extensions.
 - [WebAssembly](crates/ts-pack-wasm/README.md) -- WebAssembly bindings for tree-sitter-language-pack using wasm-bindgen.
 - [PHP](crates/ts-pack-php/README.md) -- PHP extension via ext-php-rs providing access to 170+ tree-sitter parsers.
-- [C#](packages/csharp/TreeSitterLanguagePack/README.md) -- .NET P/Invoke bindings for tree-sitter-language-pack.
+- [.NET (C#)](packages/csharp/TreeSitterLanguagePack/README.md) -- .NET P/Invoke bindings for tree-sitter-language-pack.
 - [C/C++ (FFI)](crates/ts-pack-ffi/README.md) -- C-compatible FFI bindings for tree-sitter-language-pack. Use from any language with C interop.
 - [CLI](crates/ts-pack-cli/README.md) -- Command-line tool for managing tree-sitter language parsers.
 
