@@ -66,6 +66,29 @@ public static class TsPackClient
     }
 
     /// <summary>
+    /// Get a raw TSLanguage pointer for the given language name.
+    /// </summary>
+    /// <exception cref="TsPackException">Thrown when the language is not available.</exception>
+    public static IntPtr GetLanguage(string name)
+    {
+        var namePtr = InteropUtilities.StringToUtf8Ptr(name);
+        try
+        {
+            var result = NativeMethods.GetLanguage(Registry, namePtr);
+            if (result == IntPtr.Zero)
+            {
+                InteropUtilities.ThrowIfError();
+                throw new TsPackException($"language not found: {name}");
+            }
+            return result;
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(namePtr);
+        }
+    }
+
+    /// <summary>
     /// Get the number of available languages.
     /// </summary>
     public static int LanguageCount()

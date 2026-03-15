@@ -87,6 +87,63 @@ pub fn ts_pack_language_count() -> i64 {
     ts_pack_core::language_count() as i64
 }
 
+/// Get a raw language pointer as an integer handle.
+///
+/// Returns the raw `TSLanguage` pointer cast to `i64`, which can be used by PHP
+/// code to verify that a language is available and obtain its opaque handle.
+///
+/// # Arguments
+///
+/// * `name` - The language name to look up.
+///
+/// # Returns
+///
+/// The raw language pointer as an `i64` value.
+///
+/// # Throws
+///
+/// Throws an exception if the language is not available.
+///
+/// # Example
+///
+/// ```php
+/// $langPtr = ts_pack_get_language("python");
+/// echo "Got language pointer: $langPtr\n";
+/// ```
+#[php_function]
+pub fn ts_pack_get_language(name: String) -> PhpResult<i64> {
+    let lang = ts_pack_core::get_language(&name).map_err(|e| PhpException::default(format!("{e}")))?;
+    Ok(lang.into_raw() as i64)
+}
+
+/// Parse source code and return an S-expression representation of the syntax tree.
+///
+/// # Arguments
+///
+/// * `language` - The language name to use for parsing.
+/// * `source` - The source code to parse.
+///
+/// # Returns
+///
+/// The S-expression string representation of the parsed tree.
+///
+/// # Throws
+///
+/// Throws an exception if the language is not available or parsing fails.
+///
+/// # Example
+///
+/// ```php
+/// $sexp = ts_pack_parse_string("python", "def hello(): pass");
+/// echo "Tree: $sexp\n";
+/// ```
+#[php_function]
+pub fn ts_pack_parse_string(language: String, source: String) -> PhpResult<String> {
+    let tree =
+        ts_pack_core::parse_string(&language, source.as_bytes()).map_err(|e| PhpException::default(format!("{e}")))?;
+    Ok(ts_pack_core::tree_to_sexp(&tree))
+}
+
 /// Process source code and extract metadata + chunks as a JSON string.
 ///
 /// The config JSON must contain at least `"language"`. Optional fields:
@@ -122,14 +179,12 @@ pub fn ts_pack_language_count() -> i64 {
 /// ```
 #[php_function]
 pub fn ts_pack_process(source: String, config_json: String) -> PhpResult<String> {
-    let core_config: ts_pack_core::ProcessConfig = serde_json::from_str(&config_json)
-        .map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
+    let core_config: ts_pack_core::ProcessConfig =
+        serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
 
-    let result = ts_pack_core::process(&source, &core_config)
-        .map_err(|e| PhpException::default(format!("{e}")))?;
+    let result = ts_pack_core::process(&source, &core_config).map_err(|e| PhpException::default(format!("{e}")))?;
 
-    serde_json::to_string(&result)
-        .map_err(|e| PhpException::default(format!("serialization failed: {e}")))
+    serde_json::to_string(&result).map_err(|e| PhpException::default(format!("serialization failed: {e}")))
 }
 
 /// tree-sitter-language-pack PHP extension module.

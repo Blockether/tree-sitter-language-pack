@@ -266,27 +266,27 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if assertions.is_some_and(|a| a.tree_not_null == Some(true)) {
                 writeln!(
                     out,
-                    "        $this->assertNotNull($langPtr, 'Language pointer should not be null');"
+                    "        $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');"
                 )
                 .unwrap();
 
-                // For PHP ext-php-rs binding, use process to verify parsing
+                // Use ts_pack_parse_string for tree-related assertions
                 writeln!(
                     out,
-                    "        $result = json_decode(ts_pack_process('{}', json_encode(['language' => '{}'])), true);",
-                    escape_php_string(source),
-                    escape_php_string(lang)
+                    "        $sexp = ts_pack_parse_string('{}', '{}');",
+                    escape_php_string(lang),
+                    escape_php_string(source)
                 )
                 .unwrap();
                 writeln!(
                     out,
-                    "        $this->assertNotNull($result, 'Parse result should not be null');"
+                    "        $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');"
                 )
                 .unwrap();
             } else {
                 writeln!(
                     out,
-                    "        $this->assertNotNull($langPtr, 'Language pointer should not be null');"
+                    "        $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');"
                 )
                 .unwrap();
             }
