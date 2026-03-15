@@ -88,11 +88,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         });
 
         writeln!(out).unwrap();
-        if skip_lang.is_some() {
-            writeln!(out, "    [Fact]").unwrap();
-        } else {
-            writeln!(out, "    [Fact]").unwrap();
-        }
+        writeln!(out, "    [Fact]").unwrap();
         writeln!(out, "    public void {}()", method_name).unwrap();
         writeln!(out, "    {{").unwrap();
         writeln!(out, "        // {}", fixture.description).unwrap();

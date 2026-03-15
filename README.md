@@ -132,7 +132,6 @@ See [Java README](crates/ts-pack-java/README.md) for full documentation.
 ### Elixir
 
 ```elixir
-# In mix.exs
 {:tree_sitter_language_pack, "~> 1.0"}
 ```
 

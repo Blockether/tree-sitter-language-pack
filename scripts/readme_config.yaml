@@ -209,7 +209,6 @@ languages:
     package_manager: [mix]
     description: "Elixir bindings for tree-sitter-language-pack using Rustler NIFs."
     install_command: |
-      # In mix.exs
       {:tree_sitter_language_pack, "~> 1.0"}
     quick_start: |
       # List all available languages

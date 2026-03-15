@@ -44,7 +44,6 @@ Elixir bindings for tree-sitter-language-pack using Rustler NIFs.
 ## Installation
 
 ```elixir
-# In mix.exs
 {:tree_sitter_language_pack, "~> 1.0"}
 ```
 

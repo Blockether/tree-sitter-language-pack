@@ -171,7 +171,7 @@ type ProcessConfig struct {
 	Symbols     bool   `json:"symbols"`
 	Diagnostics bool   `json:"diagnostics"`
 	// ChunkMaxSize controls chunking. When nil, no chunking is performed.
-	ChunkMaxSize *int  `json:"chunk_max_size,omitempty"`
+	ChunkMaxSize *int `json:"chunk_max_size,omitempty"`
 }
 
 // NewProcessConfig creates a ProcessConfig with all extraction options enabled

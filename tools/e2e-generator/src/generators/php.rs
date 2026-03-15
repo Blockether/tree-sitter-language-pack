@@ -109,7 +109,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         if let Some(lang) = skip_lang {
             writeln!(
                 out,
-                "        if (!ts_pack_has_language('{}')) {{",
+                "        if (!\ts_pack_has_language('{}')) {{",
                 escape_php_string(lang)
             )
             .unwrap();
@@ -125,10 +125,10 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         if assertions.is_some_and(|a| a.expect_error == Some(true)) {
             if let Some(lang) = &fixture.language {
                 writeln!(out, "        $this->expectException(\\Exception::class);").unwrap();
-                writeln!(out, "        ts_pack_get_language('{}');", escape_php_string(lang)).unwrap();
+                writeln!(out, "        \ts_pack_get_language('{}');", escape_php_string(lang)).unwrap();
             }
         } else if assertions.is_some_and(|a| a.languages_not_empty == Some(true)) {
-            writeln!(out, "        $langs = ts_pack_available_languages();").unwrap();
+            writeln!(out, "        $langs = \ts_pack_available_languages();").unwrap();
             writeln!(
                 out,
                 "        $this->assertNotEmpty($langs, 'available_languages() should not be empty');"
@@ -139,7 +139,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             let lang = fixture.language.as_deref().unwrap_or("unknown");
             writeln!(
                 out,
-                "        $this->assert{}(ts_pack_has_language('{}'));",
+                "        $this->assert{}(\ts_pack_has_language('{}'));",
                 if expected { "True" } else { "False" },
                 escape_php_string(lang)
             )
@@ -153,7 +153,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
                 writeln!(
                     out,
-                    "        $intel = json_decode(ts_pack_process('{}', json_encode(['language' => '{}', 'chunk_max_size' => {}])), true);",
+                    "        $intel = json_decode(\ts_pack_process('{}', json_encode(['language' => '{}', 'chunk_max_size' => {}])), true);",
                     escape_php_string(source),
                     escape_php_string(lang),
                     max_chunk_size
@@ -162,7 +162,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             } else {
                 writeln!(
                     out,
-                    "        $intel = json_decode(ts_pack_process('{}', json_encode(['language' => '{}'])), true);",
+                    "        $intel = json_decode(\ts_pack_process('{}', json_encode(['language' => '{}'])), true);",
                     escape_php_string(source),
                     escape_php_string(lang)
                 )
@@ -258,7 +258,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             let source = fixture.source_code.as_deref().unwrap_or("");
             writeln!(
                 out,
-                "        $langPtr = ts_pack_get_language('{}');",
+                "        $langPtr = \ts_pack_get_language('{}');",
                 escape_php_string(lang)
             )
             .unwrap();
@@ -273,7 +273,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 // Use ts_pack_parse_string for tree-related assertions
                 writeln!(
                     out,
-                    "        $sexp = ts_pack_parse_string('{}', '{}');",
+                    "        $sexp = \ts_pack_parse_string('{}', '{}');",
                     escape_php_string(lang),
                     escape_php_string(source)
                 )
