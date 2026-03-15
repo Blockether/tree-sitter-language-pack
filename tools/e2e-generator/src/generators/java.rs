@@ -230,8 +230,7 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                 let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
                 writeln!(
                     out,
-                    "            String resultJson = registry.processAndChunk(\"{}\", \"{}\", {});",
-                    escape_java_string(source),
+                    "            String configJson = \"{{\\\"language\\\":\\\"{}\\\",\\\"chunk_max_size\\\":{}}}\";",
                     escape_java_string(lang),
                     max_chunk_size
                 )
@@ -239,12 +238,17 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
             } else {
                 writeln!(
                     out,
-                    "            String resultJson = registry.process(\"{}\", \"{}\");",
-                    escape_java_string(source),
+                    "            String configJson = \"{{\\\"language\\\":\\\"{}\\\"}}\";",
                     escape_java_string(lang)
                 )
                 .unwrap();
             }
+            writeln!(
+                out,
+                "            String resultJson = registry.process(\"{}\", configJson);",
+                escape_java_string(source)
+            )
+            .unwrap();
 
             writeln!(
                 out,
@@ -252,18 +256,17 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
             )
             .unwrap();
 
-            if has_chunk_assertions(fixture) {
-                if let Some(min_chunks) = assertions.intel_chunk_count_min {
-                    writeln!(out, "            JsonArray chunks = intel.getAsJsonArray(\"chunks\");").unwrap();
-                    writeln!(
+            if has_chunk_assertions(fixture)
+                && let Some(min_chunks) = assertions.intel_chunk_count_min
+            {
+                writeln!(out, "            JsonArray chunks = intel.getAsJsonArray(\"chunks\");").unwrap();
+                writeln!(
                         out,
                         "            assertTrue(chunks.size() >= {}, \"Should have at least {} chunk(s), got \" + chunks.size());",
                         min_chunks,
                         min_chunks
                     )
                     .unwrap();
-                }
-                writeln!(out, "            intel = intel.getAsJsonObject(\"intelligence\");").unwrap();
             }
 
             if let Some(expected_lang) = &assertions.intel_language {

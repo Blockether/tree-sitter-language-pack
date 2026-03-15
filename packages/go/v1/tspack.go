@@ -328,121 +328,50 @@ func (t *Tree) HasErrorNodes() (bool, error) {
 	return bool(C.ts_pack_tree_has_error_nodes(t.ptr)), nil
 }
 
-// Process extracts file intelligence from the given source code and returns
-// the result as a JSON string.
-//
-// Returns an error if the language is not found or processing fails.
-func (r *Registry) Process(source, language string) (string, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if err := r.ensureOpen(); err != nil {
-		return "", err
-	}
-
-	csource := C.CString(source)
-	defer C.free(unsafe.Pointer(csource))
-
-	clang := C.CString(language)
-	defer C.free(unsafe.Pointer(clang))
-
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
-	result := C.ts_pack_process(r.ptr, csource, C.uintptr_t(len(source)), clang)
-
-	if result == nil {
-		if err := lastError(); err != nil {
-			return "", fmt.Errorf("tspack: process %q: %w", language, err)
-		}
-		return "", fmt.Errorf("tspack: process %q failed", language)
-	}
-	defer C.ts_pack_free_string(result)
-
-	return C.GoString(result), nil
-}
-
-// ProcessAndChunk extracts file intelligence and performs AST-aware chunking,
-// returning the result as a JSON string containing both intelligence and chunks.
-//
-// Returns an error if the language is not found or processing fails.
-func (r *Registry) ProcessAndChunk(source, language string, maxChunkSize int) (string, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if err := r.ensureOpen(); err != nil {
-		return "", err
-	}
-
-	csource := C.CString(source)
-	defer C.free(unsafe.Pointer(csource))
-
-	clang := C.CString(language)
-	defer C.free(unsafe.Pointer(clang))
-
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
-	result := C.ts_pack_process_and_chunk(r.ptr, csource, C.uintptr_t(len(source)), clang, C.uintptr_t(maxChunkSize))
-
-	if result == nil {
-		if err := lastError(); err != nil {
-			return "", fmt.Errorf("tspack: process_and_chunk %q: %w", language, err)
-		}
-		return "", fmt.Errorf("tspack: process_and_chunk %q failed", language)
-	}
-	defer C.ts_pack_free_string(result)
-
-	return C.GoString(result), nil
-}
-
-// ProcessWithConfig extracts file intelligence (and optionally chunks) from the
-// given source code using a ProcessConfig. The config specifies the language and
+// Process extracts file intelligence (and optionally chunks) from the given
+// source code using a ProcessConfig. The config specifies the language and
 // which extraction features to enable.
 //
-// When config.ChunkMaxSize is non-nil, chunking is performed via ProcessAndChunk.
-// Otherwise, only metadata extraction is performed via Process.
+// When config.ChunkMaxSize is non-nil, chunking is also performed.
 //
 // Returns a typed ProcessResult with deserialized metadata and chunks.
-func (r *Registry) ProcessWithConfig(source string, config ProcessConfig) (*ProcessResult, error) {
-	var rawJSON string
-	var err error
+func (r *Registry) Process(source string, config ProcessConfig) (*ProcessResult, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 
-	if config.ChunkMaxSize != nil {
-		rawJSON, err = r.ProcessAndChunk(source, config.Language, *config.ChunkMaxSize)
-	} else {
-		rawJSON, err = r.Process(source, config.Language)
-	}
-	if err != nil {
+	if err := r.ensureOpen(); err != nil {
 		return nil, err
 	}
 
-	// When Process (without chunking) is called, the JSON contains the intelligence
-	// fields at the top level. When ProcessAndChunk is called, it returns
-	// {"intelligence": ..., "chunks": [...]}.
-	// We normalize both into a ProcessResult.
-	if config.ChunkMaxSize != nil {
-		// ProcessAndChunk returns {"intelligence": {...}, "chunks": [...]}
-		var combined struct {
-			Intelligence FileMetadata `json:"intelligence"`
-			Chunks       []CodeChunk  `json:"chunks"`
-		}
-		if err := json.Unmarshal([]byte(rawJSON), &combined); err != nil {
-			return nil, fmt.Errorf("tspack: failed to deserialize process result: %w", err)
-		}
-		return &ProcessResult{
-			Metadata: combined.Intelligence,
-			Chunks:   combined.Chunks,
-		}, nil
+	configJSON, err := json.Marshal(config)
+	if err != nil {
+		return nil, fmt.Errorf("tspack: failed to serialize config: %w", err)
 	}
 
-	// Process returns the intelligence fields at the top level
-	var metadata FileMetadata
-	if err := json.Unmarshal([]byte(rawJSON), &metadata); err != nil {
+	csource := C.CString(source)
+	defer C.free(unsafe.Pointer(csource))
+
+	cconfigJSON := C.CString(string(configJSON))
+	defer C.free(unsafe.Pointer(cconfigJSON))
+
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	result := C.ts_pack_process(r.ptr, csource, C.uintptr_t(len(source)), cconfigJSON)
+
+	if result == nil {
+		if ffiErr := lastError(); ffiErr != nil {
+			return nil, fmt.Errorf("tspack: process %q: %w", config.Language, ffiErr)
+		}
+		return nil, fmt.Errorf("tspack: process %q failed", config.Language)
+	}
+	defer C.ts_pack_free_string(result)
+
+	rawJSON := C.GoString(result)
+
+	var processResult ProcessResult
+	if err := json.Unmarshal([]byte(rawJSON), &processResult); err != nil {
 		return nil, fmt.Errorf("tspack: failed to deserialize process result: %w", err)
 	}
-	return &ProcessResult{
-		Metadata: metadata,
-		Chunks:   nil,
-	}, nil
+	return &processResult, nil
 }

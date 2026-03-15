@@ -169,18 +169,17 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 let chunk_size = assertions.and_then(|a| a.intel_chunk_max_size).unwrap_or(1024);
                 writeln!(
                     out,
-                    "    result = TreeSitterLanguagePack.process_and_chunk(\"{}\", \"{}\", {})",
+                    "    intel = TreeSitterLanguagePack.process(\"{}\", ~s({{\"language\":\"{}\",\"chunk_max_size\":{}}}))",
                     escape_elixir_string(source),
                     escape_elixir_string(lang),
                     chunk_size
                 )
                 .unwrap();
-                writeln!(out, "    intel = result[\"intelligence\"]").unwrap();
-                writeln!(out, "    chunks = result[\"chunks\"]").unwrap();
+                writeln!(out, "    chunks = intel[\"chunks\"]").unwrap();
             } else {
                 writeln!(
                     out,
-                    "    intel = TreeSitterLanguagePack.process(\"{}\", \"{}\")",
+                    "    intel = TreeSitterLanguagePack.process(\"{}\", ~s({{\"language\":\"{}\"}}))",
                     escape_elixir_string(source),
                     escape_elixir_string(lang)
                 )

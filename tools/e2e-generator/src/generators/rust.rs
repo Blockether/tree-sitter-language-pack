@@ -133,16 +133,20 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
     let source = fixture.source_code.as_deref().unwrap_or("");
 
     writeln!(out, "    // {}", fixture.description).unwrap();
-    writeln!(out, "    let registry = ts_pack_core::LanguageRegistry::new();").unwrap();
 
     if has_chunk_assertions(fixture) {
         let max_size = assertions.intel_chunk_max_size.unwrap_or(1000);
         writeln!(
             out,
-            "    let (intel, chunks) = registry.process_and_chunk(\"{}\", \"{}\", {}).expect(\"process_and_chunk failed\");",
-            escape_rust_string(source),
+            "    let config = ts_pack_core::ProcessConfig::new(\"{}\").with_chunking({});",
             escape_rust_string(lang),
             max_size
+        )
+        .unwrap();
+        writeln!(
+            out,
+            "    let intel = ts_pack_core::process(\"{}\", &config).expect(\"process failed\");",
+            escape_rust_string(source),
         )
         .unwrap();
 
@@ -150,16 +154,21 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
         if let Some(min_chunks) = assertions.intel_chunk_count_min {
             writeln!(
                 out,
-                "    assert!(chunks.len() >= {min_chunks}, \"Expected at least {min_chunks} chunk(s), got {{}}\", chunks.len());"
+                "    assert!(intel.chunks.len() >= {min_chunks}, \"Expected at least {min_chunks} chunk(s), got {{}}\", intel.chunks.len());"
             )
             .unwrap();
         }
     } else {
         writeln!(
             out,
-            "    let intel = registry.process(\"{}\", \"{}\").expect(\"process failed\");",
-            escape_rust_string(source),
+            "    let config = ts_pack_core::ProcessConfig::new(\"{}\");",
             escape_rust_string(lang)
+        )
+        .unwrap();
+        writeln!(
+            out,
+            "    let intel = ts_pack_core::process(\"{}\", &config).expect(\"process failed\");",
+            escape_rust_string(source),
         )
         .unwrap();
     }
@@ -300,7 +309,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             )
             .unwrap();
         } else if has_intel_assertions(fixture) {
-            // Intel test: call process() or process_and_chunk()
+            // Intel test: call process() with ProcessConfig
             write_intel_assertions(&mut out, fixture);
         } else {
             // Parsing test

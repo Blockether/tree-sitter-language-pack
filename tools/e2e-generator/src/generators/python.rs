@@ -135,11 +135,7 @@ fn fixture_needs_has_language(f: &Fixture) -> bool {
 }
 
 fn fixture_needs_process(f: &Fixture) -> bool {
-    has_intel_assertions(f) && !has_chunk_assertions(f)
-}
-
-fn fixture_needs_process_and_chunk(f: &Fixture) -> bool {
-    has_chunk_assertions(f)
+    has_intel_assertions(f)
 }
 
 fn fixture_needs_tree_contains(f: &Fixture) -> bool {
@@ -168,7 +164,6 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         }
     });
     let need_process = needs_import(fixtures, fixture_needs_process);
-    let need_process_and_chunk = needs_import(fixtures, fixture_needs_process_and_chunk);
     let need_tree_contains = needs_import(fixtures, fixture_needs_tree_contains);
     let need_tree_has_error = needs_import(fixtures, fixture_needs_tree_has_error);
     let need_pytest = fixtures.iter().any(|f| {
@@ -200,9 +195,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
     }
     if need_process {
         pack_imports.push("process");
-    }
-    if need_process_and_chunk {
-        pack_imports.push("process_and_chunk");
+        pack_imports.push("ProcessConfig");
     }
 
     // Build helper imports list
@@ -305,15 +298,14 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
                 writeln!(
                     out,
-                    "    result = process_and_chunk(\"{}\", \"{}\", {})",
+                    "    intel = process(\"{}\", ProcessConfig(language=\"{}\", chunk_max_size={}))",
                     escape_python_string(source),
                     escape_python_string(lang),
                     max_chunk_size
                 )
                 .unwrap();
-                writeln!(out, "    intel = result.get(\"intelligence\", {{}})").unwrap();
                 if let Some(min_chunks) = assertions.intel_chunk_count_min {
-                    writeln!(out, "    chunks = result.get(\"chunks\", [])").unwrap();
+                    writeln!(out, "    chunks = intel.get(\"chunks\", [])").unwrap();
                     writeln!(
                         out,
                         "    assert len(chunks) >= {min_chunks}, f\"Should have at least {min_chunks} chunk(s), got {{len(chunks)}}\""
@@ -323,7 +315,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             } else {
                 writeln!(
                     out,
-                    "    intel = process(\"{}\", \"{}\")",
+                    "    intel = process(\"{}\", ProcessConfig(language=\"{}\"))",
                     escape_python_string(source),
                     escape_python_string(lang)
                 )

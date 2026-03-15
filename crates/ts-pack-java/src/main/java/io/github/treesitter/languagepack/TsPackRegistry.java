@@ -47,7 +47,6 @@ public class TsPackRegistry implements AutoCloseable {
   private static final MethodHandle FREE_STRING;
   private static final MethodHandle PARSE_STRING;
   private static final MethodHandle PROCESS;
-  private static final MethodHandle PROCESS_AND_CHUNK;
 
   static {
     // Load the native library: check TSPACK_LIB_PATH env var first, then system path
@@ -133,18 +132,6 @@ public class TsPackRegistry implements AutoCloseable {
                 ValueLayout.ADDRESS,
                 ValueLayout.JAVA_LONG,
                 ValueLayout.ADDRESS));
-
-    // ts_pack_process_and_chunk(pointer, pointer, long, pointer, long) -> pointer
-    PROCESS_AND_CHUNK =
-        LINKER.downcallHandle(
-            LOOKUP.find("ts_pack_process_and_chunk").orElseThrow(),
-            FunctionDescriptor.of(
-                ValueLayout.ADDRESS,
-                ValueLayout.ADDRESS,
-                ValueLayout.ADDRESS,
-                ValueLayout.JAVA_LONG,
-                ValueLayout.ADDRESS,
-                ValueLayout.JAVA_LONG));
   }
 
   private static final System.Logger LOGGER = System.getLogger(TsPackRegistry.class.getName());
@@ -352,20 +339,25 @@ public class TsPackRegistry implements AutoCloseable {
   /**
    * Processes source code and extracts file intelligence as a JSON string.
    *
+   * <p>The {@code configJson} parameter is a JSON string containing at least a {@code "language"}
+   * field. Optional fields include {@code "structure"}, {@code "imports"}, {@code "exports"},
+   * {@code "comments"}, {@code "docstrings"}, {@code "symbols"}, {@code "diagnostics"} (booleans,
+   * default true) and {@code "chunk_max_size"} (integer, optional).
+   *
    * @param source the source code to process
-   * @param language the language name (e.g. {@code "python"}, {@code "java"})
-   * @return a JSON string containing the file intelligence
+   * @param configJson a JSON string specifying the processing configuration
+   * @return a JSON string containing the processing result
    * @throws IllegalStateException if the registry has been closed
    * @throws RuntimeException if processing fails
    */
-  public String process(String source, String language) {
+  public String process(String source, String configJson) {
     MemorySegment ptr = ensureOpen();
 
     try (Arena arena = Arena.ofConfined()) {
       MemorySegment cSource = arena.allocateFrom(source);
-      MemorySegment cLang = arena.allocateFrom(language);
+      MemorySegment cConfig = arena.allocateFrom(configJson);
       MemorySegment result =
-          (MemorySegment) PROCESS.invokeExact(ptr, cSource, (long) source.length(), cLang);
+          (MemorySegment) PROCESS.invokeExact(ptr, cSource, (long) source.length(), cConfig);
 
       if (result.equals(MemorySegment.NULL)) {
         String error = lastError();
@@ -382,45 +374,6 @@ public class TsPackRegistry implements AutoCloseable {
       throw e;
     } catch (Throwable t) {
       throw new RuntimeException("Failed to invoke ts_pack_process", t);
-    }
-  }
-
-  /**
-   * Processes and chunks source code, returning intelligence and chunks as a JSON string.
-   *
-   * @param source the source code to process
-   * @param language the language name (e.g. {@code "python"}, {@code "java"})
-   * @param maxChunkSize the maximum chunk size in bytes
-   * @return a JSON string containing both intelligence and chunks
-   * @throws IllegalStateException if the registry has been closed
-   * @throws RuntimeException if processing fails
-   */
-  public String processAndChunk(String source, String language, int maxChunkSize) {
-    MemorySegment ptr = ensureOpen();
-
-    try (Arena arena = Arena.ofConfined()) {
-      MemorySegment cSource = arena.allocateFrom(source);
-      MemorySegment cLang = arena.allocateFrom(language);
-      MemorySegment result =
-          (MemorySegment)
-              PROCESS_AND_CHUNK.invokeExact(
-                  ptr, cSource, (long) source.length(), cLang, (long) maxChunkSize);
-
-      if (result.equals(MemorySegment.NULL)) {
-        String error = lastError();
-        throw new RuntimeException(
-            "ts_pack_process_and_chunk returned null" + (error != null ? ": " + error : ""));
-      }
-
-      try {
-        return result.reinterpret(Long.MAX_VALUE).getString(0);
-      } finally {
-        FREE_STRING.invokeExact(result);
-      }
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Throwable t) {
-      throw new RuntimeException("Failed to invoke ts_pack_process_and_chunk", t);
     }
   }
 

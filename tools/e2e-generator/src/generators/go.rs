@@ -98,6 +98,12 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         writeln!(out, "import (").unwrap();
         writeln!(out, "\t\"encoding/json\"").unwrap();
         writeln!(out, "\t\"testing\"").unwrap();
+        writeln!(out).unwrap();
+        writeln!(
+            out,
+            "\ttspack \"github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go\""
+        )
+        .unwrap();
         writeln!(out, ")").unwrap();
     } else {
         writeln!(out, "import \"testing\"").unwrap();
@@ -169,18 +175,18 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if has_chunk_assertions(fixture) {
                 let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
+                writeln!(out, "\tchunkSize := uint32({})", max_chunk_size).unwrap();
                 writeln!(
                     out,
-                    "\tresultJSON, err := reg.ProcessAndChunk(\"{}\", \"{}\", {})",
+                    "\tresultJSON, err := reg.Process(\"{}\", tspack.ProcessConfig{{Language: \"{}\", ChunkMaxSize: &chunkSize}})",
                     escape_go_string(source),
                     escape_go_string(lang),
-                    max_chunk_size
                 )
                 .unwrap();
             } else {
                 writeln!(
                     out,
-                    "\tresultJSON, err := reg.Process(\"{}\", \"{}\")",
+                    "\tresultJSON, err := reg.Process(\"{}\", tspack.ProcessConfig{{Language: \"{}\"}})",
                     escape_go_string(source),
                     escape_go_string(lang)
                 )
@@ -199,25 +205,18 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             writeln!(out, "\t\tt.Fatalf(\"failed to unmarshal JSON: %v\", err)").unwrap();
             writeln!(out, "\t}}").unwrap();
 
-            if has_chunk_assertions(fixture) {
-                if let Some(min_chunks) = assertions.intel_chunk_count_min {
-                    writeln!(out).unwrap();
-                    writeln!(out, "\tchunks, _ := intel[\"chunks\"].([]interface{{}})").unwrap();
-                    writeln!(out, "\tif len(chunks) < {} {{", min_chunks).unwrap();
-                    writeln!(
-                        out,
-                        "\t\tt.Fatalf(\"expected at least {} chunk(s), got %d\", len(chunks))",
-                        min_chunks
-                    )
-                    .unwrap();
-                    writeln!(out, "\t}}").unwrap();
-                }
+            if has_chunk_assertions(fixture)
+                && let Some(min_chunks) = assertions.intel_chunk_count_min
+            {
+                writeln!(out).unwrap();
+                writeln!(out, "\tchunks, _ := intel[\"chunks\"].([]interface{{}})").unwrap();
+                writeln!(out, "\tif len(chunks) < {} {{", min_chunks).unwrap();
                 writeln!(
                     out,
-                    "\tif intelObj, ok := intel[\"intelligence\"].(map[string]interface{{}}); ok {{"
+                    "\t\tt.Fatalf(\"expected at least {} chunk(s), got %d\", len(chunks))",
+                    min_chunks
                 )
                 .unwrap();
-                writeln!(out, "\t\tintel = intelObj").unwrap();
                 writeln!(out, "\t}}").unwrap();
             }
 

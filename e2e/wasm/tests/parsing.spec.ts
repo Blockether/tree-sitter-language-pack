@@ -12,7 +12,6 @@ import {
   treeHasErrorNodes,
   freeTree,
   process,
-  processAndChunk,
 } from "./helpers";
 
 describe("parsing", () => {

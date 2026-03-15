@@ -111,7 +111,6 @@ export {
   treeHasErrorNodes,
   freeTree,
   process,
-  processAndChunk,
 } from "@kreuzberg/tree-sitter-language-pack-wasm";
 "#;
     std::fs::write(dir.join("tests").join("helpers.ts"), content)
@@ -137,7 +136,6 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
   treeHasErrorNodes,
   freeTree,
   process,
-  processAndChunk,
 }} from \"./helpers\";"
     )
     .unwrap();
@@ -207,18 +205,17 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
                 writeln!(
                     out,
-                    "    const result = processAndChunk(\"{}\", \"{}\", {});",
+                    "    const intel = process(\"{}\", {{ language: \"{}\", chunkMaxSize: {} }});",
                     escape_js_string(source),
                     escape_js_string(lang),
                     max_chunk_size
                 )
                 .unwrap();
-                writeln!(out, "    const intel = result.intelligence;").unwrap();
-                writeln!(out, "    const chunks = result.chunks;").unwrap();
+                writeln!(out, "    const chunks = intel.chunks || [];").unwrap();
             } else {
                 writeln!(
                     out,
-                    "    const intel = process(\"{}\", \"{}\");",
+                    "    const intel = process(\"{}\", {{ language: \"{}\" }});",
                     escape_js_string(source),
                     escape_js_string(lang)
                 )

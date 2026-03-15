@@ -195,29 +195,15 @@ defmodule TreeSitterLanguagePack do
   ## Parameters
 
     * `source` - the source code string to process
-    * `language` - the language name (e.g. `"python"`, `"rust"`)
+    * `config_json` - a JSON string containing at least `"language"`. Optional fields:
+      `"structure"`, `"imports"`, `"exports"`, `"comments"`, `"docstrings"`,
+      `"symbols"`, `"diagnostics"` (booleans, default true) and `"chunk_max_size"`
+      (integer, optional).
 
   ## Returns
 
-  A map containing file intelligence: language, structure, imports, metrics, diagnostics.
+  A map containing the processing result with metadata and optionally chunks.
   """
-  @spec process(String.t(), language_name()) :: map()
-  def process(_source, _language), do: :erlang.nif_error(:nif_not_loaded)
-
-  @doc """
-  Processes and chunks source code, returning intelligence and chunks as a map.
-
-  ## Parameters
-
-    * `source` - the source code string to process
-    * `language` - the language name (e.g. `"python"`, `"rust"`)
-    * `max_chunk_size` - the maximum chunk size in bytes
-
-  ## Returns
-
-  A map with `"intelligence"` and `"chunks"` keys.
-  """
-  @spec process_and_chunk(String.t(), language_name(), non_neg_integer()) :: map()
-  def process_and_chunk(_source, _language, _max_chunk_size),
-    do: :erlang.nif_error(:nif_not_loaded)
+  @spec process(String.t(), String.t()) :: map()
+  def process(_source, _config_json), do: :erlang.nif_error(:nif_not_loaded)
 end

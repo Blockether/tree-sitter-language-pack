@@ -10,7 +10,6 @@ import {
   treeContainsNodeType as _treeContainsNodeType,
   treeHasErrorNodes as _treeHasErrorNodes,
   process as _process,
-  processAndChunk as _processAndChunk,
 } from "@kreuzberg/tree-sitter-language-pack";
 
 /**
@@ -61,4 +60,3 @@ export const hasLanguage = _hasLanguage;
 export const getLanguagePtr = _getLanguagePtr;
 export const parseString = _parseString;
 export const process = _process;
-export const processAndChunk = _processAndChunk;

@@ -14,5 +14,4 @@ export {
   treeHasErrorNodes,
   freeTree,
   process,
-  processAndChunk,
 } from "@kreuzberg/tree-sitter-language-pack-wasm";

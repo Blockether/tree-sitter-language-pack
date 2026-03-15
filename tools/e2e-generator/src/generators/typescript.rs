@@ -73,7 +73,6 @@ import {
   treeContainsNodeType as _treeContainsNodeType,
   treeHasErrorNodes as _treeHasErrorNodes,
   process as _process,
-  processAndChunk as _processAndChunk,
 } from "@kreuzberg/tree-sitter-language-pack";
 
 /**
@@ -124,7 +123,6 @@ export const hasLanguage = _hasLanguage;
 export const getLanguagePtr = _getLanguagePtr;
 export const parseString = _parseString;
 export const process = _process;
-export const processAndChunk = _processAndChunk;
 "#;
     std::fs::write(dir.join("tests").join("helpers.ts"), content)
         .map_err(|e| format!("Failed to write helpers.ts: {e}"))
@@ -138,7 +136,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
     writeln!(out, "import {{ describe, it, expect }} from \"vitest\";").unwrap();
     writeln!(
         out,
-        "import {{ availableLanguages, hasLanguage, getLanguagePtr, process, processAndChunk }} from \"./helpers\";"
+        "import {{ availableLanguages, hasLanguage, getLanguagePtr, process }} from \"./helpers\";"
     )
     .unwrap();
     writeln!(out).unwrap();
@@ -208,18 +206,17 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
                 writeln!(
                     out,
-                    "    const result = processAndChunk(\"{}\", \"{}\", {});",
+                    "    const intel = process(\"{}\", {{ language: \"{}\", chunkMaxSize: {} }});",
                     escape_js_string(source),
                     escape_js_string(lang),
                     max_chunk_size
                 )
                 .unwrap();
-                writeln!(out, "    const intel = result.intelligence;").unwrap();
-                writeln!(out, "    const chunks = result.chunks;").unwrap();
+                writeln!(out, "    const chunks = intel.chunks || [];").unwrap();
             } else {
                 writeln!(
                     out,
-                    "    const intel = process(\"{}\", \"{}\");",
+                    "    const intel = process(\"{}\", {{ language: \"{}\" }});",
                     escape_js_string(source),
                     escape_js_string(lang)
                 )

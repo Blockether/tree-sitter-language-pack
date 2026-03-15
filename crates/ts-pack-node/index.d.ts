@@ -51,12 +51,15 @@ export declare function treeRootNodeType(tree: ExternalObject<Tree>): string;
 /** Process source code and extract file intelligence as a JavaScript object. */
 export declare function process(
 	source: string,
-	language: string,
-): Record<string, unknown>;
-
-/** Process and chunk source code, returning a JavaScript object with intelligence and chunks. */
-export declare function processAndChunk(
-	source: string,
-	language: string,
-	maxChunkSize: number,
+	config: {
+		language: string;
+		structure?: boolean;
+		imports?: boolean;
+		exports?: boolean;
+		comments?: boolean;
+		docstrings?: boolean;
+		symbols?: boolean;
+		diagnostics?: boolean;
+		chunkMaxSize?: number;
+	},
 ): Record<string, unknown>;
