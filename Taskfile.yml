@@ -45,7 +45,10 @@ tasks:
       - task: python:install
       - task: ruby:deps
       - task: node:deps
+      - task: go:build:ffi
+      - task: java:deps
       - task: elixir:deps
+      - task: wasm:deps
       - echo "Cloning parser sources..."
       - task: clone
       - echo "Generating AI rules..."
@@ -129,8 +132,14 @@ tasks:
       - task: ruby:deps
       - echo "Updating Node.js dependencies..."
       - task: node:deps
+      - echo "Updating Go dependencies..."
+      - task: go:update
+      - echo "Updating Java dependencies..."
+      - task: java:update
       - echo "Updating Elixir dependencies..."
-      - task: elixir:deps
+      - task: elixir:update
+      - echo "Updating WASM tools..."
+      - task: wasm:update
       - echo "Updating language grammar revisions..."
       - uv run --no-sync scripts/pin_vendors.py
       - echo "All dependencies updated"

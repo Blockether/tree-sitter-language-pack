@@ -61,6 +61,12 @@ tasks:
     cmds:
       - cargo run -p e2e-generator -- generate --lang wasm
 
+  update:
+    desc: Update WASM build tools
+    cmds:
+      - echo "Updating wasm-pack..."
+      - cargo install wasm-pack --force
+
   e2e:test:
     desc: Run WASM E2E tests
     dir: e2e/wasm

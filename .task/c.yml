@@ -8,6 +8,22 @@ tasks:
     cmds:
       - cargo build -p ts-pack-ffi --release
 
+  build:
+    desc: Build FFI library (alias for build:ffi)
+    cmds:
+      - task: build:ffi
+
+  test:
+    desc: Build and run C E2E tests
+    cmds:
+      - task: e2e:test
+
+  clean:
+    desc: Clean C build artifacts
+    dir: e2e/c
+    cmds:
+      - rm -rf build
+
   e2e:generate:
     desc: Generate C E2E tests from fixtures
     env:

@@ -57,6 +57,14 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
 
+  update:
+    desc: Update Go dependencies
+    dir: packages/go/v1
+    cmds:
+      - echo "Updating Go dependencies..."
+      - go get -u ./...
+      - go mod tidy
+
   clean:
     desc: Clean Go build cache
     dir: packages/go/v1

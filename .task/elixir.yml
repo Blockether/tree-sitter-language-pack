@@ -36,6 +36,13 @@ tasks:
     cmds:
       - mix credo --strict || true
 
+  update:
+    desc: Update Elixir dependencies
+    dir: crates/ts-pack-elixir
+    cmds:
+      - echo "Updating Elixir dependencies..."
+      - mix deps.update --all
+
   clean:
     desc: Clean Elixir build artifacts
     dir: crates/ts-pack-elixir
