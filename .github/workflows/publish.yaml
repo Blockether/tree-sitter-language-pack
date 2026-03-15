@@ -424,7 +424,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Build all parsers
-        run: cargo build -p ts-pack-core --release
+        run: cargo build -p tree-sitter-language-pack --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: dynamic
@@ -612,16 +612,6 @@ jobs:
 
       - name: Install Bundler
         run: gem install bundler --no-document && bundler --version
-
-      - name: Set up Python (for vendor script)
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3.14"
-
-      - name: Vendor ts-pack-core into Ruby package
-        run: python3 scripts/ci/ruby/vendor-core.py
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Install Ruby dependencies
         working-directory: crates/ts-pack-ruby
@@ -1177,16 +1167,6 @@ jobs:
           components: ""
           use-sccache: "false"
           install-llvm-cov: "false"
-
-      - name: Set up Python (for vendor script)
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3.14"
-
-      - name: Vendor ts-pack-core into PHP package
-        run: python3 scripts/ci/php/vendor-core.py
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Build PHP extension
         run: cargo build --release --manifest-path crates/ts-pack-php/Cargo.toml

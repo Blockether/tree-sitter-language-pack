@@ -124,17 +124,6 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Set up Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3.14"
-
-      - name: Vendor core
-        run: python3 scripts/ci/ruby/vendor-core.py
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
-
       - name: Clippy (ts-pack-ruby)
         if: matrix.ruby-version == '3.2'
         run: cargo clippy --manifest-path crates/ts-pack-ruby/Cargo.toml -- -D warnings
@@ -190,23 +179,12 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Set up Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3.14"
-
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1.292.0
         with:
           ruby-version: "3.2"
           bundler-cache: true
           working-directory: crates/ts-pack-ruby
-
-      - name: Vendor core
-        run: python3 scripts/ci/ruby/vendor-core.py
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Build native extension
         working-directory: crates/ts-pack-ruby

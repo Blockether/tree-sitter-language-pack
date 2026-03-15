@@ -1,9 +1,9 @@
 [package]
 name = "ts-pack-php"
-version = "1.0.0-rc.1"
-edition = "2024"
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 description = "PHP ext-php-rs bindings for tree-sitter language pack"
 publish = false
 
@@ -13,10 +13,8 @@ crate-type = ["cdylib"]
 test = false
 
 [dependencies]
-ts-pack-core = { package = "ts-pack-core-vendored", path = "vendor/ts-pack-core", features = [
-  "serde",
-] }
-serde_json = "1"
+tree-sitter-language-pack = { workspace = true, features = ["serde"] }
+serde_json = { workspace = true }
 ext-php-rs = "0.15"
 
 [package.metadata.cargo-machete]

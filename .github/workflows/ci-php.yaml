@@ -131,11 +131,6 @@ jobs:
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1.0.0
 
-      - name: Set up Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3.14"
-
       - name: Setup PHP
         uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
         with:
@@ -163,12 +158,6 @@ jobs:
           else
             echo "RUSTFLAGS=${EXTRA_FLAGS}" >> "$GITHUB_ENV"
           fi
-
-      - name: Vendor core
-        run: python3 scripts/ci/php/vendor-core.py
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Clippy (ts-pack-php)
         if: matrix.php-version == '8.4' && matrix.os == 'ubuntu-latest'
@@ -213,23 +202,12 @@ jobs:
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1.0.0
 
-      - name: Set up Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3.14"
-
       - name: Setup PHP
         uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
         with:
           php-version: "8.4"
           extensions: ffi
           tools: composer
-
-      - name: Vendor core
-        run: python3 scripts/ci/php/vendor-core.py
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-          TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
       - name: Build PHP extension
         run: cargo build --release --manifest-path crates/ts-pack-php/Cargo.toml
