@@ -4,30 +4,30 @@
 #[test]
 fn error_empty_language_name() {
     // Parsing with empty language name should error
-    let result = ts_pack_core::get_language("");
+    let result = tree_sitter_language_pack::get_language("");
     assert!(result.is_err(), "Expected error loading language ''");
 }
 
 #[test]
 fn error_handling_empty_source() {
-    if !ts_pack_core::has_language("javascript") {
+    if !tree_sitter_language_pack::has_language("javascript") {
         eprintln!("Skipping: language 'javascript' not available");
         return;
     }
     // Parsing an empty string should still produce a tree.
-    let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let mut parser = tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("", None);
     assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
 fn error_handling_invalid_syntax() {
-    if !ts_pack_core::has_language("javascript") {
+    if !tree_sitter_language_pack::has_language("javascript") {
         eprintln!("Skipping: language 'javascript' not available");
         return;
     }
     // Parsing invalid syntax should produce a tree with error nodes.
-    let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let mut parser = tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("function function function @@@ %%%", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -38,6 +38,6 @@ fn error_handling_invalid_syntax() {
 #[test]
 fn error_handling_unknown_language() {
     // Loading a nonexistent language should produce an error.
-    let result = ts_pack_core::get_language("nonexistent_xyz");
+    let result = tree_sitter_language_pack::get_language("nonexistent_xyz");
     assert!(result.is_err(), "Expected error loading language 'nonexistent_xyz'");
 }

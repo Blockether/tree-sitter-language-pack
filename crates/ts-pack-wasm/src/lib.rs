@@ -29,7 +29,7 @@ pub extern "C" fn iswalpha(c: u32) -> i32 {
 /// Returns an array of all available language names.
 #[wasm_bindgen(js_name = "availableLanguages")]
 pub fn available_languages() -> Vec<JsValue> {
-    ts_pack_core::available_languages()
+    tree_sitter_language_pack::available_languages()
         .into_iter()
         .map(JsValue::from)
         .collect()
@@ -38,13 +38,13 @@ pub fn available_languages() -> Vec<JsValue> {
 /// Checks whether a language with the given name is available.
 #[wasm_bindgen(js_name = "hasLanguage")]
 pub fn has_language(name: &str) -> bool {
-    ts_pack_core::has_language(name)
+    tree_sitter_language_pack::has_language(name)
 }
 
 /// Returns the number of available languages.
 #[wasm_bindgen(js_name = "languageCount")]
 pub fn language_count() -> u32 {
-    ts_pack_core::language_count() as u32
+    tree_sitter_language_pack::language_count() as u32
 }
 
 /// Returns the raw TSLanguage pointer as a u32 for wasm32 interop.
@@ -52,7 +52,7 @@ pub fn language_count() -> u32 {
 /// Throws an error if the language is not found.
 #[wasm_bindgen(js_name = "getLanguagePtr")]
 pub fn get_language_ptr(name: &str) -> Result<u32, JsValue> {
-    let language = ts_pack_core::get_language(name)
+    let language = tree_sitter_language_pack::get_language(name)
         .map_err(|e| JsValue::from_str(&format!("{e}")))?;
     let ptr = language.into_raw() as u32;
     Ok(ptr)
@@ -72,7 +72,7 @@ pub struct WasmTree {
 /// Throws an error if the language is not found or parsing fails.
 #[wasm_bindgen(js_name = "parseString")]
 pub fn parse_string(language: &str, source: &str) -> Result<WasmTree, JsValue> {
-    let tree = ts_pack_core::parse_string(language, source.as_bytes())
+    let tree = tree_sitter_language_pack::parse_string(language, source.as_bytes())
         .map_err(|e| JsValue::from_str(&format!("{e}")))?;
     Ok(WasmTree {
         inner: Mutex::new(tree),
@@ -106,7 +106,7 @@ pub fn tree_contains_node_type(tree: &WasmTree, node_type: &str) -> Result<bool,
         .inner
         .lock()
         .map_err(|e| JsValue::from_str(&format!("lock error: {e}")))?;
-    Ok(ts_pack_core::tree_contains_node_type(&guard, node_type))
+    Ok(tree_sitter_language_pack::tree_contains_node_type(&guard, node_type))
 }
 
 /// Check whether the tree contains any ERROR or MISSING nodes.
@@ -116,7 +116,7 @@ pub fn tree_has_error_nodes(tree: &WasmTree) -> Result<bool, JsValue> {
         .inner
         .lock()
         .map_err(|e| JsValue::from_str(&format!("lock error: {e}")))?;
-    Ok(ts_pack_core::tree_has_error_nodes(&guard))
+    Ok(tree_sitter_language_pack::tree_has_error_nodes(&guard))
 }
 
 /// Free the tree handle (called automatically by JS GC, but can be called manually).
@@ -145,10 +145,10 @@ pub fn process(source: &str, config: JsValue) -> Result<JsValue, JsValue> {
                 .map_err(|e| JsValue::from_str(&format!("failed to parse config JSON: {e}")))
         })?;
 
-    let core_config: ts_pack_core::ProcessConfig = serde_json::from_value(config_json)
+    let core_config: tree_sitter_language_pack::ProcessConfig = serde_json::from_value(config_json)
         .map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
 
-    let result = ts_pack_core::process(source, &core_config)
+    let result = tree_sitter_language_pack::process(source, &core_config)
         .map_err(|e| JsValue::from_str(&format!("{e}")))?;
     let json_str = serde_json::to_string(&result)
         .map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;

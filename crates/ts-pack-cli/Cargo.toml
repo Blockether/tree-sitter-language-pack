@@ -11,6 +11,6 @@ name = "ts-pack"
 path = "src/main.rs"
 
 [dependencies]
-ts-pack-core = { path = "../ts-pack-core", features = ["config"] }
+tree-sitter-language-pack = { path = "../ts-pack-core", features = ["config"] }
 clap = { workspace = true }
 toml_edit = { workspace = true }

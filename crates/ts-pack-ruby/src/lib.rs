@@ -25,36 +25,36 @@ impl TreeWrapper {
 
     fn contains_node_type(&self, node_type: String) -> Result<bool, Error> {
         let guard = self.0.lock().map_err(|_| lock_error())?;
-        Ok(ts_pack_core::tree_contains_node_type(&guard, &node_type))
+        Ok(tree_sitter_language_pack::tree_contains_node_type(&guard, &node_type))
     }
 
     fn has_error_nodes(&self) -> Result<bool, Error> {
         let guard = self.0.lock().map_err(|_| lock_error())?;
-        Ok(ts_pack_core::tree_has_error_nodes(&guard))
+        Ok(tree_sitter_language_pack::tree_has_error_nodes(&guard))
     }
 }
 
 fn available_languages() -> Vec<String> {
-    ts_pack_core::available_languages()
+    tree_sitter_language_pack::available_languages()
 }
 
 fn has_language(name: String) -> bool {
-    ts_pack_core::has_language(&name)
+    tree_sitter_language_pack::has_language(&name)
 }
 
 fn language_count() -> usize {
-    ts_pack_core::language_count()
+    tree_sitter_language_pack::language_count()
 }
 
 fn get_language_ptr(ruby: &Ruby, name: String) -> Result<u64, Error> {
-    let language = ts_pack_core::get_language(&name)
+    let language = tree_sitter_language_pack::get_language(&name)
         .map_err(|_| Error::new(ruby.exception_runtime_error(), format!("language not found: {name}")))?;
     let raw_ptr = language.into_raw();
     Ok(raw_ptr as u64)
 }
 
 fn parse_string(ruby: &Ruby, language: String, source: String) -> Result<TreeWrapper, Error> {
-    let tree = ts_pack_core::parse_string(&language, source.as_bytes())
+    let tree = tree_sitter_language_pack::parse_string(&language, source.as_bytes())
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
     Ok(TreeWrapper(Mutex::new(tree)))
 }
@@ -65,10 +65,10 @@ fn parse_string(ruby: &Ruby, language: String, source: String) -> Result<TreeWra
 /// - `structure`, `imports`, `exports`, `comments`, `docstrings`, `symbols`, `diagnostics` (booleans, default true)
 /// - `chunk_max_size` (integer or null, default null meaning no chunking)
 fn process(ruby: &Ruby, source: String, config_json: String) -> Result<String, Error> {
-    let core_config: ts_pack_core::ProcessConfig = serde_json::from_str(&config_json)
+    let core_config: tree_sitter_language_pack::ProcessConfig = serde_json::from_str(&config_json)
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("invalid config JSON: {e}")))?;
 
-    let result = ts_pack_core::process(&source, &core_config)
+    let result = tree_sitter_language_pack::process(&source, &core_config)
         .map_err(|e| Error::new(ruby.exception_runtime_error(), format!("{e}")))?;
 
     serde_json::to_string(&result)

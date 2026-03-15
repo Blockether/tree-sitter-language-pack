@@ -7,7 +7,7 @@ pub mod remove;
 
 use clap::{Parser, Subcommand};
 use std::path::{Path, PathBuf};
-use ts_pack_core::definitions::{LanguageDefinitions, load_definitions};
+use tree_sitter_language_pack::definitions::{LanguageDefinitions, load_definitions};
 
 #[derive(Parser)]
 #[command(name = "ts-pack", about = "Manage tree-sitter language grammars")]
@@ -90,8 +90,8 @@ fn find_definitions_file() -> Result<PathBuf, Box<dyn std::error::Error>> {
     // Check if there's a language-pack.toml with a definitions path
     let config_path = cwd.join(CONFIG_FILENAME);
     if config_path.exists() {
-        let config =
-            ts_pack_core::config::Config::load(&config_path).map_err(|e| format!("Failed to load config: {e}"))?;
+        let config = tree_sitter_language_pack::config::Config::load(&config_path)
+            .map_err(|e| format!("Failed to load config: {e}"))?;
         if let Some(def_path) = config.language_pack.definitions {
             let p = PathBuf::from(&def_path);
             if p.exists() {

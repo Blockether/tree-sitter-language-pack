@@ -6,7 +6,7 @@
 //! ## Quick Start
 //!
 //! ```no_run
-//! use ts_pack_core::{ProcessConfig, available_languages, has_language, process};
+//! use tree_sitter_language_pack::{ProcessConfig, available_languages, has_language, process};
 //!
 //! // Check available languages
 //! let langs = available_languages();
@@ -76,7 +76,7 @@ static REGISTRY: std::sync::LazyLock<LanguageRegistry> = std::sync::LazyLock::ne
 /// # Example
 ///
 /// ```no_run
-/// use ts_pack_core::get_language;
+/// use tree_sitter_language_pack::get_language;
 ///
 /// let lang = get_language("python").unwrap();
 /// // Use the Language with a tree-sitter Parser
@@ -102,7 +102,7 @@ pub fn get_language(name: &str) -> Result<Language, Error> {
 /// # Example
 ///
 /// ```no_run
-/// use ts_pack_core::get_parser;
+/// use tree_sitter_language_pack::get_parser;
 ///
 /// let mut parser = get_parser("rust").unwrap();
 /// let tree = parser.parse("fn main() {}", None).unwrap();
@@ -125,7 +125,7 @@ pub fn get_parser(name: &str) -> Result<tree_sitter::Parser, Error> {
 /// # Example
 ///
 /// ```no_run
-/// use ts_pack_core::available_languages;
+/// use tree_sitter_language_pack::available_languages;
 ///
 /// let langs = available_languages();
 /// for name in &langs {
@@ -144,7 +144,7 @@ pub fn available_languages() -> Vec<String> {
 /// # Example
 ///
 /// ```no_run
-/// use ts_pack_core::has_language;
+/// use tree_sitter_language_pack::has_language;
 ///
 /// assert!(has_language("python"));
 /// assert!(has_language("shell")); // alias for "bash"
@@ -162,7 +162,7 @@ pub fn has_language(name: &str) -> bool {
 /// # Example
 ///
 /// ```no_run
-/// use ts_pack_core::language_count;
+/// use tree_sitter_language_pack::language_count;
 ///
 /// let count = language_count();
 /// println!("{} languages available", count);
@@ -184,7 +184,7 @@ pub fn language_count() -> usize {
 /// # Example
 ///
 /// ```no_run
-/// use ts_pack_core::{ProcessConfig, process};
+/// use tree_sitter_language_pack::{ProcessConfig, process};
 ///
 /// let config = ProcessConfig::new("python").all();
 /// let result = process("def hello(): pass", &config).unwrap();

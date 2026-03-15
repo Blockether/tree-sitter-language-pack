@@ -1,5 +1,5 @@
 use super::{config_path, load_definitions_from_path};
-use ts_pack_core::config::Config;
+use tree_sitter_language_pack::config::Config;
 
 pub fn run(installed: bool, definitions_path: Option<&str>) -> Result<(), Box<dyn std::error::Error>> {
     let defs = load_definitions_from_path(definitions_path)?;

@@ -45,7 +45,7 @@ pub fn ts_pack_version() -> String {
 /// ```
 #[php_function]
 pub fn ts_pack_available_languages() -> Vec<String> {
-    ts_pack_core::available_languages()
+    tree_sitter_language_pack::available_languages()
 }
 
 /// Check whether a language is available.
@@ -67,7 +67,7 @@ pub fn ts_pack_available_languages() -> Vec<String> {
 /// ```
 #[php_function]
 pub fn ts_pack_has_language(name: String) -> bool {
-    ts_pack_core::has_language(&name)
+    tree_sitter_language_pack::has_language(&name)
 }
 
 /// Get the number of available languages.
@@ -84,7 +84,7 @@ pub fn ts_pack_has_language(name: String) -> bool {
 /// ```
 #[php_function]
 pub fn ts_pack_language_count() -> i64 {
-    ts_pack_core::language_count() as i64
+    tree_sitter_language_pack::language_count() as i64
 }
 
 /// Get a raw language pointer as an integer handle.
@@ -112,7 +112,7 @@ pub fn ts_pack_language_count() -> i64 {
 /// ```
 #[php_function]
 pub fn ts_pack_get_language(name: String) -> PhpResult<i64> {
-    let lang = ts_pack_core::get_language(&name).map_err(|e| PhpException::default(format!("{e}")))?;
+    let lang = tree_sitter_language_pack::get_language(&name).map_err(|e| PhpException::default(format!("{e}")))?;
     Ok(lang.into_raw() as i64)
 }
 
@@ -140,8 +140,8 @@ pub fn ts_pack_get_language(name: String) -> PhpResult<i64> {
 #[php_function]
 pub fn ts_pack_parse_string(language: String, source: String) -> PhpResult<String> {
     let tree =
-        ts_pack_core::parse_string(&language, source.as_bytes()).map_err(|e| PhpException::default(format!("{e}")))?;
-    Ok(ts_pack_core::tree_to_sexp(&tree))
+        tree_sitter_language_pack::parse_string(&language, source.as_bytes()).map_err(|e| PhpException::default(format!("{e}")))?;
+    Ok(tree_sitter_language_pack::tree_to_sexp(&tree))
 }
 
 /// Process source code and extract metadata + chunks as a JSON string.
@@ -179,10 +179,10 @@ pub fn ts_pack_parse_string(language: String, source: String) -> PhpResult<Strin
 /// ```
 #[php_function]
 pub fn ts_pack_process(source: String, config_json: String) -> PhpResult<String> {
-    let core_config: ts_pack_core::ProcessConfig =
+    let core_config: tree_sitter_language_pack::ProcessConfig =
         serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
 
-    let result = ts_pack_core::process(&source, &core_config).map_err(|e| PhpException::default(format!("{e}")))?;
+    let result = tree_sitter_language_pack::process(&source, &core_config).map_err(|e| PhpException::default(format!("{e}")))?;
 
     serde_json::to_string(&result).map_err(|e| PhpException::default(format!("serialization failed: {e}")))
 }

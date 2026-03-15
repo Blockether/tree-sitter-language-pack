@@ -109,18 +109,18 @@ pub fn tree_has_error_nodes(node: tree_sitter::Node) -> bool {
 /// Map a fixture kind string to a Rust StructureKind variant expression.
 fn structure_kind_variant(kind: &str) -> String {
     match kind.to_ascii_lowercase().as_str() {
-        "function" => "ts_pack_core::StructureKind::Function".to_string(),
-        "method" => "ts_pack_core::StructureKind::Method".to_string(),
-        "class" => "ts_pack_core::StructureKind::Class".to_string(),
-        "struct" => "ts_pack_core::StructureKind::Struct".to_string(),
-        "interface" => "ts_pack_core::StructureKind::Interface".to_string(),
-        "enum" => "ts_pack_core::StructureKind::Enum".to_string(),
-        "module" => "ts_pack_core::StructureKind::Module".to_string(),
-        "trait" => "ts_pack_core::StructureKind::Trait".to_string(),
-        "impl" => "ts_pack_core::StructureKind::Impl".to_string(),
-        "namespace" => "ts_pack_core::StructureKind::Namespace".to_string(),
+        "function" => "tree_sitter_language_pack::StructureKind::Function".to_string(),
+        "method" => "tree_sitter_language_pack::StructureKind::Method".to_string(),
+        "class" => "tree_sitter_language_pack::StructureKind::Class".to_string(),
+        "struct" => "tree_sitter_language_pack::StructureKind::Struct".to_string(),
+        "interface" => "tree_sitter_language_pack::StructureKind::Interface".to_string(),
+        "enum" => "tree_sitter_language_pack::StructureKind::Enum".to_string(),
+        "module" => "tree_sitter_language_pack::StructureKind::Module".to_string(),
+        "trait" => "tree_sitter_language_pack::StructureKind::Trait".to_string(),
+        "impl" => "tree_sitter_language_pack::StructureKind::Impl".to_string(),
+        "namespace" => "tree_sitter_language_pack::StructureKind::Namespace".to_string(),
         _ => format!(
-            "ts_pack_core::StructureKind::Other(\"{}\".to_string())",
+            "tree_sitter_language_pack::StructureKind::Other(\"{}\".to_string())",
             escape_rust_string(kind)
         ),
     }
@@ -138,14 +138,14 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
         let max_size = assertions.intel_chunk_max_size.unwrap_or(1000);
         writeln!(
             out,
-            "    let config = ts_pack_core::ProcessConfig::new(\"{}\").with_chunking({});",
+            "    let config = tree_sitter_language_pack::ProcessConfig::new(\"{}\").with_chunking({});",
             escape_rust_string(lang),
             max_size
         )
         .unwrap();
         writeln!(
             out,
-            "    let intel = ts_pack_core::process(\"{}\", &config).expect(\"process failed\");",
+            "    let intel = tree_sitter_language_pack::process(\"{}\", &config).expect(\"process failed\");",
             escape_rust_string(source),
         )
         .unwrap();
@@ -161,13 +161,13 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
     } else {
         writeln!(
             out,
-            "    let config = ts_pack_core::ProcessConfig::new(\"{}\");",
+            "    let config = tree_sitter_language_pack::ProcessConfig::new(\"{}\");",
             escape_rust_string(lang)
         )
         .unwrap();
         writeln!(
             out,
-            "    let intel = ts_pack_core::process(\"{}\", &config).expect(\"process failed\");",
+            "    let intel = tree_sitter_language_pack::process(\"{}\", &config).expect(\"process failed\");",
             escape_rust_string(source),
         )
         .unwrap();
@@ -260,7 +260,11 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             }
         });
         if let Some(req_lang) = skip_lang {
-            writeln!(out, "    if !ts_pack_core::has_language(\"{req_lang}\") {{").unwrap();
+            writeln!(
+                out,
+                "    if !tree_sitter_language_pack::has_language(\"{req_lang}\") {{"
+            )
+            .unwrap();
             writeln!(
                 out,
                 "        eprintln!(\"Skipping: language '{}' not available\");",
@@ -276,7 +280,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(lang) = &fixture.language {
                 writeln!(
                     out,
-                    "    // {}\n    let result = ts_pack_core::get_language(\"{}\");",
+                    "    // {}\n    let result = tree_sitter_language_pack::get_language(\"{}\");",
                     fixture.description,
                     escape_rust_string(lang)
                 )
@@ -291,7 +295,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         } else if assertions.is_some_and(|a| a.languages_not_empty == Some(true)) {
             // Registry: list languages
             writeln!(out, "    // {}", fixture.description).unwrap();
-            writeln!(out, "    let langs = ts_pack_core::available_languages();").unwrap();
+            writeln!(out, "    let langs = tree_sitter_language_pack::available_languages();").unwrap();
             writeln!(
                 out,
                 "    assert!(!langs.is_empty(), \"available_languages() should not be empty\");"
@@ -304,7 +308,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             writeln!(out, "    // {}", fixture.description).unwrap();
             writeln!(
                 out,
-                "    assert_eq!(ts_pack_core::has_language(\"{}\"), {expected});",
+                "    assert_eq!(tree_sitter_language_pack::has_language(\"{}\"), {expected});",
                 escape_rust_string(lang)
             )
             .unwrap();
@@ -317,7 +321,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "    // {}", fixture.description).unwrap();
                 writeln!(
                     out,
-                    "    let mut parser = ts_pack_core::get_parser(\"{}\").expect(\"Failed to get parser for '{}'\");",
+                    "    let mut parser = tree_sitter_language_pack::get_parser(\"{}\").expect(\"Failed to get parser for '{}'\");",
                     escape_rust_string(lang),
                     escape_rust_string(lang)
                 )

@@ -4,19 +4,19 @@ use napi_derive::napi;
 /// Returns an array of all available language names.
 #[napi(js_name = "availableLanguages")]
 pub fn available_languages() -> Vec<String> {
-    ts_pack_core::available_languages()
+    tree_sitter_language_pack::available_languages()
 }
 
 /// Checks whether a language with the given name is available.
 #[napi(js_name = "hasLanguage")]
 pub fn has_language(name: String) -> bool {
-    ts_pack_core::has_language(&name)
+    tree_sitter_language_pack::has_language(&name)
 }
 
 /// Returns the number of available languages.
 #[napi(js_name = "languageCount")]
 pub fn language_count() -> u32 {
-    ts_pack_core::language_count() as u32
+    tree_sitter_language_pack::language_count() as u32
 }
 
 /// Returns the raw TSLanguage pointer for interop with node-tree-sitter.
@@ -24,7 +24,8 @@ pub fn language_count() -> u32 {
 /// Throws an error if the language is not found.
 #[napi(js_name = "getLanguagePtr")]
 pub fn get_language_ptr(name: String) -> napi::Result<i64> {
-    let language = ts_pack_core::get_language(&name).map_err(|e| napi::Error::from_reason(format!("{e}")))?;
+    let language =
+        tree_sitter_language_pack::get_language(&name).map_err(|e| napi::Error::from_reason(format!("{e}")))?;
     let ptr = language.into_raw() as i64;
     Ok(ptr)
 }
@@ -38,7 +39,7 @@ pub fn get_language_ptr(name: String) -> napi::Result<i64> {
 /// Throws an error if the language is not found or parsing fails.
 #[napi(js_name = "parseString")]
 pub fn parse_string(language: String, source: String) -> napi::Result<External<tree_sitter::Tree>> {
-    let tree = ts_pack_core::parse_string(&language, source.as_bytes())
+    let tree = tree_sitter_language_pack::parse_string(&language, source.as_bytes())
         .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
     Ok(External::new(tree))
 }
@@ -58,13 +59,13 @@ pub fn tree_root_child_count(tree: &External<tree_sitter::Tree>) -> u32 {
 /// Check whether any node in the tree has the given type name.
 #[napi(js_name = "treeContainsNodeType")]
 pub fn tree_contains_node_type(tree: &External<tree_sitter::Tree>, node_type: String) -> bool {
-    ts_pack_core::tree_contains_node_type(tree, &node_type)
+    tree_sitter_language_pack::tree_contains_node_type(tree, &node_type)
 }
 
 /// Check whether the tree contains any ERROR or MISSING nodes.
 #[napi(js_name = "treeHasErrorNodes")]
 pub fn tree_has_error_nodes(tree: &External<tree_sitter::Tree>) -> bool {
-    ts_pack_core::tree_has_error_nodes(tree)
+    tree_sitter_language_pack::tree_has_error_nodes(tree)
 }
 
 // ---------------------------------------------------------------------------
@@ -85,7 +86,7 @@ pub struct JsProcessConfig {
     pub chunk_max_size: Option<u32>,
 }
 
-impl From<JsProcessConfig> for ts_pack_core::ProcessConfig {
+impl From<JsProcessConfig> for tree_sitter_language_pack::ProcessConfig {
     fn from(js: JsProcessConfig) -> Self {
         Self {
             language: js.language,
@@ -104,7 +105,8 @@ impl From<JsProcessConfig> for ts_pack_core::ProcessConfig {
 /// Process source code using a config and return a JavaScript object with metadata and chunks.
 #[napi(js_name = "process")]
 pub fn process(source: String, config: JsProcessConfig) -> napi::Result<serde_json::Value> {
-    let core_config: ts_pack_core::ProcessConfig = config.into();
-    let result = ts_pack_core::process(&source, &core_config).map_err(|e| napi::Error::from_reason(format!("{e}")))?;
+    let core_config: tree_sitter_language_pack::ProcessConfig = config.into();
+    let result = tree_sitter_language_pack::process(&source, &core_config)
+        .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
     serde_json::to_value(&result).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))
 }

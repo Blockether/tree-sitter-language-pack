@@ -24,7 +24,8 @@ const CAPSULE_NAME: &std::ffi::CStr = c"tree_sitter.Language";
 /// tree-sitter Python package.
 #[pyfunction]
 fn get_binding(py: Python<'_>, name: &str) -> PyResult<Py<PyAny>> {
-    let language = ts_pack_core::get_language(name).map_err(|e| LanguageNotFoundError::new_err(format!("{e}")))?;
+    let language =
+        tree_sitter_language_pack::get_language(name).map_err(|e| LanguageNotFoundError::new_err(format!("{e}")))?;
 
     // Extract the raw pointer - valid for program lifetime (static registry).
     let raw_ptr: *const tree_sitter::ffi::TSLanguage = language.into_raw();
@@ -70,7 +71,7 @@ fn get_parser(py: Python<'_>, name: &str) -> PyResult<Py<PyAny>> {
 /// Returns a list of all available language names.
 #[pyfunction]
 fn available_languages(py: Python<'_>) -> PyResult<Py<PyAny>> {
-    let langs = ts_pack_core::available_languages();
+    let langs = tree_sitter_language_pack::available_languages();
     let py_list = PyList::new(py, &langs)?;
     Ok(py_list.into_any().unbind())
 }
@@ -78,13 +79,13 @@ fn available_languages(py: Python<'_>) -> PyResult<Py<PyAny>> {
 /// Checks if a language is available.
 #[pyfunction]
 fn has_language(name: &str) -> bool {
-    ts_pack_core::has_language(name)
+    tree_sitter_language_pack::has_language(name)
 }
 
 /// Returns the number of available languages.
 #[pyfunction]
 fn language_count() -> usize {
-    ts_pack_core::language_count()
+    tree_sitter_language_pack::language_count()
 }
 
 // ---------------------------------------------------------------------------
@@ -115,38 +116,38 @@ impl TreeHandle {
     /// Check whether any node in the tree has the given type name.
     fn contains_node_type(&self, node_type: &str) -> PyResult<bool> {
         let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        Ok(ts_pack_core::tree_contains_node_type(&guard, node_type))
+        Ok(tree_sitter_language_pack::tree_contains_node_type(&guard, node_type))
     }
 
     /// Check whether the tree contains any ERROR or MISSING nodes.
     fn has_error_nodes(&self) -> PyResult<bool> {
         let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        Ok(ts_pack_core::tree_has_error_nodes(&guard))
+        Ok(tree_sitter_language_pack::tree_has_error_nodes(&guard))
     }
 
     /// Returns the S-expression representation of the tree.
     fn to_sexp(&self) -> PyResult<String> {
         let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        Ok(ts_pack_core::tree_to_sexp(&guard))
+        Ok(tree_sitter_language_pack::tree_to_sexp(&guard))
     }
 
     /// Returns the count of ERROR and MISSING nodes in the tree.
     fn error_count(&self) -> PyResult<usize> {
         let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        Ok(ts_pack_core::tree_error_count(&guard))
+        Ok(tree_sitter_language_pack::tree_error_count(&guard))
     }
 
     /// Returns information about the root node as a dict.
     fn root_node_info(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
         let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        let info = ts_pack_core::root_node_info(&guard);
+        let info = tree_sitter_language_pack::root_node_info(&guard);
         node_info_to_dict(py, &info)
     }
 
     /// Finds all nodes matching the given type and returns their info as a list of dicts.
     fn find_nodes_by_type(&self, py: Python<'_>, node_type: &str) -> PyResult<Py<PyAny>> {
         let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        let nodes = ts_pack_core::find_nodes_by_type(&guard, node_type);
+        let nodes = tree_sitter_language_pack::find_nodes_by_type(&guard, node_type);
         let py_list: Vec<Py<PyAny>> = nodes
             .iter()
             .map(|info| node_info_to_dict(py, info))
@@ -158,7 +159,7 @@ impl TreeHandle {
     /// Returns info for all named children of the root node.
     fn named_children_info(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
         let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        let nodes = ts_pack_core::named_children_info(&guard);
+        let nodes = tree_sitter_language_pack::named_children_info(&guard);
         let py_list: Vec<Py<PyAny>> = nodes
             .iter()
             .map(|info| node_info_to_dict(py, info))
@@ -169,7 +170,7 @@ impl TreeHandle {
 
     /// Extracts source text for a node given its start_byte and end_byte.
     fn extract_text(&self, start_byte: usize, end_byte: usize) -> PyResult<String> {
-        let info = ts_pack_core::NodeInfo {
+        let info = tree_sitter_language_pack::NodeInfo {
             kind: String::new(),
             is_named: false,
             start_byte,
@@ -182,7 +183,7 @@ impl TreeHandle {
             is_error: false,
             is_missing: false,
         };
-        ts_pack_core::extract_text(&self.source, &info)
+        tree_sitter_language_pack::extract_text(&self.source, &info)
             .map(|s| s.to_string())
             .map_err(|e| ParseError::new_err(format!("{e}")))
     }
@@ -190,7 +191,7 @@ impl TreeHandle {
     /// Runs a tree-sitter query and returns matches as a list of dicts.
     fn run_query(&self, py: Python<'_>, language: &str, query_source: &str) -> PyResult<Py<PyAny>> {
         let guard = self.inner.lock().map_err(|_| ParseError::new_err("lock poisoned"))?;
-        let matches = ts_pack_core::run_query(&guard, language, query_source, &self.source)
+        let matches = tree_sitter_language_pack::run_query(&guard, language, query_source, &self.source)
             .map_err(|e| QueryError::new_err(format!("{e}")))?;
 
         let py_matches: Vec<Py<PyAny>> = matches
@@ -210,7 +211,8 @@ impl TreeHandle {
 #[pyfunction]
 fn parse_string(language: &str, source: &str) -> PyResult<TreeHandle> {
     let source_bytes = source.as_bytes();
-    let tree = ts_pack_core::parse_string(language, source_bytes).map_err(|e| ParseError::new_err(format!("{e}")))?;
+    let tree = tree_sitter_language_pack::parse_string(language, source_bytes)
+        .map_err(|e| ParseError::new_err(format!("{e}")))?;
     Ok(TreeHandle {
         inner: Mutex::new(tree),
         source: source_bytes.to_vec(),
@@ -221,7 +223,7 @@ fn parse_string(language: &str, source: &str) -> PyResult<TreeHandle> {
 // Helpers
 // ---------------------------------------------------------------------------
 
-fn node_info_to_dict(py: Python<'_>, info: &ts_pack_core::NodeInfo) -> PyResult<Py<PyAny>> {
+fn node_info_to_dict(py: Python<'_>, info: &tree_sitter_language_pack::NodeInfo) -> PyResult<Py<PyAny>> {
     let dict = PyDict::new(py);
     dict.set_item("kind", &info.kind)?;
     dict.set_item("is_named", info.is_named)?;
@@ -237,7 +239,7 @@ fn node_info_to_dict(py: Python<'_>, info: &ts_pack_core::NodeInfo) -> PyResult<
     Ok(dict.into_any().unbind())
 }
 
-fn query_match_to_dict(py: Python<'_>, qm: &ts_pack_core::QueryMatch) -> PyResult<Py<PyAny>> {
+fn query_match_to_dict(py: Python<'_>, qm: &tree_sitter_language_pack::QueryMatch) -> PyResult<Py<PyAny>> {
     let dict = PyDict::new(py);
     dict.set_item("pattern_index", qm.pattern_index)?;
 
@@ -360,7 +362,7 @@ impl ProcessConfig {
     }
 }
 
-impl From<&ProcessConfig> for ts_pack_core::ProcessConfig {
+impl From<&ProcessConfig> for tree_sitter_language_pack::ProcessConfig {
     fn from(py_config: &ProcessConfig) -> Self {
         Self {
             language: py_config.language.clone(),
@@ -412,8 +414,9 @@ fn json_value_to_py(py: Python<'_>, value: &serde_json::Value) -> PyResult<Py<Py
 /// Process source code using a ProcessConfig and return the result as a Python dict.
 #[pyfunction]
 fn process(py: Python<'_>, source: &str, config: &ProcessConfig) -> PyResult<Py<PyAny>> {
-    let core_config: ts_pack_core::ProcessConfig = config.into();
-    let result = ts_pack_core::process(source, &core_config).map_err(|e| ParseError::new_err(format!("{e}")))?;
+    let core_config: tree_sitter_language_pack::ProcessConfig = config.into();
+    let result =
+        tree_sitter_language_pack::process(source, &core_config).map_err(|e| ParseError::new_err(format!("{e}")))?;
     let value = serde_json::to_value(&result).map_err(|e| ParseError::new_err(format!("serialization failed: {e}")))?;
     json_value_to_py(py, &value)
 }

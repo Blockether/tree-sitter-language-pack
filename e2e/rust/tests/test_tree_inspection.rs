@@ -3,12 +3,12 @@
 
 #[test]
 fn tree_error_count_broken() {
-    if !ts_pack_core::has_language("python") {
+    if !tree_sitter_language_pack::has_language("python") {
         eprintln!("Skipping: language 'python' not available");
         return;
     }
     // Parse broken Python code and verify error count >= 1
-    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let mut parser = tree_sitter_language_pack::get_parser("python").expect("Failed to get parser for 'python'");
     let tree = parser.parse("def (broken syntax @@@ !!!", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -18,48 +18,48 @@ fn tree_error_count_broken() {
 
 #[test]
 fn tree_error_count_valid() {
-    if !ts_pack_core::has_language("python") {
+    if !tree_sitter_language_pack::has_language("python") {
         eprintln!("Skipping: language 'python' not available");
         return;
     }
     // Parse valid Python code and verify zero error count
-    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let mut parser = tree_sitter_language_pack::get_parser("python").expect("Failed to get parser for 'python'");
     let tree = parser.parse("x = 1\ny = 2\n", None);
     assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
 fn tree_find_nodes_two_functions() {
-    if !ts_pack_core::has_language("python") {
+    if !tree_sitter_language_pack::has_language("python") {
         eprintln!("Skipping: language 'python' not available");
         return;
     }
     // Parse Python with 2 functions and verify find_nodes_by_type count
-    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let mut parser = tree_sitter_language_pack::get_parser("python").expect("Failed to get parser for 'python'");
     let tree = parser.parse("def foo():\n    pass\n\ndef bar():\n    pass\n", None);
     assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
 fn tree_named_children_class_and_function() {
-    if !ts_pack_core::has_language("python") {
+    if !tree_sitter_language_pack::has_language("python") {
         eprintln!("Skipping: language 'python' not available");
         return;
     }
     // Parse Python with class and function, verify named children count
-    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let mut parser = tree_sitter_language_pack::get_parser("python").expect("Failed to get parser for 'python'");
     let tree = parser.parse("class Foo:\n    pass\n\ndef bar():\n    pass\n", None);
     assert!(tree.is_some(), "Parse tree should not be None");
 }
 
 #[test]
 fn tree_root_node_info_python() {
-    if !ts_pack_core::has_language("python") {
+    if !tree_sitter_language_pack::has_language("python") {
         eprintln!("Skipping: language 'python' not available");
         return;
     }
     // Parse Python source and verify root node info
-    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let mut parser = tree_sitter_language_pack::get_parser("python").expect("Failed to get parser for 'python'");
     let tree = parser.parse("def hello():\n    pass\n", None);
     assert!(tree.is_some(), "Parse tree should not be None");
 }

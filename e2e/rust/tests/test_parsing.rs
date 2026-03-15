@@ -3,12 +3,12 @@
 
 #[test]
 fn parsing_go_function() {
-    if !ts_pack_core::has_language("go") {
+    if !tree_sitter_language_pack::has_language("go") {
         eprintln!("Skipping: language 'go' not available");
         return;
     }
     // Parse a Go function declaration and assert node type
-    let mut parser = ts_pack_core::get_parser("go").expect("Failed to get parser for 'go'");
+    let mut parser = tree_sitter_language_pack::get_parser("go").expect("Failed to get parser for 'go'");
     let tree = parser.parse("package main\nfunc main() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -21,12 +21,12 @@ fn parsing_go_function() {
 
 #[test]
 fn parsing_html_element() {
-    if !ts_pack_core::has_language("html") {
+    if !tree_sitter_language_pack::has_language("html") {
         eprintln!("Skipping: language 'html' not available");
         return;
     }
     // Parse an HTML element and assert node type
-    let mut parser = ts_pack_core::get_parser("html").expect("Failed to get parser for 'html'");
+    let mut parser = tree_sitter_language_pack::get_parser("html").expect("Failed to get parser for 'html'");
     let tree = parser.parse("<div>hello</div>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -39,12 +39,12 @@ fn parsing_html_element() {
 
 #[test]
 fn parsing_javascript_class() {
-    if !ts_pack_core::has_language("javascript") {
+    if !tree_sitter_language_pack::has_language("javascript") {
         eprintln!("Skipping: language 'javascript' not available");
         return;
     }
     // Parse a JavaScript class declaration.
-    let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let mut parser = tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("class Foo { bar() {} }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -62,12 +62,12 @@ fn parsing_javascript_class() {
 
 #[test]
 fn parsing_javascript_variable() {
-    if !ts_pack_core::has_language("javascript") {
+    if !tree_sitter_language_pack::has_language("javascript") {
         eprintln!("Skipping: language 'javascript' not available");
         return;
     }
     // Parse a JavaScript variable declaration and assert node type
-    let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let mut parser = tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("const x = 1;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -80,12 +80,12 @@ fn parsing_javascript_variable() {
 
 #[test]
 fn parsing_python_function() {
-    if !ts_pack_core::has_language("python") {
+    if !tree_sitter_language_pack::has_language("python") {
         eprintln!("Skipping: language 'python' not available");
         return;
     }
     // Parse a Python function definition and assert node type
-    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let mut parser = tree_sitter_language_pack::get_parser("python").expect("Failed to get parser for 'python'");
     let tree = parser.parse("def hello(): pass", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -98,12 +98,12 @@ fn parsing_python_function() {
 
 #[test]
 fn parsing_rust_function() {
-    if !ts_pack_core::has_language("rust") {
+    if !tree_sitter_language_pack::has_language("rust") {
         eprintln!("Skipping: language 'rust' not available");
         return;
     }
     // Parse a Rust function definition and assert node type
-    let mut parser = ts_pack_core::get_parser("rust").expect("Failed to get parser for 'rust'");
+    let mut parser = tree_sitter_language_pack::get_parser("rust").expect("Failed to get parser for 'rust'");
     let tree = parser.parse("fn main() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -116,12 +116,12 @@ fn parsing_rust_function() {
 
 #[test]
 fn parsing_rust_struct() {
-    if !ts_pack_core::has_language("rust") {
+    if !tree_sitter_language_pack::has_language("rust") {
         eprintln!("Skipping: language 'rust' not available");
         return;
     }
     // Parse a Rust struct definition.
-    let mut parser = ts_pack_core::get_parser("rust").expect("Failed to get parser for 'rust'");
+    let mut parser = tree_sitter_language_pack::get_parser("rust").expect("Failed to get parser for 'rust'");
     let tree = parser.parse("struct Point { x: f64, y: f64 }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();

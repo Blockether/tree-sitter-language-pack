@@ -127,7 +127,7 @@ version = "0.0.0"
 dependencies = [
  "serde_json",
  "tree-sitter",
- "ts-pack-core",
+ "tree-sitter-language-pack",
 ]
 
 [[package]]
@@ -617,7 +617,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
 
 [[package]]
-name = "ts-pack-core"
+name = "tree-sitter-language-pack"
 version = "1.0.0-rc.1"
 dependencies = [
  "cc",

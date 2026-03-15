@@ -14,7 +14,7 @@ wasm-opt = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-ts-pack-core = { path = "../ts-pack-core", version = "1.0.0-rc.1", default-features = false, features = [
+tree-sitter-language-pack = { path = "../ts-pack-core", version = "1.0.0-rc.1", default-features = false, features = [
   "web",
   "serde",
 ] }

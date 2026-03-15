@@ -11,7 +11,7 @@ use std::panic;
 use std::ptr;
 
 use tree_sitter::ffi::TSLanguage;
-use ts_pack_core::LanguageRegistry;
+use tree_sitter_language_pack::LanguageRegistry;
 
 // ---------------------------------------------------------------------------
 // Opaque handles
@@ -461,7 +461,7 @@ pub unsafe extern "C" fn ts_pack_tree_contains_node_type(tree: *const TsPackTree
                 return false;
             }
         };
-        ts_pack_core::tree_contains_node_type(&t.inner, target)
+        tree_sitter_language_pack::tree_contains_node_type(&t.inner, target)
     })
 }
 
@@ -479,7 +479,7 @@ pub unsafe extern "C" fn ts_pack_tree_has_error_nodes(tree: *const TsPackTree) -
             return false;
         }
         let t = unsafe { &*tree };
-        ts_pack_core::tree_has_error_nodes(&t.inner)
+        tree_sitter_language_pack::tree_has_error_nodes(&t.inner)
     })
 }
 
@@ -500,7 +500,7 @@ pub unsafe extern "C" fn ts_pack_tree_to_sexp(tree: *const TsPackTree) -> *mut c
             return ptr::null_mut();
         }
         let t = unsafe { &*tree };
-        let sexp = ts_pack_core::tree_to_sexp(&t.inner);
+        let sexp = tree_sitter_language_pack::tree_to_sexp(&t.inner);
         match CString::new(sexp) {
             Ok(c) => CString::into_raw(c),
             Err(e) => {
@@ -527,7 +527,7 @@ pub unsafe extern "C" fn ts_pack_tree_error_count(tree: *const TsPackTree) -> us
             return 0;
         }
         let t = unsafe { &*tree };
-        ts_pack_core::tree_error_count(&t.inner)
+        tree_sitter_language_pack::tree_error_count(&t.inner)
     })
 }
 
@@ -577,7 +577,7 @@ pub unsafe extern "C" fn ts_pack_process(
                 return ptr::null_mut();
             }
         };
-        let core_config: ts_pack_core::ProcessConfig = match serde_json::from_value(config) {
+        let core_config: tree_sitter_language_pack::ProcessConfig = match serde_json::from_value(config) {
             Ok(c) => c,
             Err(e) => {
                 set_last_error(&format!("invalid config: {e}"));

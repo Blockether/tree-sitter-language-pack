@@ -17,22 +17,22 @@ impl rustler::Resource for TreeResource {}
 
 #[rustler::nif]
 fn available_languages() -> Vec<String> {
-    ts_pack_core::available_languages()
+    tree_sitter_language_pack::available_languages()
 }
 
 #[rustler::nif]
 fn has_language(name: String) -> bool {
-    ts_pack_core::has_language(&name)
+    tree_sitter_language_pack::has_language(&name)
 }
 
 #[rustler::nif]
 fn language_count() -> usize {
-    ts_pack_core::language_count()
+    tree_sitter_language_pack::language_count()
 }
 
 #[rustler::nif]
 fn get_language_ptr(name: String) -> NifResult<u64> {
-    let language = ts_pack_core::get_language(&name)
+    let language = tree_sitter_language_pack::get_language(&name)
         .map_err(|_| Error::RaiseTerm(Box::new((atoms::language_not_found(), name.clone()))))?;
     let raw_ptr = language.into_raw();
     Ok(raw_ptr as u64)
@@ -40,7 +40,7 @@ fn get_language_ptr(name: String) -> NifResult<u64> {
 
 #[rustler::nif]
 fn parse_string(language: String, source: String) -> NifResult<ResourceArc<TreeResource>> {
-    let tree = ts_pack_core::parse_string(&language, source.as_bytes())
+    let tree = tree_sitter_language_pack::parse_string(&language, source.as_bytes())
         .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
     Ok(ResourceArc::new(TreeResource(Mutex::new(tree))))
 }
@@ -69,7 +69,7 @@ fn tree_contains_node_type(tree: ResourceArc<TreeResource>, node_type: String) -
         .0
         .lock()
         .map_err(|_| Error::RaiseTerm(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
-    Ok(ts_pack_core::tree_contains_node_type(&guard, &node_type))
+    Ok(tree_sitter_language_pack::tree_contains_node_type(&guard, &node_type))
 }
 
 #[rustler::nif]
@@ -78,7 +78,7 @@ fn tree_has_error_nodes(tree: ResourceArc<TreeResource>) -> NifResult<bool> {
         .0
         .lock()
         .map_err(|_| Error::RaiseTerm(Box::new((atoms::parse_error(), "lock poisoned".to_string()))))?;
-    Ok(ts_pack_core::tree_has_error_nodes(&guard))
+    Ok(tree_sitter_language_pack::tree_has_error_nodes(&guard))
 }
 
 // ---------------------------------------------------------------------------
@@ -119,9 +119,9 @@ fn json_to_term<'a>(env: Env<'a>, value: &serde_json::Value) -> Term<'a> {
 /// - `chunk_max_size` (number, optional): maximum chunk size in bytes (default: 1500)
 #[rustler::nif]
 fn process<'a>(env: Env<'a>, source: String, config_json: String) -> NifResult<Term<'a>> {
-    let core_config: ts_pack_core::ProcessConfig = serde_json::from_str(&config_json)
+    let core_config: tree_sitter_language_pack::ProcessConfig = serde_json::from_str(&config_json)
         .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("invalid config JSON: {e}")))))?;
-    let result = ts_pack_core::process(&source, &core_config)
+    let result = tree_sitter_language_pack::process(&source, &core_config)
         .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("{e}")))))?;
     let value = serde_json::to_value(&result)
         .map_err(|e| Error::RaiseTerm(Box::new((atoms::parse_error(), format!("serialization failed: {e}")))))?;

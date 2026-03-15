@@ -169,7 +169,7 @@ mod dynamic {
 /// # Example
 ///
 /// ```no_run
-/// use ts_pack_core::{LanguageRegistry, ProcessConfig};
+/// use tree_sitter_language_pack::{LanguageRegistry, ProcessConfig};
 ///
 /// let registry = LanguageRegistry::new();
 /// let langs = registry.available_languages();

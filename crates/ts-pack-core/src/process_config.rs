@@ -5,7 +5,7 @@
 /// # Examples
 ///
 /// ```
-/// use ts_pack_core::ProcessConfig;
+/// use tree_sitter_language_pack::ProcessConfig;
 ///
 /// // Defaults: structure + imports + exports enabled
 /// let config = ProcessConfig::new("python");

@@ -3,12 +3,12 @@
 
 #[test]
 fn smoke_actionscript() {
-    if !ts_pack_core::has_language("actionscript") {
+    if !tree_sitter_language_pack::has_language("actionscript") {
         eprintln!("Skipping: language 'actionscript' not available");
         return;
     }
     // Smoke test: load actionscript and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("actionscript").expect("Failed to get parser for 'actionscript'");
+    let mut parser = tree_sitter_language_pack::get_parser("actionscript").expect("Failed to get parser for 'actionscript'");
     let tree = parser.parse("var x:int = 1;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -26,12 +26,12 @@ fn smoke_actionscript() {
 
 #[test]
 fn smoke_ada() {
-    if !ts_pack_core::has_language("ada") {
+    if !tree_sitter_language_pack::has_language("ada") {
         eprintln!("Skipping: language 'ada' not available");
         return;
     }
     // Smoke test: load ada and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("ada").expect("Failed to get parser for 'ada'");
+    let mut parser = tree_sitter_language_pack::get_parser("ada").expect("Failed to get parser for 'ada'");
     let tree = parser.parse("procedure Main is begin null; end Main;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -49,12 +49,12 @@ fn smoke_ada() {
 
 #[test]
 fn smoke_agda() {
-    if !ts_pack_core::has_language("agda") {
+    if !tree_sitter_language_pack::has_language("agda") {
         eprintln!("Skipping: language 'agda' not available");
         return;
     }
     // Smoke test: load agda and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("agda").expect("Failed to get parser for 'agda'");
+    let mut parser = tree_sitter_language_pack::get_parser("agda").expect("Failed to get parser for 'agda'");
     let tree = parser.parse("module Main where", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -72,12 +72,12 @@ fn smoke_agda() {
 
 #[test]
 fn smoke_apex() {
-    if !ts_pack_core::has_language("apex") {
+    if !tree_sitter_language_pack::has_language("apex") {
         eprintln!("Skipping: language 'apex' not available");
         return;
     }
     // Smoke test: load apex and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("apex").expect("Failed to get parser for 'apex'");
+    let mut parser = tree_sitter_language_pack::get_parser("apex").expect("Failed to get parser for 'apex'");
     let tree = parser.parse("public class Main {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -95,12 +95,12 @@ fn smoke_apex() {
 
 #[test]
 fn smoke_arduino() {
-    if !ts_pack_core::has_language("arduino") {
+    if !tree_sitter_language_pack::has_language("arduino") {
         eprintln!("Skipping: language 'arduino' not available");
         return;
     }
     // Smoke test: load arduino and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("arduino").expect("Failed to get parser for 'arduino'");
+    let mut parser = tree_sitter_language_pack::get_parser("arduino").expect("Failed to get parser for 'arduino'");
     let tree = parser.parse("void setup() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -118,12 +118,12 @@ fn smoke_arduino() {
 
 #[test]
 fn smoke_asm() {
-    if !ts_pack_core::has_language("asm") {
+    if !tree_sitter_language_pack::has_language("asm") {
         eprintln!("Skipping: language 'asm' not available");
         return;
     }
     // Smoke test: load asm and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("asm").expect("Failed to get parser for 'asm'");
+    let mut parser = tree_sitter_language_pack::get_parser("asm").expect("Failed to get parser for 'asm'");
     let tree = parser.parse("mov eax, 1", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -141,12 +141,12 @@ fn smoke_asm() {
 
 #[test]
 fn smoke_astro() {
-    if !ts_pack_core::has_language("astro") {
+    if !tree_sitter_language_pack::has_language("astro") {
         eprintln!("Skipping: language 'astro' not available");
         return;
     }
     // Smoke test: load astro and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("astro").expect("Failed to get parser for 'astro'");
+    let mut parser = tree_sitter_language_pack::get_parser("astro").expect("Failed to get parser for 'astro'");
     let tree = parser.parse("---\n---\n<p>hello</p>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -164,12 +164,12 @@ fn smoke_astro() {
 
 #[test]
 fn smoke_bash() {
-    if !ts_pack_core::has_language("bash") {
+    if !tree_sitter_language_pack::has_language("bash") {
         eprintln!("Skipping: language 'bash' not available");
         return;
     }
     // Smoke test: load bash and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("bash").expect("Failed to get parser for 'bash'");
+    let mut parser = tree_sitter_language_pack::get_parser("bash").expect("Failed to get parser for 'bash'");
     let tree = parser.parse("echo hello", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -187,12 +187,12 @@ fn smoke_bash() {
 
 #[test]
 fn smoke_beancount() {
-    if !ts_pack_core::has_language("beancount") {
+    if !tree_sitter_language_pack::has_language("beancount") {
         eprintln!("Skipping: language 'beancount' not available");
         return;
     }
     // Smoke test: load beancount and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("beancount").expect("Failed to get parser for 'beancount'");
+    let mut parser = tree_sitter_language_pack::get_parser("beancount").expect("Failed to get parser for 'beancount'");
     let tree = parser.parse("2024-01-01 open Assets:Bank USD", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -210,12 +210,12 @@ fn smoke_beancount() {
 
 #[test]
 fn smoke_bibtex() {
-    if !ts_pack_core::has_language("bibtex") {
+    if !tree_sitter_language_pack::has_language("bibtex") {
         eprintln!("Skipping: language 'bibtex' not available");
         return;
     }
     // Smoke test: load bibtex and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("bibtex").expect("Failed to get parser for 'bibtex'");
+    let mut parser = tree_sitter_language_pack::get_parser("bibtex").expect("Failed to get parser for 'bibtex'");
     let tree = parser.parse("@article{key, title={A}}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -233,12 +233,12 @@ fn smoke_bibtex() {
 
 #[test]
 fn smoke_bicep() {
-    if !ts_pack_core::has_language("bicep") {
+    if !tree_sitter_language_pack::has_language("bicep") {
         eprintln!("Skipping: language 'bicep' not available");
         return;
     }
     // Smoke test: load bicep and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("bicep").expect("Failed to get parser for 'bicep'");
+    let mut parser = tree_sitter_language_pack::get_parser("bicep").expect("Failed to get parser for 'bicep'");
     let tree = parser.parse("param name string", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -256,12 +256,12 @@ fn smoke_bicep() {
 
 #[test]
 fn smoke_bitbake() {
-    if !ts_pack_core::has_language("bitbake") {
+    if !tree_sitter_language_pack::has_language("bitbake") {
         eprintln!("Skipping: language 'bitbake' not available");
         return;
     }
     // Smoke test: load bitbake and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("bitbake").expect("Failed to get parser for 'bitbake'");
+    let mut parser = tree_sitter_language_pack::get_parser("bitbake").expect("Failed to get parser for 'bitbake'");
     let tree = parser.parse("DESCRIPTION = \"hello\"", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -279,12 +279,12 @@ fn smoke_bitbake() {
 
 #[test]
 fn smoke_bsl() {
-    if !ts_pack_core::has_language("bsl") {
+    if !tree_sitter_language_pack::has_language("bsl") {
         eprintln!("Skipping: language 'bsl' not available");
         return;
     }
     // Smoke test: load bsl and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("bsl").expect("Failed to get parser for 'bsl'");
+    let mut parser = tree_sitter_language_pack::get_parser("bsl").expect("Failed to get parser for 'bsl'");
     let tree = parser.parse("Procedure Main() EndProcedure", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -302,12 +302,12 @@ fn smoke_bsl() {
 
 #[test]
 fn smoke_c() {
-    if !ts_pack_core::has_language("c") {
+    if !tree_sitter_language_pack::has_language("c") {
         eprintln!("Skipping: language 'c' not available");
         return;
     }
     // Smoke test: load c and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("c").expect("Failed to get parser for 'c'");
+    let mut parser = tree_sitter_language_pack::get_parser("c").expect("Failed to get parser for 'c'");
     let tree = parser.parse("int main() { return 0; }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -321,12 +321,12 @@ fn smoke_c() {
 
 #[test]
 fn smoke_cairo() {
-    if !ts_pack_core::has_language("cairo") {
+    if !tree_sitter_language_pack::has_language("cairo") {
         eprintln!("Skipping: language 'cairo' not available");
         return;
     }
     // Smoke test: load cairo and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("cairo").expect("Failed to get parser for 'cairo'");
+    let mut parser = tree_sitter_language_pack::get_parser("cairo").expect("Failed to get parser for 'cairo'");
     let tree = parser.parse("fn main() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -344,12 +344,12 @@ fn smoke_cairo() {
 
 #[test]
 fn smoke_capnp() {
-    if !ts_pack_core::has_language("capnp") {
+    if !tree_sitter_language_pack::has_language("capnp") {
         eprintln!("Skipping: language 'capnp' not available");
         return;
     }
     // Smoke test: load capnp and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("capnp").expect("Failed to get parser for 'capnp'");
+    let mut parser = tree_sitter_language_pack::get_parser("capnp").expect("Failed to get parser for 'capnp'");
     let tree = parser.parse("@0xabcdef1234567890;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -367,12 +367,12 @@ fn smoke_capnp() {
 
 #[test]
 fn smoke_chatito() {
-    if !ts_pack_core::has_language("chatito") {
+    if !tree_sitter_language_pack::has_language("chatito") {
         eprintln!("Skipping: language 'chatito' not available");
         return;
     }
     // Smoke test: load chatito and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("chatito").expect("Failed to get parser for 'chatito'");
+    let mut parser = tree_sitter_language_pack::get_parser("chatito").expect("Failed to get parser for 'chatito'");
     let tree = parser.parse("%[greeting]\n    hello", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -390,12 +390,12 @@ fn smoke_chatito() {
 
 #[test]
 fn smoke_clarity() {
-    if !ts_pack_core::has_language("clarity") {
+    if !tree_sitter_language_pack::has_language("clarity") {
         eprintln!("Skipping: language 'clarity' not available");
         return;
     }
     // Smoke test: load clarity and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("clarity").expect("Failed to get parser for 'clarity'");
+    let mut parser = tree_sitter_language_pack::get_parser("clarity").expect("Failed to get parser for 'clarity'");
     let tree = parser.parse("(define-public (hello) (ok true))", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -413,12 +413,12 @@ fn smoke_clarity() {
 
 #[test]
 fn smoke_clojure() {
-    if !ts_pack_core::has_language("clojure") {
+    if !tree_sitter_language_pack::has_language("clojure") {
         eprintln!("Skipping: language 'clojure' not available");
         return;
     }
     // Smoke test: load clojure and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("clojure").expect("Failed to get parser for 'clojure'");
+    let mut parser = tree_sitter_language_pack::get_parser("clojure").expect("Failed to get parser for 'clojure'");
     let tree = parser.parse("(def x 1)", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -436,12 +436,12 @@ fn smoke_clojure() {
 
 #[test]
 fn smoke_cmake() {
-    if !ts_pack_core::has_language("cmake") {
+    if !tree_sitter_language_pack::has_language("cmake") {
         eprintln!("Skipping: language 'cmake' not available");
         return;
     }
     // Smoke test: load cmake and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("cmake").expect("Failed to get parser for 'cmake'");
+    let mut parser = tree_sitter_language_pack::get_parser("cmake").expect("Failed to get parser for 'cmake'");
     let tree = parser.parse("cmake_minimum_required(VERSION 3.0)", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -459,12 +459,12 @@ fn smoke_cmake() {
 
 #[test]
 fn smoke_cobol() {
-    if !ts_pack_core::has_language("cobol") {
+    if !tree_sitter_language_pack::has_language("cobol") {
         eprintln!("Skipping: language 'cobol' not available");
         return;
     }
     // Smoke test: load cobol and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("cobol").expect("Failed to get parser for 'cobol'");
+    let mut parser = tree_sitter_language_pack::get_parser("cobol").expect("Failed to get parser for 'cobol'");
     let tree = parser.parse("       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -482,12 +482,12 @@ fn smoke_cobol() {
 
 #[test]
 fn smoke_comment() {
-    if !ts_pack_core::has_language("comment") {
+    if !tree_sitter_language_pack::has_language("comment") {
         eprintln!("Skipping: language 'comment' not available");
         return;
     }
     // Smoke test: load comment and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("comment").expect("Failed to get parser for 'comment'");
+    let mut parser = tree_sitter_language_pack::get_parser("comment").expect("Failed to get parser for 'comment'");
     let tree = parser.parse("TODO: fix this", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -505,12 +505,12 @@ fn smoke_comment() {
 
 #[test]
 fn smoke_commonlisp() {
-    if !ts_pack_core::has_language("commonlisp") {
+    if !tree_sitter_language_pack::has_language("commonlisp") {
         eprintln!("Skipping: language 'commonlisp' not available");
         return;
     }
     // Smoke test: load commonlisp and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("commonlisp").expect("Failed to get parser for 'commonlisp'");
+    let mut parser = tree_sitter_language_pack::get_parser("commonlisp").expect("Failed to get parser for 'commonlisp'");
     let tree = parser.parse("(defun hello () (print \"hello\"))", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -528,12 +528,12 @@ fn smoke_commonlisp() {
 
 #[test]
 fn smoke_cpon() {
-    if !ts_pack_core::has_language("cpon") {
+    if !tree_sitter_language_pack::has_language("cpon") {
         eprintln!("Skipping: language 'cpon' not available");
         return;
     }
     // Smoke test: load cpon and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("cpon").expect("Failed to get parser for 'cpon'");
+    let mut parser = tree_sitter_language_pack::get_parser("cpon").expect("Failed to get parser for 'cpon'");
     let tree = parser.parse("{\"key\": 1}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -551,12 +551,12 @@ fn smoke_cpon() {
 
 #[test]
 fn smoke_cpp() {
-    if !ts_pack_core::has_language("cpp") {
+    if !tree_sitter_language_pack::has_language("cpp") {
         eprintln!("Skipping: language 'cpp' not available");
         return;
     }
     // Smoke test: load cpp and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("cpp").expect("Failed to get parser for 'cpp'");
+    let mut parser = tree_sitter_language_pack::get_parser("cpp").expect("Failed to get parser for 'cpp'");
     let tree = parser.parse("int main() { return 0; }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -570,12 +570,12 @@ fn smoke_cpp() {
 
 #[test]
 fn smoke_css() {
-    if !ts_pack_core::has_language("css") {
+    if !tree_sitter_language_pack::has_language("css") {
         eprintln!("Skipping: language 'css' not available");
         return;
     }
     // Smoke test: load css and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("css").expect("Failed to get parser for 'css'");
+    let mut parser = tree_sitter_language_pack::get_parser("css").expect("Failed to get parser for 'css'");
     let tree = parser.parse("body { color: red; }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -593,12 +593,12 @@ fn smoke_css() {
 
 #[test]
 fn smoke_csv() {
-    if !ts_pack_core::has_language("csv") {
+    if !tree_sitter_language_pack::has_language("csv") {
         eprintln!("Skipping: language 'csv' not available");
         return;
     }
     // Smoke test: load csv and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("csv").expect("Failed to get parser for 'csv'");
+    let mut parser = tree_sitter_language_pack::get_parser("csv").expect("Failed to get parser for 'csv'");
     let tree = parser.parse("a,b,c\n1,2,3", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -616,12 +616,12 @@ fn smoke_csv() {
 
 #[test]
 fn smoke_cuda() {
-    if !ts_pack_core::has_language("cuda") {
+    if !tree_sitter_language_pack::has_language("cuda") {
         eprintln!("Skipping: language 'cuda' not available");
         return;
     }
     // Smoke test: load cuda and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("cuda").expect("Failed to get parser for 'cuda'");
+    let mut parser = tree_sitter_language_pack::get_parser("cuda").expect("Failed to get parser for 'cuda'");
     let tree = parser.parse("__global__ void kernel() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -639,12 +639,12 @@ fn smoke_cuda() {
 
 #[test]
 fn smoke_d() {
-    if !ts_pack_core::has_language("d") {
+    if !tree_sitter_language_pack::has_language("d") {
         eprintln!("Skipping: language 'd' not available");
         return;
     }
     // Smoke test: load d and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("d").expect("Failed to get parser for 'd'");
+    let mut parser = tree_sitter_language_pack::get_parser("d").expect("Failed to get parser for 'd'");
     let tree = parser.parse("void main() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -662,12 +662,12 @@ fn smoke_d() {
 
 #[test]
 fn smoke_dart() {
-    if !ts_pack_core::has_language("dart") {
+    if !tree_sitter_language_pack::has_language("dart") {
         eprintln!("Skipping: language 'dart' not available");
         return;
     }
     // Smoke test: load dart and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("dart").expect("Failed to get parser for 'dart'");
+    let mut parser = tree_sitter_language_pack::get_parser("dart").expect("Failed to get parser for 'dart'");
     let tree = parser.parse("void main() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -685,12 +685,12 @@ fn smoke_dart() {
 
 #[test]
 fn smoke_dockerfile() {
-    if !ts_pack_core::has_language("dockerfile") {
+    if !tree_sitter_language_pack::has_language("dockerfile") {
         eprintln!("Skipping: language 'dockerfile' not available");
         return;
     }
     // Smoke test: load dockerfile and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("dockerfile").expect("Failed to get parser for 'dockerfile'");
+    let mut parser = tree_sitter_language_pack::get_parser("dockerfile").expect("Failed to get parser for 'dockerfile'");
     let tree = parser.parse("FROM alpine", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -708,12 +708,12 @@ fn smoke_dockerfile() {
 
 #[test]
 fn smoke_doxygen() {
-    if !ts_pack_core::has_language("doxygen") {
+    if !tree_sitter_language_pack::has_language("doxygen") {
         eprintln!("Skipping: language 'doxygen' not available");
         return;
     }
     // Smoke test: load doxygen and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("doxygen").expect("Failed to get parser for 'doxygen'");
+    let mut parser = tree_sitter_language_pack::get_parser("doxygen").expect("Failed to get parser for 'doxygen'");
     let tree = parser.parse("/** @brief A function */", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -731,12 +731,12 @@ fn smoke_doxygen() {
 
 #[test]
 fn smoke_dtd() {
-    if !ts_pack_core::has_language("dtd") {
+    if !tree_sitter_language_pack::has_language("dtd") {
         eprintln!("Skipping: language 'dtd' not available");
         return;
     }
     // Smoke test: load dtd and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("dtd").expect("Failed to get parser for 'dtd'");
+    let mut parser = tree_sitter_language_pack::get_parser("dtd").expect("Failed to get parser for 'dtd'");
     let tree = parser.parse("<!ELEMENT note (body)>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -754,12 +754,12 @@ fn smoke_dtd() {
 
 #[test]
 fn smoke_elisp() {
-    if !ts_pack_core::has_language("elisp") {
+    if !tree_sitter_language_pack::has_language("elisp") {
         eprintln!("Skipping: language 'elisp' not available");
         return;
     }
     // Smoke test: load elisp and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("elisp").expect("Failed to get parser for 'elisp'");
+    let mut parser = tree_sitter_language_pack::get_parser("elisp").expect("Failed to get parser for 'elisp'");
     let tree = parser.parse("(defun hello () (message \"hello\"))", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -777,12 +777,12 @@ fn smoke_elisp() {
 
 #[test]
 fn smoke_elixir() {
-    if !ts_pack_core::has_language("elixir") {
+    if !tree_sitter_language_pack::has_language("elixir") {
         eprintln!("Skipping: language 'elixir' not available");
         return;
     }
     // Smoke test: load elixir and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("elixir").expect("Failed to get parser for 'elixir'");
+    let mut parser = tree_sitter_language_pack::get_parser("elixir").expect("Failed to get parser for 'elixir'");
     let tree = parser.parse("IO.puts(\"hello\")", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -800,12 +800,12 @@ fn smoke_elixir() {
 
 #[test]
 fn smoke_elm() {
-    if !ts_pack_core::has_language("elm") {
+    if !tree_sitter_language_pack::has_language("elm") {
         eprintln!("Skipping: language 'elm' not available");
         return;
     }
     // Smoke test: load elm and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("elm").expect("Failed to get parser for 'elm'");
+    let mut parser = tree_sitter_language_pack::get_parser("elm").expect("Failed to get parser for 'elm'");
     let tree = parser.parse("module Main exposing (..)", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -823,12 +823,12 @@ fn smoke_elm() {
 
 #[test]
 fn smoke_erlang() {
-    if !ts_pack_core::has_language("erlang") {
+    if !tree_sitter_language_pack::has_language("erlang") {
         eprintln!("Skipping: language 'erlang' not available");
         return;
     }
     // Smoke test: load erlang and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("erlang").expect("Failed to get parser for 'erlang'");
+    let mut parser = tree_sitter_language_pack::get_parser("erlang").expect("Failed to get parser for 'erlang'");
     let tree = parser.parse("main() -> ok.", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -846,12 +846,12 @@ fn smoke_erlang() {
 
 #[test]
 fn smoke_fennel() {
-    if !ts_pack_core::has_language("fennel") {
+    if !tree_sitter_language_pack::has_language("fennel") {
         eprintln!("Skipping: language 'fennel' not available");
         return;
     }
     // Smoke test: load fennel and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("fennel").expect("Failed to get parser for 'fennel'");
+    let mut parser = tree_sitter_language_pack::get_parser("fennel").expect("Failed to get parser for 'fennel'");
     let tree = parser.parse("(fn hello [] (print :hello))", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -869,12 +869,12 @@ fn smoke_fennel() {
 
 #[test]
 fn smoke_firrtl() {
-    if !ts_pack_core::has_language("firrtl") {
+    if !tree_sitter_language_pack::has_language("firrtl") {
         eprintln!("Skipping: language 'firrtl' not available");
         return;
     }
     // Smoke test: load firrtl and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("firrtl").expect("Failed to get parser for 'firrtl'");
+    let mut parser = tree_sitter_language_pack::get_parser("firrtl").expect("Failed to get parser for 'firrtl'");
     let tree = parser.parse("circuit Main :", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -892,12 +892,12 @@ fn smoke_firrtl() {
 
 #[test]
 fn smoke_fish() {
-    if !ts_pack_core::has_language("fish") {
+    if !tree_sitter_language_pack::has_language("fish") {
         eprintln!("Skipping: language 'fish' not available");
         return;
     }
     // Smoke test: load fish and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("fish").expect("Failed to get parser for 'fish'");
+    let mut parser = tree_sitter_language_pack::get_parser("fish").expect("Failed to get parser for 'fish'");
     let tree = parser.parse("echo hello", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -912,12 +912,12 @@ fn smoke_fish() {
 
 #[test]
 fn smoke_fortran() {
-    if !ts_pack_core::has_language("fortran") {
+    if !tree_sitter_language_pack::has_language("fortran") {
         eprintln!("Skipping: language 'fortran' not available");
         return;
     }
     // Smoke test: load fortran and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("fortran").expect("Failed to get parser for 'fortran'");
+    let mut parser = tree_sitter_language_pack::get_parser("fortran").expect("Failed to get parser for 'fortran'");
     let tree = parser.parse("program main\nend program main", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -935,12 +935,12 @@ fn smoke_fortran() {
 
 #[test]
 fn smoke_fsharp() {
-    if !ts_pack_core::has_language("fsharp") {
+    if !tree_sitter_language_pack::has_language("fsharp") {
         eprintln!("Skipping: language 'fsharp' not available");
         return;
     }
     // Smoke test: load fsharp and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("fsharp").expect("Failed to get parser for 'fsharp'");
+    let mut parser = tree_sitter_language_pack::get_parser("fsharp").expect("Failed to get parser for 'fsharp'");
     let tree = parser.parse("let x = 1", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -958,12 +958,12 @@ fn smoke_fsharp() {
 
 #[test]
 fn smoke_fsharp_signature() {
-    if !ts_pack_core::has_language("fsharp_signature") {
+    if !tree_sitter_language_pack::has_language("fsharp_signature") {
         eprintln!("Skipping: language 'fsharp_signature' not available");
         return;
     }
     // Smoke test: load fsharp_signature and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("fsharp_signature").expect("Failed to get parser for 'fsharp_signature'");
+    let mut parser = tree_sitter_language_pack::get_parser("fsharp_signature").expect("Failed to get parser for 'fsharp_signature'");
     let tree = parser.parse("val x: int", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -981,12 +981,12 @@ fn smoke_fsharp_signature() {
 
 #[test]
 fn smoke_func() {
-    if !ts_pack_core::has_language("func") {
+    if !tree_sitter_language_pack::has_language("func") {
         eprintln!("Skipping: language 'func' not available");
         return;
     }
     // Smoke test: load func and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("func").expect("Failed to get parser for 'func'");
+    let mut parser = tree_sitter_language_pack::get_parser("func").expect("Failed to get parser for 'func'");
     let tree = parser.parse("() recv_internal() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1004,12 +1004,12 @@ fn smoke_func() {
 
 #[test]
 fn smoke_gdscript() {
-    if !ts_pack_core::has_language("gdscript") {
+    if !tree_sitter_language_pack::has_language("gdscript") {
         eprintln!("Skipping: language 'gdscript' not available");
         return;
     }
     // Smoke test: load gdscript and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("gdscript").expect("Failed to get parser for 'gdscript'");
+    let mut parser = tree_sitter_language_pack::get_parser("gdscript").expect("Failed to get parser for 'gdscript'");
     let tree = parser.parse("extends Node\nfunc _ready():\n\tpass", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1027,12 +1027,12 @@ fn smoke_gdscript() {
 
 #[test]
 fn smoke_gitattributes() {
-    if !ts_pack_core::has_language("gitattributes") {
+    if !tree_sitter_language_pack::has_language("gitattributes") {
         eprintln!("Skipping: language 'gitattributes' not available");
         return;
     }
     // Smoke test: load gitattributes and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("gitattributes").expect("Failed to get parser for 'gitattributes'");
+    let mut parser = tree_sitter_language_pack::get_parser("gitattributes").expect("Failed to get parser for 'gitattributes'");
     let tree = parser.parse("*.txt text", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1050,12 +1050,12 @@ fn smoke_gitattributes() {
 
 #[test]
 fn smoke_gitcommit() {
-    if !ts_pack_core::has_language("gitcommit") {
+    if !tree_sitter_language_pack::has_language("gitcommit") {
         eprintln!("Skipping: language 'gitcommit' not available");
         return;
     }
     // Smoke test: load gitcommit and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("gitcommit").expect("Failed to get parser for 'gitcommit'");
+    let mut parser = tree_sitter_language_pack::get_parser("gitcommit").expect("Failed to get parser for 'gitcommit'");
     let tree = parser.parse("feat: add feature\n\nBody text", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1073,12 +1073,12 @@ fn smoke_gitcommit() {
 
 #[test]
 fn smoke_gitignore() {
-    if !ts_pack_core::has_language("gitignore") {
+    if !tree_sitter_language_pack::has_language("gitignore") {
         eprintln!("Skipping: language 'gitignore' not available");
         return;
     }
     // Smoke test: load gitignore and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("gitignore").expect("Failed to get parser for 'gitignore'");
+    let mut parser = tree_sitter_language_pack::get_parser("gitignore").expect("Failed to get parser for 'gitignore'");
     let tree = parser.parse("*.o\n*.log", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1096,12 +1096,12 @@ fn smoke_gitignore() {
 
 #[test]
 fn smoke_gleam() {
-    if !ts_pack_core::has_language("gleam") {
+    if !tree_sitter_language_pack::has_language("gleam") {
         eprintln!("Skipping: language 'gleam' not available");
         return;
     }
     // Smoke test: load gleam and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("gleam").expect("Failed to get parser for 'gleam'");
+    let mut parser = tree_sitter_language_pack::get_parser("gleam").expect("Failed to get parser for 'gleam'");
     let tree = parser.parse("pub fn main() { }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1119,12 +1119,12 @@ fn smoke_gleam() {
 
 #[test]
 fn smoke_glsl() {
-    if !ts_pack_core::has_language("glsl") {
+    if !tree_sitter_language_pack::has_language("glsl") {
         eprintln!("Skipping: language 'glsl' not available");
         return;
     }
     // Smoke test: load glsl and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("glsl").expect("Failed to get parser for 'glsl'");
+    let mut parser = tree_sitter_language_pack::get_parser("glsl").expect("Failed to get parser for 'glsl'");
     let tree = parser.parse("void main() { gl_Position = vec4(0.0); }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1142,12 +1142,12 @@ fn smoke_glsl() {
 
 #[test]
 fn smoke_gn() {
-    if !ts_pack_core::has_language("gn") {
+    if !tree_sitter_language_pack::has_language("gn") {
         eprintln!("Skipping: language 'gn' not available");
         return;
     }
     // Smoke test: load gn and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("gn").expect("Failed to get parser for 'gn'");
+    let mut parser = tree_sitter_language_pack::get_parser("gn").expect("Failed to get parser for 'gn'");
     let tree = parser.parse("group(\"hello\") {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1165,12 +1165,12 @@ fn smoke_gn() {
 
 #[test]
 fn smoke_go() {
-    if !ts_pack_core::has_language("go") {
+    if !tree_sitter_language_pack::has_language("go") {
         eprintln!("Skipping: language 'go' not available");
         return;
     }
     // Smoke test: load go and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("go").expect("Failed to get parser for 'go'");
+    let mut parser = tree_sitter_language_pack::get_parser("go").expect("Failed to get parser for 'go'");
     let tree = parser.parse("package main", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1184,12 +1184,12 @@ fn smoke_go() {
 
 #[test]
 fn smoke_gomod() {
-    if !ts_pack_core::has_language("gomod") {
+    if !tree_sitter_language_pack::has_language("gomod") {
         eprintln!("Skipping: language 'gomod' not available");
         return;
     }
     // Smoke test: load gomod and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("gomod").expect("Failed to get parser for 'gomod'");
+    let mut parser = tree_sitter_language_pack::get_parser("gomod").expect("Failed to get parser for 'gomod'");
     let tree = parser.parse("module example.com/hello\n\ngo 1.21", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1207,12 +1207,12 @@ fn smoke_gomod() {
 
 #[test]
 fn smoke_gosum() {
-    if !ts_pack_core::has_language("gosum") {
+    if !tree_sitter_language_pack::has_language("gosum") {
         eprintln!("Skipping: language 'gosum' not available");
         return;
     }
     // Smoke test: load gosum and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("gosum").expect("Failed to get parser for 'gosum'");
+    let mut parser = tree_sitter_language_pack::get_parser("gosum").expect("Failed to get parser for 'gosum'");
     let tree = parser.parse("example.com/pkg v1.0.0 h1:abc=", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1230,12 +1230,12 @@ fn smoke_gosum() {
 
 #[test]
 fn smoke_graphql() {
-    if !ts_pack_core::has_language("graphql") {
+    if !tree_sitter_language_pack::has_language("graphql") {
         eprintln!("Skipping: language 'graphql' not available");
         return;
     }
     // Smoke test: load graphql and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("graphql").expect("Failed to get parser for 'graphql'");
+    let mut parser = tree_sitter_language_pack::get_parser("graphql").expect("Failed to get parser for 'graphql'");
     let tree = parser.parse("type Query { hello: String }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1253,12 +1253,12 @@ fn smoke_graphql() {
 
 #[test]
 fn smoke_groovy() {
-    if !ts_pack_core::has_language("groovy") {
+    if !tree_sitter_language_pack::has_language("groovy") {
         eprintln!("Skipping: language 'groovy' not available");
         return;
     }
     // Smoke test: load groovy and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("groovy").expect("Failed to get parser for 'groovy'");
+    let mut parser = tree_sitter_language_pack::get_parser("groovy").expect("Failed to get parser for 'groovy'");
     let tree = parser.parse("def x = 1", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1276,12 +1276,12 @@ fn smoke_groovy() {
 
 #[test]
 fn smoke_gstlaunch() {
-    if !ts_pack_core::has_language("gstlaunch") {
+    if !tree_sitter_language_pack::has_language("gstlaunch") {
         eprintln!("Skipping: language 'gstlaunch' not available");
         return;
     }
     // Smoke test: load gstlaunch and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("gstlaunch").expect("Failed to get parser for 'gstlaunch'");
+    let mut parser = tree_sitter_language_pack::get_parser("gstlaunch").expect("Failed to get parser for 'gstlaunch'");
     let tree = parser.parse("fakesrc ! fakesink", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1299,12 +1299,12 @@ fn smoke_gstlaunch() {
 
 #[test]
 fn smoke_hack() {
-    if !ts_pack_core::has_language("hack") {
+    if !tree_sitter_language_pack::has_language("hack") {
         eprintln!("Skipping: language 'hack' not available");
         return;
     }
     // Smoke test: load hack and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("hack").expect("Failed to get parser for 'hack'");
+    let mut parser = tree_sitter_language_pack::get_parser("hack").expect("Failed to get parser for 'hack'");
     let tree = parser.parse("<?hh\nfunction main(): void {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1322,12 +1322,12 @@ fn smoke_hack() {
 
 #[test]
 fn smoke_hare() {
-    if !ts_pack_core::has_language("hare") {
+    if !tree_sitter_language_pack::has_language("hare") {
         eprintln!("Skipping: language 'hare' not available");
         return;
     }
     // Smoke test: load hare and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("hare").expect("Failed to get parser for 'hare'");
+    let mut parser = tree_sitter_language_pack::get_parser("hare").expect("Failed to get parser for 'hare'");
     let tree = parser.parse("export fn main() void = void;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1345,12 +1345,12 @@ fn smoke_hare() {
 
 #[test]
 fn smoke_haskell() {
-    if !ts_pack_core::has_language("haskell") {
+    if !tree_sitter_language_pack::has_language("haskell") {
         eprintln!("Skipping: language 'haskell' not available");
         return;
     }
     // Smoke test: load haskell and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("haskell").expect("Failed to get parser for 'haskell'");
+    let mut parser = tree_sitter_language_pack::get_parser("haskell").expect("Failed to get parser for 'haskell'");
     let tree = parser.parse("main = putStrLn \"hello\"", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1368,12 +1368,12 @@ fn smoke_haskell() {
 
 #[test]
 fn smoke_haxe() {
-    if !ts_pack_core::has_language("haxe") {
+    if !tree_sitter_language_pack::has_language("haxe") {
         eprintln!("Skipping: language 'haxe' not available");
         return;
     }
     // Smoke test: load haxe and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("haxe").expect("Failed to get parser for 'haxe'");
+    let mut parser = tree_sitter_language_pack::get_parser("haxe").expect("Failed to get parser for 'haxe'");
     let tree = parser.parse("class Main { static function main() {} }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1391,12 +1391,12 @@ fn smoke_haxe() {
 
 #[test]
 fn smoke_hcl() {
-    if !ts_pack_core::has_language("hcl") {
+    if !tree_sitter_language_pack::has_language("hcl") {
         eprintln!("Skipping: language 'hcl' not available");
         return;
     }
     // Smoke test: load hcl and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("hcl").expect("Failed to get parser for 'hcl'");
+    let mut parser = tree_sitter_language_pack::get_parser("hcl").expect("Failed to get parser for 'hcl'");
     let tree = parser.parse("variable \"name\" { type = string }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1414,12 +1414,12 @@ fn smoke_hcl() {
 
 #[test]
 fn smoke_heex() {
-    if !ts_pack_core::has_language("heex") {
+    if !tree_sitter_language_pack::has_language("heex") {
         eprintln!("Skipping: language 'heex' not available");
         return;
     }
     // Smoke test: load heex and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("heex").expect("Failed to get parser for 'heex'");
+    let mut parser = tree_sitter_language_pack::get_parser("heex").expect("Failed to get parser for 'heex'");
     let tree = parser.parse("<%= @greeting %>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1437,12 +1437,12 @@ fn smoke_heex() {
 
 #[test]
 fn smoke_hlsl() {
-    if !ts_pack_core::has_language("hlsl") {
+    if !tree_sitter_language_pack::has_language("hlsl") {
         eprintln!("Skipping: language 'hlsl' not available");
         return;
     }
     // Smoke test: load hlsl and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("hlsl").expect("Failed to get parser for 'hlsl'");
+    let mut parser = tree_sitter_language_pack::get_parser("hlsl").expect("Failed to get parser for 'hlsl'");
     let tree = parser.parse("float4 main() : SV_Target { return 0; }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1460,12 +1460,12 @@ fn smoke_hlsl() {
 
 #[test]
 fn smoke_html() {
-    if !ts_pack_core::has_language("html") {
+    if !tree_sitter_language_pack::has_language("html") {
         eprintln!("Skipping: language 'html' not available");
         return;
     }
     // Smoke test: load html and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("html").expect("Failed to get parser for 'html'");
+    let mut parser = tree_sitter_language_pack::get_parser("html").expect("Failed to get parser for 'html'");
     let tree = parser.parse("<p>hello</p>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1479,12 +1479,12 @@ fn smoke_html() {
 
 #[test]
 fn smoke_hyprlang() {
-    if !ts_pack_core::has_language("hyprlang") {
+    if !tree_sitter_language_pack::has_language("hyprlang") {
         eprintln!("Skipping: language 'hyprlang' not available");
         return;
     }
     // Smoke test: load hyprlang and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("hyprlang").expect("Failed to get parser for 'hyprlang'");
+    let mut parser = tree_sitter_language_pack::get_parser("hyprlang").expect("Failed to get parser for 'hyprlang'");
     let tree = parser.parse("general { border_size = 1 }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1499,12 +1499,12 @@ fn smoke_hyprlang() {
 
 #[test]
 fn smoke_ini() {
-    if !ts_pack_core::has_language("ini") {
+    if !tree_sitter_language_pack::has_language("ini") {
         eprintln!("Skipping: language 'ini' not available");
         return;
     }
     // Smoke test: load ini and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("ini").expect("Failed to get parser for 'ini'");
+    let mut parser = tree_sitter_language_pack::get_parser("ini").expect("Failed to get parser for 'ini'");
     let tree = parser.parse("[section]\nkey = value", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1522,12 +1522,12 @@ fn smoke_ini() {
 
 #[test]
 fn smoke_ispc() {
-    if !ts_pack_core::has_language("ispc") {
+    if !tree_sitter_language_pack::has_language("ispc") {
         eprintln!("Skipping: language 'ispc' not available");
         return;
     }
     // Smoke test: load ispc and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("ispc").expect("Failed to get parser for 'ispc'");
+    let mut parser = tree_sitter_language_pack::get_parser("ispc").expect("Failed to get parser for 'ispc'");
     let tree = parser.parse("export void main() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1545,12 +1545,12 @@ fn smoke_ispc() {
 
 #[test]
 fn smoke_janet() {
-    if !ts_pack_core::has_language("janet") {
+    if !tree_sitter_language_pack::has_language("janet") {
         eprintln!("Skipping: language 'janet' not available");
         return;
     }
     // Smoke test: load janet and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("janet").expect("Failed to get parser for 'janet'");
+    let mut parser = tree_sitter_language_pack::get_parser("janet").expect("Failed to get parser for 'janet'");
     let tree = parser.parse("(print \"hello\")", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1568,12 +1568,12 @@ fn smoke_janet() {
 
 #[test]
 fn smoke_java() {
-    if !ts_pack_core::has_language("java") {
+    if !tree_sitter_language_pack::has_language("java") {
         eprintln!("Skipping: language 'java' not available");
         return;
     }
     // Smoke test: load java and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("java").expect("Failed to get parser for 'java'");
+    let mut parser = tree_sitter_language_pack::get_parser("java").expect("Failed to get parser for 'java'");
     let tree = parser.parse("class Main { public static void main(String[] args) {} }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1587,12 +1587,12 @@ fn smoke_java() {
 
 #[test]
 fn smoke_javascript() {
-    if !ts_pack_core::has_language("javascript") {
+    if !tree_sitter_language_pack::has_language("javascript") {
         eprintln!("Skipping: language 'javascript' not available");
         return;
     }
     // Smoke test: load javascript and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let mut parser = tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("console.log('hello');", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1606,12 +1606,12 @@ fn smoke_javascript() {
 
 #[test]
 fn smoke_jsdoc() {
-    if !ts_pack_core::has_language("jsdoc") {
+    if !tree_sitter_language_pack::has_language("jsdoc") {
         eprintln!("Skipping: language 'jsdoc' not available");
         return;
     }
     // Smoke test: load jsdoc and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("jsdoc").expect("Failed to get parser for 'jsdoc'");
+    let mut parser = tree_sitter_language_pack::get_parser("jsdoc").expect("Failed to get parser for 'jsdoc'");
     let tree = parser.parse("/** @param {string} name */", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1629,12 +1629,12 @@ fn smoke_jsdoc() {
 
 #[test]
 fn smoke_json() {
-    if !ts_pack_core::has_language("json") {
+    if !tree_sitter_language_pack::has_language("json") {
         eprintln!("Skipping: language 'json' not available");
         return;
     }
     // Smoke test: load json and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("json").expect("Failed to get parser for 'json'");
+    let mut parser = tree_sitter_language_pack::get_parser("json").expect("Failed to get parser for 'json'");
     let tree = parser.parse("{\"key\": \"value\"}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1652,12 +1652,12 @@ fn smoke_json() {
 
 #[test]
 fn smoke_jsonnet() {
-    if !ts_pack_core::has_language("jsonnet") {
+    if !tree_sitter_language_pack::has_language("jsonnet") {
         eprintln!("Skipping: language 'jsonnet' not available");
         return;
     }
     // Smoke test: load jsonnet and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("jsonnet").expect("Failed to get parser for 'jsonnet'");
+    let mut parser = tree_sitter_language_pack::get_parser("jsonnet").expect("Failed to get parser for 'jsonnet'");
     let tree = parser.parse("{ key: 'value' }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1675,12 +1675,12 @@ fn smoke_jsonnet() {
 
 #[test]
 fn smoke_julia() {
-    if !ts_pack_core::has_language("julia") {
+    if !tree_sitter_language_pack::has_language("julia") {
         eprintln!("Skipping: language 'julia' not available");
         return;
     }
     // Smoke test: load julia and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("julia").expect("Failed to get parser for 'julia'");
+    let mut parser = tree_sitter_language_pack::get_parser("julia").expect("Failed to get parser for 'julia'");
     let tree = parser.parse("function main() end", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1698,12 +1698,12 @@ fn smoke_julia() {
 
 #[test]
 fn smoke_kconfig() {
-    if !ts_pack_core::has_language("kconfig") {
+    if !tree_sitter_language_pack::has_language("kconfig") {
         eprintln!("Skipping: language 'kconfig' not available");
         return;
     }
     // Smoke test: load kconfig and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("kconfig").expect("Failed to get parser for 'kconfig'");
+    let mut parser = tree_sitter_language_pack::get_parser("kconfig").expect("Failed to get parser for 'kconfig'");
     let tree = parser.parse("config FOO\n\tbool \"Enable foo\"", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1721,12 +1721,12 @@ fn smoke_kconfig() {
 
 #[test]
 fn smoke_kdl() {
-    if !ts_pack_core::has_language("kdl") {
+    if !tree_sitter_language_pack::has_language("kdl") {
         eprintln!("Skipping: language 'kdl' not available");
         return;
     }
     // Smoke test: load kdl and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("kdl").expect("Failed to get parser for 'kdl'");
+    let mut parser = tree_sitter_language_pack::get_parser("kdl").expect("Failed to get parser for 'kdl'");
     let tree = parser.parse("node \"value\"", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1744,12 +1744,12 @@ fn smoke_kdl() {
 
 #[test]
 fn smoke_kotlin() {
-    if !ts_pack_core::has_language("kotlin") {
+    if !tree_sitter_language_pack::has_language("kotlin") {
         eprintln!("Skipping: language 'kotlin' not available");
         return;
     }
     // Smoke test: load kotlin and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("kotlin").expect("Failed to get parser for 'kotlin'");
+    let mut parser = tree_sitter_language_pack::get_parser("kotlin").expect("Failed to get parser for 'kotlin'");
     let tree = parser.parse("fun main() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1767,12 +1767,12 @@ fn smoke_kotlin() {
 
 #[test]
 fn smoke_latex() {
-    if !ts_pack_core::has_language("latex") {
+    if !tree_sitter_language_pack::has_language("latex") {
         eprintln!("Skipping: language 'latex' not available");
         return;
     }
     // Smoke test: load latex and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("latex").expect("Failed to get parser for 'latex'");
+    let mut parser = tree_sitter_language_pack::get_parser("latex").expect("Failed to get parser for 'latex'");
     let tree = parser.parse(
         "\\documentclass{article}\n\\begin{document}\nHello\n\\end{document}",
         None,
@@ -1793,12 +1793,12 @@ fn smoke_latex() {
 
 #[test]
 fn smoke_linkerscript() {
-    if !ts_pack_core::has_language("linkerscript") {
+    if !tree_sitter_language_pack::has_language("linkerscript") {
         eprintln!("Skipping: language 'linkerscript' not available");
         return;
     }
     // Smoke test: load linkerscript and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("linkerscript").expect("Failed to get parser for 'linkerscript'");
+    let mut parser = tree_sitter_language_pack::get_parser("linkerscript").expect("Failed to get parser for 'linkerscript'");
     let tree = parser.parse("SECTIONS { .text : { *(.text) } }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1816,12 +1816,12 @@ fn smoke_linkerscript() {
 
 #[test]
 fn smoke_llvm() {
-    if !ts_pack_core::has_language("llvm") {
+    if !tree_sitter_language_pack::has_language("llvm") {
         eprintln!("Skipping: language 'llvm' not available");
         return;
     }
     // Smoke test: load llvm and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("llvm").expect("Failed to get parser for 'llvm'");
+    let mut parser = tree_sitter_language_pack::get_parser("llvm").expect("Failed to get parser for 'llvm'");
     let tree = parser.parse("define i32 @main() { ret i32 0 }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1839,12 +1839,12 @@ fn smoke_llvm() {
 
 #[test]
 fn smoke_lua() {
-    if !ts_pack_core::has_language("lua") {
+    if !tree_sitter_language_pack::has_language("lua") {
         eprintln!("Skipping: language 'lua' not available");
         return;
     }
     // Smoke test: load lua and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("lua").expect("Failed to get parser for 'lua'");
+    let mut parser = tree_sitter_language_pack::get_parser("lua").expect("Failed to get parser for 'lua'");
     let tree = parser.parse("print('hello')", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1862,12 +1862,12 @@ fn smoke_lua() {
 
 #[test]
 fn smoke_luadoc() {
-    if !ts_pack_core::has_language("luadoc") {
+    if !tree_sitter_language_pack::has_language("luadoc") {
         eprintln!("Skipping: language 'luadoc' not available");
         return;
     }
     // Smoke test: load luadoc and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("luadoc").expect("Failed to get parser for 'luadoc'");
+    let mut parser = tree_sitter_language_pack::get_parser("luadoc").expect("Failed to get parser for 'luadoc'");
     let tree = parser.parse("---@param name string", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1885,12 +1885,12 @@ fn smoke_luadoc() {
 
 #[test]
 fn smoke_luap() {
-    if !ts_pack_core::has_language("luap") {
+    if !tree_sitter_language_pack::has_language("luap") {
         eprintln!("Skipping: language 'luap' not available");
         return;
     }
     // Smoke test: load luap and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("luap").expect("Failed to get parser for 'luap'");
+    let mut parser = tree_sitter_language_pack::get_parser("luap").expect("Failed to get parser for 'luap'");
     let tree = parser.parse("[a-z]+", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1908,12 +1908,12 @@ fn smoke_luap() {
 
 #[test]
 fn smoke_luau() {
-    if !ts_pack_core::has_language("luau") {
+    if !tree_sitter_language_pack::has_language("luau") {
         eprintln!("Skipping: language 'luau' not available");
         return;
     }
     // Smoke test: load luau and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("luau").expect("Failed to get parser for 'luau'");
+    let mut parser = tree_sitter_language_pack::get_parser("luau").expect("Failed to get parser for 'luau'");
     let tree = parser.parse("local x: number = 1", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1931,12 +1931,12 @@ fn smoke_luau() {
 
 #[test]
 fn smoke_magik() {
-    if !ts_pack_core::has_language("magik") {
+    if !tree_sitter_language_pack::has_language("magik") {
         eprintln!("Skipping: language 'magik' not available");
         return;
     }
     // Smoke test: load magik and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("magik").expect("Failed to get parser for 'magik'");
+    let mut parser = tree_sitter_language_pack::get_parser("magik").expect("Failed to get parser for 'magik'");
     let tree = parser.parse("_method object.hello\n_endmethod", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1954,12 +1954,12 @@ fn smoke_magik() {
 
 #[test]
 fn smoke_make() {
-    if !ts_pack_core::has_language("make") {
+    if !tree_sitter_language_pack::has_language("make") {
         eprintln!("Skipping: language 'make' not available");
         return;
     }
     // Smoke test: load make and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("make").expect("Failed to get parser for 'make'");
+    let mut parser = tree_sitter_language_pack::get_parser("make").expect("Failed to get parser for 'make'");
     let tree = parser.parse("all:\n\techo hello", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1977,12 +1977,12 @@ fn smoke_make() {
 
 #[test]
 fn smoke_markdown() {
-    if !ts_pack_core::has_language("markdown") {
+    if !tree_sitter_language_pack::has_language("markdown") {
         eprintln!("Skipping: language 'markdown' not available");
         return;
     }
     // Smoke test: load markdown and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("markdown").expect("Failed to get parser for 'markdown'");
+    let mut parser = tree_sitter_language_pack::get_parser("markdown").expect("Failed to get parser for 'markdown'");
     let tree = parser.parse("# Hello\n\nWorld", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2000,12 +2000,12 @@ fn smoke_markdown() {
 
 #[test]
 fn smoke_markdown_inline() {
-    if !ts_pack_core::has_language("markdown_inline") {
+    if !tree_sitter_language_pack::has_language("markdown_inline") {
         eprintln!("Skipping: language 'markdown_inline' not available");
         return;
     }
     // Smoke test: load markdown_inline and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("markdown_inline").expect("Failed to get parser for 'markdown_inline'");
+    let mut parser = tree_sitter_language_pack::get_parser("markdown_inline").expect("Failed to get parser for 'markdown_inline'");
     let tree = parser.parse("**bold** and *italic*", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2023,12 +2023,12 @@ fn smoke_markdown_inline() {
 
 #[test]
 fn smoke_matlab() {
-    if !ts_pack_core::has_language("matlab") {
+    if !tree_sitter_language_pack::has_language("matlab") {
         eprintln!("Skipping: language 'matlab' not available");
         return;
     }
     // Smoke test: load matlab and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("matlab").expect("Failed to get parser for 'matlab'");
+    let mut parser = tree_sitter_language_pack::get_parser("matlab").expect("Failed to get parser for 'matlab'");
     let tree = parser.parse("function y = hello(x)\ny = x;\nend", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2046,12 +2046,12 @@ fn smoke_matlab() {
 
 #[test]
 fn smoke_mermaid() {
-    if !ts_pack_core::has_language("mermaid") {
+    if !tree_sitter_language_pack::has_language("mermaid") {
         eprintln!("Skipping: language 'mermaid' not available");
         return;
     }
     // Smoke test: load mermaid and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("mermaid").expect("Failed to get parser for 'mermaid'");
+    let mut parser = tree_sitter_language_pack::get_parser("mermaid").expect("Failed to get parser for 'mermaid'");
     let tree = parser.parse("graph TD\nA --> B", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2066,12 +2066,12 @@ fn smoke_mermaid() {
 
 #[test]
 fn smoke_meson() {
-    if !ts_pack_core::has_language("meson") {
+    if !tree_sitter_language_pack::has_language("meson") {
         eprintln!("Skipping: language 'meson' not available");
         return;
     }
     // Smoke test: load meson and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("meson").expect("Failed to get parser for 'meson'");
+    let mut parser = tree_sitter_language_pack::get_parser("meson").expect("Failed to get parser for 'meson'");
     let tree = parser.parse("project('hello', 'c')", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2089,12 +2089,12 @@ fn smoke_meson() {
 
 #[test]
 fn smoke_netlinx() {
-    if !ts_pack_core::has_language("netlinx") {
+    if !tree_sitter_language_pack::has_language("netlinx") {
         eprintln!("Skipping: language 'netlinx' not available");
         return;
     }
     // Smoke test: load netlinx and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("netlinx").expect("Failed to get parser for 'netlinx'");
+    let mut parser = tree_sitter_language_pack::get_parser("netlinx").expect("Failed to get parser for 'netlinx'");
     let tree = parser.parse("PROGRAM_NAME='hello'", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2112,12 +2112,12 @@ fn smoke_netlinx() {
 
 #[test]
 fn smoke_nim() {
-    if !ts_pack_core::has_language("nim") {
+    if !tree_sitter_language_pack::has_language("nim") {
         eprintln!("Skipping: language 'nim' not available");
         return;
     }
     // Smoke test: load nim and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("nim").expect("Failed to get parser for 'nim'");
+    let mut parser = tree_sitter_language_pack::get_parser("nim").expect("Failed to get parser for 'nim'");
     let tree = parser.parse("echo \"hello\"", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2135,12 +2135,12 @@ fn smoke_nim() {
 
 #[test]
 fn smoke_ninja() {
-    if !ts_pack_core::has_language("ninja") {
+    if !tree_sitter_language_pack::has_language("ninja") {
         eprintln!("Skipping: language 'ninja' not available");
         return;
     }
     // Smoke test: load ninja and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("ninja").expect("Failed to get parser for 'ninja'");
+    let mut parser = tree_sitter_language_pack::get_parser("ninja").expect("Failed to get parser for 'ninja'");
     let tree = parser.parse("rule cc\n  command = cc $in -o $out", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2158,12 +2158,12 @@ fn smoke_ninja() {
 
 #[test]
 fn smoke_nix() {
-    if !ts_pack_core::has_language("nix") {
+    if !tree_sitter_language_pack::has_language("nix") {
         eprintln!("Skipping: language 'nix' not available");
         return;
     }
     // Smoke test: load nix and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("nix").expect("Failed to get parser for 'nix'");
+    let mut parser = tree_sitter_language_pack::get_parser("nix").expect("Failed to get parser for 'nix'");
     let tree = parser.parse("{ pkgs ? import <nixpkgs> {} }: pkgs.hello", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2181,12 +2181,12 @@ fn smoke_nix() {
 
 #[test]
 fn smoke_nqc() {
-    if !ts_pack_core::has_language("nqc") {
+    if !tree_sitter_language_pack::has_language("nqc") {
         eprintln!("Skipping: language 'nqc' not available");
         return;
     }
     // Smoke test: load nqc and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("nqc").expect("Failed to get parser for 'nqc'");
+    let mut parser = tree_sitter_language_pack::get_parser("nqc").expect("Failed to get parser for 'nqc'");
     let tree = parser.parse("task main() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2204,12 +2204,12 @@ fn smoke_nqc() {
 
 #[test]
 fn smoke_objc() {
-    if !ts_pack_core::has_language("objc") {
+    if !tree_sitter_language_pack::has_language("objc") {
         eprintln!("Skipping: language 'objc' not available");
         return;
     }
     // Smoke test: load objc and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("objc").expect("Failed to get parser for 'objc'");
+    let mut parser = tree_sitter_language_pack::get_parser("objc").expect("Failed to get parser for 'objc'");
     let tree = parser.parse("@interface Main @end", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2227,12 +2227,12 @@ fn smoke_objc() {
 
 #[test]
 fn smoke_ocaml() {
-    if !ts_pack_core::has_language("ocaml") {
+    if !tree_sitter_language_pack::has_language("ocaml") {
         eprintln!("Skipping: language 'ocaml' not available");
         return;
     }
     // Smoke test: load ocaml and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("ocaml").expect("Failed to get parser for 'ocaml'");
+    let mut parser = tree_sitter_language_pack::get_parser("ocaml").expect("Failed to get parser for 'ocaml'");
     let tree = parser.parse("let () = print_endline \"hello\"", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2250,12 +2250,12 @@ fn smoke_ocaml() {
 
 #[test]
 fn smoke_ocaml_interface() {
-    if !ts_pack_core::has_language("ocaml_interface") {
+    if !tree_sitter_language_pack::has_language("ocaml_interface") {
         eprintln!("Skipping: language 'ocaml_interface' not available");
         return;
     }
     // Smoke test: load ocaml_interface and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("ocaml_interface").expect("Failed to get parser for 'ocaml_interface'");
+    let mut parser = tree_sitter_language_pack::get_parser("ocaml_interface").expect("Failed to get parser for 'ocaml_interface'");
     let tree = parser.parse("val x : int", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2273,12 +2273,12 @@ fn smoke_ocaml_interface() {
 
 #[test]
 fn smoke_odin() {
-    if !ts_pack_core::has_language("odin") {
+    if !tree_sitter_language_pack::has_language("odin") {
         eprintln!("Skipping: language 'odin' not available");
         return;
     }
     // Smoke test: load odin and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("odin").expect("Failed to get parser for 'odin'");
+    let mut parser = tree_sitter_language_pack::get_parser("odin").expect("Failed to get parser for 'odin'");
     let tree = parser.parse("package main", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2296,12 +2296,12 @@ fn smoke_odin() {
 
 #[test]
 fn smoke_org() {
-    if !ts_pack_core::has_language("org") {
+    if !tree_sitter_language_pack::has_language("org") {
         eprintln!("Skipping: language 'org' not available");
         return;
     }
     // Smoke test: load org and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("org").expect("Failed to get parser for 'org'");
+    let mut parser = tree_sitter_language_pack::get_parser("org").expect("Failed to get parser for 'org'");
     let tree = parser.parse("* Hello\nWorld", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2319,12 +2319,12 @@ fn smoke_org() {
 
 #[test]
 fn smoke_pascal() {
-    if !ts_pack_core::has_language("pascal") {
+    if !tree_sitter_language_pack::has_language("pascal") {
         eprintln!("Skipping: language 'pascal' not available");
         return;
     }
     // Smoke test: load pascal and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("pascal").expect("Failed to get parser for 'pascal'");
+    let mut parser = tree_sitter_language_pack::get_parser("pascal").expect("Failed to get parser for 'pascal'");
     let tree = parser.parse("program Hello; begin end.", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2342,12 +2342,12 @@ fn smoke_pascal() {
 
 #[test]
 fn smoke_pem() {
-    if !ts_pack_core::has_language("pem") {
+    if !tree_sitter_language_pack::has_language("pem") {
         eprintln!("Skipping: language 'pem' not available");
         return;
     }
     // Smoke test: load pem and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("pem").expect("Failed to get parser for 'pem'");
+    let mut parser = tree_sitter_language_pack::get_parser("pem").expect("Failed to get parser for 'pem'");
     let tree = parser.parse("-----BEGIN CERTIFICATE-----\ndata\n-----END CERTIFICATE-----", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2365,12 +2365,12 @@ fn smoke_pem() {
 
 #[test]
 fn smoke_perl() {
-    if !ts_pack_core::has_language("perl") {
+    if !tree_sitter_language_pack::has_language("perl") {
         eprintln!("Skipping: language 'perl' not available");
         return;
     }
     // Smoke test: load perl and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("perl").expect("Failed to get parser for 'perl'");
+    let mut parser = tree_sitter_language_pack::get_parser("perl").expect("Failed to get parser for 'perl'");
     let tree = parser.parse("print 'hello';", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2388,12 +2388,12 @@ fn smoke_perl() {
 
 #[test]
 fn smoke_pgn() {
-    if !ts_pack_core::has_language("pgn") {
+    if !tree_sitter_language_pack::has_language("pgn") {
         eprintln!("Skipping: language 'pgn' not available");
         return;
     }
     // Smoke test: load pgn and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("pgn").expect("Failed to get parser for 'pgn'");
+    let mut parser = tree_sitter_language_pack::get_parser("pgn").expect("Failed to get parser for 'pgn'");
     let tree = parser.parse("1. e4 e5 *", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2411,12 +2411,12 @@ fn smoke_pgn() {
 
 #[test]
 fn smoke_php() {
-    if !ts_pack_core::has_language("php") {
+    if !tree_sitter_language_pack::has_language("php") {
         eprintln!("Skipping: language 'php' not available");
         return;
     }
     // Smoke test: load php and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("php").expect("Failed to get parser for 'php'");
+    let mut parser = tree_sitter_language_pack::get_parser("php").expect("Failed to get parser for 'php'");
     let tree = parser.parse("<?php echo 'hello'; ?>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2434,12 +2434,12 @@ fn smoke_php() {
 
 #[test]
 fn smoke_po() {
-    if !ts_pack_core::has_language("po") {
+    if !tree_sitter_language_pack::has_language("po") {
         eprintln!("Skipping: language 'po' not available");
         return;
     }
     // Smoke test: load po and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("po").expect("Failed to get parser for 'po'");
+    let mut parser = tree_sitter_language_pack::get_parser("po").expect("Failed to get parser for 'po'");
     let tree = parser.parse("msgid \"hello\"\nmsgstr \"world\"", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2457,12 +2457,12 @@ fn smoke_po() {
 
 #[test]
 fn smoke_pony() {
-    if !ts_pack_core::has_language("pony") {
+    if !tree_sitter_language_pack::has_language("pony") {
         eprintln!("Skipping: language 'pony' not available");
         return;
     }
     // Smoke test: load pony and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("pony").expect("Failed to get parser for 'pony'");
+    let mut parser = tree_sitter_language_pack::get_parser("pony").expect("Failed to get parser for 'pony'");
     let tree = parser.parse("actor Main\n  new create(env: Env) => None", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2480,12 +2480,12 @@ fn smoke_pony() {
 
 #[test]
 fn smoke_powershell() {
-    if !ts_pack_core::has_language("powershell") {
+    if !tree_sitter_language_pack::has_language("powershell") {
         eprintln!("Skipping: language 'powershell' not available");
         return;
     }
     // Smoke test: load powershell and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("powershell").expect("Failed to get parser for 'powershell'");
+    let mut parser = tree_sitter_language_pack::get_parser("powershell").expect("Failed to get parser for 'powershell'");
     let tree = parser.parse("Write-Host 'hello'", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2503,12 +2503,12 @@ fn smoke_powershell() {
 
 #[test]
 fn smoke_printf() {
-    if !ts_pack_core::has_language("printf") {
+    if !tree_sitter_language_pack::has_language("printf") {
         eprintln!("Skipping: language 'printf' not available");
         return;
     }
     // Smoke test: load printf and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("printf").expect("Failed to get parser for 'printf'");
+    let mut parser = tree_sitter_language_pack::get_parser("printf").expect("Failed to get parser for 'printf'");
     let tree = parser.parse("%d %s", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2526,12 +2526,12 @@ fn smoke_printf() {
 
 #[test]
 fn smoke_prisma() {
-    if !ts_pack_core::has_language("prisma") {
+    if !tree_sitter_language_pack::has_language("prisma") {
         eprintln!("Skipping: language 'prisma' not available");
         return;
     }
     // Smoke test: load prisma and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("prisma").expect("Failed to get parser for 'prisma'");
+    let mut parser = tree_sitter_language_pack::get_parser("prisma").expect("Failed to get parser for 'prisma'");
     let tree = parser.parse("model User { id Int @id }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2549,12 +2549,12 @@ fn smoke_prisma() {
 
 #[test]
 fn smoke_properties() {
-    if !ts_pack_core::has_language("properties") {
+    if !tree_sitter_language_pack::has_language("properties") {
         eprintln!("Skipping: language 'properties' not available");
         return;
     }
     // Smoke test: load properties and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("properties").expect("Failed to get parser for 'properties'");
+    let mut parser = tree_sitter_language_pack::get_parser("properties").expect("Failed to get parser for 'properties'");
     let tree = parser.parse("key=value", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2572,12 +2572,12 @@ fn smoke_properties() {
 
 #[test]
 fn smoke_proto() {
-    if !ts_pack_core::has_language("proto") {
+    if !tree_sitter_language_pack::has_language("proto") {
         eprintln!("Skipping: language 'proto' not available");
         return;
     }
     // Smoke test: load proto and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("proto").expect("Failed to get parser for 'proto'");
+    let mut parser = tree_sitter_language_pack::get_parser("proto").expect("Failed to get parser for 'proto'");
     let tree = parser.parse("syntax = \"proto3\";", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2595,12 +2595,12 @@ fn smoke_proto() {
 
 #[test]
 fn smoke_psv() {
-    if !ts_pack_core::has_language("psv") {
+    if !tree_sitter_language_pack::has_language("psv") {
         eprintln!("Skipping: language 'psv' not available");
         return;
     }
     // Smoke test: load psv and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("psv").expect("Failed to get parser for 'psv'");
+    let mut parser = tree_sitter_language_pack::get_parser("psv").expect("Failed to get parser for 'psv'");
     let tree = parser.parse("a|b|c\n1|2|3", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2618,12 +2618,12 @@ fn smoke_psv() {
 
 #[test]
 fn smoke_puppet() {
-    if !ts_pack_core::has_language("puppet") {
+    if !tree_sitter_language_pack::has_language("puppet") {
         eprintln!("Skipping: language 'puppet' not available");
         return;
     }
     // Smoke test: load puppet and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("puppet").expect("Failed to get parser for 'puppet'");
+    let mut parser = tree_sitter_language_pack::get_parser("puppet").expect("Failed to get parser for 'puppet'");
     let tree = parser.parse("notify { 'hello': }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2641,12 +2641,12 @@ fn smoke_puppet() {
 
 #[test]
 fn smoke_purescript() {
-    if !ts_pack_core::has_language("purescript") {
+    if !tree_sitter_language_pack::has_language("purescript") {
         eprintln!("Skipping: language 'purescript' not available");
         return;
     }
     // Smoke test: load purescript and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("purescript").expect("Failed to get parser for 'purescript'");
+    let mut parser = tree_sitter_language_pack::get_parser("purescript").expect("Failed to get parser for 'purescript'");
     let tree = parser.parse("module Main where", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2664,12 +2664,12 @@ fn smoke_purescript() {
 
 #[test]
 fn smoke_pymanifest() {
-    if !ts_pack_core::has_language("pymanifest") {
+    if !tree_sitter_language_pack::has_language("pymanifest") {
         eprintln!("Skipping: language 'pymanifest' not available");
         return;
     }
     // Smoke test: load pymanifest and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("pymanifest").expect("Failed to get parser for 'pymanifest'");
+    let mut parser = tree_sitter_language_pack::get_parser("pymanifest").expect("Failed to get parser for 'pymanifest'");
     let tree = parser.parse("include *.txt", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2687,12 +2687,12 @@ fn smoke_pymanifest() {
 
 #[test]
 fn smoke_python() {
-    if !ts_pack_core::has_language("python") {
+    if !tree_sitter_language_pack::has_language("python") {
         eprintln!("Skipping: language 'python' not available");
         return;
     }
     // Smoke test: load python and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("python").expect("Failed to get parser for 'python'");
+    let mut parser = tree_sitter_language_pack::get_parser("python").expect("Failed to get parser for 'python'");
     let tree = parser.parse("print('hello')", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2706,12 +2706,12 @@ fn smoke_python() {
 
 #[test]
 fn smoke_qmldir() {
-    if !ts_pack_core::has_language("qmldir") {
+    if !tree_sitter_language_pack::has_language("qmldir") {
         eprintln!("Skipping: language 'qmldir' not available");
         return;
     }
     // Smoke test: load qmldir and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("qmldir").expect("Failed to get parser for 'qmldir'");
+    let mut parser = tree_sitter_language_pack::get_parser("qmldir").expect("Failed to get parser for 'qmldir'");
     let tree = parser.parse("module Example", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2729,12 +2729,12 @@ fn smoke_qmldir() {
 
 #[test]
 fn smoke_qmljs() {
-    if !ts_pack_core::has_language("qmljs") {
+    if !tree_sitter_language_pack::has_language("qmljs") {
         eprintln!("Skipping: language 'qmljs' not available");
         return;
     }
     // Smoke test: load qmljs and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("qmljs").expect("Failed to get parser for 'qmljs'");
+    let mut parser = tree_sitter_language_pack::get_parser("qmljs").expect("Failed to get parser for 'qmljs'");
     let tree = parser.parse("import QtQuick 2.0\nItem {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2752,12 +2752,12 @@ fn smoke_qmljs() {
 
 #[test]
 fn smoke_query() {
-    if !ts_pack_core::has_language("query") {
+    if !tree_sitter_language_pack::has_language("query") {
         eprintln!("Skipping: language 'query' not available");
         return;
     }
     // Smoke test: load query and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("query").expect("Failed to get parser for 'query'");
+    let mut parser = tree_sitter_language_pack::get_parser("query").expect("Failed to get parser for 'query'");
     let tree = parser.parse("(identifier) @name", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2775,12 +2775,12 @@ fn smoke_query() {
 
 #[test]
 fn smoke_r() {
-    if !ts_pack_core::has_language("r") {
+    if !tree_sitter_language_pack::has_language("r") {
         eprintln!("Skipping: language 'r' not available");
         return;
     }
     // Smoke test: load r and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("r").expect("Failed to get parser for 'r'");
+    let mut parser = tree_sitter_language_pack::get_parser("r").expect("Failed to get parser for 'r'");
     let tree = parser.parse("print('hello')", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2798,12 +2798,12 @@ fn smoke_r() {
 
 #[test]
 fn smoke_racket() {
-    if !ts_pack_core::has_language("racket") {
+    if !tree_sitter_language_pack::has_language("racket") {
         eprintln!("Skipping: language 'racket' not available");
         return;
     }
     // Smoke test: load racket and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("racket").expect("Failed to get parser for 'racket'");
+    let mut parser = tree_sitter_language_pack::get_parser("racket").expect("Failed to get parser for 'racket'");
     let tree = parser.parse("#lang racket\n(define x 1)", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2821,12 +2821,12 @@ fn smoke_racket() {
 
 #[test]
 fn smoke_re2c() {
-    if !ts_pack_core::has_language("re2c") {
+    if !tree_sitter_language_pack::has_language("re2c") {
         eprintln!("Skipping: language 're2c' not available");
         return;
     }
     // Smoke test: load re2c and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("re2c").expect("Failed to get parser for 're2c'");
+    let mut parser = tree_sitter_language_pack::get_parser("re2c").expect("Failed to get parser for 're2c'");
     let tree = parser.parse("/*!re2c\n  [a-z]+ { return; }\n*/", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2844,12 +2844,12 @@ fn smoke_re2c() {
 
 #[test]
 fn smoke_readline() {
-    if !ts_pack_core::has_language("readline") {
+    if !tree_sitter_language_pack::has_language("readline") {
         eprintln!("Skipping: language 'readline' not available");
         return;
     }
     // Smoke test: load readline and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("readline").expect("Failed to get parser for 'readline'");
+    let mut parser = tree_sitter_language_pack::get_parser("readline").expect("Failed to get parser for 'readline'");
     let tree = parser.parse("set editing-mode vi", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2867,12 +2867,12 @@ fn smoke_readline() {
 
 #[test]
 fn smoke_rego() {
-    if !ts_pack_core::has_language("rego") {
+    if !tree_sitter_language_pack::has_language("rego") {
         eprintln!("Skipping: language 'rego' not available");
         return;
     }
     // Smoke test: load rego and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("rego").expect("Failed to get parser for 'rego'");
+    let mut parser = tree_sitter_language_pack::get_parser("rego").expect("Failed to get parser for 'rego'");
     let tree = parser.parse("package main\ndefault allow = false", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2890,12 +2890,12 @@ fn smoke_rego() {
 
 #[test]
 fn smoke_requirements() {
-    if !ts_pack_core::has_language("requirements") {
+    if !tree_sitter_language_pack::has_language("requirements") {
         eprintln!("Skipping: language 'requirements' not available");
         return;
     }
     // Smoke test: load requirements and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("requirements").expect("Failed to get parser for 'requirements'");
+    let mut parser = tree_sitter_language_pack::get_parser("requirements").expect("Failed to get parser for 'requirements'");
     let tree = parser.parse("flask>=2.0", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2910,12 +2910,12 @@ fn smoke_requirements() {
 
 #[test]
 fn smoke_ron() {
-    if !ts_pack_core::has_language("ron") {
+    if !tree_sitter_language_pack::has_language("ron") {
         eprintln!("Skipping: language 'ron' not available");
         return;
     }
     // Smoke test: load ron and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("ron").expect("Failed to get parser for 'ron'");
+    let mut parser = tree_sitter_language_pack::get_parser("ron").expect("Failed to get parser for 'ron'");
     let tree = parser.parse("(key: \"value\")", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2933,12 +2933,12 @@ fn smoke_ron() {
 
 #[test]
 fn smoke_rst() {
-    if !ts_pack_core::has_language("rst") {
+    if !tree_sitter_language_pack::has_language("rst") {
         eprintln!("Skipping: language 'rst' not available");
         return;
     }
     // Smoke test: load rst and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("rst").expect("Failed to get parser for 'rst'");
+    let mut parser = tree_sitter_language_pack::get_parser("rst").expect("Failed to get parser for 'rst'");
     let tree = parser.parse("Hello\n=====\n\nWorld", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2956,12 +2956,12 @@ fn smoke_rst() {
 
 #[test]
 fn smoke_ruby() {
-    if !ts_pack_core::has_language("ruby") {
+    if !tree_sitter_language_pack::has_language("ruby") {
         eprintln!("Skipping: language 'ruby' not available");
         return;
     }
     // Smoke test: load ruby and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("ruby").expect("Failed to get parser for 'ruby'");
+    let mut parser = tree_sitter_language_pack::get_parser("ruby").expect("Failed to get parser for 'ruby'");
     let tree = parser.parse("puts 'hello'", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2975,12 +2975,12 @@ fn smoke_ruby() {
 
 #[test]
 fn smoke_rust() {
-    if !ts_pack_core::has_language("rust") {
+    if !tree_sitter_language_pack::has_language("rust") {
         eprintln!("Skipping: language 'rust' not available");
         return;
     }
     // Smoke test: load rust and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("rust").expect("Failed to get parser for 'rust'");
+    let mut parser = tree_sitter_language_pack::get_parser("rust").expect("Failed to get parser for 'rust'");
     let tree = parser.parse("fn main() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2994,12 +2994,12 @@ fn smoke_rust() {
 
 #[test]
 fn smoke_scala() {
-    if !ts_pack_core::has_language("scala") {
+    if !tree_sitter_language_pack::has_language("scala") {
         eprintln!("Skipping: language 'scala' not available");
         return;
     }
     // Smoke test: load scala and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("scala").expect("Failed to get parser for 'scala'");
+    let mut parser = tree_sitter_language_pack::get_parser("scala").expect("Failed to get parser for 'scala'");
     let tree = parser.parse("object Main", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3017,12 +3017,12 @@ fn smoke_scala() {
 
 #[test]
 fn smoke_scheme() {
-    if !ts_pack_core::has_language("scheme") {
+    if !tree_sitter_language_pack::has_language("scheme") {
         eprintln!("Skipping: language 'scheme' not available");
         return;
     }
     // Smoke test: load scheme and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("scheme").expect("Failed to get parser for 'scheme'");
+    let mut parser = tree_sitter_language_pack::get_parser("scheme").expect("Failed to get parser for 'scheme'");
     let tree = parser.parse("(define x 1)", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3040,12 +3040,12 @@ fn smoke_scheme() {
 
 #[test]
 fn smoke_scss() {
-    if !ts_pack_core::has_language("scss") {
+    if !tree_sitter_language_pack::has_language("scss") {
         eprintln!("Skipping: language 'scss' not available");
         return;
     }
     // Smoke test: load scss and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("scss").expect("Failed to get parser for 'scss'");
+    let mut parser = tree_sitter_language_pack::get_parser("scss").expect("Failed to get parser for 'scss'");
     let tree = parser.parse("$color: red;\nbody { color: $color; }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3063,12 +3063,12 @@ fn smoke_scss() {
 
 #[test]
 fn smoke_smali() {
-    if !ts_pack_core::has_language("smali") {
+    if !tree_sitter_language_pack::has_language("smali") {
         eprintln!("Skipping: language 'smali' not available");
         return;
     }
     // Smoke test: load smali and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("smali").expect("Failed to get parser for 'smali'");
+    let mut parser = tree_sitter_language_pack::get_parser("smali").expect("Failed to get parser for 'smali'");
     let tree = parser.parse(".class public LMain;\n.super Ljava/lang/Object;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3086,12 +3086,12 @@ fn smoke_smali() {
 
 #[test]
 fn smoke_smithy() {
-    if !ts_pack_core::has_language("smithy") {
+    if !tree_sitter_language_pack::has_language("smithy") {
         eprintln!("Skipping: language 'smithy' not available");
         return;
     }
     // Smoke test: load smithy and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("smithy").expect("Failed to get parser for 'smithy'");
+    let mut parser = tree_sitter_language_pack::get_parser("smithy").expect("Failed to get parser for 'smithy'");
     let tree = parser.parse("namespace example\nstring MyString", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3109,12 +3109,12 @@ fn smoke_smithy() {
 
 #[test]
 fn smoke_solidity() {
-    if !ts_pack_core::has_language("solidity") {
+    if !tree_sitter_language_pack::has_language("solidity") {
         eprintln!("Skipping: language 'solidity' not available");
         return;
     }
     // Smoke test: load solidity and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("solidity").expect("Failed to get parser for 'solidity'");
+    let mut parser = tree_sitter_language_pack::get_parser("solidity").expect("Failed to get parser for 'solidity'");
     let tree = parser.parse("pragma solidity ^0.8.0;\ncontract Main {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3132,12 +3132,12 @@ fn smoke_solidity() {
 
 #[test]
 fn smoke_sparql() {
-    if !ts_pack_core::has_language("sparql") {
+    if !tree_sitter_language_pack::has_language("sparql") {
         eprintln!("Skipping: language 'sparql' not available");
         return;
     }
     // Smoke test: load sparql and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("sparql").expect("Failed to get parser for 'sparql'");
+    let mut parser = tree_sitter_language_pack::get_parser("sparql").expect("Failed to get parser for 'sparql'");
     let tree = parser.parse("SELECT ?s WHERE { ?s ?p ?o }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3155,12 +3155,12 @@ fn smoke_sparql() {
 
 #[test]
 fn smoke_sql() {
-    if !ts_pack_core::has_language("sql") {
+    if !tree_sitter_language_pack::has_language("sql") {
         eprintln!("Skipping: language 'sql' not available");
         return;
     }
     // Smoke test: load sql and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("sql").expect("Failed to get parser for 'sql'");
+    let mut parser = tree_sitter_language_pack::get_parser("sql").expect("Failed to get parser for 'sql'");
     let tree = parser.parse("SELECT 1;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3178,12 +3178,12 @@ fn smoke_sql() {
 
 #[test]
 fn smoke_squirrel() {
-    if !ts_pack_core::has_language("squirrel") {
+    if !tree_sitter_language_pack::has_language("squirrel") {
         eprintln!("Skipping: language 'squirrel' not available");
         return;
     }
     // Smoke test: load squirrel and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("squirrel").expect("Failed to get parser for 'squirrel'");
+    let mut parser = tree_sitter_language_pack::get_parser("squirrel").expect("Failed to get parser for 'squirrel'");
     let tree = parser.parse("function main() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3201,12 +3201,12 @@ fn smoke_squirrel() {
 
 #[test]
 fn smoke_starlark() {
-    if !ts_pack_core::has_language("starlark") {
+    if !tree_sitter_language_pack::has_language("starlark") {
         eprintln!("Skipping: language 'starlark' not available");
         return;
     }
     // Smoke test: load starlark and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("starlark").expect("Failed to get parser for 'starlark'");
+    let mut parser = tree_sitter_language_pack::get_parser("starlark").expect("Failed to get parser for 'starlark'");
     let tree = parser.parse("def hello(): pass", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3224,12 +3224,12 @@ fn smoke_starlark() {
 
 #[test]
 fn smoke_svelte() {
-    if !ts_pack_core::has_language("svelte") {
+    if !tree_sitter_language_pack::has_language("svelte") {
         eprintln!("Skipping: language 'svelte' not available");
         return;
     }
     // Smoke test: load svelte and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("svelte").expect("Failed to get parser for 'svelte'");
+    let mut parser = tree_sitter_language_pack::get_parser("svelte").expect("Failed to get parser for 'svelte'");
     let tree = parser.parse("<p>hello</p>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3242,12 +3242,12 @@ fn smoke_svelte() {
 
 #[test]
 fn smoke_swift() {
-    if !ts_pack_core::has_language("swift") {
+    if !tree_sitter_language_pack::has_language("swift") {
         eprintln!("Skipping: language 'swift' not available");
         return;
     }
     // Smoke test: load swift and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("swift").expect("Failed to get parser for 'swift'");
+    let mut parser = tree_sitter_language_pack::get_parser("swift").expect("Failed to get parser for 'swift'");
     let tree = parser.parse("print(\"hello\")", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3265,12 +3265,12 @@ fn smoke_swift() {
 
 #[test]
 fn smoke_tablegen() {
-    if !ts_pack_core::has_language("tablegen") {
+    if !tree_sitter_language_pack::has_language("tablegen") {
         eprintln!("Skipping: language 'tablegen' not available");
         return;
     }
     // Smoke test: load tablegen and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("tablegen").expect("Failed to get parser for 'tablegen'");
+    let mut parser = tree_sitter_language_pack::get_parser("tablegen").expect("Failed to get parser for 'tablegen'");
     let tree = parser.parse("def Hello : Base {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3288,12 +3288,12 @@ fn smoke_tablegen() {
 
 #[test]
 fn smoke_tcl() {
-    if !ts_pack_core::has_language("tcl") {
+    if !tree_sitter_language_pack::has_language("tcl") {
         eprintln!("Skipping: language 'tcl' not available");
         return;
     }
     // Smoke test: load tcl and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("tcl").expect("Failed to get parser for 'tcl'");
+    let mut parser = tree_sitter_language_pack::get_parser("tcl").expect("Failed to get parser for 'tcl'");
     let tree = parser.parse("puts hello", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3308,12 +3308,12 @@ fn smoke_tcl() {
 
 #[test]
 fn smoke_terraform() {
-    if !ts_pack_core::has_language("terraform") {
+    if !tree_sitter_language_pack::has_language("terraform") {
         eprintln!("Skipping: language 'terraform' not available");
         return;
     }
     // Smoke test: load terraform and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("terraform").expect("Failed to get parser for 'terraform'");
+    let mut parser = tree_sitter_language_pack::get_parser("terraform").expect("Failed to get parser for 'terraform'");
     let tree = parser.parse("resource \"null_resource\" \"main\" {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3331,12 +3331,12 @@ fn smoke_terraform() {
 
 #[test]
 fn smoke_test() {
-    if !ts_pack_core::has_language("test") {
+    if !tree_sitter_language_pack::has_language("test") {
         eprintln!("Skipping: language 'test' not available");
         return;
     }
     // Smoke test: load test and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("test").expect("Failed to get parser for 'test'");
+    let mut parser = tree_sitter_language_pack::get_parser("test").expect("Failed to get parser for 'test'");
     let tree = parser.parse("===========\nTest\n===========\n---\n(node)", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3354,12 +3354,12 @@ fn smoke_test() {
 
 #[test]
 fn smoke_thrift() {
-    if !ts_pack_core::has_language("thrift") {
+    if !tree_sitter_language_pack::has_language("thrift") {
         eprintln!("Skipping: language 'thrift' not available");
         return;
     }
     // Smoke test: load thrift and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("thrift").expect("Failed to get parser for 'thrift'");
+    let mut parser = tree_sitter_language_pack::get_parser("thrift").expect("Failed to get parser for 'thrift'");
     let tree = parser.parse("service HelloService {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3377,12 +3377,12 @@ fn smoke_thrift() {
 
 #[test]
 fn smoke_toml() {
-    if !ts_pack_core::has_language("toml") {
+    if !tree_sitter_language_pack::has_language("toml") {
         eprintln!("Skipping: language 'toml' not available");
         return;
     }
     // Smoke test: load toml and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("toml").expect("Failed to get parser for 'toml'");
+    let mut parser = tree_sitter_language_pack::get_parser("toml").expect("Failed to get parser for 'toml'");
     let tree = parser.parse("key = \"value\"", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3400,12 +3400,12 @@ fn smoke_toml() {
 
 #[test]
 fn smoke_tsv() {
-    if !ts_pack_core::has_language("tsv") {
+    if !tree_sitter_language_pack::has_language("tsv") {
         eprintln!("Skipping: language 'tsv' not available");
         return;
     }
     // Smoke test: load tsv and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("tsv").expect("Failed to get parser for 'tsv'");
+    let mut parser = tree_sitter_language_pack::get_parser("tsv").expect("Failed to get parser for 'tsv'");
     let tree = parser.parse("a\tb\tc\n1\t2\t3", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3423,12 +3423,12 @@ fn smoke_tsv() {
 
 #[test]
 fn smoke_tsx() {
-    if !ts_pack_core::has_language("tsx") {
+    if !tree_sitter_language_pack::has_language("tsx") {
         eprintln!("Skipping: language 'tsx' not available");
         return;
     }
     // Smoke test: load tsx and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("tsx").expect("Failed to get parser for 'tsx'");
+    let mut parser = tree_sitter_language_pack::get_parser("tsx").expect("Failed to get parser for 'tsx'");
     let tree = parser.parse("const App = () => <div />;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3446,12 +3446,12 @@ fn smoke_tsx() {
 
 #[test]
 fn smoke_twig() {
-    if !ts_pack_core::has_language("twig") {
+    if !tree_sitter_language_pack::has_language("twig") {
         eprintln!("Skipping: language 'twig' not available");
         return;
     }
     // Smoke test: load twig and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("twig").expect("Failed to get parser for 'twig'");
+    let mut parser = tree_sitter_language_pack::get_parser("twig").expect("Failed to get parser for 'twig'");
     let tree = parser.parse("{{ variable }}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3469,12 +3469,12 @@ fn smoke_twig() {
 
 #[test]
 fn smoke_typescript() {
-    if !ts_pack_core::has_language("typescript") {
+    if !tree_sitter_language_pack::has_language("typescript") {
         eprintln!("Skipping: language 'typescript' not available");
         return;
     }
     // Smoke test: load typescript and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("typescript").expect("Failed to get parser for 'typescript'");
+    let mut parser = tree_sitter_language_pack::get_parser("typescript").expect("Failed to get parser for 'typescript'");
     let tree = parser.parse("const x: number = 42;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3488,12 +3488,12 @@ fn smoke_typescript() {
 
 #[test]
 fn smoke_typst() {
-    if !ts_pack_core::has_language("typst") {
+    if !tree_sitter_language_pack::has_language("typst") {
         eprintln!("Skipping: language 'typst' not available");
         return;
     }
     // Smoke test: load typst and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("typst").expect("Failed to get parser for 'typst'");
+    let mut parser = tree_sitter_language_pack::get_parser("typst").expect("Failed to get parser for 'typst'");
     let tree = parser.parse("#let x = 1", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3511,12 +3511,12 @@ fn smoke_typst() {
 
 #[test]
 fn smoke_udev() {
-    if !ts_pack_core::has_language("udev") {
+    if !tree_sitter_language_pack::has_language("udev") {
         eprintln!("Skipping: language 'udev' not available");
         return;
     }
     // Smoke test: load udev and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("udev").expect("Failed to get parser for 'udev'");
+    let mut parser = tree_sitter_language_pack::get_parser("udev").expect("Failed to get parser for 'udev'");
     let tree = parser.parse("ACTION==\"add\", KERNEL==\"sd*\"", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3531,12 +3531,12 @@ fn smoke_udev() {
 
 #[test]
 fn smoke_ungrammar() {
-    if !ts_pack_core::has_language("ungrammar") {
+    if !tree_sitter_language_pack::has_language("ungrammar") {
         eprintln!("Skipping: language 'ungrammar' not available");
         return;
     }
     // Smoke test: load ungrammar and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("ungrammar").expect("Failed to get parser for 'ungrammar'");
+    let mut parser = tree_sitter_language_pack::get_parser("ungrammar").expect("Failed to get parser for 'ungrammar'");
     let tree = parser.parse("Root = Item*\nItem = 'token'", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3554,12 +3554,12 @@ fn smoke_ungrammar() {
 
 #[test]
 fn smoke_uxntal() {
-    if !ts_pack_core::has_language("uxntal") {
+    if !tree_sitter_language_pack::has_language("uxntal") {
         eprintln!("Skipping: language 'uxntal' not available");
         return;
     }
     // Smoke test: load uxntal and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("uxntal").expect("Failed to get parser for 'uxntal'");
+    let mut parser = tree_sitter_language_pack::get_parser("uxntal").expect("Failed to get parser for 'uxntal'");
     let tree = parser.parse("|0100 LIT 01", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3577,12 +3577,12 @@ fn smoke_uxntal() {
 
 #[test]
 fn smoke_v() {
-    if !ts_pack_core::has_language("v") {
+    if !tree_sitter_language_pack::has_language("v") {
         eprintln!("Skipping: language 'v' not available");
         return;
     }
     // Smoke test: load v and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("v").expect("Failed to get parser for 'v'");
+    let mut parser = tree_sitter_language_pack::get_parser("v").expect("Failed to get parser for 'v'");
     let tree = parser.parse("fn main() {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3600,12 +3600,12 @@ fn smoke_v() {
 
 #[test]
 fn smoke_verilog() {
-    if !ts_pack_core::has_language("verilog") {
+    if !tree_sitter_language_pack::has_language("verilog") {
         eprintln!("Skipping: language 'verilog' not available");
         return;
     }
     // Smoke test: load verilog and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("verilog").expect("Failed to get parser for 'verilog'");
+    let mut parser = tree_sitter_language_pack::get_parser("verilog").expect("Failed to get parser for 'verilog'");
     let tree = parser.parse("module main; endmodule", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3623,12 +3623,12 @@ fn smoke_verilog() {
 
 #[test]
 fn smoke_vhdl() {
-    if !ts_pack_core::has_language("vhdl") {
+    if !tree_sitter_language_pack::has_language("vhdl") {
         eprintln!("Skipping: language 'vhdl' not available");
         return;
     }
     // Smoke test: load vhdl and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("vhdl").expect("Failed to get parser for 'vhdl'");
+    let mut parser = tree_sitter_language_pack::get_parser("vhdl").expect("Failed to get parser for 'vhdl'");
     let tree = parser.parse("entity main is end main;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3646,12 +3646,12 @@ fn smoke_vhdl() {
 
 #[test]
 fn smoke_vim() {
-    if !ts_pack_core::has_language("vim") {
+    if !tree_sitter_language_pack::has_language("vim") {
         eprintln!("Skipping: language 'vim' not available");
         return;
     }
     // Smoke test: load vim and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("vim").expect("Failed to get parser for 'vim'");
+    let mut parser = tree_sitter_language_pack::get_parser("vim").expect("Failed to get parser for 'vim'");
     let tree = parser.parse("echo 'hello'", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3669,12 +3669,12 @@ fn smoke_vim() {
 
 #[test]
 fn smoke_vue() {
-    if !ts_pack_core::has_language("vue") {
+    if !tree_sitter_language_pack::has_language("vue") {
         eprintln!("Skipping: language 'vue' not available");
         return;
     }
     // Smoke test: load vue and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("vue").expect("Failed to get parser for 'vue'");
+    let mut parser = tree_sitter_language_pack::get_parser("vue").expect("Failed to get parser for 'vue'");
     let tree = parser.parse("<template><div>hello</div></template>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3692,12 +3692,12 @@ fn smoke_vue() {
 
 #[test]
 fn smoke_wast() {
-    if !ts_pack_core::has_language("wast") {
+    if !tree_sitter_language_pack::has_language("wast") {
         eprintln!("Skipping: language 'wast' not available");
         return;
     }
     // Smoke test: load wast and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("wast").expect("Failed to get parser for 'wast'");
+    let mut parser = tree_sitter_language_pack::get_parser("wast").expect("Failed to get parser for 'wast'");
     let tree = parser.parse("(module)", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3715,12 +3715,12 @@ fn smoke_wast() {
 
 #[test]
 fn smoke_wat() {
-    if !ts_pack_core::has_language("wat") {
+    if !tree_sitter_language_pack::has_language("wat") {
         eprintln!("Skipping: language 'wat' not available");
         return;
     }
     // Smoke test: load wat and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("wat").expect("Failed to get parser for 'wat'");
+    let mut parser = tree_sitter_language_pack::get_parser("wat").expect("Failed to get parser for 'wat'");
     let tree = parser.parse("(module)", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3738,12 +3738,12 @@ fn smoke_wat() {
 
 #[test]
 fn smoke_wgsl() {
-    if !ts_pack_core::has_language("wgsl") {
+    if !tree_sitter_language_pack::has_language("wgsl") {
         eprintln!("Skipping: language 'wgsl' not available");
         return;
     }
     // Smoke test: load wgsl and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("wgsl").expect("Failed to get parser for 'wgsl'");
+    let mut parser = tree_sitter_language_pack::get_parser("wgsl").expect("Failed to get parser for 'wgsl'");
     let tree = parser.parse(
         "@vertex fn main() -> @builtin(position) vec4f { return vec4f(); }",
         None,
@@ -3764,12 +3764,12 @@ fn smoke_wgsl() {
 
 #[test]
 fn smoke_xcompose() {
-    if !ts_pack_core::has_language("xcompose") {
+    if !tree_sitter_language_pack::has_language("xcompose") {
         eprintln!("Skipping: language 'xcompose' not available");
         return;
     }
     // Smoke test: load xcompose and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("xcompose").expect("Failed to get parser for 'xcompose'");
+    let mut parser = tree_sitter_language_pack::get_parser("xcompose").expect("Failed to get parser for 'xcompose'");
     let tree = parser.parse("<Multi_key> <a> : \"a\"", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3787,12 +3787,12 @@ fn smoke_xcompose() {
 
 #[test]
 fn smoke_xml() {
-    if !ts_pack_core::has_language("xml") {
+    if !tree_sitter_language_pack::has_language("xml") {
         eprintln!("Skipping: language 'xml' not available");
         return;
     }
     // Smoke test: load xml and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("xml").expect("Failed to get parser for 'xml'");
+    let mut parser = tree_sitter_language_pack::get_parser("xml").expect("Failed to get parser for 'xml'");
     let tree = parser.parse("<?xml version=\"1.0\"?>\n<root>hello</root>", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3810,12 +3810,12 @@ fn smoke_xml() {
 
 #[test]
 fn smoke_yuck() {
-    if !ts_pack_core::has_language("yuck") {
+    if !tree_sitter_language_pack::has_language("yuck") {
         eprintln!("Skipping: language 'yuck' not available");
         return;
     }
     // Smoke test: load yuck and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("yuck").expect("Failed to get parser for 'yuck'");
+    let mut parser = tree_sitter_language_pack::get_parser("yuck").expect("Failed to get parser for 'yuck'");
     let tree = parser.parse("(defwidget main [] (label :text \"hi\"))", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3833,12 +3833,12 @@ fn smoke_yuck() {
 
 #[test]
 fn smoke_zig() {
-    if !ts_pack_core::has_language("zig") {
+    if !tree_sitter_language_pack::has_language("zig") {
         eprintln!("Skipping: language 'zig' not available");
         return;
     }
     // Smoke test: load zig and parse a simple snippet
-    let mut parser = ts_pack_core::get_parser("zig").expect("Failed to get parser for 'zig'");
+    let mut parser = tree_sitter_language_pack::get_parser("zig").expect("Failed to get parser for 'zig'");
     let tree = parser.parse("pub fn main() void {}", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();

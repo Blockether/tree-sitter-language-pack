@@ -16,8 +16,8 @@ badges:
     url: "https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue"
     link: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE"
   rust:
-    url: "https://img.shields.io/crates/v/ts-pack-core?label=Rust&color=007ec6"
-    link: "https://crates.io/crates/ts-pack-core"
+    url: "https://img.shields.io/crates/v/tree-sitter-language-pack?label=Rust&color=007ec6"
+    link: "https://crates.io/crates/tree-sitter-language-pack"
   python:
     url: "https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6"
     link: "https://pypi.org/project/tree-sitter-language-pack/"

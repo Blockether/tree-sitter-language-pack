@@ -3,8 +3,8 @@
 # Ruby
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
-  <!-- Language Bindings -->  <a href="https://crates.io/crates/ts-pack-core">
-    <img src="https://img.shields.io/crates/v/ts-pack-core?label=Rust&color=007ec6" alt="Rust">
+  <!-- Language Bindings -->  <a href="https://crates.io/crates/tree-sitter-language-pack">
+    <img src="https://img.shields.io/crates/v/tree-sitter-language-pack?label=Rust&color=007ec6" alt="Rust">
   </a>  <a href="https://pypi.org/project/tree-sitter-language-pack/">
     <img src="https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6" alt="Python">
   </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack">
