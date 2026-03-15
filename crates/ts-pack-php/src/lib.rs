@@ -139,8 +139,8 @@ pub fn ts_pack_get_language(name: String) -> PhpResult<i64> {
 /// ```
 #[php_function]
 pub fn ts_pack_parse_string(language: String, source: String) -> PhpResult<String> {
-    let tree =
-        tree_sitter_language_pack::parse_string(&language, source.as_bytes()).map_err(|e| PhpException::default(format!("{e}")))?;
+    let tree = tree_sitter_language_pack::parse_string(&language, source.as_bytes())
+        .map_err(|e| PhpException::default(format!("{e}")))?;
     Ok(tree_sitter_language_pack::tree_to_sexp(&tree))
 }
 
@@ -182,7 +182,8 @@ pub fn ts_pack_process(source: String, config_json: String) -> PhpResult<String>
     let core_config: tree_sitter_language_pack::ProcessConfig =
         serde_json::from_str(&config_json).map_err(|e| PhpException::default(format!("invalid config JSON: {e}")))?;
 
-    let result = tree_sitter_language_pack::process(&source, &core_config).map_err(|e| PhpException::default(format!("{e}")))?;
+    let result =
+        tree_sitter_language_pack::process(&source, &core_config).map_err(|e| PhpException::default(format!("{e}")))?;
 
     serde_json::to_string(&result).map_err(|e| PhpException::default(format!("serialization failed: {e}")))
 }

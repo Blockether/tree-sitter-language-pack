@@ -6,7 +6,8 @@ use wasm_bindgen::prelude::*;
 // sufficient for parser operation in WASM.
 #[unsafe(no_mangle)]
 pub extern "C" fn iswspace(c: u32) -> i32 {
-    matches!(c, 0x09..=0x0D | 0x20 | 0x85 | 0xA0 | 0x1680 | 0x2000..=0x200A | 0x2028 | 0x2029 | 0x202F | 0x205F | 0x3000) as i32
+    matches!(c, 0x09..=0x0D | 0x20 | 0x85 | 0xA0 | 0x1680 | 0x2000..=0x200A | 0x2028 | 0x2029 | 0x202F | 0x205F | 0x3000)
+        as i32
 }
 
 #[unsafe(no_mangle)]
@@ -52,8 +53,7 @@ pub fn language_count() -> u32 {
 /// Throws an error if the language is not found.
 #[wasm_bindgen(js_name = "getLanguagePtr")]
 pub fn get_language_ptr(name: &str) -> Result<u32, JsValue> {
-    let language = tree_sitter_language_pack::get_language(name)
-        .map_err(|e| JsValue::from_str(&format!("{e}")))?;
+    let language = tree_sitter_language_pack::get_language(name).map_err(|e| JsValue::from_str(&format!("{e}")))?;
     let ptr = language.into_raw() as u32;
     Ok(ptr)
 }
@@ -141,16 +141,15 @@ pub fn process(source: &str, config: JsValue) -> Result<JsValue, JsValue> {
         .as_string()
         .ok_or_else(|| JsValue::from_str("config stringify returned non-string"))
         .and_then(|s| {
-            serde_json::from_str(&s)
-                .map_err(|e| JsValue::from_str(&format!("failed to parse config JSON: {e}")))
+            serde_json::from_str(&s).map_err(|e| JsValue::from_str(&format!("failed to parse config JSON: {e}")))
         })?;
 
-    let core_config: tree_sitter_language_pack::ProcessConfig = serde_json::from_value(config_json)
-        .map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
+    let core_config: tree_sitter_language_pack::ProcessConfig =
+        serde_json::from_value(config_json).map_err(|e| JsValue::from_str(&format!("invalid config: {e}")))?;
 
-    let result = tree_sitter_language_pack::process(source, &core_config)
-        .map_err(|e| JsValue::from_str(&format!("{e}")))?;
-    let json_str = serde_json::to_string(&result)
-        .map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
+    let result =
+        tree_sitter_language_pack::process(source, &core_config).map_err(|e| JsValue::from_str(&format!("{e}")))?;
+    let json_str =
+        serde_json::to_string(&result).map_err(|e| JsValue::from_str(&format!("serialization failed: {e}")))?;
     js_sys::JSON::parse(&json_str)
 }

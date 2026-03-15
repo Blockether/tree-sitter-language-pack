@@ -145,6 +145,37 @@ def update_gemspec(file_path: Path, version: str) -> tuple[bool, str, str]:
     return False, old_version, gem_version
 
 
+def update_composer_json(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update Composer composer.json version field."""
+    content = json.loads(file_path.read_text())
+    old_version = content.get("version", "NOT SET")
+
+    if old_version == version:
+        return False, old_version, version
+
+    content["version"] = version
+    file_path.write_text(json.dumps(content, indent=4, ensure_ascii=False) + "\n")
+    return True, old_version, version
+
+
+def update_csproj(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update .NET .csproj Version property."""
+    content = file_path.read_text()
+    match = re.search(r"<Version>([^<]+)</Version>", content)
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version == version:
+        return False, old_version, version
+
+    new_content = re.sub(r"<Version>[^<]+</Version>", f"<Version>{version}</Version>", content)
+
+    if new_content != content:
+        file_path.write_text(new_content)
+        return True, old_version, version
+
+    return False, old_version, version
+
+
 def update_cargo_toml_version(file_path: Path, version: str) -> tuple[bool, str, str]:
     """Update version in a non-workspace Cargo.toml (e.g. WASM crate)."""
     content = file_path.read_text()
@@ -199,6 +230,8 @@ def main() -> None:
         (repo_root / "crates/ts-pack-java/pom.xml", "pom_xml"),
         (repo_root / "crates/ts-pack-ruby/tree_sitter_language_pack.gemspec", "gemspec"),
         (repo_root / "crates/ts-pack-wasm/Cargo.toml", "cargo_toml_version"),
+        (repo_root / "packages/php/composer.json", "composer_json"),
+        (repo_root / "packages/csharp/TreeSitterLanguagePack/TreeSitterLanguagePack.csproj", "csproj"),
     ]
 
     update_funcs = {
@@ -208,6 +241,8 @@ def main() -> None:
         "pom_xml": update_pom_xml,
         "gemspec": update_gemspec,
         "cargo_toml_version": update_cargo_toml_version,
+        "composer_json": update_composer_json,
+        "csproj": update_csproj,
     }
 
     for file_path, file_type in targets:
