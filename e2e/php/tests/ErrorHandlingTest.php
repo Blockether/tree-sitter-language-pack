@@ -14,30 +14,30 @@ class ErrorHandlingTest extends TestCase
     {
         // Parsing with empty language name should error
         $this->expectException(\Exception::class);
-        	s_pack_get_language('');
+        \ts_pack_get_language('');
     }
 
     public function test_error_handling_empty_source(): void
     {
         // Parsing an empty string should still produce a tree.
-        if (!	s_pack_has_language('javascript')) {
+        if (!\ts_pack_has_language('javascript')) {
             $this->markTestSkipped('Language \'javascript\' not available');
         }
-        $langPtr = 	s_pack_get_language('javascript');
+        $langPtr = \ts_pack_get_language('javascript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('javascript', '');
+        $sexp = \ts_pack_parse_string('javascript', '');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_error_handling_invalid_syntax(): void
     {
         // Parsing invalid syntax should produce a tree with error nodes.
-        if (!	s_pack_has_language('javascript')) {
+        if (!\ts_pack_has_language('javascript')) {
             $this->markTestSkipped('Language \'javascript\' not available');
         }
-        $langPtr = 	s_pack_get_language('javascript');
+        $langPtr = \ts_pack_get_language('javascript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('javascript', 'function function function @@@ %%%');
+        $sexp = \ts_pack_parse_string('javascript', 'function function function @@@ %%%');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -45,6 +45,6 @@ class ErrorHandlingTest extends TestCase
     {
         // Loading a nonexistent language should produce an error.
         $this->expectException(\Exception::class);
-        	s_pack_get_language('nonexistent_xyz');
+        \ts_pack_get_language('nonexistent_xyz');
     }
 }

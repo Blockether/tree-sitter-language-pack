@@ -13,166 +13,166 @@ class MetadataTest extends TestCase
     public function test_go_function_metadata(): void
     {
         // Intel: extract structure from Go function definition
-        if (!	s_pack_has_language('go')) {
+        if (!\ts_pack_has_language('go')) {
             $this->markTestSkipped('Language \'go\' not available');
         }
-        $langPtr = 	s_pack_get_language('go');
+        $langPtr = \ts_pack_get_language('go');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
     }
 
     public function test_javascript_multi_import_metadata(): void
     {
         // Intel: detect multiple imports and function in JavaScript
-        if (!	s_pack_has_language('javascript')) {
+        if (!\ts_pack_has_language('javascript')) {
             $this->markTestSkipped('Language \'javascript\' not available');
         }
-        $langPtr = 	s_pack_get_language('javascript');
+        $langPtr = \ts_pack_get_language('javascript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
     }
 
     public function test_meta_javascript_exports_detail(): void
     {
         // JavaScript with exports, verify export count
-        if (!	s_pack_has_language('javascript')) {
+        if (!\ts_pack_has_language('javascript')) {
             $this->markTestSkipped('Language \'javascript\' not available');
         }
-        $langPtr = 	s_pack_get_language('javascript');
+        $langPtr = \ts_pack_get_language('javascript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('javascript', 'export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = \'1.0\';\n');
+        $sexp = \ts_pack_parse_string('javascript', 'export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = \'1.0\';\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_meta_python_comments(): void
     {
         // Python with comments, verify comment count
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('python', '# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n');
+        $sexp = \ts_pack_parse_string('python', '# This is a comment\n# Another comment\ndef hello():\n    # inline comment\n    pass\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_meta_python_imports_detail(): void
     {
         // Python with multiple imports, verify imports contain specific source
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('python', 'import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n');
+        $sexp = \ts_pack_parse_string('python', 'import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_meta_python_metrics_detail(): void
     {
         // Python code with metrics assertions
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('python', '# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print(\'hello\')\n\ndef world():\n    print(\'world\')\n');
+        $sexp = \ts_pack_parse_string('python', '# module docstring\nimport os\n\ndef hello():\n    # greeting\n    print(\'hello\')\n\ndef world():\n    print(\'world\')\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_meta_rust_structure_name(): void
     {
         // Rust struct with name, verify structure name contains value
-        if (!	s_pack_has_language('rust')) {
+        if (!\ts_pack_has_language('rust')) {
             $this->markTestSkipped('Language \'rust\' not available');
         }
-        $langPtr = 	s_pack_get_language('rust');
+        $langPtr = \ts_pack_get_language('rust');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('rust', 'pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n');
+        $sexp = \ts_pack_parse_string('rust', 'pub struct MyConfig {\n    pub name: String,\n    pub value: i32,\n}\n\nimpl MyConfig {\n    pub fn new() -> Self {\n        Self { name: String::new(), value: 0 }\n    }\n}\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_python_chunking_metadata(): void
     {
         // Intel: chunk multi-function Python source into multiple pieces
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('python', 'def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n');
+        $sexp = \ts_pack_parse_string('python', 'def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_python_class_with_methods_metadata(): void
     {
         // Intel: extract nested structure from Python class with methods
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
     }
 
     public function test_python_function_metadata(): void
     {
         // Intel: extract structure from Python function definition
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('python', 'def greet(name):\n    return f\'Hello, {name}!\'\n');
+        $sexp = \ts_pack_parse_string('python', 'def greet(name):\n    return f\'Hello, {name}!\'\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_python_malformed_code_metadata(): void
     {
         // Intel: detect diagnostics in malformed Python code
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
     }
 
     public function test_python_multi_import_metadata(): void
     {
         // Intel: detect multiple Python imports
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
     }
 
     public function test_rust_chunking_metadata(): void
     {
         // Intel: chunk multi-function Rust source into pieces
-        if (!	s_pack_has_language('rust')) {
+        if (!\ts_pack_has_language('rust')) {
             $this->markTestSkipped('Language \'rust\' not available');
         }
-        $langPtr = 	s_pack_get_language('rust');
+        $langPtr = \ts_pack_get_language('rust');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
     }
 
     public function test_rust_function_metadata(): void
     {
         // Intel: extract structure from Rust function definition
-        if (!	s_pack_has_language('rust')) {
+        if (!\ts_pack_has_language('rust')) {
             $this->markTestSkipped('Language \'rust\' not available');
         }
-        $langPtr = 	s_pack_get_language('rust');
+        $langPtr = \ts_pack_get_language('rust');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('rust', 'fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n');
+        $sexp = \ts_pack_parse_string('rust', 'fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_typescript_function_metadata(): void
     {
         // Intel: extract structure from TypeScript function
-        if (!	s_pack_has_language('typescript')) {
+        if (!\ts_pack_has_language('typescript')) {
             $this->markTestSkipped('Language \'typescript\' not available');
         }
-        $langPtr = 	s_pack_get_language('typescript');
+        $langPtr = \ts_pack_get_language('typescript');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
     }
 }

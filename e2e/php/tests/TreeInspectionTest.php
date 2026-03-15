@@ -13,60 +13,60 @@ class TreeInspectionTest extends TestCase
     public function test_tree_error_count_broken(): void
     {
         // Parse broken Python code and verify error count >= 1
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('python', 'def (broken syntax @@@ !!!');
+        $sexp = \ts_pack_parse_string('python', 'def (broken syntax @@@ !!!');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_tree_error_count_valid(): void
     {
         // Parse valid Python code and verify zero error count
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('python', 'x = 1\ny = 2\n');
+        $sexp = \ts_pack_parse_string('python', 'x = 1\ny = 2\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_tree_find_nodes_two_functions(): void
     {
         // Parse Python with 2 functions and verify find_nodes_by_type count
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('python', 'def foo():\n    pass\n\ndef bar():\n    pass\n');
+        $sexp = \ts_pack_parse_string('python', 'def foo():\n    pass\n\ndef bar():\n    pass\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_tree_named_children_class_and_function(): void
     {
         // Parse Python with class and function, verify named children count
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('python', 'class Foo:\n    pass\n\ndef bar():\n    pass\n');
+        $sexp = \ts_pack_parse_string('python', 'class Foo:\n    pass\n\ndef bar():\n    pass\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
     public function test_tree_root_node_info_python(): void
     {
         // Parse Python source and verify root node info
-        if (!	s_pack_has_language('python')) {
+        if (!\ts_pack_has_language('python')) {
             $this->markTestSkipped('Language \'python\' not available');
         }
-        $langPtr = 	s_pack_get_language('python');
+        $langPtr = \ts_pack_get_language('python');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
-        $sexp = 	s_pack_parse_string('python', 'def hello():\n    pass\n');
+        $sexp = \ts_pack_parse_string('python', 'def hello():\n    pass\n');
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 }
