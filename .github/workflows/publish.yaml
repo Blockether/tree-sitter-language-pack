@@ -423,17 +423,27 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
+      - name: Get all language names
+        id: langs
+        run: |
+          LANGS=$(python3 -c "import json; d=json.load(open('sources/language_definitions.json')); print(','.join(sorted(d.keys())))")
+          echo "names=$LANGS" >> "$GITHUB_OUTPUT"
+
       - name: Build all parsers
         run: cargo build -p tree-sitter-language-pack --release
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: dynamic
+          TSLP_LANGUAGES: ${{ steps.langs.outputs.names }}
 
       - name: Package parser binaries (Unix)
         if: runner.os != 'Windows'
         run: |
           mkdir -p staging
-          find target/release -maxdepth 1 \( -name '*.so' -o -name '*.dylib' \) -exec cp {} staging/ \;
+          # Dynamic parser libraries are built into the OUT_DIR/libs/ by build.rs
+          find target/release/build -path '*/out/libs/*' \( -name 'libtree_sitter_*.so' -o -name 'libtree_sitter_*.dylib' \) -exec cp {} staging/ \;
+          echo "Packaged $(find staging/ -maxdepth 1 -type f | wc -l) parser libraries"
+          find staging/ -maxdepth 1 -type f | head -20
           cd staging && tar -cf - . | zstd -19 -o "../parsers-${{ matrix.label }}.tar.zst"
 
       - name: Package parser binaries (Windows)
@@ -441,7 +451,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p staging
-          find target/release -maxdepth 1 -name '*.dll' -exec cp {} staging/ \;
+          find target/release/build -path '*/out/libs/*' -name 'tree_sitter_*.dll' -exec cp {} staging/ \;
+          echo "Packaged $(find staging/ -maxdepth 1 -type f | wc -l) parser libraries"
           cd staging && tar -cf - . | zstd -19 -o "../parsers-${{ matrix.label }}.tar.zst"
 
       - name: Upload parser binaries
@@ -1341,12 +1352,50 @@ jobs:
           path: dist/parsers
           merge-multiple: true
 
+      - name: Generate parsers.json manifest
+        run: |
+          python3 -c "
+          import json, hashlib, os, subprocess
+
+          version = '${{ needs.prepare.outputs.version }}'
+          base_url = 'https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v' + version
+          defs = json.load(open('sources/language_definitions.json'))
+
+          platforms = {}
+          for f in sorted(os.listdir('dist/parsers')):
+              if f.startswith('parsers-') and f.endswith('.tar.zst'):
+                  path = os.path.join('dist/parsers', f)
+                  label = f.replace('parsers-', '').replace('.tar.zst', '')
+                  sha = hashlib.sha256(open(path, 'rb').read()).hexdigest()
+                  size = os.path.getsize(path)
+                  platforms[label] = {
+                      'url': base_url + '/' + f,
+                      'sha256': sha,
+                      'size': size,
+                  }
+
+          languages = {}
+          for name in sorted(defs.keys()):
+              languages[name] = {'group': 'all', 'size': 0}
+
+          manifest = {
+              'version': version,
+              'platforms': platforms,
+              'languages': languages,
+              'groups': {'all': sorted(defs.keys())},
+          }
+
+          with open('dist/parsers/parsers.json', 'w') as f:
+              json.dump(manifest, f, indent=2)
+          print(f'Generated parsers.json with {len(platforms)} platforms and {len(languages)} languages')
+          "
+
       - name: Upload to GitHub Release
         uses: kreuzberg-dev/actions/publish-github-release@v1.0.0
         with:
           tag: ${{ inputs.tag }}
           title: "Release ${{ inputs.tag }}"
-          artifacts: "dist/parsers/parsers-*.tar.zst"
+          artifacts: "dist/parsers/parsers-*.tar.zst,dist/parsers/parsers.json"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
           GH_TOKEN: ${{ github.token }}
