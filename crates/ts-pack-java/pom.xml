@@ -6,7 +6,7 @@
 
     <groupId>dev.kreuzberg</groupId>
     <artifactId>tree-sitter-language-pack</artifactId>
-    <version>1.0.0-rc.3</version>
+    <version>1.0.0-rc.4</version>
     <packaging>jar</packaging>
 
     <name>Tree-Sitter Language Pack</name>
@@ -88,6 +88,9 @@
     <profiles>
         <profile>
             <id>publish</id>
+            <properties>
+                <gpg.skip>false</gpg.skip>
+            </properties>
             <build>
                 <plugins>
                     <plugin>

@@ -423,8 +423,14 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Get all language names
         id: langs
+        shell: bash
         run: |
           LANGS=$(python3 -c "import json; d=json.load(open('sources/language_definitions.json')); print(','.join(sorted(d.keys())))")
           echo "names=$LANGS" >> "$GITHUB_OUTPUT"
@@ -1996,6 +2002,7 @@ jobs:
         uses: kreuzberg-dev/actions/publish-hex@v1.0.0
         with:
           package-dir: crates/ts-pack-elixir
+          skip-docs: "true"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
