@@ -34,10 +34,8 @@ fn find_project_root() -> PathBuf {
         }
         match dir.parent() {
             Some(parent) => dir = parent,
-            None => panic!(
-                "Could not find project root (sources/language_definitions.json) starting from {}",
-                manifest_dir.display()
-            ),
+            // When installed from crates.io, sources/ won't exist — fall back to manifest dir
+            None => return manifest_dir,
         }
     }
 }
@@ -423,19 +421,26 @@ fn emit_rerun_if_changed(parser_dir: &Path) {
 }
 
 fn main() {
-    let project_root = find_project_root();
-    let definitions_path = project_root.join("sources/language_definitions.json");
-    let parsers_dir = project_root.join("parsers");
-
-    println!("cargo:rerun-if-changed={}", definitions_path.display());
     println!("cargo:rerun-if-env-changed=TSLP_LANGUAGES");
     println!("cargo:rerun-if-env-changed=PROJECT_ROOT");
     println!("cargo:rerun-if-env-changed=TSLP_LINK_MODE");
 
-    let definitions_json = fs::read_to_string(&definitions_path)
-        .unwrap_or_else(|e| panic!("Failed to read {}: {e}", definitions_path.display()));
-    let definitions: BTreeMap<String, LanguageDefinition> =
-        serde_json::from_str(&definitions_json).expect("Failed to parse language_definitions.json");
+    let project_root = find_project_root();
+
+    // When installed from crates.io without lang-* features, the project root
+    // (and language_definitions.json) won't exist. Generate an empty registry
+    // so the crate builds — dynamic loading + download handles parsers at runtime.
+    let definitions_path = project_root.join("sources/language_definitions.json");
+    let definitions: BTreeMap<String, LanguageDefinition> = if definitions_path.exists() {
+        println!("cargo:rerun-if-changed={}", definitions_path.display());
+        let definitions_json = fs::read_to_string(&definitions_path)
+            .unwrap_or_else(|e| panic!("Failed to read {}: {e}", definitions_path.display()));
+        serde_json::from_str(&definitions_json).expect("Failed to parse language_definitions.json")
+    } else {
+        // No definitions available (e.g. crates.io install) — empty set
+        BTreeMap::new()
+    };
+    let parsers_dir = project_root.join("parsers");
 
     let selected = selected_languages(&definitions);
 

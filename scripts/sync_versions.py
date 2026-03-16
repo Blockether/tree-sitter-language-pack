@@ -136,7 +136,7 @@ def update_gemspec(file_path: Path, version: str) -> tuple[bool, str, str]:
     1.0.0-rc.1 -> 1.0.0.rc.1
     """
     content = file_path.read_text()
-    match = re.search(r'spec\.version\s*=\s*"([^"]+)"', content)
+    match = re.search(r"""spec\.version\s*=\s*['"]([^'"]+)['"]""", content)
     old_version = match.group(1) if match else "NOT FOUND"
 
     # Convert Cargo pre-release format to Ruby gem format
@@ -146,8 +146,8 @@ def update_gemspec(file_path: Path, version: str) -> tuple[bool, str, str]:
         return False, old_version, gem_version
 
     new_content = re.sub(
-        r'(spec\.version\s*=\s*)"[^"]+"',
-        rf'\1"{gem_version}"',
+        r"""(spec\.version\s*=\s*)['"][^'"]+['"]""",
+        lambda m: f"{m.group(1)}'{gem_version}'",
         content,
     )
 
@@ -221,6 +221,208 @@ def update_cargo_toml_version(file_path: Path, version: str) -> tuple[bool, str,
     return False, old_version, version
 
 
+def update_gemfile(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update Ruby gem version in Gemfile.
+
+    Handles format: gem 'tree_sitter_language_pack', '1.0.0.rc.1'
+    Ruby gem versions use dots instead of hyphens for pre-release.
+    """
+    content = file_path.read_text()
+    original_content = content
+    gem_version = version.replace("-", ".")
+
+    match = re.search(
+        r"""gem\s+["']tree_sitter_language_pack["'],\s+["']([^"']+)["']""",
+        content,
+    )
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version != gem_version:
+        content = re.sub(
+            r"""(gem\s+["']tree_sitter_language_pack["'],\s+["'])[^"']+(['"])""",
+            lambda m: f"{m.group(1)}{gem_version}{m.group(2)}",
+            content,
+        )
+
+    if content != original_content:
+        file_path.write_text(content)
+        return True, old_version, gem_version
+
+    return False, old_version, gem_version
+
+
+def update_go_mod_require(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update Go require directive version in go.mod."""
+    content = file_path.read_text()
+    original_content = content
+
+    match = re.search(
+        r"require\s+\S+\s+v([\d.]+[-\w.]*)",
+        content,
+    )
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version != version:
+        content = re.sub(
+            r"(require\s+\S+\s+v)[\d.]+[-\w.]*",
+            lambda m: f"{m.group(1)}{version}",
+            content,
+        )
+
+    if content != original_content:
+        file_path.write_text(content)
+        return True, old_version, version
+
+    return False, old_version, version
+
+
+def update_cargo_dep_version(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update tree-sitter-language-pack dependency version in a Cargo.toml."""
+    content = file_path.read_text()
+    original_content = content
+
+    match = re.search(
+        r'tree-sitter-language-pack\s*=\s*"([^"]+)"',
+        content,
+    )
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version != version:
+        content = re.sub(
+            r'(tree-sitter-language-pack\s*=\s*")[^"]+(")',
+            lambda m: f"{m.group(1)}{version}{m.group(2)}",
+            content,
+        )
+
+    if content != original_content:
+        file_path.write_text(content)
+        return True, old_version, version
+
+    return False, old_version, version
+
+
+def update_pyproject_dep_version(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update tree-sitter-language-pack dependency version in pyproject.toml (PEP 440)."""
+    content = file_path.read_text()
+    original_content = content
+    pep_version = cargo_to_pep440(version)
+
+    match = re.search(
+        r"tree-sitter-language-pack==([\w.]+)",
+        content,
+    )
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version != pep_version:
+        content = re.sub(
+            r"(tree-sitter-language-pack==)[\w.]+",
+            lambda m: f"{m.group(1)}{pep_version}",
+            content,
+        )
+
+    if content != original_content:
+        file_path.write_text(content)
+        return True, old_version, pep_version
+
+    return False, old_version, pep_version
+
+
+def update_package_json_dep(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update @kreuzberg/* dependency versions in package.json."""
+    data = json.loads(file_path.read_text())
+    file_path.read_text()
+    changed = False
+
+    for section in ("dependencies", "devDependencies"):
+        deps = data.get(section, {})
+        for key in list(deps):
+            if key.startswith("@kreuzberg/") and deps[key] != version:
+                deps[key] = version
+                changed = True
+
+    old_version = "unknown"
+    for dep in data.get("dependencies", {}).values():
+        old_version = dep
+        break
+
+    if changed:
+        file_path.write_text(json.dumps(data, indent=2) + "\n")
+        return True, old_version, version
+
+    return False, version, version
+
+
+def update_mix_exs_dep(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update tree_sitter_language_pack dep version in mix.exs."""
+    content = file_path.read_text()
+    original_content = content
+
+    match = re.search(
+        r""":tree_sitter_language_pack,\s*["']~>\s*([\d.]+[-\w.]*)["']""",
+        content,
+    )
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version != version:
+        content = re.sub(
+            r"""(:tree_sitter_language_pack,\s*["']~>\s*)[\d.]+[-\w.]*""",
+            lambda m: f"{m.group(1)}{version}",
+            content,
+        )
+
+    if content != original_content:
+        file_path.write_text(content)
+        return True, old_version, version
+
+    return False, old_version, version
+
+
+def update_pom_xml_dep(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update tree-sitter-language-pack dependency version in pom.xml."""
+    return update_pom_xml(file_path, version)
+
+
+def update_composer_json_dep(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update kreuzberg/tree-sitter-language-pack require version in composer.json."""
+    data = json.loads(file_path.read_text())
+    require = data.get("require", {})
+    pkg = "kreuzberg/tree-sitter-language-pack"
+    old_version = require.get(pkg, "NOT FOUND")
+
+    if old_version == version:
+        return False, old_version, version
+
+    require[pkg] = version
+    data["require"] = require
+    file_path.write_text(json.dumps(data, indent=4, ensure_ascii=False) + "\n")
+    return True, old_version, version
+
+
+def update_csproj_dep(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update TreeSitterLanguagePack PackageReference version in .csproj."""
+    content = file_path.read_text()
+    original_content = content
+
+    match = re.search(
+        r'PackageReference\s+Include="TreeSitterLanguagePack"\s+Version="([^"]+)"',
+        content,
+    )
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version != version:
+        content = re.sub(
+            r'(PackageReference\s+Include="TreeSitterLanguagePack"\s+Version=")[^"]+(")',
+            lambda m: f"{m.group(1)}{version}{m.group(2)}",
+            content,
+        )
+
+    if content != original_content:
+        file_path.write_text(content)
+        return True, old_version, version
+
+    return False, old_version, version
+
+
 def main() -> None:
     repo_root = get_repo_root()
 
@@ -247,6 +449,17 @@ def main() -> None:
         (repo_root / "composer.json", "composer_json"),
         (repo_root / "packages/php/composer.json", "composer_json"),
         (repo_root / "packages/csharp/TreeSitterLanguagePack/TreeSitterLanguagePack.csproj", "csproj"),
+        # Test app manifests — update dependency versions (not package versions)
+        (repo_root / "tests/test_apps/rust/Cargo.toml", "cargo_dep"),
+        (repo_root / "tests/test_apps/python/pyproject.toml", "pyproject_dep"),
+        (repo_root / "tests/test_apps/node/package.json", "package_json_dep"),
+        (repo_root / "tests/test_apps/wasm/package.json", "package_json_dep"),
+        (repo_root / "tests/test_apps/ruby/Gemfile", "gemfile"),
+        (repo_root / "tests/test_apps/go/go.mod", "go_mod_require"),
+        (repo_root / "tests/test_apps/java/pom.xml", "pom_xml_dep"),
+        (repo_root / "tests/test_apps/elixir/mix.exs", "mix_exs_dep"),
+        (repo_root / "tests/test_apps/php/composer.json", "composer_json_dep"),
+        (repo_root / "tests/test_apps/csharp/TestApp.csproj", "csproj_dep"),
     ]
 
     def update_pyproject_pep440(file_path: Path, version: str) -> tuple[bool, str, str]:
@@ -264,6 +477,15 @@ def main() -> None:
         "cargo_toml_version": update_cargo_toml_version,
         "composer_json": update_composer_json,
         "csproj": update_csproj,
+        "gemfile": update_gemfile,
+        "go_mod_require": update_go_mod_require,
+        "cargo_dep": update_cargo_dep_version,
+        "pyproject_dep": update_pyproject_dep_version,
+        "package_json_dep": update_package_json_dep,
+        "mix_exs_dep": update_mix_exs_dep,
+        "pom_xml_dep": update_pom_xml_dep,
+        "composer_json_dep": update_composer_json_dep,
+        "csproj_dep": update_csproj_dep,
     }
 
     for file_path, file_type in targets:

@@ -45,6 +45,15 @@ _build/
 e2e/c/build/
 e2e/c/test_*
 
+# Test app build/install artifacts
+tests/test_apps/*/target/
+tests/test_apps/*/build/
+tests/test_apps/*/.venv/
+tests/test_apps/*/vendor/
+tests/test_apps/*/_build/
+tests/test_apps/*/deps/
+tests/test_apps/c/build/
+
 # Claude artifacts
 CLAUDE.md
 .claude/

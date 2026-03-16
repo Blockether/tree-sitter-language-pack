@@ -25,6 +25,8 @@ includes:
     taskfile: .task/csharp.yml
   version:
     taskfile: .task/version.yml
+  test-apps:
+    taskfile: .task/test-apps.yml
 
 vars:
   PROJECT_ROOT:
