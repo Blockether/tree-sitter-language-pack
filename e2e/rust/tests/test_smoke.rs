@@ -8,7 +8,8 @@ fn smoke_actionscript() {
         return;
     }
     // Smoke test: load actionscript and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("actionscript").expect("Failed to get parser for 'actionscript'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("actionscript").expect("Failed to get parser for 'actionscript'");
     let tree = parser.parse("var x:int = 1;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -510,7 +511,8 @@ fn smoke_commonlisp() {
         return;
     }
     // Smoke test: load commonlisp and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("commonlisp").expect("Failed to get parser for 'commonlisp'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("commonlisp").expect("Failed to get parser for 'commonlisp'");
     let tree = parser.parse("(defun hello () (print \"hello\"))", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -690,7 +692,8 @@ fn smoke_dockerfile() {
         return;
     }
     // Smoke test: load dockerfile and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("dockerfile").expect("Failed to get parser for 'dockerfile'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("dockerfile").expect("Failed to get parser for 'dockerfile'");
     let tree = parser.parse("FROM alpine", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -963,7 +966,8 @@ fn smoke_fsharp_signature() {
         return;
     }
     // Smoke test: load fsharp_signature and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("fsharp_signature").expect("Failed to get parser for 'fsharp_signature'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("fsharp_signature").expect("Failed to get parser for 'fsharp_signature'");
     let tree = parser.parse("val x: int", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1032,7 +1036,8 @@ fn smoke_gitattributes() {
         return;
     }
     // Smoke test: load gitattributes and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("gitattributes").expect("Failed to get parser for 'gitattributes'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("gitattributes").expect("Failed to get parser for 'gitattributes'");
     let tree = parser.parse("*.txt text", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1592,7 +1597,8 @@ fn smoke_javascript() {
         return;
     }
     // Smoke test: load javascript and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("console.log('hello');", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -1798,7 +1804,8 @@ fn smoke_linkerscript() {
         return;
     }
     // Smoke test: load linkerscript and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("linkerscript").expect("Failed to get parser for 'linkerscript'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("linkerscript").expect("Failed to get parser for 'linkerscript'");
     let tree = parser.parse("SECTIONS { .text : { *(.text) } }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2005,7 +2012,8 @@ fn smoke_markdown_inline() {
         return;
     }
     // Smoke test: load markdown_inline and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("markdown_inline").expect("Failed to get parser for 'markdown_inline'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("markdown_inline").expect("Failed to get parser for 'markdown_inline'");
     let tree = parser.parse("**bold** and *italic*", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2255,7 +2263,8 @@ fn smoke_ocaml_interface() {
         return;
     }
     // Smoke test: load ocaml_interface and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("ocaml_interface").expect("Failed to get parser for 'ocaml_interface'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("ocaml_interface").expect("Failed to get parser for 'ocaml_interface'");
     let tree = parser.parse("val x : int", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2485,7 +2494,8 @@ fn smoke_powershell() {
         return;
     }
     // Smoke test: load powershell and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("powershell").expect("Failed to get parser for 'powershell'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("powershell").expect("Failed to get parser for 'powershell'");
     let tree = parser.parse("Write-Host 'hello'", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2554,7 +2564,8 @@ fn smoke_properties() {
         return;
     }
     // Smoke test: load properties and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("properties").expect("Failed to get parser for 'properties'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("properties").expect("Failed to get parser for 'properties'");
     let tree = parser.parse("key=value", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2646,7 +2657,8 @@ fn smoke_purescript() {
         return;
     }
     // Smoke test: load purescript and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("purescript").expect("Failed to get parser for 'purescript'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("purescript").expect("Failed to get parser for 'purescript'");
     let tree = parser.parse("module Main where", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2669,7 +2681,8 @@ fn smoke_pymanifest() {
         return;
     }
     // Smoke test: load pymanifest and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("pymanifest").expect("Failed to get parser for 'pymanifest'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("pymanifest").expect("Failed to get parser for 'pymanifest'");
     let tree = parser.parse("include *.txt", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -2895,7 +2908,8 @@ fn smoke_requirements() {
         return;
     }
     // Smoke test: load requirements and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("requirements").expect("Failed to get parser for 'requirements'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("requirements").expect("Failed to get parser for 'requirements'");
     let tree = parser.parse("flask>=2.0", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -3474,7 +3488,8 @@ fn smoke_typescript() {
         return;
     }
     // Smoke test: load typescript and parse a simple snippet
-    let mut parser = tree_sitter_language_pack::get_parser("typescript").expect("Failed to get parser for 'typescript'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("typescript").expect("Failed to get parser for 'typescript'");
     let tree = parser.parse("const x: number = 42;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();

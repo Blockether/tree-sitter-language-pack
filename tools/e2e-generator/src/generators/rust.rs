@@ -56,17 +56,14 @@ doctest = false
 [workspace.dependencies]
 tree-sitter-language-pack = { path = "../../crates/ts-pack-core", features = ["serde", "all"] }
 tree-sitter = "0.26"
-serde_json = "1"
 
 [dependencies]
 tree-sitter-language-pack = { workspace = true }
 tree-sitter = { workspace = true }
-serde_json = { workspace = true }
 
 [dev-dependencies]
 tree-sitter-language-pack = { workspace = true }
 tree-sitter = { workspace = true }
-serde_json = { workspace = true }
 "#;
     std::fs::write(dir.join("Cargo.toml"), content).map_err(|e| format!("Failed to write Cargo.toml: {e}"))
 }

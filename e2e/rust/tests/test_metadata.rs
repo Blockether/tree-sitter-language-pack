@@ -22,7 +22,8 @@ fn javascript_multi_import_metadata() {
         return;
     }
     // Intel: detect multiple imports and function in JavaScript
-    let mut parser = tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let _tree = parser.parse(
         "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n",
         None,
@@ -36,7 +37,8 @@ fn meta_javascript_exports_detail() {
         return;
     }
     // JavaScript with exports, verify export count
-    let mut parser = tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse(
         "export function greet(name) {\n  return `Hello ${name}`;\n}\n\nexport const VERSION = '1.0';\n",
         None,
@@ -194,7 +196,8 @@ fn typescript_function_metadata() {
         return;
     }
     // Intel: extract structure from TypeScript function
-    let mut parser = tree_sitter_language_pack::get_parser("typescript").expect("Failed to get parser for 'typescript'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("typescript").expect("Failed to get parser for 'typescript'");
     let _tree = parser.parse(
         "import { readFile } from 'fs';\n\nfunction greet(name: string): string {\n    return `Hello, ${name}!`;\n}\n",
         None,

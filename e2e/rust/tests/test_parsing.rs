@@ -44,7 +44,8 @@ fn parsing_javascript_class() {
         return;
     }
     // Parse a JavaScript class declaration.
-    let mut parser = tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("class Foo { bar() {} }", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
@@ -67,7 +68,8 @@ fn parsing_javascript_variable() {
         return;
     }
     // Parse a JavaScript variable declaration and assert node type
-    let mut parser = tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
+    let mut parser =
+        tree_sitter_language_pack::get_parser("javascript").expect("Failed to get parser for 'javascript'");
     let tree = parser.parse("const x = 1;", None);
     assert!(tree.is_some(), "Parse tree should not be None");
     let tree = tree.unwrap();
