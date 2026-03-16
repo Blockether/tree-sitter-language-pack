@@ -1799,14 +1799,16 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Configure trusted publishing credentials
+        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        uses: rubygems/configure-rubygems-credentials@bc6dd217f8a4f919d6835fcfefd470ef821f5c44 # v1.0.0
+
       - name: Publish gems to RubyGems
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
         uses: kreuzberg-dev/actions/publish-rubygems@v1.0.0
         with:
           gems-dir: dist
           dry-run: ${{ inputs.dry_run }}
-        env:
-          GEM_HOST_API_KEY: ${{ secrets.GEM_HOST_API_KEY }}
 
   # ─── Publish Maven package ────────────────────────────────────────
   publish-maven:
