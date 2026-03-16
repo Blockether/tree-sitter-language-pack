@@ -7,18 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0-rc.2] - 2026-03-16
+## [1.0.0-rc.3] - 2026-03-16
 
 ### Fixed
 
-- Crate now builds correctly when installed from crates.io without `lang-*` features — `build.rs` no longer panics when `sources/language_definitions.json` is absent, falling back to an empty registry for dynamic loading
-- Python wheel now includes `.pyi` type stubs and `py.typed` marker (PEP 561)
-- PEP 440 version sync for Python (`1.0.0-rc.2` → `1.0.0rc2`)
-- pyproject.toml metadata fixes
+- Crate now builds correctly when installed from crates.io without `lang-*` features — `build.rs` no longer panics when `sources/language_definitions.json` is absent
+- Parser binaries now actually compiled: publish workflow sets `TSLP_LANGUAGES` and finds `.so`/`.dylib` in correct build output path
+- `parsers.json` manifest generated and uploaded to GitHub releases for `DownloadManager`
+- Elixir Hex.pm publish: added LICENSE, removed missing `native` from files list
+- Maven Central publish: renamed profile from `release` to `publish` to match workflow
+- Python wheel includes `.pyi` type stubs and `py.typed` marker (PEP 561)
 
 ### Added
 
-- Test apps (`tests/test_apps/`) for validating published packages across 12 ecosystems (Rust, Python, Node.js, WASM, Ruby, Go, Java, Elixir, PHP, C#, C)
+- Test apps (`tests/test_apps/`) for validating published packages across 12 ecosystems
 - Shared JSON test fixtures for cross-language test parity
 - `task test-apps:smoke` and `task test-apps:comprehensive` for post-release validation
 - Version sync support for test_app dependency manifests in `sync_versions.py`
