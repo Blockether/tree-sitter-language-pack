@@ -2123,6 +2123,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
       - name: Smoke test Rust crate
         uses: kreuzberg-dev/actions/smoke-rust@v1.0.0
         with:
@@ -2140,6 +2143,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
       - name: Smoke test Python package
         uses: kreuzberg-dev/actions/smoke-python@v1.0.0
         with:
@@ -2157,6 +2163,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
       - name: Smoke test Node.js package
         uses: kreuzberg-dev/actions/smoke-node@v1.0.0
         with:
@@ -2174,6 +2183,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
       - name: Smoke test WASM package
         uses: kreuzberg-dev/actions/smoke-wasm@v1.0.0
         with:
@@ -2191,6 +2203,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
       - name: Smoke test Ruby gem
         uses: kreuzberg-dev/actions/smoke-ruby@v1.0.0
         with:
@@ -2208,6 +2223,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
       - name: Smoke test Java package
         uses: kreuzberg-dev/actions/smoke-java@v1.0.0
         with:
@@ -2226,6 +2244,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
       - name: Smoke test Go module
         uses: kreuzberg-dev/actions/smoke-go@v1.0.0
         with:
@@ -2243,6 +2264,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
       - name: Smoke test PHP package
         uses: kreuzberg-dev/actions/smoke-php@v1.0.0
         with:
@@ -2260,6 +2284,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ inputs.tag }}
       - name: Smoke test C# package
         uses: kreuzberg-dev/actions/smoke-csharp@v1.0.0
         with:
