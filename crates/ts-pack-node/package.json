@@ -26,6 +26,15 @@
 		"type": "git",
 		"url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org/",
+		"access": "public"
+	},
+	"scripts": {
+		"artifacts": "napi artifacts",
+		"build": "napi build --platform --release",
+		"prepublishOnly": "napi prepublish -t npm"
+	},
 	"keywords": [
 		"tree-sitter",
 		"parser",
@@ -34,5 +43,8 @@
 		"language-pack",
 		"kreuzberg"
 	],
-	"license": "MIT OR Apache-2.0"
+	"license": "MIT OR Apache-2.0",
+	"devDependencies": {
+		"@napi-rs/cli": "^3.5.0"
+	}
 }

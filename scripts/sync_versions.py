@@ -449,6 +449,12 @@ def main() -> None:
         (repo_root / "composer.json", "composer_json"),
         (repo_root / "packages/php/composer.json", "composer_json"),
         (repo_root / "packages/csharp/TreeSitterLanguagePack/TreeSitterLanguagePack.csproj", "csproj"),
+        # Node.js platform-specific packages
+        (repo_root / "crates/ts-pack-node/npm/linux-x64-gnu/package.json", "package_json"),
+        (repo_root / "crates/ts-pack-node/npm/linux-arm64-gnu/package.json", "package_json"),
+        (repo_root / "crates/ts-pack-node/npm/darwin-x64/package.json", "package_json"),
+        (repo_root / "crates/ts-pack-node/npm/darwin-arm64/package.json", "package_json"),
+        (repo_root / "crates/ts-pack-node/npm/win32-x64-msvc/package.json", "package_json"),
         # Test app manifests — update dependency versions (not package versions)
         (repo_root / "tests/test_apps/rust/Cargo.toml", "cargo_dep"),
         (repo_root / "tests/test_apps/python/pyproject.toml", "pyproject_dep"),
