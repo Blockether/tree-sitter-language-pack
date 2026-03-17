@@ -321,7 +321,7 @@ impl DownloadManager {
         };
 
         let arch = if cfg!(target_arch = "aarch64") {
-            "aarch64"
+            if cfg!(target_os = "macos") { "arm64" } else { "aarch64" }
         } else if cfg!(target_arch = "x86_64") {
             "x86_64"
         } else {

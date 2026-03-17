@@ -289,6 +289,30 @@ impl LanguageRegistry {
                     langs.push(name);
                 }
             }
+
+            // Scan extra library directories for downloadable/cached libraries
+            for extra_dir in &self.extra_lib_dirs {
+                if let Ok(entries) = std::fs::read_dir(extra_dir) {
+                    for entry in entries.flatten() {
+                        let filename = entry.file_name();
+                        let name = filename.to_string_lossy();
+                        // Extract language name from libtree_sitter_<name>.{so,dylib,dll}
+                        let stripped = name.strip_prefix("lib").unwrap_or(&name);
+                        if let Some(lang) = stripped.strip_prefix("tree_sitter_") {
+                            let lang = lang
+                                .strip_suffix(".so")
+                                .or_else(|| lang.strip_suffix(".dylib"))
+                                .or_else(|| lang.strip_suffix(".dll"));
+                            if let Some(lang) = lang {
+                                let lang = lang.to_string();
+                                if !langs.contains(&lang) {
+                                    langs.push(lang);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         for &(alias, target) in LANGUAGE_ALIASES {
             if langs.iter().any(|lang| lang.as_str() == target) {
