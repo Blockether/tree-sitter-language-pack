@@ -56,8 +56,9 @@ class TestErrorHandling:
     """Validate error handling for invalid inputs."""
 
     def test_invalid_language_process(self) -> None:
+        config = tslp.ProcessConfig(language="nonexistent_xyz_123")
         with pytest.raises(Exception):
-            tslp.process("some code", {"language": "nonexistent_xyz_123"})
+            tslp.process("some code", config)
 
     def test_has_language_returns_false_for_invalid(self) -> None:
         assert tslp.has_language("nonexistent_xyz_123") is False
