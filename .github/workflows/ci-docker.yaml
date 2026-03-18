@@ -1,0 +1,92 @@
+name: CI Docker Build & Grammar Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-core/**"
+      - "crates/ts-pack-cli/**"
+      - "sources/language_definitions.json"
+      - "tests/test_apps/fixtures/all_grammars.json"
+      - "tests/test_apps/cli/**"
+      - ".github/workflows/ci-docker.yaml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+  pull_request:
+    branches: [main]
+    paths:
+      - "crates/ts-pack-core/**"
+      - "crates/ts-pack-cli/**"
+      - "sources/language_definitions.json"
+      - "tests/test_apps/fixtures/all_grammars.json"
+      - "tests/test_apps/cli/**"
+      - ".github/workflows/ci-docker.yaml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+
+jobs:
+  build-and-test:
+    name: Build static CLI & test all grammars
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: rust:alpine
+    steps:
+      - name: Install build dependencies
+        run: apk add --no-cache musl-dev gcc g++ python3 bash git
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Get all language names
+        id: langs
+        run: |
+          LANGS=$(python3 -c "import json; d=json.load(open('sources/language_definitions.json')); print(','.join(sorted(d.keys())))")
+          echo "names=$LANGS" >> "$GITHUB_OUTPUT"
+
+      - name: Build static CLI with all parsers
+        run: cargo build --release -p ts-pack-cli
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LANGUAGES: ${{ steps.langs.outputs.names }}
+          TSLP_LINK_MODE: static
+
+      - name: Verify static binary
+        run: |
+          file target/release/ts-pack
+          ls -lh target/release/ts-pack
+          target/release/ts-pack --version
+
+      - name: Test all grammars
+        run: |
+          TS_PACK_BIN=target/release/ts-pack bash tests/test_apps/cli/test_all_grammars.sh
+
+      - name: Test CLI commands
+        run: |
+          BIN=target/release/ts-pack
+          echo "def hello(): pass" | $BIN parse - --language python
+          echo "fn main() {}" | $BIN parse - --language rust --format json | head -5
+          echo "import os" | $BIN process - --language python --structure --imports | head -10
+          $BIN cache-dir
+          $BIN --version
+
+      - name: Package binary
+        run: |
+          mkdir -p dist
+          cp target/release/ts-pack dist/
+          cd dist && tar -czf ts-pack-linux-x86_64-musl.tar.gz ts-pack
+          ls -lh ts-pack-linux-x86_64-musl.tar.gz
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ts-pack-linux-x86_64-musl
+          path: dist/ts-pack-linux-x86_64-musl.tar.gz
+          retention-days: 14

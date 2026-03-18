@@ -2245,11 +2245,6 @@ jobs:
             label: linux-aarch64
             target: aarch64-unknown-linux-gnu
             artifact: ts-pack-linux-aarch64
-          - os: ubuntu-latest
-            label: linux-x86_64-musl
-            target: x86_64-unknown-linux-musl
-            artifact: ts-pack-linux-x86_64-musl
-            cross: true
           - os: macos-latest
             label: macos-arm64
             target: aarch64-apple-darwin
@@ -2278,14 +2273,6 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Install cross (musl)
-        if: matrix.cross
-        run: cargo install cross --locked
-
-      - name: Install musl tools
-        if: matrix.label == 'linux-x86_64-musl' && !matrix.cross
-        run: sudo apt-get update && sudo apt-get install -y musl-tools
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -2298,17 +2285,8 @@ jobs:
           LANGS=$(python3 -c "import json; d=json.load(open('sources/language_definitions.json')); print(','.join(sorted(d.keys())))")
           echo "names=$LANGS" >> "$GITHUB_OUTPUT"
 
-      - name: Build CLI (native)
-        if: ${{ !matrix.cross }}
+      - name: Build CLI
         run: cargo build --release -p ts-pack-cli --target ${{ matrix.target }}
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-          TSLP_LANGUAGES: ${{ steps.langs.outputs.names }}
-          TSLP_LINK_MODE: static
-
-      - name: Build CLI (cross)
-        if: ${{ matrix.cross }}
-        run: cross build --release -p ts-pack-cli --target ${{ matrix.target }}
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: ${{ steps.langs.outputs.names }}
