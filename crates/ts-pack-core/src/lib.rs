@@ -235,7 +235,7 @@ pub fn process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Er
 
 #[cfg(feature = "download")]
 fn ensure_cache_registered() -> Result<(), Error> {
-    if CACHE_REGISTERED.load(std::sync::atomic::Ordering::Relaxed) {
+    if CACHE_REGISTERED.load(std::sync::atomic::Ordering::Acquire) {
         return Ok(());
     }
     let cache_dir = effective_cache_dir()?;
@@ -327,7 +327,10 @@ pub fn configure(config: &PackConfig) -> Result<(), Error> {
             .write()
             .map_err(|e| Error::LockPoisoned(e.to_string()))?;
         *custom = Some(dir.clone());
-        // Reset cache registration so the new directory gets registered on next use
+        // Reset cache registration so the new directory gets registered on next use.
+        // NOTE: Old directories remain in the registry but won't have new files since
+        // add_extra_libs_dir deduplicates, and the directory scanning is independent
+        // per path. This is acceptable behavior and avoids complex cleanup logic.
         CACHE_REGISTERED.store(false, std::sync::atomic::Ordering::Release);
     }
     Ok(())

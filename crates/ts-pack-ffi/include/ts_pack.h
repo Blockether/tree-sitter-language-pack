@@ -328,7 +328,7 @@ int32_t ts_pack_clean_cache(void);
  * Returns a newly-allocated C string that the caller must free with
  * `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
  */
-const char *ts_pack_cache_dir(void);
+char *ts_pack_cache_dir(void);
 
 /**
  * Free a string array that was returned by the FFI (e.g. from `ts_pack_manifest_languages`).

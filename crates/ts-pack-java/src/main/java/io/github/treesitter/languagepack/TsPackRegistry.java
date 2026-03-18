@@ -382,7 +382,12 @@ public class TsPackRegistry implements AutoCloseable {
       MemorySegment cName = arena.allocateFrom(language);
       MemorySegment cSource = arena.allocateFrom(source);
       MemorySegment result =
-          (MemorySegment) PARSE_STRING.invokeExact(ptr, cName, cSource, (long) source.length());
+          (MemorySegment)
+              PARSE_STRING.invokeExact(
+                  ptr,
+                  cName,
+                  cSource,
+                  (long) source.getBytes(java.nio.charset.StandardCharsets.UTF_8).length);
 
       if (result.equals(MemorySegment.NULL)) {
         String error = lastError();
@@ -421,7 +426,12 @@ public class TsPackRegistry implements AutoCloseable {
       MemorySegment cSource = arena.allocateFrom(source);
       MemorySegment cConfig = arena.allocateFrom(configJson);
       MemorySegment result =
-          (MemorySegment) PROCESS.invokeExact(ptr, cSource, (long) source.length(), cConfig);
+          (MemorySegment)
+              PROCESS.invokeExact(
+                  ptr,
+                  cSource,
+                  (long) source.getBytes(java.nio.charset.StandardCharsets.UTF_8).length,
+                  cConfig);
 
       if (result.equals(MemorySegment.NULL)) {
         String error = lastError();
@@ -615,6 +625,8 @@ public class TsPackRegistry implements AutoCloseable {
           MemorySegment strPtr = arr.getAtIndex(ValueLayout.ADDRESS, i);
           String name = strPtr.reinterpret(Long.MAX_VALUE).getString(0);
           languages.add(name);
+          // Free each individual string before freeing the array
+          FREE_STRING.invokeExact(strPtr);
         }
         return Collections.unmodifiableList(languages);
       } finally {
@@ -649,6 +661,8 @@ public class TsPackRegistry implements AutoCloseable {
           MemorySegment strPtr = arr.getAtIndex(ValueLayout.ADDRESS, i);
           String name = strPtr.reinterpret(Long.MAX_VALUE).getString(0);
           languages.add(name);
+          // Free each individual string before freeing the array
+          FREE_STRING.invokeExact(strPtr);
         }
         return Collections.unmodifiableList(languages);
       } finally {

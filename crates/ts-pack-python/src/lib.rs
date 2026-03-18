@@ -469,7 +469,16 @@ fn dict_to_pack_config(dict: &pyo3::Bound<'_, PyDict>) -> PyResult<tree_sitter_l
 #[pyfunction]
 fn init(_py: Python<'_>, config: &pyo3::Bound<'_, PyDict>) -> PyResult<()> {
     let pack_config = dict_to_pack_config(config)?;
-    tree_sitter_language_pack::init(&pack_config).map_err(|e| DownloadError::new_err(e.to_string()))
+    // Release GIL during blocking network I/O
+    // SAFETY: We release the GIL before calling blocking Rust code and reacquire it before returning to Python.
+    // PyEval_SaveThread returns a pointer that must be passed to PyEval_RestoreThread.
+    let result = unsafe {
+        let state = pyo3::ffi::PyEval_SaveThread();
+        let r = tree_sitter_language_pack::init(&pack_config);
+        pyo3::ffi::PyEval_RestoreThread(state);
+        r
+    };
+    result.map_err(|e| DownloadError::new_err(e.to_string()))
 }
 
 /// Configure the language pack without downloading.
@@ -493,7 +502,16 @@ fn configure(_py: Python<'_>, cache_dir: Option<String>) -> PyResult<()> {
 #[pyfunction]
 fn download(_py: Python<'_>, names: Vec<String>) -> PyResult<usize> {
     let refs: Vec<&str> = names.iter().map(String::as_str).collect();
-    tree_sitter_language_pack::download(&refs).map_err(|e| DownloadError::new_err(e.to_string()))
+    // Release GIL during blocking network I/O
+    // SAFETY: We release the GIL before calling blocking Rust code and reacquire it before returning to Python.
+    // PyEval_SaveThread returns a pointer that must be passed to PyEval_RestoreThread.
+    let result = unsafe {
+        let state = pyo3::ffi::PyEval_SaveThread();
+        let r = tree_sitter_language_pack::download(&refs);
+        pyo3::ffi::PyEval_RestoreThread(state);
+        r
+    };
+    result.map_err(|e| DownloadError::new_err(e.to_string()))
 }
 
 /// Download all available languages from the remote manifest.
@@ -501,7 +519,16 @@ fn download(_py: Python<'_>, names: Vec<String>) -> PyResult<usize> {
 /// Returns the number of newly downloaded languages.
 #[pyfunction]
 fn download_all(_py: Python<'_>) -> PyResult<usize> {
-    tree_sitter_language_pack::download_all().map_err(|e| DownloadError::new_err(e.to_string()))
+    // Release GIL during blocking network I/O
+    // SAFETY: We release the GIL before calling blocking Rust code and reacquire it before returning to Python.
+    // PyEval_SaveThread returns a pointer that must be passed to PyEval_RestoreThread.
+    let result = unsafe {
+        let state = pyo3::ffi::PyEval_SaveThread();
+        let r = tree_sitter_language_pack::download_all();
+        pyo3::ffi::PyEval_RestoreThread(state);
+        r
+    };
+    result.map_err(|e| DownloadError::new_err(e.to_string()))
 }
 
 /// Fetch all language names available in the remote manifest.
@@ -509,7 +536,16 @@ fn download_all(_py: Python<'_>) -> PyResult<usize> {
 /// Returns a sorted list of all 170+ downloadable languages.
 #[pyfunction]
 fn manifest_languages(py: Python<'_>) -> PyResult<Py<PyAny>> {
-    let langs = tree_sitter_language_pack::manifest_languages().map_err(|e| DownloadError::new_err(e.to_string()))?;
+    // Release GIL during blocking network I/O
+    // SAFETY: We release the GIL before calling blocking Rust code and reacquire it before returning to Python.
+    // PyEval_SaveThread returns a pointer that must be passed to PyEval_RestoreThread.
+    let langs = unsafe {
+        let state = pyo3::ffi::PyEval_SaveThread();
+        let r = tree_sitter_language_pack::manifest_languages();
+        pyo3::ffi::PyEval_RestoreThread(state);
+        r
+    }
+    .map_err(|e| DownloadError::new_err(e.to_string()))?;
     let py_list = PyList::new(py, &langs)?;
     Ok(py_list.into_any().unbind())
 }
@@ -527,7 +563,16 @@ fn downloaded_languages(py: Python<'_>) -> PyResult<Py<PyAny>> {
 /// Delete all cached parser shared libraries.
 #[pyfunction]
 fn clean_cache(_py: Python<'_>) -> PyResult<()> {
-    tree_sitter_language_pack::clean_cache().map_err(|e| DownloadError::new_err(e.to_string()))
+    // Release GIL during blocking I/O (filesystem operations)
+    // SAFETY: We release the GIL before calling blocking Rust code and reacquire it before returning to Python.
+    // PyEval_SaveThread returns a pointer that must be passed to PyEval_RestoreThread.
+    let result = unsafe {
+        let state = pyo3::ffi::PyEval_SaveThread();
+        let r = tree_sitter_language_pack::clean_cache();
+        pyo3::ffi::PyEval_RestoreThread(state);
+        r
+    };
+    result.map_err(|e| DownloadError::new_err(e.to_string()))
 }
 
 /// Return the effective cache directory path.

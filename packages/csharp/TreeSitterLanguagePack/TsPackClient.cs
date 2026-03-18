@@ -316,6 +316,8 @@ public static class TsPackClient
             {
                 IntPtr strPtr = Marshal.ReadIntPtr(arrPtr, i * IntPtr.Size);
                 result[i] = Marshal.PtrToStringUTF8(strPtr) ?? string.Empty;
+                // Free each individual string before freeing the array
+                NativeMethods.FreeString(strPtr);
             }
             return result;
         }
@@ -345,6 +347,8 @@ public static class TsPackClient
             {
                 IntPtr strPtr = Marshal.ReadIntPtr(arrPtr, i * IntPtr.Size);
                 result[i] = Marshal.PtrToStringUTF8(strPtr) ?? string.Empty;
+                // Free each individual string before freeing the array
+                NativeMethods.FreeString(strPtr);
             }
             return result;
         }

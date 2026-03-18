@@ -868,20 +868,20 @@ pub unsafe extern "C" fn ts_pack_clean_cache() -> i32 {
 /// `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
 #[cfg(feature = "download")]
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ts_pack_cache_dir() -> *const c_char {
-    ffi_guard!(ptr::null(), {
+pub unsafe extern "C" fn ts_pack_cache_dir() -> *mut c_char {
+    ffi_guard!(ptr::null_mut(), {
         clear_last_error();
         match tree_sitter_language_pack::cache_dir() {
             Ok(path) => match CString::new(path.to_string_lossy().to_string()) {
                 Ok(c) => CString::into_raw(c),
                 Err(e) => {
                     set_last_error(&format!("path contains null byte: {e}"));
-                    ptr::null()
+                    ptr::null_mut()
                 }
             },
             Err(e) => {
                 set_last_error(&e.to_string());
-                ptr::null()
+                ptr::null_mut()
             }
         }
     })

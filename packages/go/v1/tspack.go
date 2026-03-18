@@ -489,8 +489,10 @@ func ManifestLanguages() ([]string, error) {
 	languages := make([]string, int(count))
 	for i := 0; i < int(count); i++ {
 		// Unsafe pointer arithmetic to get each string pointer
-		ptr := *(**C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(arr)) + uintptr(i)*unsafe.Sizeof(arr)))
+		ptr := *(**C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(arr)) + uintptr(i)*unsafe.Sizeof((*C.char)(nil))))
 		languages[i] = C.GoString(ptr)
+		// Free each individual string before freeing the array
+		C.ts_pack_free_string(ptr)
 	}
 
 	return languages, nil
@@ -511,8 +513,10 @@ func DownloadedLanguages() ([]string, error) {
 
 	languages := make([]string, int(count))
 	for i := 0; i < int(count); i++ {
-		ptr := *(**C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(arr)) + uintptr(i)*unsafe.Sizeof(arr)))
+		ptr := *(**C.char)(unsafe.Pointer(uintptr(unsafe.Pointer(arr)) + uintptr(i)*unsafe.Sizeof((*C.char)(nil))))
 		languages[i] = C.GoString(ptr)
+		// Free each individual string before freeing the array
+		C.ts_pack_free_string(ptr)
 	}
 
 	return languages, nil
