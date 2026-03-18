@@ -46,25 +46,27 @@ tree-sitter-language-pack/
 
 {% if lang.install_commands is defined -%}
 {% for pm, cmd in lang.install_commands.items() -%}
-{% if cmd is string and '\n' not in cmd -%}
+{%- set rendered_cmd = cmd.replace('${version}', project.version) if cmd is string else cmd -%}
+{% if rendered_cmd is string and '\n' not in rendered_cmd -%}
 ```sh
-{{ cmd }}
+{{ rendered_cmd }}
 ```
-{% elif cmd is string -%}
+{% elif rendered_cmd is string -%}
 ```{{ pm_lang_map.get(pm, "text") }}
-{{ cmd.strip() }}
+{{ rendered_cmd.strip() }}
 ```
 {% endif -%}
 {% endfor -%}
 {% elif lang.install_command is defined -%}
-{% if lang.install_command is string and '\n' not in lang.install_command -%}
+{%- set rendered_install = lang.install_command.replace('${version}', project.version) if lang.install_command is string else lang.install_command -%}
+{% if rendered_install is string and '\n' not in rendered_install -%}
 ```sh
-{{ lang.install_command }}
+{{ rendered_install }}
 ```
 {% else -%}
 {%- set first_pm = lang.package_manager[0] if lang.package_manager else "text" -%}
 ```{{ pm_lang_map.get(first_pm, "text") }}
-{{ lang.install_command.strip() }}
+{{ rendered_install.strip() }}
 ```
 {% endif -%}
 {% elif lang.package_manager | length == 0 -%}

@@ -63,3 +63,68 @@ export declare function treeRootChildCount(tree: ExternalObject<Tree>): number;
 
 /** Get the type name of the root node. */
 export declare function treeRootNodeType(tree: ExternalObject<Tree>): string;
+
+/** Configuration for download and cache management. */
+export interface JsPackConfig {
+	cacheDir?: string;
+	languages?: Array<string>;
+	groups?: Array<string>;
+}
+
+/**
+ * Initialize download system with configuration and pre-download all specified languages.
+ *
+ * Throws an error if configuration or download fails.
+ */
+export declare function init(config?: JsPackConfig): void;
+
+/**
+ * Configure the cache directory without downloading.
+ *
+ * Throws an error if configuration fails.
+ */
+export declare function configure(config?: JsPackConfig): void;
+
+/**
+ * Download specific languages by name.
+ *
+ * Returns the number of languages successfully downloaded.
+ * Throws an error if download fails.
+ */
+export declare function download(names: Array<string>): number;
+
+/**
+ * Download all 170+ available languages from the remote manifest.
+ *
+ * Returns the number of languages successfully downloaded.
+ * Throws an error if download fails.
+ */
+export declare function downloadAll(): number;
+
+/**
+ * Get all available languages from the remote manifest.
+ *
+ * Returns an array of language names. Throws an error if manifest fetch fails.
+ */
+export declare function manifestLanguages(): Array<string>;
+
+/**
+ * Get all languages that have been downloaded and cached locally.
+ *
+ * Returns an array of language names currently in the cache.
+ */
+export declare function downloadedLanguages(): Array<string>;
+
+/**
+ * Delete all cached parser files.
+ *
+ * Throws an error if cache deletion fails.
+ */
+export declare function cleanCache(): void;
+
+/**
+ * Get the effective cache directory being used.
+ *
+ * Returns the path as a string. Throws an error if cache directory cannot be determined.
+ */
+export declare function cacheDir(): string;

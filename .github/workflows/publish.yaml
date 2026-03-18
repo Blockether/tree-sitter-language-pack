@@ -2215,11 +2215,23 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
 
+      - name: Detect macOS bottle tag
+        id: os-info
+        run: |
+          OS_VERSION=$(sw_vers -productVersion | cut -d. -f1)
+          case "$OS_VERSION" in
+            15) BOTTLE_TAG="arm64_sequoia" ;;
+            14) BOTTLE_TAG="arm64_sonoma" ;;
+            13) BOTTLE_TAG="arm64_ventura" ;;
+            *) BOTTLE_TAG="arm64_macos${OS_VERSION}" ;;
+          esac
+          echo "bottle_tag=$BOTTLE_TAG" >> "$GITHUB_OUTPUT"
+
       - name: Create Homebrew bottle
         id: bottle
         run: |
           VERSION="${{ needs.prepare.outputs.version }}"
-          BOTTLE_TAG="arm64_sequoia"
+          BOTTLE_TAG="${{ steps.os-info.outputs.bottle_tag }}"
           bottle_root="/tmp/ts-pack-bottle"
           bottle_dir="${bottle_root}/ts-pack/${VERSION}"
           mkdir -p "${bottle_dir}/bin"

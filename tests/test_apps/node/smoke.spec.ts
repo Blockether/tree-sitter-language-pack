@@ -80,7 +80,7 @@ describe("smoke tests", () => {
 			init();
 		});
 
-		it("exposes all download functions", () => {
+		it("exposes all download functions", async () => {
 			const functions = [
 				"init",
 				"download",
@@ -92,9 +92,10 @@ describe("smoke tests", () => {
 				"cacheDir",
 			];
 
-			const bindings = require("@kreuzberg/tree-sitter-language-pack");
+			// Use dynamic import to load bindings in ESM context
+			const tslp = await import("@kreuzberg/tree-sitter-language-pack");
 			for (const fn of functions) {
-				expect(typeof bindings[fn]).toBe("function");
+				expect(typeof tslp[fn as keyof typeof tslp]).toBe("function");
 			}
 		});
 

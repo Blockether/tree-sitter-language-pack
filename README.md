@@ -26,10 +26,16 @@
   </a>
   <!-- Project Info -->
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci.yaml?branch=main&label=CI" alt="CI">
+    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI" alt="CI">
   </a>
   <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-blue" alt="License">
+  </a>
+  <a href="https://github.com/kreuzberg-dev/homebrew-tap">
+    <img src="https://img.shields.io/badge/homebrew-ts--pack-FBB040?logo=homebrew" alt="Homebrew">
+  </a>
+  <a href="https://docs.rs/tree-sitter-language-pack">
+    <img src="https://img.shields.io/badge/docs-crates.io-blue" alt="Docs">
   </a>
 </div>
 
@@ -108,7 +114,7 @@ See [Node.js README](crates/ts-pack-node/README.md) for full documentation.
 ### Go
 
 ```sh
-go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
+go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1
 ```
 
 See [Go README](packages/go/v1/README.md) for full documentation.

@@ -86,6 +86,12 @@ enum Commands {
         /// Extract symbols
         #[arg(long)]
         symbols: bool,
+        /// Extract docstrings
+        #[arg(long)]
+        docstrings: bool,
+        /// Include diagnostics
+        #[arg(long)]
+        diagnostics: bool,
         /// Maximum chunk size in bytes
         #[arg(long)]
         chunk_size: Option<usize>,
@@ -323,6 +329,8 @@ fn run() -> Result<(), String> {
             exports,
             comments,
             symbols,
+            docstrings,
+            diagnostics,
             chunk_size,
         } => {
             let source_bytes = read_source(&file)?;
@@ -330,9 +338,14 @@ fn run() -> Result<(), String> {
 
             let lang = match language {
                 Some(ref l) => l.as_str().to_string(),
-                None => detect_language(&file)
-                    .ok_or_else(|| format!("Cannot detect language for '{}'. Use --language.", file))?
-                    .to_string(),
+                None => {
+                    if file == "-" {
+                        return Err("Cannot detect language from stdin. Use --language to specify.".to_string());
+                    }
+                    detect_language(&file)
+                        .ok_or_else(|| format!("Cannot detect language for '{}'. Use --language to specify.", file))?
+                        .to_string()
+                }
             };
 
             let mut config = ProcessConfig::new(lang);
@@ -341,13 +354,15 @@ fn run() -> Result<(), String> {
                 config = config.all();
             } else {
                 // Apply explicit flags; when none are given, defaults kick in (structure+imports+exports=true)
-                let any_explicit = structure || imports || exports || comments || symbols;
+                let any_explicit = structure || imports || exports || comments || symbols || docstrings || diagnostics;
                 if any_explicit {
                     config.structure = structure;
                     config.imports = imports;
                     config.exports = exports;
                     config.comments = comments;
                     config.symbols = symbols;
+                    config.docstrings = docstrings || all;
+                    config.diagnostics = diagnostics || all;
                 }
             }
 

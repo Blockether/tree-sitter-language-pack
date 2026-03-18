@@ -7,23 +7,115 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc.8] - 2026-03-18
+
+### Added
+
+- Download/configure API across all bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP, WASM, C FFI)
+    - `init(config)` — configure + pre-download languages
+    - `download(languages)` — download specific parsers
+    - `download_all()` — download all 170+ parsers
+    - `configure(config)` — set cache directory
+    - `manifest_languages()` — list all available from remote manifest
+    - `downloaded_languages()` — list locally cached parsers
+    - `clean_cache()` — remove cached parsers
+    - `cache_dir()` — get effective cache directory
+- Auto-download in `get_language()` — parsers download on first use
+- `PackConfig` struct with TOML file loading and directory discovery
+- CLI redesign: `download`, `clean`, `list`, `parse`, `process`, `cache-dir`, `init`, `completions`
+- Homebrew publishing pipeline (bottles, formula update via `kreuzberg-dev/homebrew-tap`)
+- NAPI-RS multi-platform npm distribution (5 platform packages)
+- Test apps for published package validation across 12 ecosystems
+- E2E test fixtures for download API surface
+
+### Fixed
+
+- Memory leaks in Go, Java, C# bindings (individual strings in FFI arrays not freed)
+- Python GIL not released during download/network I/O operations
+- Elixir NIFs not scheduled as DirtyIo for network operations
+- Java `parseString`/`process` passing `source.length()` instead of UTF-8 byte count
+- Rust core `AtomicBool` ordering: `Relaxed` → `Acquire` in `ensure_cache_registered`
+- C FFI `cache_dir` return type `*const c_char` → `*mut c_char`
+- Elixir error atom: `parse_error` → `download_error` for download failures
+- Platform detection: macOS aarch64 → `arm64` in `DownloadManager`
+- Node.js npm publishing: multi-platform packages via `napi artifacts`
+- Parser binary builds: `TSLP_LANGUAGES` set, correct output path
+- `parsers.json` manifest generated and uploaded to GitHub releases
+- `build.rs` graceful fallback for crates.io installs
+- Maven GPG signing enabled in publish profile
+- Ruby trusted publishing (gem name with underscores)
+
+### Changed
+
+- READMEs overhauled: correct badges (Homebrew, docs), download API docs, language-specific naming
+- CLI binary name: `ts-pack`
+- dotnet target: 9.0 → 10.0
+- Ruby minimum: 3.2 → 3.4
+- Go minimum: 1.22 → 1.26
+- Smoke tests removed from publish workflow (replaced by test_apps)
+
+## [1.0.0-rc.7] - 2026-03-17
+
+### Fixed
+
+- NAPI-RS multi-platform npm distribution (5 platform packages)
+- Platform detection: macOS aarch64 → `arm64` in `DownloadManager`
+- Language discovery: `available_languages()` scans download cache directories
+- Python test_app uses `ProcessConfig` instead of raw dicts
+
+## [1.0.0-rc.6] - 2026-03-17
+
+### Fixed
+
+- Platform detection: macOS aarch64 → `arm64` for parser downloads
+- Language discovery in extra library directories
+- Smoke tests removed from publish workflow
+
+## [1.0.0-rc.5] - 2026-03-16
+
+### Fixed
+
+- Parser binary upload: newline-separated artifact patterns
+- Upload artifacts script: empty array initialization, comma-separated pattern support
+- Smoke test jobs: added checkout steps
+
+## [1.0.0-rc.4] - 2026-03-16
+
+### Fixed
+
+- Windows parser build: `setup-python` action added
+- Maven Central: GPG signing enabled in publish profile (`gpg.skip=false`)
+- Elixir Hex.pm: skip docs during publish for NIF packages
+
 ## [1.0.0-rc.3] - 2026-03-16
 
 ### Fixed
 
-- Crate now builds correctly when installed from crates.io without `lang-*` features — `build.rs` no longer panics when `sources/language_definitions.json` is absent
-- Parser binaries now actually compiled: publish workflow sets `TSLP_LANGUAGES` and finds `.so`/`.dylib` in correct build output path
-- `parsers.json` manifest generated and uploaded to GitHub releases for `DownloadManager`
-- Elixir Hex.pm publish: added LICENSE, removed missing `native` from files list
-- Maven Central publish: renamed profile from `release` to `publish` to match workflow
-- Python wheel includes `.pyi` type stubs and `py.typed` marker (PEP 561)
+- `build.rs` graceful fallback when `sources/language_definitions.json` missing
+- Parser binaries: `TSLP_LANGUAGES` set, correct output path for `.so`/`.dylib`
+- `parsers.json` manifest generated and uploaded to GitHub releases
+- Elixir Hex.pm: added LICENSE, removed `native` from files list
+- Maven Central: profile renamed `release` → `publish`
+- Python wheel: `.pyi` type stubs and `py.typed` marker (PEP 561)
 
 ### Added
 
 - Test apps (`tests/test_apps/`) for validating published packages across 12 ecosystems
 - Shared JSON test fixtures for cross-language test parity
-- `task test-apps:smoke` and `task test-apps:comprehensive` for post-release validation
-- Version sync support for test_app dependency manifests in `sync_versions.py`
+- Version sync for test_app dependency manifests
+
+## [1.0.0-rc.2] - 2026-03-16
+
+### Fixed
+
+- `build.rs` no longer panics on crates.io installs without `sources/language_definitions.json`
+- PEP 440 version sync for Python
+- `sync_versions.py` gemspec single-quote regex
+
+### Added
+
+- Test apps structure and shared fixtures
+- Task definitions for test-apps:smoke and test-apps:comprehensive
 
 ## [1.0.0-rc.1] - 2026-03-09
 
