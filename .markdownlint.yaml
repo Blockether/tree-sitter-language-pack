@@ -15,3 +15,5 @@ MD024:
   siblings_only: true
 # MD046/code-block-style
 MD046: false
+# MD060/table-column-style
+MD060: false
