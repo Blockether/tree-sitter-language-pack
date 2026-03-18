@@ -9,6 +9,7 @@ on:
       - "tools/**"
       - "scripts/**"
       - "e2e/**"
+      - "docs/snippets/**"
       - ".github/workflows/ci-validate.yaml"
       - ".github/actions/**"
       - ".pre-commit-config.yaml"
@@ -28,6 +29,7 @@ on:
       - "tools/**"
       - "scripts/**"
       - "e2e/**"
+      - "docs/snippets/**"
       - ".github/workflows/ci-validate.yaml"
       - ".github/actions/**"
       - ".pre-commit-config.yaml"
@@ -168,3 +170,9 @@ jobs:
 
       - name: Check README generation
         run: uv run scripts/generate_readme.py --validate
+
+      - name: Build snippet-runner
+        run: cargo build --release -p snippet-runner
+
+      - name: Validate documentation snippets
+        run: ./target/release/snippet-runner validate --snippets docs/snippets --level syntax --timeout 120

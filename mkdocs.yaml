@@ -1,4 +1,6 @@
 site_name: tree-sitter-language-pack
+site_description: "Pre-compiled tree-sitter parsers for 170+ languages with code intelligence, chunking, and polyglot bindings."
+site_author: "Na'aman Hirschfeld"
 site_url: https://docs.tree-sitter-language-pack.kreuzberg.dev
 repo_url: https://github.com/kreuzberg-dev/tree-sitter-language-pack
 repo_name: kreuzberg-dev/tree-sitter-language-pack

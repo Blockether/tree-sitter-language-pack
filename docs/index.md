@@ -80,6 +80,34 @@ description: "Pre-compiled tree-sitter parsers for 170+ languages with code inte
 
     --8<-- "snippets/rust/quickstart.md"
 
+=== "Go"
+
+    --8<-- "snippets/go/quickstart.md"
+
+=== "Java"
+
+    --8<-- "snippets/java/quickstart.md"
+
+=== "C#"
+
+    --8<-- "snippets/csharp/quickstart.md"
+
+=== "Ruby"
+
+    --8<-- "snippets/ruby/quickstart.md"
+
+=== "Elixir"
+
+    --8<-- "snippets/elixir/quickstart.md"
+
+=== "PHP"
+
+    --8<-- "snippets/php/quickstart.md"
+
+=== "WASM"
+
+    --8<-- "snippets/wasm/quickstart.md"
+
 === "CLI"
 
     --8<-- "snippets/cli/quickstart.md"

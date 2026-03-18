@@ -1,13 +1,13 @@
 ```bash title="CLI"
-# Download parsers for offline use
-ts-pack download python rust javascript
+# Download parsers
+ts-pack download python javascript rust
 
-# Parse a file — outputs the syntax tree
+# Parse a file
 ts-pack parse main.py --format json
 
-# Run code intelligence on a file
-ts-pack process src/app.py --structure --imports
+# Run code intelligence
+ts-pack process src/app.py --all
 
-# List all 170+ available languages
-ts-pack list
+# List available languages
+ts-pack list --manifest
 ```
