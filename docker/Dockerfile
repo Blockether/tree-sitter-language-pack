@@ -1,20 +1,17 @@
 # tree-sitter-language-pack CLI — static musl binary with all 173 parsers
 # Build: docker build -f docker/Dockerfile -t ts-pack .
 # Run:   docker run --rm ts-pack parse --language python -
+#
+# NOTE: The `parsers/` directory must exist in the build context.
+# Run `uv run scripts/clone_vendors.py` before building, or use ci-docker.yaml.
 
 # ─── Builder ─────────────────────────────────────────────────────────
 FROM rust:alpine AS builder
 
-RUN apk add --no-cache musl-dev gcc g++ python3 py3-pip git bash
+RUN apk add --no-cache musl-dev gcc g++ python3 bash
 
 WORKDIR /build
 COPY . .
-
-# Clone grammar sources if not present (CI may not have them)
-RUN if [ ! -d parsers ] || [ -z "$(ls -A parsers 2>/dev/null)" ]; then \
-      pip install --break-system-packages gitpython anyio typing-extensions && \
-      python3 scripts/clone_vendors.py; \
-    fi
 
 # Build CLI with all parsers statically linked
 RUN LANGS=$(python3 -c "import json; d=json.load(open('sources/language_definitions.json')); print(','.join(sorted(d.keys())))") && \

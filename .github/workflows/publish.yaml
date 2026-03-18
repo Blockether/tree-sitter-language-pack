@@ -2511,7 +2511,7 @@ jobs:
   # ─── Publish Docker image ─────────────────────────────────────────
   publish-docker:
     name: Publish Docker image
-    needs: [prepare, upload-cli-release]
+    needs: [prepare, upload-cli-release, clone-vendors]
     if: |
       needs.prepare.outputs.dry_run != 'true' &&
       needs.upload-cli-release.result == 'success'
@@ -2525,6 +2525,12 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
