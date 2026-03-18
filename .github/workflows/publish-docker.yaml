@@ -1,0 +1,117 @@
+name: Publish Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g., v1.0.0-rc.8)"
+        required: true
+        type: string
+      dry_run:
+        description: "Dry run without pushing"
+        required: false
+        type: boolean
+        default: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: kreuzberg-dev/ts-pack
+
+concurrency:
+  group: publish-docker-${{ github.event.inputs.tag || github.run_id }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+    steps:
+      - name: Extract version
+        id: meta
+        run: |
+          version="${{ inputs.tag }}"
+          version="${version#v}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  check-docker:
+    name: Check if image exists
+    needs: prepare
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check GHCR
+        id: check
+        run: |
+          TAG="${{ needs.prepare.outputs.version }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $(echo ${{ github.token }} | base64)" \
+            "https://ghcr.io/v2/${{ env.IMAGE_NAME }}/manifests/$TAG")
+          if [[ "$STATUS" == "200" ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Image $TAG already exists"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    name: Build & publish Docker image
+    needs: [prepare, check-docker]
+    if: needs.check-docker.outputs.exists != 'true' || inputs.dry_run
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GHCR
+        if: ${{ !inputs.dry_run }}
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}},value=${{ inputs.tag }}
+            type=raw,value=latest,enable=${{ !contains(inputs.tag, '-') }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64
+          push: ${{ !inputs.dry_run }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=publish-docker
+          cache-to: type=gha,mode=max,scope=publish-docker
+
+      - name: Test published image
+        if: ${{ !inputs.dry_run }}
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.prepare.outputs.version }}"
+          docker pull "$IMAGE"
+          docker run --rm "$IMAGE" --version
+          echo "def hello(): pass" | docker run --rm -i "$IMAGE" parse - --language python
+          echo "fn main() {}" | docker run --rm -i "$IMAGE" parse - --language rust
