@@ -51,6 +51,14 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
 
+      - name: Setup Node.js (for tree-sitter-cli)
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Install tree-sitter-cli
+        run: npm install -g tree-sitter-cli
+
       - name: Clone grammar sources
         run: uv run scripts/clone_vendors.py
 
