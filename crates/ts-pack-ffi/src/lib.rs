@@ -641,7 +641,7 @@ pub unsafe extern "C" fn ts_pack_init(config_json: *const c_char) -> i32 {
         let config_str = if config_json.is_null() {
             "{}"
         } else {
-            match CStr::from_ptr(config_json).to_str() {
+            match unsafe { CStr::from_ptr(config_json) }.to_str() {
                 Ok(s) => s,
                 Err(e) => {
                     set_last_error(&format!("invalid UTF-8 in config_json: {e}"));
@@ -684,7 +684,7 @@ pub unsafe extern "C" fn ts_pack_configure(config_json: *const c_char) -> i32 {
         let config_str = if config_json.is_null() {
             "{}"
         } else {
-            match CStr::from_ptr(config_json).to_str() {
+            match unsafe { CStr::from_ptr(config_json) }.to_str() {
                 Ok(s) => s,
                 Err(e) => {
                     set_last_error(&format!("invalid UTF-8 in config_json: {e}"));
@@ -758,6 +758,10 @@ pub unsafe extern "C" fn ts_pack_download(names: *const *const c_char, count: us
 /// Download all available languages from the remote manifest.
 ///
 /// Returns the number of newly downloaded languages on success, or -1 on error.
+///
+/// # Safety
+///
+/// This function is safe to call; it does not take any unsafe parameters.
 #[cfg(feature = "download")]
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_download_all() -> i32 {
@@ -781,6 +785,10 @@ pub unsafe extern "C" fn ts_pack_download_all() -> i32 {
 ///
 /// Sets `out_count` to the number of languages in the returned array.
 /// Returns null on error (check `ts_pack_last_error`).
+///
+/// # Safety
+///
+/// `out_count` must be a valid, non-null pointer to a `usize` that the caller owns.
 #[cfg(feature = "download")]
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_manifest_languages(out_count: *mut usize) -> *const *const c_char {
@@ -820,6 +828,10 @@ pub unsafe extern "C" fn ts_pack_manifest_languages(out_count: *mut usize) -> *c
 ///
 /// Sets `out_count` to the number of languages in the returned array.
 /// Returns null if the count pointer is null, but never fails otherwise.
+///
+/// # Safety
+///
+/// `out_count` must be a valid, non-null pointer to a `usize` that the caller owns.
 #[cfg(feature = "download")]
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_downloaded_languages(out_count: *mut usize) -> *const *const c_char {
@@ -847,6 +859,10 @@ pub unsafe extern "C" fn ts_pack_downloaded_languages(out_count: *mut usize) -> 
 /// Delete all cached parser shared libraries.
 ///
 /// Returns 0 on success, -1 on error (check `ts_pack_last_error`).
+///
+/// # Safety
+///
+/// This function is safe to call; it does not take any unsafe parameters.
 #[cfg(feature = "download")]
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_clean_cache() -> i32 {
@@ -866,6 +882,10 @@ pub unsafe extern "C" fn ts_pack_clean_cache() -> i32 {
 ///
 /// Returns a newly-allocated C string that the caller must free with
 /// `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
+///
+/// # Safety
+///
+/// This function is safe to call; it does not take any unsafe parameters.
 #[cfg(feature = "download")]
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ts_pack_cache_dir() -> *mut c_char {

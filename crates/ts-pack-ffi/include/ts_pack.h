@@ -288,6 +288,10 @@ int32_t ts_pack_download(const char *const *names, uintptr_t count);
  * Download all available languages from the remote manifest.
  *
  * Returns the number of newly downloaded languages on success, or -1 on error.
+ *
+ * # Safety
+ *
+ * This function is safe to call; it does not take any unsafe parameters.
  */
 int32_t ts_pack_download_all(void);
 
@@ -300,6 +304,10 @@ int32_t ts_pack_download_all(void);
  *
  * Sets `out_count` to the number of languages in the returned array.
  * Returns null on error (check `ts_pack_last_error`).
+ *
+ * # Safety
+ *
+ * `out_count` must be a valid, non-null pointer to a `usize` that the caller owns.
  */
 const char *const *ts_pack_manifest_languages(uintptr_t *out_count);
 
@@ -312,6 +320,10 @@ const char *const *ts_pack_manifest_languages(uintptr_t *out_count);
  *
  * Sets `out_count` to the number of languages in the returned array.
  * Returns null if the count pointer is null, but never fails otherwise.
+ *
+ * # Safety
+ *
+ * `out_count` must be a valid, non-null pointer to a `usize` that the caller owns.
  */
 const char *const *ts_pack_downloaded_languages(uintptr_t *out_count);
 
@@ -319,6 +331,10 @@ const char *const *ts_pack_downloaded_languages(uintptr_t *out_count);
  * Delete all cached parser shared libraries.
  *
  * Returns 0 on success, -1 on error (check `ts_pack_last_error`).
+ *
+ * # Safety
+ *
+ * This function is safe to call; it does not take any unsafe parameters.
  */
 int32_t ts_pack_clean_cache(void);
 
@@ -327,6 +343,10 @@ int32_t ts_pack_clean_cache(void);
  *
  * Returns a newly-allocated C string that the caller must free with
  * `ts_pack_free_string`. Returns null on error (check `ts_pack_last_error`).
+ *
+ * # Safety
+ *
+ * This function is safe to call; it does not take any unsafe parameters.
  */
 char *ts_pack_cache_dir(void);
 

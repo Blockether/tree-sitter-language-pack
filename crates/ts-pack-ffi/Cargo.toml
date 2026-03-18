@@ -18,5 +18,9 @@ tree-sitter-language-pack = { path = "../ts-pack-core", features = [
 serde_json = { workspace = true }
 tree-sitter = { workspace = true }
 
+[features]
+default = ["download"]
+download = ["tree-sitter-language-pack/download"]
+
 [build-dependencies]
 cbindgen = { workspace = true }
