@@ -297,50 +297,80 @@ fn apply_wasm32_sysroot(build: &mut cc::Build) {
 }
 
 /// Compile a parser statically and link it into the main binary.
+///
+/// Compiles parser.c and scanner.c/cc separately to avoid symbol collisions
+/// when statically linking multiple grammars. Scanner functions (`scan`,
+/// `deserialize`, `serialize`, `scan_comment`) are prefixed with the language
+/// name via C preprocessor defines.
 fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
     let src_dir = parser_dir.join("src");
     let parser_c = src_dir.join("parser.c");
+    let common_dir = parser_dir.join("common");
 
+    // Step 1: Compile parser.c (no symbol conflicts — each has unique tree_sitter_{name})
     let mut build = cc::Build::new();
     build
         .include(&src_dir)
         .file(&parser_c)
         .define("TREE_SITTER_HIDE_SYMBOLS", None)
+        .flag_if_supported("-fvisibility=hidden")
         .warnings(false);
-
-    // cc crate handles std flag portability
     build.std("c11");
-
-    // For wasm32 targets, add wasi-sysroot so C standard library headers are available
     apply_wasm32_sysroot(&mut build);
-
-    let scanner_c = src_dir.join("scanner.c");
-    if scanner_c.exists() {
-        build.file(&scanner_c);
-    }
-
-    let common_dir = parser_dir.join("common");
     if common_dir.exists() {
         build.include(&common_dir);
     }
 
-    let scanner_cc = src_dir.join("scanner.cc");
-
-    if let Err(e) = build.try_compile(&format!("tree_sitter_{name}")) {
-        println!("cargo:warning=Failed to compile static library for '{}': {}", name, e);
+    if let Err(e) = build.try_compile(&format!("tree_sitter_{name}_parser")) {
+        println!("cargo:warning=Failed to compile parser for '{}': {}", name, e);
         return false;
     }
 
+    // Step 2: Compile scanner.c separately with symbol prefixing to avoid collisions.
+    // Many grammars define unprefixed functions like `scan`, `deserialize`, `serialize`,
+    // `scan_comment` which collide when multiple grammars are linked into one binary.
+    let scanner_c = src_dir.join("scanner.c");
+    if scanner_c.exists() {
+        let mut scanner_build = cc::Build::new();
+        scanner_build
+            .include(&src_dir)
+            .file(&scanner_c)
+            .define("TREE_SITTER_HIDE_SYMBOLS", None)
+            .define("scan", &*format!("tree_sitter_{name}_ext_scan"))
+            .define("deserialize", &*format!("tree_sitter_{name}_ext_deserialize"))
+            .define("serialize", &*format!("tree_sitter_{name}_ext_serialize"))
+            .define("scan_comment", &*format!("tree_sitter_{name}_ext_scan_comment"))
+            .flag_if_supported("-fvisibility=hidden")
+            .warnings(false);
+        scanner_build.std("c11");
+        apply_wasm32_sysroot(&mut scanner_build);
+        if common_dir.exists() {
+            scanner_build.include(&common_dir);
+        }
+        if let Err(e) = scanner_build.try_compile(&format!("tree_sitter_{name}_scanner")) {
+            println!("cargo:warning=Failed to compile C scanner for '{}': {}", name, e);
+            return false;
+        }
+    }
+
+    // Step 3: Compile scanner.cc (C++ scanners) separately with same prefixing.
+    let scanner_cc = src_dir.join("scanner.cc");
     if scanner_cc.exists() {
         let mut cpp_build = cc::Build::new();
         cpp_build
             .include(&src_dir)
             .file(&scanner_cc)
             .define("TREE_SITTER_HIDE_SYMBOLS", None)
+            .define("scan", &*format!("tree_sitter_{name}_ext_scan"))
+            .define("deserialize", &*format!("tree_sitter_{name}_ext_deserialize"))
+            .define("serialize", &*format!("tree_sitter_{name}_ext_serialize"))
+            .flag_if_supported("-fvisibility=hidden")
             .warnings(false)
             .cpp(true);
-        // Also apply wasi sysroot for C++ scanners
         apply_wasm32_sysroot(&mut cpp_build);
+        if common_dir.exists() {
+            cpp_build.include(&common_dir);
+        }
         if let Err(e) = cpp_build.try_compile(&format!("tree_sitter_{name}_scanner_cpp")) {
             println!("cargo:warning=Failed to compile C++ scanner for '{}': {}", name, e);
             return false;
