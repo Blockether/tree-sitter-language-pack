@@ -62,3 +62,40 @@ class TestErrorHandling:
 
     def test_has_language_returns_false_for_invalid(self) -> None:
         assert tslp.has_language("nonexistent_xyz_123") is False
+
+
+class TestDownloadAPI:
+    """Validate download and configuration API."""
+
+    def test_api_surface(self) -> None:
+        """Verify all download-related functions are exposed."""
+        for fn_name in [
+            "init",
+            "download",
+            "download_all",
+            "configure",
+            "manifest_languages",
+            "downloaded_languages",
+            "clean_cache",
+            "cache_dir",
+            "DownloadError",
+        ]:
+            assert hasattr(tslp, fn_name), f"Missing API: {fn_name}"
+
+    def test_downloaded_languages_returns_list(self) -> None:
+        """Verify downloaded_languages() returns a list."""
+        result = tslp.downloaded_languages()
+        assert isinstance(result, list)
+
+    def test_cache_dir_returns_string(self) -> None:
+        """Verify cache_dir() returns a non-empty string."""
+        result = tslp.cache_dir()
+        assert isinstance(result, str)
+        assert len(result) > 0
+
+    def test_manifest_languages_returns_list(self) -> None:
+        """Verify manifest_languages() returns a list."""
+        result = tslp.manifest_languages()
+        assert isinstance(result, list)
+        # The manifest should contain a reasonable number of languages
+        assert len(result) > 50

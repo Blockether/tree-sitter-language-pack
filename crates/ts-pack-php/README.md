@@ -39,7 +39,7 @@
   </a>
 </div>
 
-PHP extension via ext-php-rs providing access to 170+ tree-sitter parsers.
+PHP extension via ext-php-rs with on-demand parser downloads.
 
 ## Installation
 
@@ -51,6 +51,9 @@ composer require kreuzberg/tree-sitter-language-pack
 
 ```text
 <?php
+// Optional: Pre-download specific languages for offline use
+ts_pack_init(["php", "javascript", "python"]);
+
 $languages = ts_pack_available_languages();
 echo "Languages: " . count($languages) . "\n";
 
@@ -59,11 +62,14 @@ if (ts_pack_has_language("php")) {
     echo "PHP language available!\n";
 }
 
-// Process source code
+// Auto-downloads language if not cached
 $result = json_decode(ts_pack_process($source, json_encode([
     'language' => 'php',
 ])), true);
 echo "Structure: " . count($result['structure']) . "\n";
+
+// Pre-download languages for offline use
+ts_pack_download(["python", "javascript"]);
 ```
 
 ## API Reference

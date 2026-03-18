@@ -39,7 +39,7 @@
   </a>
 </div>
 
-.NET P/Invoke bindings for tree-sitter-language-pack.
+.NET P/Invoke bindings with on-demand parser downloads.
 
 ## Installation
 
@@ -52,6 +52,9 @@ dotnet add package TreeSitterLanguagePack
 ```text
 using TreeSitterLanguagePack;
 
+// Optional: Pre-download specific languages for offline use
+TsPackClient.Init(["csharp", "python", "javascript"]);
+
 // List all available languages
 var languages = TsPackClient.AvailableLanguages();
 Console.WriteLine($"Languages: {languages.Length}");
@@ -59,9 +62,12 @@ Console.WriteLine($"Languages: {languages.Length}");
 // Check if a language is available
 Console.WriteLine(TsPackClient.HasLanguage("csharp")); // true
 
-// Process source code
+// Auto-downloads language if not cached
 var result = TsPackClient.Process(source, new ProcessConfig { Language = "csharp" });
 Console.WriteLine($"Structure: {result.Structure.Count}");
+
+// Pre-download languages for offline use
+TsPackClient.Download(["python", "javascript"]);
 ```
 
 ## API Reference

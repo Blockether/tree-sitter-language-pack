@@ -24,6 +24,7 @@ cc = "1"
 libloading = "0.9"
 cbindgen = "0.29"
 clap = { version = "4", features = ["derive"] }
+clap_complete = "4"
 toml_edit = "0.25"
 napi = { version = "3", features = ["napi4", "serde-json"] }
 napi-derive = "3"

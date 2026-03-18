@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeAll } from "vitest";
 import {
 	availableLanguages,
 	hasLanguage,
@@ -7,6 +7,10 @@ import {
 	treeRootNodeType,
 	treeRootChildCount,
 	treeHasErrorNodes,
+	init,
+	downloadedLanguages,
+	manifestLanguages,
+	cacheDir,
 } from "@kreuzberg/tree-sitter-language-pack";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -67,6 +71,48 @@ describe("smoke tests", () => {
 
 		it("throws on invalid language", () => {
 			expect(() => parseString("nonexistent_xyz_123", "code")).toThrow();
+		});
+	});
+
+	describe("download API", () => {
+		beforeAll(() => {
+			// Initialize the download system before running download tests
+			init();
+		});
+
+		it("exposes all download functions", () => {
+			const functions = [
+				"init",
+				"download",
+				"downloadAll",
+				"configure",
+				"manifestLanguages",
+				"downloadedLanguages",
+				"cleanCache",
+				"cacheDir",
+			];
+
+			const bindings = require("@kreuzberg/tree-sitter-language-pack");
+			for (const fn of functions) {
+				expect(typeof bindings[fn]).toBe("function");
+			}
+		});
+
+		it("downloadedLanguages returns array", () => {
+			const langs = downloadedLanguages();
+			expect(Array.isArray(langs)).toBe(true);
+		});
+
+		it("manifestLanguages returns array with 50+ languages", () => {
+			const langs = manifestLanguages();
+			expect(Array.isArray(langs)).toBe(true);
+			expect(langs.length).toBeGreaterThan(50);
+		});
+
+		it("cacheDir returns non-empty string", () => {
+			const dir = cacheDir();
+			expect(typeof dir).toBe("string");
+			expect(dir.length).toBeGreaterThan(0);
 		});
 	});
 });

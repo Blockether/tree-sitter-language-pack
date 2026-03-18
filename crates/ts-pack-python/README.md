@@ -39,7 +39,7 @@
   </a>
 </div>
 
-Python bindings for tree-sitter-language-pack, providing access to 170+ pre-compiled tree-sitter parsers.
+Python bindings for tree-sitter-language-pack, providing access to 170+ pre-compiled tree-sitter parsers with on-demand downloads.
 
 ## Installation
 
@@ -54,12 +54,15 @@ uv add tree-sitter-language-pack
 ## Quick Start
 
 ```python
-from tree_sitter_language_pack import get_language, get_parser, available_languages
+from tree_sitter_language_pack import init, download, get_language, get_parser, available_languages
 
-# Get a language
+# Optional: Pre-download specific languages for offline use
+init(["python", "javascript", "rust"])
+
+# Get a language (auto-downloads if not cached)
 language = get_language("python")
 
-# Get a pre-configured parser
+# Get a pre-configured parser (auto-downloads if needed)
 parser = get_parser("python")
 tree = parser.parse(b"def hello(): pass")
 print(tree.root_node.sexp())
@@ -70,9 +73,12 @@ for lang in available_languages():
 
 from tree_sitter_language_pack import process, ProcessConfig
 
-# Extract file intelligence
+# Extract file intelligence (auto-downloads language if needed)
 result = process("def hello(): pass", ProcessConfig(language="python"))
 print(f"Functions: {len(result['structure'])}")
+
+# Pre-download languages for offline use
+download(["python", "javascript"])
 
 # With chunking
 result = process(source, ProcessConfig(language="python", chunk_max_size=1000, comments=True))

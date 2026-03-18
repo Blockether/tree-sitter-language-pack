@@ -39,7 +39,7 @@
   </a>
 </div>
 
-Rust core library providing access to 170+ tree-sitter parsers with static and dynamic linking support.
+Rust core library providing access to 170+ tree-sitter parsers with on-demand download and caching support.
 
 ## Installation
 
@@ -52,7 +52,10 @@ cargo add ts-pack-core
 ```rust
 use ts_pack_core::{get_language, get_parser, available_languages};
 
-// Get a language
+// Initialize and download specific languages (optional)
+ts_pack_core::init(&["python", "javascript", "rust"]).unwrap();
+
+// Get a language (auto-downloads if needed)
 let lang = get_language("python").unwrap();
 
 // Get a pre-configured parser
@@ -65,11 +68,14 @@ for lang in available_languages() {
     println!("{}", lang);
 }
 
-// Process source code
+// Process source code (auto-downloads language if needed)
 let config = ts_pack_core::ProcessConfig::new("python").all();
 let result = ts_pack_core::process("def hello(): pass", &config).unwrap();
 println!("Functions: {}", result.structure.len());
 println!("Imports: {}", result.imports.len());
+
+// Pre-download languages for offline use
+ts_pack_core::download(&["python", "javascript"]).unwrap();
 
 // With chunking
 let config = ts_pack_core::ProcessConfig::new("python").all().with_chunking(1000);
@@ -82,11 +88,11 @@ println!("Chunks: {}", result.chunks.len());
 | Feature | Description |
 | --- | --- |
 | **170+ Languages** | Pre-compiled parsers for 170+ programming languages |
-| **Static Linking** | All parsers compiled into a single binary -- no runtime downloads |
-| **Dynamic Linking** | Load parsers at runtime via shared libraries |
+| **On-Demand Downloads** | Parsers are downloaded on-demand and cached locally for fast reuse |
+| **Selective Installation** | Download only the languages you need; unused parsers never downloaded |
 | **Polyglot Bindings** | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++ |
-| **Selective Installation** | Cargo feature flags to include only the languages you need (Rust) |
-| **Feature Groups** | Curated sets: `web`, `systems`, `scripting`, `data`, `jvm`, `functional` |
+| **Automatic Caching** | Downloaded parsers cached in platform-specific directories for offline use |
+| **Feature Groups** | Curated language sets: `web`, `systems`, `scripting`, `data`, `jvm`, `functional` |
 
 ### Feature Groups
 

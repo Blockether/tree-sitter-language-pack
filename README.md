@@ -214,11 +214,11 @@ The `process()` function returns structured analysis including functions, classe
 | Feature | Description |
 | --- | --- |
 | **170+ Languages** | Pre-compiled parsers for 170+ programming languages |
-| **Static Linking** | All parsers compiled into a single binary -- no runtime downloads |
-| **Dynamic Linking** | Load parsers at runtime via shared libraries |
+| **On-Demand Downloads** | Parsers are downloaded on-demand and cached locally for fast reuse |
+| **Selective Installation** | Download only the languages you need; unused parsers never downloaded |
 | **Polyglot Bindings** | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++ |
-| **Selective Installation** | Cargo feature flags to include only the languages you need (Rust) |
-| **Feature Groups** | Curated sets: `web`, `systems`, `scripting`, `data`, `jvm`, `functional` |
+| **Automatic Caching** | Downloaded parsers cached in platform-specific directories for offline use |
+| **Feature Groups** | Curated language sets: `web`, `systems`, `scripting`, `data`, `jvm`, `functional` |
 
 ## Supported Languages
 
@@ -226,18 +226,18 @@ This pack includes 170+ languages. See the [Rust core Cargo.toml](crates/ts-pack
 
 ## Package READMEs
 
-- [Rust](crates/ts-pack-core/README.md) -- Rust core library providing access to 170+ tree-sitter parsers with static and dynamic linking support.
-- [Python](crates/ts-pack-python/README.md) -- Python bindings for tree-sitter-language-pack, providing access to 170+ pre-compiled tree-sitter parsers.
-- [Node.js](crates/ts-pack-node/README.md) -- Node.js NAPI bindings for tree-sitter-language-pack.
-- [Go](packages/go/v1/README.md) -- Go bindings for tree-sitter-language-pack using cgo.
-- [Java](crates/ts-pack-java/README.md) -- Java bindings for tree-sitter-language-pack using Panama FFI (JDK 22+).
-- [Elixir](crates/ts-pack-elixir/README.md) -- Elixir bindings for tree-sitter-language-pack using Rustler NIFs.
-- [Ruby](crates/ts-pack-ruby/README.md) -- Ruby bindings for tree-sitter-language-pack using Magnus native extensions.
-- [WebAssembly](crates/ts-pack-wasm/README.md) -- WebAssembly bindings for tree-sitter-language-pack using wasm-bindgen.
-- [PHP](crates/ts-pack-php/README.md) -- PHP extension via ext-php-rs providing access to 170+ tree-sitter parsers.
-- [.NET (C#)](packages/csharp/TreeSitterLanguagePack/README.md) -- .NET P/Invoke bindings for tree-sitter-language-pack.
+- [Rust](crates/ts-pack-core/README.md) -- Rust core library providing access to 170+ tree-sitter parsers with on-demand download and caching support.
+- [Python](crates/ts-pack-python/README.md) -- Python bindings for tree-sitter-language-pack, providing access to 170+ pre-compiled tree-sitter parsers with on-demand downloads.
+- [Node.js](crates/ts-pack-node/README.md) -- Node.js NAPI bindings for tree-sitter-language-pack with on-demand parser downloads.
+- [Go](packages/go/v1/README.md) -- Go bindings for tree-sitter-language-pack with on-demand parser caching.
+- [Java](crates/ts-pack-java/README.md) -- Java bindings for tree-sitter-language-pack with on-demand parser downloads (JDK 22+).
+- [Elixir](crates/ts-pack-elixir/README.md) -- Elixir bindings for tree-sitter-language-pack with on-demand parser downloads.
+- [Ruby](crates/ts-pack-ruby/README.md) -- Ruby bindings for tree-sitter-language-pack with on-demand parser downloads.
+- [WebAssembly](crates/ts-pack-wasm/README.md) -- WebAssembly bindings for tree-sitter-language-pack with browser caching support.
+- [PHP](crates/ts-pack-php/README.md) -- PHP extension via ext-php-rs with on-demand parser downloads.
+- [.NET (C#)](packages/csharp/TreeSitterLanguagePack/README.md) -- .NET P/Invoke bindings with on-demand parser downloads.
 - [C/C++ (FFI)](crates/ts-pack-ffi/README.md) -- C-compatible FFI bindings for tree-sitter-language-pack. Use from any language with C interop.
-- [CLI](crates/ts-pack-cli/README.md) -- Command-line tool for managing tree-sitter language parsers.
+- [CLI](crates/ts-pack-cli/README.md) -- Command-line tool for managing tree-sitter language parsers with download utilities.
 
 ## Contributing
 

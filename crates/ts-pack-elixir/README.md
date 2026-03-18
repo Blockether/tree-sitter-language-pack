@@ -39,7 +39,7 @@
   </a>
 </div>
 
-Elixir bindings for tree-sitter-language-pack using Rustler NIFs.
+Elixir bindings for tree-sitter-language-pack with on-demand parser downloads.
 
 ## Installation
 
@@ -50,14 +50,20 @@ Elixir bindings for tree-sitter-language-pack using Rustler NIFs.
 ## Quick Start
 
 ```elixir
+# Optional: Pre-download specific languages for offline use
+TreeSitterLanguagePack.init(["python", "elixir", "javascript"])
+
 # List all available languages
 TreeSitterLanguagePack.available_languages()
 
 # Check if a language exists
 TreeSitterLanguagePack.has_language("python")
 
-# Get language pointer for tree-sitter interop
+# Auto-downloads language if not cached
 ptr = TreeSitterLanguagePack.get_language_ptr("python")
+
+# Pre-download languages for offline use
+TreeSitterLanguagePack.download(["python", "javascript"])
 
 result = TreeSitterLanguagePack.process(source, ~s({"language":"elixir"}))
 IO.inspect(result)

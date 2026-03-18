@@ -39,7 +39,7 @@
   </a>
 </div>
 
-WebAssembly bindings for tree-sitter-language-pack using wasm-bindgen.
+WebAssembly bindings for tree-sitter-language-pack with browser caching support.
 
 ## Installation
 
@@ -58,16 +58,23 @@ yarn add @kreuzberg/tree-sitter-language-pack-wasm
 ## Quick Start
 
 ```javascript
-import init, { availableLanguages, hasLanguage, parseString } from "@kreuzberg/tree-sitter-language-pack-wasm";
+import init, { availableLanguages, hasLanguage, init as initLanguages, download } from "@kreuzberg/tree-sitter-language-pack-wasm";
 
 await init();
+
+// Optional: Pre-download specific languages for offline use
+initLanguages(["python", "javascript", "typescript"]);
 
 console.log(availableLanguages());
 console.log(hasLanguage("python")); // true
 
 import { process } from '@kreuzberg/tree-sitter-language-pack-wasm';
+// Auto-downloads language if not cached in IndexedDB
 const result = process(source, { language: 'javascript' });
 console.log('Structure:', result.structure);
+
+// Pre-download languages for offline use
+download(["python", "javascript"]);
 ```
 
 ## API Reference

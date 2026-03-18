@@ -56,6 +56,7 @@ jobs:
       release_c_ffi: ${{ steps.targets.outputs.c_ffi }}
       release_php: ${{ steps.targets.outputs.php }}
       release_csharp: ${{ steps.targets.outputs.csharp }}
+      release_homebrew: ${{ steps.targets.outputs.homebrew }}
     steps:
       - name: Extract version and flags
         id: meta
@@ -72,7 +73,7 @@ jobs:
         id: targets
         run: |
           targets="${{ inputs.targets }}"
-          for target in crates python node wasm ruby go java elixir c_ffi php csharp; do
+          for target in crates python node wasm ruby go java elixir c_ffi php csharp homebrew; do
             if [[ "$targets" == "all" || "$targets" == *"$target"* ]]; then
               echo "$target=true" >> "$GITHUB_OUTPUT"
             else
@@ -2162,6 +2163,149 @@ jobs:
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
+  # ─── Check Homebrew ────────────────────────────────────────────────
+  check-homebrew:
+    name: Check Homebrew
+    needs: prepare
+    if: needs.prepare.outputs.release_homebrew == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if version exists
+        id: check
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: homebrew
+          package: ts-pack
+          version: ${{ needs.prepare.outputs.version }}
+          tap-repo: kreuzberg-dev/homebrew-tap
+
+  # ─── Build Homebrew bottle ─────────────────────────────────────────
+  homebrew-bottles:
+    name: Build Homebrew bottle
+    needs: [prepare, check-homebrew]
+    if: |
+      needs.prepare.outputs.release_homebrew == 'true' &&
+      (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Build CLI
+        run: cargo build --release -p ts-pack-cli
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Create Homebrew bottle
+        id: bottle
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          BOTTLE_TAG="arm64_sequoia"
+          bottle_root="/tmp/ts-pack-bottle"
+          bottle_dir="${bottle_root}/ts-pack/${VERSION}"
+          mkdir -p "${bottle_dir}/bin"
+          cp target/release/ts-pack "${bottle_dir}/bin/"
+          cd "${bottle_root}"
+          BOTTLE_FILE="ts-pack-${VERSION}.${BOTTLE_TAG}.bottle.tar.gz"
+          tar -czf "${BOTTLE_FILE}" ts-pack/
+          SHA256=$(shasum -a 256 "${BOTTLE_FILE}" | cut -d' ' -f1)
+          {
+            echo "bottle_file=${BOTTLE_FILE}"
+            echo "bottle_sha=${SHA256}"
+          } >> "$GITHUB_OUTPUT"
+          cp "${BOTTLE_FILE}" "$GITHUB_WORKSPACE/"
+
+      - name: Upload bottle artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: homebrew-bottle
+          path: ts-pack-*.bottle.tar.gz
+          retention-days: 14
+
+  # ─── Upload Homebrew bottles to Release ────────────────────────────
+  upload-homebrew-bottles:
+    name: Upload Homebrew bottles to Release
+    needs: [prepare, homebrew-bottles]
+    if: |
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.homebrew-bottles.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Download bottle artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: homebrew-bottle
+          path: dist/homebrew
+
+      - name: Upload to GitHub Release
+        uses: kreuzberg-dev/actions/publish-github-release@v1
+        with:
+          tag: ${{ inputs.tag }}
+          title: "Release ${{ inputs.tag }}"
+          artifacts: "dist/homebrew/ts-pack-*.bottle.tar.gz"
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  # ─── Publish Homebrew formula ──────────────────────────────────────
+  publish-homebrew:
+    name: Publish Homebrew formula
+    needs: [prepare, validate-versions, check-homebrew, upload-homebrew-bottles]
+    if: |
+      always() &&
+      needs.prepare.outputs.release_homebrew == 'true' &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.upload-homebrew-bottles.result == 'success' &&
+      (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download bottle artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: homebrew-bottle
+          path: dist/homebrew
+
+      - name: Publish to Homebrew tap
+        uses: kreuzberg-dev/actions/publish-homebrew@v1
+        with:
+          bottles-dir: dist/homebrew
+          formula-name: ts-pack
+          tap-repo: kreuzberg-dev/homebrew-tap
+          tag: ${{ inputs.tag }}
+          version: ${{ needs.prepare.outputs.version }}
+          github-repo: kreuzberg-dev/tree-sitter-language-pack
+          dry-run: ${{ needs.prepare.outputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
+
   # ─── Release finalize ──────────────────────────────────────────────
   release-finalize:
     name: Finalize release
@@ -2190,6 +2334,9 @@ jobs:
       - publish-nuget
       - check-packagist
       - check-nuget
+      - check-homebrew
+      - upload-homebrew-bottles
+      - publish-homebrew
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -2239,6 +2386,7 @@ jobs:
           CHECK_HEX_EXISTS: ${{ needs.check-hex.outputs.exists || '' }}
           CHECK_PACKAGIST_EXISTS: ${{ needs.check-packagist.outputs.exists || '' }}
           CHECK_NUGET_EXISTS: ${{ needs.check-nuget.outputs.exists || '' }}
+          CHECK_HOMEBREW_EXISTS: ${{ needs.check-homebrew.outputs.exists || '' }}
           RESULT_VALIDATE: ${{ needs.validate-versions.result }}
           RESULT_PUBLISH_CRATES: ${{ needs.publish-crates.result }}
           RESULT_PUBLISH_PYPI: ${{ needs.publish-pypi.result }}
@@ -2253,6 +2401,8 @@ jobs:
           RESULT_UPLOAD_GO: ${{ needs.upload-go-release.result }}
           RESULT_UPLOAD_C_FFI: ${{ needs.upload-c-ffi-release.result }}
           RESULT_UPLOAD_ELIXIR: ${{ needs.upload-elixir-release.result }}
+          RESULT_UPLOAD_HOMEBREW: ${{ needs.upload-homebrew-bottles.result }}
+          RESULT_PUBLISH_HOMEBREW: ${{ needs.publish-homebrew.result }}
         run: |
           {
             echo "## Release Summary"
@@ -2280,6 +2430,7 @@ jobs:
             results[elixir-nifs]="${RESULT_UPLOAD_ELIXIR}"
             results[packagist]="${RESULT_PUBLISH_PACKAGIST}"
             results[nuget]="${RESULT_PUBLISH_NUGET}"
+            results[homebrew]="${RESULT_PUBLISH_HOMEBREW}"
 
             declare -A checks
             checks[crates]="${CHECK_CRATESIO_EXISTS}"
@@ -2291,8 +2442,9 @@ jobs:
             checks[hex]="${CHECK_HEX_EXISTS}"
             checks[packagist]="${CHECK_PACKAGIST_EXISTS}"
             checks[nuget]="${CHECK_NUGET_EXISTS}"
+            checks[homebrew]="${CHECK_HOMEBREW_EXISTS}"
 
-            for target in crates python node wasm ruby maven hex packagist nuget parser-binaries go-ffi c-ffi elixir-nifs; do
+            for target in crates python node wasm ruby maven hex packagist nuget homebrew parser-binaries go-ffi c-ffi elixir-nifs; do
               result="${results[$target]}"
               check="${checks[$target]:-}"
               if [[ "$result" == "success" ]]; then

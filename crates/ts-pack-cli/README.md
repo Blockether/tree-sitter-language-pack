@@ -39,7 +39,7 @@
   </a>
 </div>
 
-Command-line tool for managing tree-sitter language parsers.
+Command-line tool for managing tree-sitter language parsers with download utilities.
 
 ## Installation
 
@@ -55,6 +55,12 @@ ts-pack init
 
 # List available languages
 ts-pack list
+
+# Download specific languages for offline use
+ts-pack download python rust javascript
+
+# Check download status
+ts-pack status
 
 # Add languages to your config
 ts-pack add python rust javascript

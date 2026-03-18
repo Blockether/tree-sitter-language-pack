@@ -39,7 +39,7 @@
   </a>
 </div>
 
-Java bindings for tree-sitter-language-pack using Panama FFI (JDK 22+).
+Java bindings for tree-sitter-language-pack with on-demand parser downloads (JDK 22+).
 
 ## Installation
 
@@ -61,11 +61,18 @@ implementation("dev.kreuzberg:tree-sitter-language-pack:1.0.0-rc.1")
 import dev.kreuzberg.treesitter.languagepack.TsPackRegistry;
 
 try (var registry = new TsPackRegistry()) {
+    // Optional: Pre-download specific languages for offline use
+    registry.init(new String[]{"python", "java", "javascript"});
+
     var languages = registry.availableLanguages();
     System.out.println(languages);
 
+    // Auto-downloads language if not cached
     var lang = registry.getLanguage("python");
     System.out.println("Loaded: " + lang);
+
+    // Pre-download languages for offline use
+    registry.download(new String[]{"python", "javascript"});
 
     String result = registry.process(source, "{\"language\":\"java\"}");
     System.out.println("Result: " + result);

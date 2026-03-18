@@ -39,7 +39,7 @@
   </a>
 </div>
 
-Ruby bindings for tree-sitter-language-pack using Magnus native extensions.
+Ruby bindings for tree-sitter-language-pack with on-demand parser downloads.
 
 ## Installation
 
@@ -52,14 +52,20 @@ gem install tree_sitter_language_pack
 ```ruby
 require 'tree_sitter_language_pack'
 
+# Optional: Pre-download specific languages for offline use
+TreeSitterLanguagePack.init(["python", "ruby", "javascript"])
+
 # List all available languages
 TreeSitterLanguagePack.available_languages
 
 # Check if a language exists
 TreeSitterLanguagePack.has_language("python")
 
-# Get language pointer for tree-sitter interop
+# Auto-downloads language if not cached
 ptr = TreeSitterLanguagePack.get_language_ptr("python")
+
+# Pre-download languages for offline use
+TreeSitterLanguagePack.download(["python", "javascript"])
 
 result = TreeSitterLanguagePack.process(source, '{"language":"ruby"}')
 puts "Functions: #{JSON.parse(result)['structure'].length}"

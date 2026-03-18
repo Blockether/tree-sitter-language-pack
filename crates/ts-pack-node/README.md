@@ -39,7 +39,7 @@
   </a>
 </div>
 
-Node.js NAPI bindings for tree-sitter-language-pack.
+Node.js NAPI bindings for tree-sitter-language-pack with on-demand parser downloads.
 
 ## Installation
 
@@ -58,17 +58,22 @@ yarn add @kreuzberg/tree-sitter-language-pack
 ## Quick Start
 
 ```javascript
-const { availableLanguages, hasLanguage, getLanguagePtr } = require("@kreuzberg/tree-sitter-language-pack");
+const { init, download, availableLanguages, hasLanguage, process } = require("@kreuzberg/tree-sitter-language-pack");
+
+// Optional: Pre-download specific languages for offline use
+init(["python", "javascript", "rust"]);
 
 console.log(availableLanguages());
 console.log(hasLanguage("python")); // true
 
-const { process } = require('@kreuzberg/tree-sitter-language-pack');
-
+// Auto-downloads language if not cached
 const result = process('function hello() {}', { language: 'javascript' });
 console.log('Functions:', result.structure.length);
 
-// With chunking
+// Pre-download languages for offline use
+download(["python", "javascript"]);
+
+// With chunking (auto-downloads if needed)
 const result2 = process(source, { language: 'javascript', chunkMaxSize: 1000 });
 console.log('Chunks:', result2.chunks.length);
 ```

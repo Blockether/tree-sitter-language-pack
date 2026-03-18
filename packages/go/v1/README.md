@@ -39,7 +39,7 @@
   </a>
 </div>
 
-Go bindings for tree-sitter-language-pack using cgo.
+Go bindings for tree-sitter-language-pack with on-demand parser caching.
 
 ## Installation
 
@@ -61,12 +61,19 @@ func main() {
     reg, _ := tspack.NewRegistry()
     defer reg.Close()
 
+    // Optional: Pre-download specific languages for offline use
+    reg.Init([]string{"python", "go", "rust"})
+
     langs := reg.AvailableLanguages()
     fmt.Println(langs)
 
+    // Auto-downloads language if not cached
     config := tspack.ProcessConfig{Language: "go"}
     result, _ := reg.Process(source, config)
     fmt.Printf("Functions: %d\n", len(result.Structure))
+
+    // Pre-download languages for offline use
+    reg.Download([]string{"python", "javascript"})
 }
 ```
 

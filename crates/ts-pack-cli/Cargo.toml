@@ -4,13 +4,18 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "CLI tool for tree-sitter language pack - manage parser configurations"
+description = "CLI tool for tree-sitter language pack - manage parser downloads and run code intelligence"
 
 [[bin]]
 name = "ts-pack"
 path = "src/main.rs"
 
 [dependencies]
-tree-sitter-language-pack = { path = "../ts-pack-core", features = ["config"] }
-clap = { workspace = true }
-toml_edit = { workspace = true }
+tree-sitter-language-pack = { path = "../ts-pack-core", features = [
+  "download",
+  "config",
+  "serde",
+] }
+clap = { workspace = true, features = ["derive"] }
+clap_complete = { workspace = true }
+serde_json = { workspace = true }
