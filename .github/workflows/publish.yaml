@@ -1956,7 +1956,7 @@ jobs:
 
       - name: Configure trusted publishing credentials
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        uses: rubygems/configure-rubygems-credentials@v1
+        uses: rubygems/configure-rubygems-credentials@v1.0.0
 
       - name: Publish gems to RubyGems
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
@@ -2450,6 +2450,11 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag }}
+
       - name: Download bottle artifacts
         uses: actions/download-artifact@v8
         with:
