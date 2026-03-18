@@ -2032,10 +2032,6 @@ jobs:
         working-directory: crates/ts-pack-elixir
         run: mix compile
 
-      - name: Build documentation
-        working-directory: crates/ts-pack-elixir
-        run: mix docs || echo "::warning::Documentation build failed (NIF not available); continuing without docs"
-
       - name: Re-check Hex.pm before publish
         id: recheck
         run: |
