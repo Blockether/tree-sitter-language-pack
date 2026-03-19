@@ -7,6 +7,85 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc.12] - 2026-03-19
+
+### Added
+
+- Config files aligned with kreuzberg: biome.json, rust-toolchain.toml, deny.toml, .golangci.yml, .clang-format, .taplo.toml, .shellcheckrc, tsconfig.json, .npmrc, go.work
+- CI CLI workflow (`ci-cli.yaml`) with clone-vendors, build, smoke tests, grammar tests
+- Vendor scripts for PHP and Ruby (`scripts/ci/php/vendor-core.py`, `scripts/ci/ruby/vendor-core.py`)
+- Docker + C FFI badges in all READMEs
+- `composer.lock` for reproducible PHP builds
+- `tsconfig.json` for ts-pack-node, ts-pack-wasm, and tests/test_apps/node crates
+- 8 missing Elixir NIF stubs: init, configure, download, download_all, manifest_languages, downloaded_languages, clean_cache, cache_dir
+
+### Fixed
+
+- CI: `rustfmt` and `clippy` added to `rust-toolchain.toml` components (fixes 6 CI workflows)
+- CI: Go E2E tests — added `e2e/go` to `go.work` for module resolution
+- CI: C# E2E tests — `setup-dotnet@v4` → `@v5`, e2e-generator C# template `net9.0` → `net10.0`
+- CI: WASM E2E tests — missing tsconfig.json files caused vitest ENOENT
+- CI: CLI smoke tests — added clone-vendors job so parsers are available
+- Publish: npm tag computed once in prepare job (kreuzberg pattern: rc/alpha/beta → `next`, stable → `latest`)
+- README badges: reordered to match kreuzberg, license badge `.svg`, docs link to kreuzberg.dev
+
+### Removed
+
+- Dead code: `sources/language_extension.c`, `scripts/publish/go/tag-and-push-go-module.sh`, `tools/e2e-generator/src/generators/mod.rs.bak`
+
+## [1.0.0-rc.11] - 2026-03-19
+
+### Added
+
+- Multi-arch Docker build (linux/amd64 + linux/arm64)
+- Full 19-test suite aligned across all 12 test apps (Python, Node, Ruby, Go, Java, C#, Elixir, PHP, WASM, C, Docker, Rust)
+- Docker test app
+
+### Fixed
+
+- Node test: remove redundant `init()` call in download API tests
+- WASM serde fix
+
+## [1.0.0-rc.10] - 2026-03-19
+
+### Added
+
+- `json_utils` module with `snake_to_camel` / `camel_to_snake` conversion
+- Node.js `process()` accepts both camelCase and snake_case config keys
+- Expanded test suites: Ruby, Go, Elixir, Java, C#, PHP, WASM, C all at 19 tests
+
+### Fixed
+
+- Homebrew publish: git credentials for tap push
+- `json_utils` gated behind `serde` feature flag
+- `init()` accepts optional config, `process()` registers cache for download feature
+- `cargo fmt` formatting
+
+## [1.0.0-rc.9] - 2026-03-19
+
+### Added
+
+- Full documentation site with MkDocs Material (29 pages), GitHub Pages deploy
+- 173-language grammar test fixtures
+- Docker image build/publish to GHCR, ci-docker workflow
+- `snippet-runner` tool with 33 code snippets for 11 languages
+- `llms.txt` for AI assistant context
+- All-grammars test suite
+
+### Fixed
+
+- Static linking symbol collisions: prefix scanner functions per language
+- Enable grammar generation for batch/diff/pkl
+- Homebrew upload checkout, RubyGems action, Docker clone_vendors
+- Move Cargo profiles to workspace root
+- Docker needs parsers from clone-vendors
+- ci-docker needs tree-sitter-cli for grammar generation
+- test_apps call `download()` before testing
+
+### Removed
+
+- Musl cross-compile from publish workflow
+
 ## [1.0.0-rc.8] - 2026-03-18
 
 ### Added
