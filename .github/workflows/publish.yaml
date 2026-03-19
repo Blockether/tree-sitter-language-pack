@@ -699,8 +699,7 @@ jobs:
           CARGO_TARGET_DIR: ${{ github.workspace }}/crates/ts-pack-ruby/target
 
       - name: Build platform gem
-        working-directory: crates/ts-pack-ruby
-        run: gem build ./*.gemspec
+        run: ruby scripts/publish/ruby/build-native-gem.rb "${{ matrix.ruby_platform }}"
 
       - name: Verify gem was built
         working-directory: crates/ts-pack-ruby
@@ -711,6 +710,8 @@ jobs:
           fi
           echo "Gem built successfully:"
           ls -lh ./*.gem
+          # Verify it's a platform gem, not a source gem
+          gem spec ./*.gem | grep -i platform
 
       - name: Verify gem integrity
         working-directory: crates/ts-pack-ruby
@@ -1899,6 +1900,11 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.14"
+
+      - name: Vendor core for source gem
+        run: python3 scripts/ci/ruby/vendor-core.py
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Build source gem (fallback for unsupported platforms)
         working-directory: crates/ts-pack-ruby
