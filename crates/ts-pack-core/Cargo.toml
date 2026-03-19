@@ -27,7 +27,7 @@ serde_json = { workspace = true }
 [features]
 default = ["dynamic-loading", "download"]
 dynamic-loading = ["dep:libloading"]
-serde = ["dep:serde"]
+serde = ["dep:serde", "dep:serde_json"]
 config = ["dep:serde", "dep:serde_json", "dep:toml"]
 download = [
   "dep:ureq",

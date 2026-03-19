@@ -33,6 +33,7 @@
 
 pub mod error;
 pub mod intel;
+#[cfg(feature = "serde")]
 pub mod json_utils;
 pub mod node;
 pub mod pack_config;
