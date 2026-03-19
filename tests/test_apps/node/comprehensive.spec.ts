@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { process } from "@kreuzberg/tree-sitter-language-pack";
+import { describe, expect, it, beforeAll } from "vitest";
+import { process, download } from "@kreuzberg/tree-sitter-language-pack";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -18,6 +18,10 @@ function loadFixtures<T>(name: string): T[] {
 }
 
 describe("process tests", () => {
+	beforeAll(() => {
+		download(["python", "javascript", "rust", "go"]);
+	});
+
 	const fixtures = loadFixtures<ProcessFixture>("process.json");
 
 	for (const fixture of fixtures) {

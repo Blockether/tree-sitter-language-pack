@@ -14,28 +14,8 @@ FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 
 @pytest.fixture(scope="session", autouse=True)
 def _setup_languages() -> None:
-    """Ensure required languages are downloaded before running tests."""
-    try:
-        # Initialize the download system
-        tslp.init()
-
-        # Check which languages are already downloaded
-        downloaded = set(tslp.downloaded_languages())
-        manifest = set(tslp.manifest_languages())
-
-        # Determine which languages are needed for tests
-        # (all fixtures use python, javascript, go, rust, c at minimum)
-        required = {"python", "javascript", "go", "rust", "c"}
-        to_download = required - downloaded
-
-        if to_download:
-            # Download missing languages (mark as network test)
-            missing = to_download & manifest
-            if missing:
-                tslp.download(list(missing))
-    except Exception:
-        # If download fails, tests will still run against available languages
-        pass
+    """Download required languages before running tests."""
+    tslp.download(["python", "javascript", "go", "rust", "c"])
 
 
 def load_fixtures(name: str) -> list[dict]:

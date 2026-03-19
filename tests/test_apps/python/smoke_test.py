@@ -11,6 +11,12 @@ import tree_sitter_language_pack as tslp
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 
 
+@pytest.fixture(scope="session", autouse=True)
+def _download_languages() -> None:
+    """Download required languages before running tests."""
+    tslp.download(["python", "javascript", "rust", "go", "ruby", "java", "c", "cpp"])
+
+
 def load_fixtures(name: str) -> list[dict]:
     return json.loads((FIXTURES_DIR / name).read_text())
 

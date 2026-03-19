@@ -30,7 +30,13 @@ function loadFixtures<T>(name: string): T[] {
 	return JSON.parse(readFileSync(resolve(fixturesDir, name), "utf-8"));
 }
 
+import { download } from "@kreuzberg/tree-sitter-language-pack";
+
 describe("smoke tests", () => {
+	beforeAll(() => {
+		download(["python", "javascript", "rust", "go", "ruby", "java", "c", "cpp"]);
+	});
+
 	describe("basic fixtures", () => {
 		const fixtures = loadFixtures<BasicFixture>("basic.json");
 
