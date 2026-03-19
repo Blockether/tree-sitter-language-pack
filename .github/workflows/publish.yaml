@@ -2495,6 +2495,15 @@ jobs:
           name: homebrew-bottle
           path: dist/homebrew
 
+      - name: Setup Git credentials for tap push
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
+        run: |
+          git config --global credential.helper store
+          echo "https://x-access-token:${GH_TOKEN}@github.com" > ~/.git-credentials
+          git config --global user.name "kreuzberg-bot"
+          git config --global user.email "bot@kreuzberg.dev"
+
       - name: Publish to Homebrew tap
         uses: kreuzberg-dev/actions/publish-homebrew@v1
         with:
