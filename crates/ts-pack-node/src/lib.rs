@@ -126,6 +126,7 @@ pub fn process(source: String, config: serde_json::Value) -> napi::Result<serde_
 
 /// Configuration for download and cache management.
 #[napi(object)]
+#[derive(Default)]
 pub struct JsPackConfig {
     pub cache_dir: Option<String>,
     pub languages: Option<Vec<String>>,
@@ -146,8 +147,8 @@ impl From<JsPackConfig> for tree_sitter_language_pack::PackConfig {
 ///
 /// Throws an error if configuration or download fails.
 #[napi(js_name = "init")]
-pub fn js_init(config: JsPackConfig) -> napi::Result<()> {
-    let pack_config = tree_sitter_language_pack::PackConfig::from(config);
+pub fn js_init(config: Option<JsPackConfig>) -> napi::Result<()> {
+    let pack_config = tree_sitter_language_pack::PackConfig::from(config.unwrap_or_default());
     tree_sitter_language_pack::init(&pack_config).map_err(|e| napi::Error::from_reason(format!("{e}")))
 }
 

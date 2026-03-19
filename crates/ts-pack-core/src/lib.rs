@@ -227,6 +227,10 @@ pub fn language_count() -> usize {
 /// println!("Structures: {}", result.structure.len());
 /// ```
 pub fn process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Error> {
+    // Ensure cache is registered before attempting to process
+    #[cfg(feature = "download")]
+    ensure_cache_registered()?;
+
     let registry = REGISTRY.read().map_err(|e| Error::LockPoisoned(e.to_string()))?;
     registry.process(source, config)
 }

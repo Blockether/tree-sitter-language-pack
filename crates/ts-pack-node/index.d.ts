@@ -11,79 +11,25 @@ export declare class ExternalObject<T> {
 export declare function availableLanguages(): Array<string>;
 
 /**
- * Returns the raw TSLanguage pointer for interop with node-tree-sitter.
+ * Get the effective cache directory being used.
  *
- * Throws an error if the language is not found.
+ * Returns the path as a string. Throws an error if cache directory cannot be determined.
  */
-export declare function getLanguagePtr(name: string): number;
-
-/** Checks whether a language with the given name is available. */
-export declare function hasLanguage(name: string): boolean;
-
-/** Configuration for the `process` function. */
-export interface JsProcessConfig {
-	language: string;
-	structure?: boolean;
-	imports?: boolean;
-	exports?: boolean;
-	comments?: boolean;
-	docstrings?: boolean;
-	symbols?: boolean;
-	diagnostics?: boolean;
-	chunkMaxSize?: number;
-}
-
-/** Returns the number of available languages. */
-export declare function languageCount(): number;
+export declare function cacheDir(): string;
 
 /**
- * Parse a source string using the named language and return an opaque tree handle.
+ * Delete all cached parser files.
  *
- * Throws an error if the language is not found or parsing fails.
+ * Throws an error if cache deletion fails.
  */
-export declare function parseString(
-	language: string,
-	source: string,
-): ExternalObject<Tree>;
-
-/** Process source code using a config and return a JavaScript object with metadata and chunks. */
-export declare function process(source: string, config: JsProcessConfig): any;
-
-/** Check whether any node in the tree has the given type name. */
-export declare function treeContainsNodeType(
-	tree: ExternalObject<Tree>,
-	nodeType: string,
-): boolean;
-
-/** Check whether the tree contains any ERROR or MISSING nodes. */
-export declare function treeHasErrorNodes(tree: ExternalObject<Tree>): boolean;
-
-/** Get the number of named children of the root node. */
-export declare function treeRootChildCount(tree: ExternalObject<Tree>): number;
-
-/** Get the type name of the root node. */
-export declare function treeRootNodeType(tree: ExternalObject<Tree>): string;
-
-/** Configuration for download and cache management. */
-export interface JsPackConfig {
-	cacheDir?: string;
-	languages?: Array<string>;
-	groups?: Array<string>;
-}
-
-/**
- * Initialize download system with configuration and pre-download all specified languages.
- *
- * Throws an error if configuration or download fails.
- */
-export declare function init(config?: JsPackConfig): void;
+export declare function cleanCache(): void;
 
 /**
  * Configure the cache directory without downloading.
  *
  * Throws an error if configuration fails.
  */
-export declare function configure(config?: JsPackConfig): void;
+export declare function configure(config: JsPackConfig): void;
 
 /**
  * Download specific languages by name.
@@ -102,13 +48,6 @@ export declare function download(names: Array<string>): number;
 export declare function downloadAll(): number;
 
 /**
- * Get all available languages from the remote manifest.
- *
- * Returns an array of language names. Throws an error if manifest fetch fails.
- */
-export declare function manifestLanguages(): Array<string>;
-
-/**
  * Get all languages that have been downloaded and cached locally.
  *
  * Returns an array of language names currently in the cache.
@@ -116,15 +55,81 @@ export declare function manifestLanguages(): Array<string>;
 export declare function downloadedLanguages(): Array<string>;
 
 /**
- * Delete all cached parser files.
+ * Returns the raw TSLanguage pointer for interop with node-tree-sitter.
  *
- * Throws an error if cache deletion fails.
+ * Throws an error if the language is not found.
  */
-export declare function cleanCache(): void;
+export declare function getLanguagePtr(name: string): number;
+
+/** Checks whether a language with the given name is available. */
+export declare function hasLanguage(name: string): boolean;
 
 /**
- * Get the effective cache directory being used.
+ * Initialize download system with configuration and pre-download all specified languages.
  *
- * Returns the path as a string. Throws an error if cache directory cannot be determined.
+ * Throws an error if configuration or download fails.
  */
-export declare function cacheDir(): string;
+export declare function init(config?: JsPackConfig | undefined | null): void;
+
+/** Configuration for download and cache management. */
+export interface JsPackConfig {
+	cacheDir?: string;
+	languages?: Array<string>;
+	groups?: Array<string>;
+}
+
+/** Configuration for the `process` function. */
+export interface JsProcessConfig {
+	language: string;
+	structure?: boolean;
+	imports?: boolean;
+	exports?: boolean;
+	comments?: boolean;
+	docstrings?: boolean;
+	symbols?: boolean;
+	diagnostics?: boolean;
+	chunkMaxSize?: number;
+}
+
+/** Returns the number of available languages. */
+export declare function languageCount(): number;
+
+/**
+ * Get all available languages from the remote manifest.
+ *
+ * Returns an array of language names. Throws an error if manifest fetch fails.
+ */
+export declare function manifestLanguages(): Array<string>;
+
+/**
+ * Parse a source string using the named language and return an opaque tree handle.
+ *
+ * Throws an error if the language is not found or parsing fails.
+ */
+export declare function parseString(
+	language: string,
+	source: string,
+): ExternalObject<Tree>;
+
+/**
+ * Process source code using a config and return a JavaScript object with metadata and chunks.
+ *
+ * Accepts both camelCase and snake_case config keys (auto-normalized to snake_case).
+ * Returns camelCase keys in the result for JavaScript convention.
+ */
+export declare function process(source: string, config: any): any;
+
+/** Check whether any node in the tree has the given type name. */
+export declare function treeContainsNodeType(
+	tree: ExternalObject<Tree>,
+	nodeType: string,
+): boolean;
+
+/** Check whether the tree contains any ERROR or MISSING nodes. */
+export declare function treeHasErrorNodes(tree: ExternalObject<Tree>): boolean;
+
+/** Get the number of named children of the root node. */
+export declare function treeRootChildCount(tree: ExternalObject<Tree>): number;
+
+/** Get the type name of the root node. */
+export declare function treeRootNodeType(tree: ExternalObject<Tree>): string;
