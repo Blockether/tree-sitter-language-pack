@@ -24,7 +24,16 @@ defmodule TreeSitterLanguagePack.MixProject do
       links: %{
         "GitHub" => "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
       },
-      files: ~w(lib mix.exs README.md LICENSE)
+      files: ~w(
+        lib
+        src
+        Cargo.toml
+        Cargo.lock
+        mix.exs
+        README.md
+        LICENSE
+        checksum-Elixir.TreeSitterLanguagePack.Native.exs
+      )
     ]
   end
 
@@ -36,7 +45,8 @@ defmodule TreeSitterLanguagePack.MixProject do
 
   defp deps do
     [
-      {:rustler, "~> 0.37"},
+      {:rustler, "~> 0.37", optional: true, runtime: false},
+      {:rustler_precompiled, "~> 0.8"},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false}
     ]
   end

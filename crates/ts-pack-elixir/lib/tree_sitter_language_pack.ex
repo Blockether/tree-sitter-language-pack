@@ -34,12 +34,19 @@ defmodule TreeSitterLanguagePack do
   check availability before calling these functions if you want to avoid handling errors.
   """
 
-  use Rustler,
+  use RustlerPrecompiled,
     otp_app: :tree_sitter_language_pack,
-    crate: "ts-pack-elixir",
-    path: ".",
-    skip_compilation?: true,
-    load_from: {:tree_sitter_language_pack, "priv/native/ts_pack_elixir"}
+    crate: "ts_pack_elixir",
+    base_url:
+      "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v#{Mix.Project.config()[:version]}",
+    version: Mix.Project.config()[:version],
+    force_build: System.get_env("TSLP_BUILD") in ["1", "true"] or Mix.env() in [:test, :dev],
+    targets: ~w(
+      aarch64-apple-darwin
+      aarch64-unknown-linux-gnu
+      x86_64-unknown-linux-gnu
+    ),
+    nif_versions: ["2.16", "2.17"]
 
   @typedoc """
   A language name string such as `"python"`, `"rust"`, or `"javascript"`.

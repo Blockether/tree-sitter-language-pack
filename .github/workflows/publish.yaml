@@ -2068,10 +2068,7 @@ jobs:
           fetch-depth: 0
 
       - name: Generate checksums from GitHub release
-        run: |
-          if [ -f scripts/publish/generate_elixir_checksums.sh ]; then
-            ./scripts/publish/generate_elixir_checksums.sh "${{ needs.prepare.outputs.version }}"
-          fi
+        run: ./scripts/publish/elixir/generate_checksums.sh "${{ needs.prepare.outputs.version }}"
 
       - name: Setup Elixir
         uses: erlef/setup-elixir@v1

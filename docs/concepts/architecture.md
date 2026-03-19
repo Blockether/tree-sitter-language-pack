@@ -54,7 +54,7 @@ graph TD
     DL -->|"fetch binary"| BIN
     CACHE -->|"dlopen"| BIN
     Core --> TS
-```text
+```
 
 ## Rust Core (`crates/ts-pack-core`)
 
@@ -125,7 +125,7 @@ tree-sitter-language-pack/
 │   └── generate_readme.py  # README sync tooling
 └── tools/
     └── e2e-generator/      # Test suite generator
-```text
+```
 
 ## Design Principles
 

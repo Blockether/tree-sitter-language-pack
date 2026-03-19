@@ -179,7 +179,7 @@ description: "Pre-compiled tree-sitter parsers for 170+ languages with code inte
 | :fontawesome-brands-java: Java | [`dev.kreuzberg:tree-sitter-language-pack`](https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack) | 21+ |
 | :material-language-csharp: C# / .NET | [`TreeSitterLanguagePack`](https://www.nuget.org/packages/TreeSitterLanguagePack) | .NET 10+ |
 | :material-language-ruby: Ruby | [`tree_sitter_language_pack`](https://rubygems.org/gems/tree_sitter_language_pack) | 3.4+ |
-| :material-language-elixir: Elixir | [`tree_sitter_language_pack`](https://hex.pm/packages/tree_sitter_language_pack) | 1.14+ / OTP 25+ |
+| :simple-elixir: Elixir | [`tree_sitter_language_pack`](https://hex.pm/packages/tree_sitter_language_pack) | 1.14+ / OTP 25+ |
 | :material-elephant: PHP | [`kreuzberg/tree-sitter-language-pack`](https://packagist.org/packages/kreuzberg/tree-sitter-language-pack) | 8.2+ |
 | :material-web: WebAssembly | [`@kreuzberg/tree-sitter-language-pack-wasm`](https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm) | Browser / Deno |
 | :material-console: CLI | [`ts-pack`](https://github.com/kreuzberg-dev/homebrew-tap) | — |
