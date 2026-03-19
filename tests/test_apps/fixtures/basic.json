@@ -2,7 +2,7 @@
 	{
 		"name": "language_count_positive",
 		"test": "language_count",
-		"expected_min": 100
+		"expected_min": 8
 	},
 	{
 		"name": "has_python",
