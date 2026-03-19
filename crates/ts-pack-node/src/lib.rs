@@ -110,12 +110,12 @@ impl From<JsProcessConfig> for tree_sitter_language_pack::ProcessConfig {
 pub fn process(source: String, config: serde_json::Value) -> napi::Result<serde_json::Value> {
     // Normalize config keys to snake_case (accepts both camelCase and snake_case input)
     let normalized = tree_sitter_language_pack::json_utils::camel_to_snake(config);
-    let core_config: tree_sitter_language_pack::ProcessConfig = serde_json::from_value(normalized)
-        .map_err(|e| napi::Error::from_reason(format!("invalid config: {e}")))?;
+    let core_config: tree_sitter_language_pack::ProcessConfig =
+        serde_json::from_value(normalized).map_err(|e| napi::Error::from_reason(format!("invalid config: {e}")))?;
     let result = tree_sitter_language_pack::process(&source, &core_config)
         .map_err(|e| napi::Error::from_reason(format!("{e}")))?;
-    let json = serde_json::to_value(&result)
-        .map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))?;
+    let json =
+        serde_json::to_value(&result).map_err(|e| napi::Error::from_reason(format!("serialization failed: {e}")))?;
     // Convert result keys to camelCase for JS convention
     Ok(tree_sitter_language_pack::json_utils::snake_to_camel(json))
 }
