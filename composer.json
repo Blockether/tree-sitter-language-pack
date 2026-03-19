@@ -1,62 +1,62 @@
 {
-    "name": "kreuzberg/tree-sitter-language-pack",
-    "description": "Pre-compiled tree-sitter parsers for 170+ programming languages with PHP extension bindings. Parse, analyze, and chunk source code with a single process() call.",
-    "version": "1.0.0-rc.11",
-    "type": "php-ext",
-    "license": "MIT",
-    "keywords": [
-        "tree-sitter",
-        "parser",
-        "syntax",
-        "language-pack",
-        "code-analysis",
-        "code-intelligence",
-        "ast",
-        "php8",
-        "rust",
-        "performance"
-    ],
-    "homepage": "https://github.com/kreuzberg-dev/tree-sitter-language-pack",
-    "support": {
-        "issues": "https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues",
-        "source": "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
-    },
-    "authors": [
-        {
-            "name": "Na'aman Hirschfeld",
-            "email": "nhirschfeld@gmail.com",
-            "role": "creator"
-        }
-    ],
-    "require": {
-        "php": "^8.4"
-    },
-    "replace": {
-        "ext-ts_pack_php": "*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^11.0",
-        "phpstan/phpstan": "^2.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "TreeSitterLanguagePack\\": "packages/php/src/"
-        }
-    },
-    "scripts": {
-        "test": "vendor/bin/phpunit"
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true,
-    "php-ext": {
-        "extension-name": "ts_pack_php",
-        "priority": 50,
-        "support": {
-            "source-url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack",
-            "download-url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases"
-        }
-    }
+	"name": "kreuzberg/tree-sitter-language-pack",
+	"description": "Pre-compiled tree-sitter parsers for 170+ programming languages with PHP extension bindings. Parse, analyze, and chunk source code with a single process() call.",
+	"version": "1.0.0-rc.11",
+	"type": "php-ext",
+	"license": "MIT",
+	"keywords": [
+		"tree-sitter",
+		"parser",
+		"syntax",
+		"language-pack",
+		"code-analysis",
+		"code-intelligence",
+		"ast",
+		"php8",
+		"rust",
+		"performance"
+	],
+	"homepage": "https://github.com/kreuzberg-dev/tree-sitter-language-pack",
+	"support": {
+		"issues": "https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues",
+		"source": "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+	},
+	"authors": [
+		{
+			"name": "Na'aman Hirschfeld",
+			"email": "nhirschfeld@gmail.com",
+			"role": "creator"
+		}
+	],
+	"require": {
+		"php": "^8.4"
+	},
+	"replace": {
+		"ext-ts_pack_php": "*"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^11.0",
+		"phpstan/phpstan": "^2.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"TreeSitterLanguagePack\\": "packages/php/src/"
+		}
+	},
+	"scripts": {
+		"test": "vendor/bin/phpunit"
+	},
+	"config": {
+		"sort-packages": true
+	},
+	"minimum-stability": "stable",
+	"prefer-stable": true,
+	"php-ext": {
+		"extension-name": "ts_pack_php",
+		"priority": 50,
+		"support": {
+			"source-url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack",
+			"download-url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases"
+		}
+	}
 }

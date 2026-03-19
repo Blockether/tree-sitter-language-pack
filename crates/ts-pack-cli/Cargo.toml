@@ -11,11 +11,7 @@ name = "ts-pack"
 path = "src/main.rs"
 
 [dependencies]
-tree-sitter-language-pack = { path = "../ts-pack-core", features = [
-  "download",
-  "config",
-  "serde",
-] }
+tree-sitter-language-pack = { path = "../ts-pack-core", features = ["download", "config", "serde"] }
 clap = { workspace = true, features = ["derive"] }
 clap_complete = { workspace = true }
 serde_json = { workspace = true }

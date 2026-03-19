@@ -106,10 +106,7 @@ export declare function manifestLanguages(): Array<string>;
  *
  * Throws an error if the language is not found or parsing fails.
  */
-export declare function parseString(
-	language: string,
-	source: string,
-): ExternalObject<Tree>;
+export declare function parseString(language: string, source: string): ExternalObject<Tree>;
 
 /**
  * Process source code using a config and return a JavaScript object with metadata and chunks.
@@ -120,10 +117,7 @@ export declare function parseString(
 export declare function process(source: string, config: any): any;
 
 /** Check whether any node in the tree has the given type name. */
-export declare function treeContainsNodeType(
-	tree: ExternalObject<Tree>,
-	nodeType: string,
-): boolean;
+export declare function treeContainsNodeType(tree: ExternalObject<Tree>, nodeType: string): boolean;
 
 /** Check whether the tree contains any ERROR or MISSING nodes. */
 export declare function treeHasErrorNodes(tree: ExternalObject<Tree>): boolean;

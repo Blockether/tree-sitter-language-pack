@@ -37,15 +37,6 @@
 	{
 		"name": "available_languages_not_empty",
 		"test": "available_languages",
-		"expected_contains": [
-			"python",
-			"javascript",
-			"rust",
-			"go",
-			"ruby",
-			"java",
-			"c",
-			"cpp"
-		]
+		"expected_contains": ["python", "javascript", "rust", "go", "ruby", "java", "c", "cpp"]
 	}
 ]

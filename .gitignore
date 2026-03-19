@@ -89,3 +89,5 @@ CLAUDE.md
 .github/copilot-instructions.md
 AGENTS.md
 GEMINI.md
+
+.cache/

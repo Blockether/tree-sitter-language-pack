@@ -128,10 +128,6 @@ tasks:
   update:
     desc: Update all dependencies to latest versions
     cmds:
-      - echo "Updating pre-commit hooks..."
-      - prek autoupdate
-      - prek install
-      - prek install --hook-type commit-msg
       - echo "Updating Rust dependencies..."
       - task: rust:update
       - echo "Updating Python dependencies..."
@@ -155,6 +151,8 @@ tasks:
       - echo "Updating language grammar revisions..."
       - uv run --no-sync scripts/pin_vendors.py
       - echo "All dependencies updated"
+      - echo "Updating pre-commit hooks..."
+      - prek autoupdate
 
   update:grammars:
     desc: Update language grammar revisions

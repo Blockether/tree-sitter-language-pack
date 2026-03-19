@@ -1,0 +1,108 @@
+name: CI CLI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ci-cli.yaml'
+      - '.cargo/config.toml'
+      - 'rust-toolchain.toml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'crates/ts-pack-cli/**'
+      - 'crates/ts-pack-core/**'
+      - 'tests/test_apps/cli/**'
+      - 'tests/test_apps/fixtures/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/ci-cli.yaml'
+      - '.cargo/config.toml'
+      - 'rust-toolchain.toml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'crates/ts-pack-cli/**'
+      - 'crates/ts-pack-core/**'
+      - 'tests/test_apps/cli/**'
+      - 'tests/test_apps/fixtures/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-cli-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
+  RUST_BACKTRACE: short
+  BUILD_PROFILE: ci
+
+jobs:
+  build-cli:
+    name: CLI Build & Test (${{ matrix.os }})
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
+    timeout-minutes: 30
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          cache-key-prefix: cli-${{ matrix.os }}
+          use-sccache: true
+
+      - name: Clone grammar vendors
+        shell: bash
+        run: |
+          if command -v node &>/dev/null; then
+            node scripts/clone_vendors.mjs || true
+          fi
+
+      - name: Build CLI (release)
+        shell: bash
+        run: cargo build --release --package ts-pack-cli
+
+      - name: Verify CLI binary exists
+        shell: bash
+        run: |
+          test -f target/release/ts-pack
+          echo "CLI binary built: target/release/ts-pack"
+
+      - name: Smoke test — version
+        shell: bash
+        run: ./target/release/ts-pack --version
+
+      - name: Smoke test — help
+        shell: bash
+        run: ./target/release/ts-pack --help
+
+      - name: Run CLI smoke test script
+        shell: bash
+        run: |
+          chmod +x tests/test_apps/cli/smoke_test.sh
+          TS_PACK_BIN=./target/release/ts-pack tests/test_apps/cli/smoke_test.sh
+
+      - name: Run grammar test (subset)
+        shell: bash
+        run: |
+          chmod +x tests/test_apps/cli/test_all_grammars.sh
+          TS_PACK_BIN=./target/release/ts-pack tests/test_apps/cli/test_all_grammars.sh
+
+      - name: Upload CLI binary (artifact)
+        if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cli-${{ matrix.os }}-${{ github.sha }}
+          path: target/release/ts-pack
+          if-no-files-found: ignore
+          retention-days: 7

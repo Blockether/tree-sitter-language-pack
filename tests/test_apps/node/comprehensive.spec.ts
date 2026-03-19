@@ -17,7 +17,6 @@ function loadFixtures<T>(name: string): T[] {
 	return JSON.parse(readFileSync(resolve(fixturesDir, name), "utf-8"));
 }
 
-
 describe("process tests", () => {
 	beforeAll(() => {
 		download(["python", "javascript", "rust", "go"]);
@@ -34,14 +33,10 @@ describe("process tests", () => {
 				expect(result.language).toBe(expected.language);
 			}
 			if ("structure_min" in expected) {
-				expect(result.structure.length).toBeGreaterThanOrEqual(
-					expected.structure_min as number,
-				);
+				expect(result.structure.length).toBeGreaterThanOrEqual(expected.structure_min as number);
 			}
 			if ("imports_min" in expected) {
-				expect(result.imports.length).toBeGreaterThanOrEqual(
-					expected.imports_min as number,
-				);
+				expect(result.imports.length).toBeGreaterThanOrEqual(expected.imports_min as number);
 			}
 			if ("error_count" in expected) {
 				expect(result.metrics.errorCount).toBe(expected.error_count);
@@ -59,9 +54,7 @@ describe("chunking tests", () => {
 			const expected = fixture.expected;
 
 			if ("chunks_min" in expected) {
-				expect(result.chunks.length).toBeGreaterThanOrEqual(
-					expected.chunks_min as number,
-				);
+				expect(result.chunks.length).toBeGreaterThanOrEqual(expected.chunks_min as number);
 			}
 		});
 	}

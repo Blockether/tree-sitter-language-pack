@@ -81,7 +81,6 @@ describe("smoke tests", () => {
 	});
 
 	describe("download API", () => {
-
 		it("exposes all download functions", async () => {
 			const functions = [
 				"init",

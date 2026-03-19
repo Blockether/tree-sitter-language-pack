@@ -53,9 +53,7 @@ const isMuslFromReport = () => {
 
 const isMuslFromChildProcess = () => {
 	try {
-		return require("child_process")
-			.execSync("ldd --version", { encoding: "utf8" })
-			.includes("musl");
+		return require("child_process").execSync("ldd --version", { encoding: "utf8" }).includes("musl");
 	} catch (e) {
 		// If we reach this case, we don't know if the system is musl or not, so is better to just fallback to false
 		return false;
@@ -117,9 +115,7 @@ function requireNative() {
 				loadErrors.push(e);
 			}
 		} else {
-			loadErrors.push(
-				new Error(`Unsupported architecture on Android ${process.arch}`),
-			);
+			loadErrors.push(new Error(`Unsupported architecture on Android ${process.arch}`));
 		}
 	} else if (process.platform === "win32") {
 		if (process.arch === "x64") {
@@ -220,9 +216,7 @@ function requireNative() {
 				loadErrors.push(e);
 			}
 		} else {
-			loadErrors.push(
-				new Error(`Unsupported architecture on Windows: ${process.arch}`),
-			);
+			loadErrors.push(new Error(`Unsupported architecture on Windows: ${process.arch}`));
 		}
 	} else if (process.platform === "darwin") {
 		try {
@@ -255,8 +249,7 @@ function requireNative() {
 			}
 			try {
 				const binding = require("@kreuzberg/tree-sitter-language-pack-darwin-x64");
-				const bindingPackageVersion =
-					require("@kreuzberg/tree-sitter-language-pack-darwin-x64/package.json").version;
+				const bindingPackageVersion = require("@kreuzberg/tree-sitter-language-pack-darwin-x64/package.json").version;
 				if (
 					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -278,8 +271,7 @@ function requireNative() {
 			}
 			try {
 				const binding = require("@kreuzberg/tree-sitter-language-pack-darwin-arm64");
-				const bindingPackageVersion =
-					require("@kreuzberg/tree-sitter-language-pack-darwin-arm64/package.json").version;
+				const bindingPackageVersion = require("@kreuzberg/tree-sitter-language-pack-darwin-arm64/package.json").version;
 				if (
 					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -294,9 +286,7 @@ function requireNative() {
 				loadErrors.push(e);
 			}
 		} else {
-			loadErrors.push(
-				new Error(`Unsupported architecture on macOS: ${process.arch}`),
-			);
+			loadErrors.push(new Error(`Unsupported architecture on macOS: ${process.arch}`));
 		}
 	} else if (process.platform === "freebsd") {
 		if (process.arch === "x64") {
@@ -307,8 +297,7 @@ function requireNative() {
 			}
 			try {
 				const binding = require("@kreuzberg/tree-sitter-language-pack-freebsd-x64");
-				const bindingPackageVersion =
-					require("@kreuzberg/tree-sitter-language-pack-freebsd-x64/package.json").version;
+				const bindingPackageVersion = require("@kreuzberg/tree-sitter-language-pack-freebsd-x64/package.json").version;
 				if (
 					bindingPackageVersion !== "1.0.0-rc.11" &&
 					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
@@ -346,9 +335,7 @@ function requireNative() {
 				loadErrors.push(e);
 			}
 		} else {
-			loadErrors.push(
-				new Error(`Unsupported architecture on FreeBSD: ${process.arch}`),
-			);
+			loadErrors.push(new Error(`Unsupported architecture on FreeBSD: ${process.arch}`));
 		}
 	} else if (process.platform === "linux") {
 		if (process.arch === "x64") {
@@ -638,9 +625,7 @@ function requireNative() {
 				loadErrors.push(e);
 			}
 		} else {
-			loadErrors.push(
-				new Error(`Unsupported architecture on Linux: ${process.arch}`),
-			);
+			loadErrors.push(new Error(`Unsupported architecture on Linux: ${process.arch}`));
 		}
 	} else if (process.platform === "openharmony") {
 		if (process.arch === "arm64") {
@@ -713,16 +698,10 @@ function requireNative() {
 				loadErrors.push(e);
 			}
 		} else {
-			loadErrors.push(
-				new Error(`Unsupported architecture on OpenHarmony: ${process.arch}`),
-			);
+			loadErrors.push(new Error(`Unsupported architecture on OpenHarmony: ${process.arch}`));
 		}
 	} else {
-		loadErrors.push(
-			new Error(
-				`Unsupported OS: ${process.platform}, architecture: ${process.arch}`,
-			),
-		);
+		loadErrors.push(new Error(`Unsupported OS: ${process.platform}, architecture: ${process.arch}`));
 	}
 }
 
@@ -755,9 +734,7 @@ if (!nativeBinding || process.env.NAPI_RS_FORCE_WASI) {
 		}
 	}
 	if (process.env.NAPI_RS_FORCE_WASI === "error" && !wasiBinding) {
-		const error = new Error(
-			"WASI binding not found and NAPI_RS_FORCE_WASI is set to error",
-		);
+		const error = new Error("WASI binding not found and NAPI_RS_FORCE_WASI is set to error");
 		error.cause = wasiBindingError;
 		throw error;
 	}

@@ -625,7 +625,7 @@
 	},
 	"scss": {
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-scss",
-		"rev": "bca847c1410f7dd97e13fbe7838b3c2c203fb473"
+		"rev": "554fea6db093c5c370ebdfe30c336fc45da91d30"
 	},
 	"smali": {
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-smali",

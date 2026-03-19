@@ -89,7 +89,7 @@ describe("wasm smoke tests", () => {
 		});
 
 		it("parses Rust code", () => {
-			const tree = parseString("rust", "fn main() { println!(\"hello\"); }\n");
+			const tree = parseString("rust", 'fn main() { println!("hello"); }\n');
 			expect(treeRootNodeType(tree)).toBe("source_file");
 			expect(treeHasErrorNodes(tree)).toBe(false);
 		});
@@ -123,9 +123,7 @@ describe("wasm smoke tests", () => {
 
 				// Verify structure count
 				if (typeof fixture.expected.structure_min === "number") {
-					expect((result.structure || []).length).toBeGreaterThanOrEqual(
-						fixture.expected.structure_min
-					);
+					expect((result.structure || []).length).toBeGreaterThanOrEqual(fixture.expected.structure_min);
 				}
 
 				// Verify error count
@@ -136,15 +134,13 @@ describe("wasm smoke tests", () => {
 				// Verify metrics if present
 				if (fixture.expected.metrics_total_lines_min) {
 					expect(result.metrics?.total_lines || 0).toBeGreaterThanOrEqual(
-						fixture.expected.metrics_total_lines_min as number
+						fixture.expected.metrics_total_lines_min as number,
 					);
 				}
 
 				// Verify imports if expected
 				if (typeof fixture.expected.imports_min === "number") {
-					expect((result.imports || []).length).toBeGreaterThanOrEqual(
-						fixture.expected.imports_min
-					);
+					expect((result.imports || []).length).toBeGreaterThanOrEqual(fixture.expected.imports_min);
 				}
 			});
 		}
@@ -163,9 +159,7 @@ describe("wasm smoke tests", () => {
 
 				// Verify chunks exist and meet minimum count
 				if (typeof fixture.expected.chunks_min === "number") {
-					expect((result.chunks || []).length).toBeGreaterThanOrEqual(
-						fixture.expected.chunks_min
-					);
+					expect((result.chunks || []).length).toBeGreaterThanOrEqual(fixture.expected.chunks_min);
 				}
 			});
 		}
