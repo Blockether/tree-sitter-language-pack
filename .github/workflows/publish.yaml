@@ -22,9 +22,11 @@ on:
         required: false
         type: string
         default: "all"
+  release:
+    types: [published]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.inputs.tag || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.event.inputs.tag || github.event.release.tag_name || github.run_id }}
   cancel-in-progress: false
 
 env:
@@ -42,6 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
+      tag: ${{ steps.meta.outputs.tag }}
       version: ${{ steps.meta.outputs.version }}
       npm_tag: ${{ steps.meta.outputs.npm_tag }}
       dry_run: ${{ steps.meta.outputs.dry_run }}
@@ -62,24 +65,36 @@ jobs:
       - name: Extract version and flags
         id: meta
         run: |
-          version="${{ inputs.tag }}"
-          version="${version#v}"
+          # Resolve tag from workflow_dispatch input or release event
+          if [[ -n "${{ inputs.tag }}" ]]; then
+            tag="${{ inputs.tag }}"
+          elif [[ -n "${{ github.event.release.tag_name }}" ]]; then
+            tag="${{ github.event.release.tag_name }}"
+          else
+            echo "::error::No tag provided"
+            exit 1
+          fi
+          version="${tag#v}"
           if [[ "$version" == *-rc* ]] || [[ "$version" == *-alpha* ]] || [[ "$version" == *-beta* ]] || [[ "$version" == *-pre* ]]; then
             npm_tag="next"
           else
             npm_tag="latest"
           fi
+          # For release events, default to non-dry-run with all targets
+          dry_run="${{ inputs.dry_run || 'false' }}"
+          force_republish="${{ inputs.force_republish || 'false' }}"
           {
+            echo "tag=$tag"
             echo "version=$version"
             echo "npm_tag=$npm_tag"
-            echo "dry_run=${{ inputs.dry_run }}"
-            echo "force_republish=${{ inputs.force_republish }}"
+            echo "dry_run=$dry_run"
+            echo "force_republish=$force_republish"
           } >> "$GITHUB_OUTPUT"
 
       - name: Determine targets
         id: targets
         run: |
-          targets="${{ inputs.targets }}"
+          targets="${{ inputs.targets || 'all' }}"
           for target in crates python node wasm ruby go java elixir c_ffi php csharp homebrew; do
             if [[ "$targets" == "all" || "$targets" == *"$target"* ]]; then
               echo "$target=true" >> "$GITHUB_OUTPUT"
@@ -92,7 +107,7 @@ jobs:
         run: |
           {
             echo "## Release Configuration"
-            echo "- **Tag**: ${{ inputs.tag }}"
+            echo "- **Tag**: ${{ steps.meta.outputs.tag }}"
             echo "- **Version**: ${{ steps.meta.outputs.version }}"
             echo "- **Dry run**: ${{ inputs.dry_run }}"
             echo "- **Force republish**: ${{ inputs.force_republish }}"
@@ -109,7 +124,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Verify Cargo.toml version matches tag
         run: |
@@ -347,13 +362,14 @@ jobs:
   # ─── Clone vendors ────────────────────────────────────────────────
   clone-vendors:
     name: Clone vendors
+    needs: prepare
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -418,7 +434,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -521,7 +537,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -575,7 +591,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -638,7 +654,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -732,7 +748,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -832,7 +848,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -906,7 +922,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -958,7 +974,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -1025,7 +1041,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -1144,7 +1160,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -1222,7 +1238,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -1295,7 +1311,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -1347,7 +1363,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
@@ -1401,7 +1417,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parser binary artifacts
         uses: actions/download-artifact@v8
@@ -1451,8 +1467,8 @@ jobs:
       - name: Upload to GitHub Release
         uses: kreuzberg-dev/actions/publish-github-release@v1
         with:
-          tag: ${{ inputs.tag }}
-          title: "Release ${{ inputs.tag }}"
+          tag: ${{ needs.prepare.outputs.tag }}
+          title: "Release ${{ needs.prepare.outputs.tag }}"
           artifacts: |
             dist/parsers/parsers-*.tar.zst
             dist/parsers/parsers.json
@@ -1477,7 +1493,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download Go FFI artifacts
         uses: actions/download-artifact@v8
@@ -1489,8 +1505,8 @@ jobs:
       - name: Upload to GitHub Release
         uses: kreuzberg-dev/actions/publish-github-release@v1
         with:
-          tag: ${{ inputs.tag }}
-          title: "Release ${{ inputs.tag }}"
+          tag: ${{ needs.prepare.outputs.tag }}
+          title: "Release ${{ needs.prepare.outputs.tag }}"
           artifacts: "dist/go/go-ffi-*.tar.gz"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
@@ -1513,7 +1529,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download C FFI artifacts
         uses: actions/download-artifact@v8
@@ -1525,8 +1541,8 @@ jobs:
       - name: Upload to GitHub Release
         uses: kreuzberg-dev/actions/publish-github-release@v1
         with:
-          tag: ${{ inputs.tag }}
-          title: "Release ${{ inputs.tag }}"
+          tag: ${{ needs.prepare.outputs.tag }}
+          title: "Release ${{ needs.prepare.outputs.tag }}"
           artifacts: "dist/c-ffi/c-ffi-*.tar.gz"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
@@ -1549,7 +1565,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download Elixir NIF artifacts
         uses: actions/download-artifact@v8
@@ -1562,7 +1578,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="${{ inputs.tag }}"
+          TAG="${{ needs.prepare.outputs.tag }}"
           # Ensure release exists (draft)
           gh release view "$TAG" >/dev/null 2>&1 || \
             gh release create "$TAG" --draft --title "Release $TAG"
@@ -1590,7 +1606,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -1689,7 +1705,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -1786,7 +1802,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -1863,7 +1879,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -1967,7 +1983,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Re-check Maven Central before publish
         id: recheck
@@ -2042,7 +2058,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
           fetch-depth: 0
 
       - name: Generate checksums from GitHub release
@@ -2110,7 +2126,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download PHP extension artifacts
         uses: actions/download-artifact@v8
@@ -2159,7 +2175,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
@@ -2242,7 +2258,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -2317,7 +2333,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download CLI artifacts
         uses: actions/download-artifact@v8
@@ -2329,8 +2345,8 @@ jobs:
       - name: Upload to GitHub Release
         uses: kreuzberg-dev/actions/publish-github-release@v1
         with:
-          tag: ${{ inputs.tag }}
-          title: "Release ${{ inputs.tag }}"
+          tag: ${{ needs.prepare.outputs.tag }}
+          title: "Release ${{ needs.prepare.outputs.tag }}"
           artifacts: |
             dist/cli/ts-pack-*.tar.gz
             dist/cli/ts-pack-*.zip
@@ -2351,7 +2367,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -2438,7 +2454,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download bottle artifacts
         uses: actions/download-artifact@v8
@@ -2449,8 +2465,8 @@ jobs:
       - name: Upload to GitHub Release
         uses: kreuzberg-dev/actions/publish-github-release@v1
         with:
-          tag: ${{ inputs.tag }}
-          title: "Release ${{ inputs.tag }}"
+          tag: ${{ needs.prepare.outputs.tag }}
+          title: "Release ${{ needs.prepare.outputs.tag }}"
           artifacts: "dist/homebrew/ts-pack-*.bottle.tar.gz"
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
@@ -2472,7 +2488,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download bottle artifacts
         uses: actions/download-artifact@v8
@@ -2495,7 +2511,7 @@ jobs:
           bottles-dir: dist/homebrew
           formula-name: ts-pack
           tap-repo: kreuzberg-dev/homebrew-tap
-          tag: ${{ inputs.tag }}
+          tag: ${{ needs.prepare.outputs.tag }}
           version: ${{ needs.prepare.outputs.version }}
           github-repo: kreuzberg-dev/tree-sitter-language-pack
           dry-run: ${{ needs.prepare.outputs.dry_run }}
@@ -2518,7 +2534,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -2542,8 +2558,8 @@ jobs:
         with:
           images: ghcr.io/kreuzberg-dev/ts-pack
           tags: |
-            type=semver,pattern={{version}},value=${{ inputs.tag }}
-            type=raw,value=latest,enable=${{ !contains(inputs.tag, '-') }}
+            type=semver,pattern={{version}},value=${{ needs.prepare.outputs.tag }}
+            type=raw,value=latest,enable=${{ !contains(needs.prepare.outputs.tag, '-') }}
 
       - name: Build and push
         uses: docker/build-push-action@v7
@@ -2599,7 +2615,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.prepare.outputs.tag }}
           fetch-depth: 0
 
       - name: Setup Git credentials
@@ -2621,7 +2637,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="${{ inputs.tag }}"
+          TAG="${{ needs.prepare.outputs.tag }}"
           # Mark release as non-draft if it exists
           gh release edit "$TAG" --draft=false 2>/dev/null || \
             gh release create "$TAG" --title "Release $TAG" --generate-notes 2>/dev/null || \
@@ -2714,7 +2730,7 @@ jobs:
             done
 
             echo ""
-            echo "- **Tag**: ${{ inputs.tag }}"
+            echo "- **Tag**: ${{ needs.prepare.outputs.tag }}"
             echo "- **Version**: ${{ needs.prepare.outputs.version }}"
             echo "- **Dry run**: ${{ inputs.dry_run }}"
             echo "- **Force republish**: ${{ inputs.force_republish }}"
