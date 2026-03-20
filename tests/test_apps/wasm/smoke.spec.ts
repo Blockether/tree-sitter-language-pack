@@ -12,6 +12,7 @@ import init, {
 } from "@kreuzberg/tree-sitter-language-pack-wasm";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { createRequire } from "node:module";
 
 interface BasicFixture {
 	name: string;
@@ -38,8 +39,12 @@ function loadFixtures<T>(name: string): T[] {
 
 describe("wasm smoke tests", () => {
 	beforeAll(async () => {
-		await init();
+		const require = createRequire(import.meta.url);
+		const wasmPath = require.resolve("@kreuzberg/tree-sitter-language-pack-wasm/ts_pack_wasm_bg.wasm");
+		const wasmBytes = readFileSync(wasmPath);
+		await init(wasmBytes);
 	});
+
 	describe("basic fixtures", () => {
 		const fixtures = loadFixtures<BasicFixture>("basic.json");
 
@@ -112,33 +117,27 @@ describe("wasm smoke tests", () => {
 			it(fixture.name, () => {
 				const result = process(fixture.source, fixture.config);
 
-				// Check if result is a valid object
 				expect(result).toBeTruthy();
 				expect(typeof result).toBe("object");
 
-				// Verify language matches
 				if (fixture.expected.language) {
 					expect(result.language).toBe(fixture.expected.language);
 				}
 
-				// Verify structure count
 				if (typeof fixture.expected.structure_min === "number") {
 					expect((result.structure || []).length).toBeGreaterThanOrEqual(fixture.expected.structure_min);
 				}
 
-				// Verify error count
 				if (typeof fixture.expected.error_count === "number") {
 					expect(result.error_count || 0).toBe(fixture.expected.error_count);
 				}
 
-				// Verify metrics if present
 				if (fixture.expected.metrics_total_lines_min) {
 					expect(result.metrics?.total_lines || 0).toBeGreaterThanOrEqual(
 						fixture.expected.metrics_total_lines_min as number,
 					);
 				}
 
-				// Verify imports if expected
 				if (typeof fixture.expected.imports_min === "number") {
 					expect((result.imports || []).length).toBeGreaterThanOrEqual(fixture.expected.imports_min);
 				}
@@ -153,11 +152,9 @@ describe("wasm smoke tests", () => {
 			it(fixture.name, () => {
 				const result = process(fixture.source, fixture.config);
 
-				// Check if result is a valid object
 				expect(result).toBeTruthy();
 				expect(typeof result).toBe("object");
 
-				// Verify chunks exist and meet minimum count
 				if (typeof fixture.expected.chunks_min === "number") {
 					expect((result.chunks || []).length).toBeGreaterThanOrEqual(fixture.expected.chunks_min);
 				}

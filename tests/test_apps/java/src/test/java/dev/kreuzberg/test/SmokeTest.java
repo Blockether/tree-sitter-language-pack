@@ -22,13 +22,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class SmokeTest {
 
     private static final Gson GSON = new Gson();
+    private static final Type MAP_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
     private static final Path FIXTURES_DIR = Path.of("..", "fixtures");
     private static TsPackRegistry registry;
 
     @BeforeAll
     static void setup() {
         registry = new TsPackRegistry();
-        registry.download(List.of("python", "javascript", "rust", "go", "ruby", "java", "c", "cpp"));
+        TsPackRegistry.download(List.of("python", "javascript", "rust", "go", "ruby", "java", "c", "cpp"));
     }
 
     @AfterAll
@@ -43,6 +44,11 @@ class SmokeTest {
         String json = Files.readString(FIXTURES_DIR.resolve(name));
         Type type = new TypeToken<List<Map<String, Object>>>() {}.getType();
         return GSON.fromJson(json, type);
+    }
+
+    private Map<String, Object> processAndParse(String source, String configJson) {
+        String resultJson = registry.process(source, configJson);
+        return GSON.fromJson(resultJson, MAP_TYPE);
     }
 
     @TestFactory
@@ -96,7 +102,7 @@ class SmokeTest {
                 Map<String, Object> expected = (Map<String, Object>) fixture.get("expected");
 
                 String configJson = GSON.toJson(configMap);
-                Map<String, Object> result = registry.process(source, configJson);
+                Map<String, Object> result = processAndParse(source, configJson);
 
                 if (expected.containsKey("language")) {
                     assertEquals(expected.get("language"), result.get("language"));
@@ -148,7 +154,7 @@ class SmokeTest {
                 Map<String, Object> expected = (Map<String, Object>) fixture.get("expected");
 
                 String configJson = GSON.toJson(configMap);
-                Map<String, Object> result = registry.process(source, configJson);
+                Map<String, Object> result = processAndParse(source, configJson);
 
                 if (expected.containsKey("chunks_min")) {
                     @SuppressWarnings("unchecked")
@@ -163,27 +169,27 @@ class SmokeTest {
 
     @Test
     void downloadedLanguagesReturnsArray() {
-        List<String> langs = registry.downloadedLanguages();
+        List<String> langs = TsPackRegistry.downloadedLanguages();
         assertNotNull(langs);
     }
 
     @Test
     void manifestLanguagesReturnsArrayWith50Plus() {
-        List<String> langs = registry.manifestLanguages();
+        List<String> langs = TsPackRegistry.manifestLanguages();
         assertNotNull(langs);
         assertTrue(langs.size() > 50, "manifestLanguages should return 50+ languages");
     }
 
     @Test
     void cacheDirReturnsNonEmptyString() {
-        String dir = registry.cacheDir();
+        String dir = TsPackRegistry.cacheDir();
         assertNotNull(dir);
         assertFalse(dir.isEmpty(), "cacheDir should return non-empty string");
     }
 
     @Test
     void initDoesNotThrow() {
-        assertDoesNotThrow(() -> registry.init());
+        assertDoesNotThrow(() -> TsPackRegistry.init("{}"));
     }
 
     @Test

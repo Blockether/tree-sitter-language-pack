@@ -15,7 +15,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 tree-sitter-language-pack = { path = "../ts-pack-core", default-features = false, features = [
-    "web",
+    "all",
     "serde",
 ] }
 serde_json = { workspace = true }

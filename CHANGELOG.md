@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc.16] - 2026-03-20
+
+### Fixed
+
+- Elixir: RustlerPrecompiled `Mix.Project.config()[:version]` returns nil at compile time — use `@version` module attribute instead
+- Elixir: CI compilation fails with `cargo metadata` error — add `skip_compilation?` when NIF is pre-staged
+- Elixir: version sync now covers `tree_sitter_language_pack.ex` module attribute
+- WASM: bundle all 165+ parsers (changed feature from `web` to `all`)
+- WASM: Node.js test loading — read `.wasm` binary from disk instead of `fetch()`
+- Java test app: align with binding API — `process()` returns JSON string, static methods for `download()`/`init()`
+- Go test app: add to `go.work` for local module resolution
+- C# test app: update target framework from `net8.0` to `net10.0`
+
 ## [1.0.0-rc.15] - 2026-03-20
 
 ### Fixed
