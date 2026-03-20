@@ -984,7 +984,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '25.0.2'
+          java-version: '25.0.2+10'
           cache: 'maven'
 
       - name: Setup Maven
@@ -2013,7 +2013,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '25.0.2'
+          java-version: '25.0.2+10'
           cache: maven
           server-id: ossrh
           server-username: MAVEN_USERNAME
@@ -2070,9 +2070,6 @@ jobs:
           ref: ${{ needs.prepare.outputs.tag }}
           fetch-depth: 0
 
-      - name: Generate checksums from GitHub release
-        run: ./scripts/publish/elixir/generate_checksums.sh "${{ needs.prepare.outputs.version }}"
-
       - name: Setup Elixir
         uses: erlef/setup-elixir@v1
         with:
@@ -2088,6 +2085,10 @@ jobs:
       - name: Install Elixir dependencies
         working-directory: crates/ts-pack-elixir
         run: mix deps.get
+
+      - name: Generate checksums from GitHub release
+        working-directory: crates/ts-pack-elixir
+        run: mix rustler_precompiled.download TreeSitterLanguagePack --all --print
 
       - name: Compile project
         working-directory: crates/ts-pack-elixir

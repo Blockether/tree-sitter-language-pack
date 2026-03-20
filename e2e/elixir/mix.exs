@@ -14,7 +14,8 @@ defmodule E2eTests.MixProject do
 
   defp deps do
     [
-      {:tree_sitter_language_pack, path: "../../crates/ts-pack-elixir"}
+      {:tree_sitter_language_pack, path: "../../crates/ts-pack-elixir"},
+      {:rustler, ">= 0.0.0", optional: true, runtime: false}
     ]
   end
 end
