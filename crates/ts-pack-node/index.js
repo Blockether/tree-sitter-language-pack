@@ -241,29 +241,7 @@ function requireNative() {
 		} catch (e) {
 			loadErrors.push(e);
 		}
-		if (process.arch === "x64") {
-			try {
-				return require("./ts-pack-node.darwin-x64.node");
-			} catch (e) {
-				loadErrors.push(e);
-			}
-			try {
-				const binding = require("@kreuzberg/tree-sitter-language-pack-darwin-x64");
-				const bindingPackageVersion = require("@kreuzberg/tree-sitter-language-pack-darwin-x64/package.json").version;
-				if (
-					bindingPackageVersion !== "1.0.0-rc.11" &&
-					process.env.NAPI_RS_ENFORCE_VERSION_CHECK &&
-					process.env.NAPI_RS_ENFORCE_VERSION_CHECK !== "0"
-				) {
-					throw new Error(
-						`Native binding package version mismatch, expected 1.0.0-rc.11 but got ${bindingPackageVersion}. You can reinstall dependencies to fix this issue.`,
-					);
-				}
-				return binding;
-			} catch (e) {
-				loadErrors.push(e);
-			}
-		} else if (process.arch === "arm64") {
+		if (process.arch === "arm64") {
 			try {
 				return require("./ts-pack-node.darwin-arm64.node");
 			} catch (e) {

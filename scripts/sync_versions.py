@@ -464,7 +464,6 @@ def main() -> None:
         # Node.js platform-specific packages
         (repo_root / "crates/ts-pack-node/npm/linux-x64-gnu/package.json", "package_json"),
         (repo_root / "crates/ts-pack-node/npm/linux-arm64-gnu/package.json", "package_json"),
-        (repo_root / "crates/ts-pack-node/npm/darwin-x64/package.json", "package_json"),
         (repo_root / "crates/ts-pack-node/npm/darwin-arm64/package.json", "package_json"),
         (repo_root / "crates/ts-pack-node/npm/win32-x64-msvc/package.json", "package_json"),
         # Test app manifests — update dependency versions (not package versions)

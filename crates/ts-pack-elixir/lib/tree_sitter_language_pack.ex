@@ -40,7 +40,7 @@ defmodule TreeSitterLanguagePack do
     base_url:
       "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v#{Mix.Project.config()[:version]}",
     version: Mix.Project.config()[:version],
-    force_build: System.get_env("TSLP_BUILD") in ["1", "true"] or Mix.env() in [:test, :dev],
+    force_build: System.get_env("TSLP_BUILD") in ["1", "true"],
     targets: ~w(
       aarch64-apple-darwin
       aarch64-unknown-linux-gnu

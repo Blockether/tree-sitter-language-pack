@@ -221,3 +221,4 @@ jobs:
         run: task elixir:e2e:test
         env:
           PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_BUILD: "1"

@@ -1,6 +1,6 @@
 {
 	"name": "@kreuzberg/tree-sitter-language-pack",
-	"version": "1.0.0-rc.13",
+	"version": "1.0.0-rc.14",
 	"description": "Tree-sitter language pack - pre-compiled parsers for 170+ languages (Node.js NAPI bindings)",
 	"main": "index.js",
 	"types": "index.d.ts",
@@ -12,7 +12,6 @@
 	"napi": {
 		"binaryName": "ts-pack-node",
 		"targets": [
-			"x86_64-apple-darwin",
 			"aarch64-apple-darwin",
 			"x86_64-unknown-linux-gnu",
 			"aarch64-unknown-linux-gnu",
@@ -48,8 +47,9 @@
 		"@napi-rs/cli": "^3.5.0"
 	},
 	"optionalDependencies": {
-		"@kreuzberg/tree-sitter-language-pack-darwin-arm64": "1.0.0-rc.13",
-		"@kreuzberg/tree-sitter-language-pack-linux-x64-gnu": "1.0.0-rc.13",
-		"@kreuzberg/tree-sitter-language-pack-win32-x64-msvc": "1.0.0-rc.13"
+		"@kreuzberg/tree-sitter-language-pack-darwin-arm64": "1.0.0-rc.14",
+		"@kreuzberg/tree-sitter-language-pack-linux-x64-gnu": "1.0.0-rc.14",
+		"@kreuzberg/tree-sitter-language-pack-linux-arm64-gnu": "1.0.0-rc.14",
+		"@kreuzberg/tree-sitter-language-pack-win32-x64-msvc": "1.0.0-rc.14"
 	}
 }

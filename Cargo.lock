@@ -988,9 +988,9 @@ dependencies = [
 
 [[package]]
 name = "itoa"
-version = "1.0.17"
+version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92ecc6618181def0457392ccd0ee51198e065e016d1d527a7ac1b6dc7c1f09d2"
+checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
 name = "jobserver"
@@ -1948,7 +1948,7 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "snippet-runner"
-version = "1.0.0-rc.13"
+version = "1.0.0-rc.14"
 dependencies = [
  "clap",
  "rayon",
@@ -1992,9 +1992,9 @@ dependencies = [
 
 [[package]]
 name = "tar"
-version = "0.4.44"
+version = "0.4.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d863878d212c87a19c1a610eb53bb01fe12951c0501cf5a0d65f724914a667a"
+checksum = "22692a6476a21fa75fdfc11d452fda482af402c008cdbaf3476414e122040973"
 dependencies = [
  "filetime",
  "libc",
@@ -2145,7 +2145,7 @@ checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.0.0-rc.13"
+version = "1.0.0-rc.14"
 dependencies = [
  "cc",
  "dirs",
@@ -2163,7 +2163,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-cli"
-version = "1.0.0-rc.13"
+version = "1.0.0-rc.14"
 dependencies = [
  "clap",
  "clap_complete",
@@ -2173,7 +2173,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-elixir"
-version = "1.0.0-rc.13"
+version = "1.0.0-rc.14"
 dependencies = [
  "rustler",
  "serde_json",
@@ -2183,7 +2183,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-ffi"
-version = "1.0.0-rc.13"
+version = "1.0.0-rc.14"
 dependencies = [
  "cbindgen",
  "serde_json",
@@ -2193,7 +2193,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-node"
-version = "1.0.0-rc.13"
+version = "1.0.0-rc.14"
 dependencies = [
  "napi",
  "napi-build",
@@ -2205,7 +2205,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-php"
-version = "1.0.0-rc.13"
+version = "1.0.0-rc.14"
 dependencies = [
  "ext-php-rs",
  "serde_json",
@@ -2214,7 +2214,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-python"
-version = "1.0.0-rc.13"
+version = "1.0.0-rc.14"
 dependencies = [
  "pyo3",
  "serde_json",
@@ -2224,7 +2224,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-ruby"
-version = "1.0.0-rc.13"
+version = "1.0.0-rc.14"
 dependencies = [
  "magnus",
  "rb-sys",
@@ -2235,7 +2235,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-wasm"
-version = "1.0.0-rc.13"
+version = "1.0.0-rc.14"
 dependencies = [
  "js-sys",
  "serde_json",
