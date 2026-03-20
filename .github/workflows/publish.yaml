@@ -2077,7 +2077,13 @@ jobs:
         uses: erlef/setup-elixir@v1
         with:
           elixir-version: "1.17"
-          otp-version: "26"
+          otp-version: "27.2"
+          version-type: strict
+
+      - name: Install Hex and Rebar
+        run: |
+          mix local.hex --force
+          mix local.rebar --force
 
       - name: Install Elixir dependencies
         working-directory: crates/ts-pack-elixir
@@ -2561,6 +2567,9 @@ jobs:
         with:
           name: language-parsers
           path: parsers
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4

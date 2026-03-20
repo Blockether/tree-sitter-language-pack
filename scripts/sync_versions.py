@@ -170,6 +170,31 @@ def update_gemspec(file_path: Path, version: str) -> tuple[bool, str, str]:
     return False, old_version, gem_version
 
 
+def update_napi_index_js(file_path: Path, version: str) -> tuple[bool, str, str]:
+    """Update hardcoded version strings in NAPI-RS auto-generated index.js."""
+    content = file_path.read_text()
+    original_content = content
+
+    # Find current hardcoded version (first occurrence of the version check pattern)
+    match = re.search(
+        r'bindingPackageVersion !== "([^"]+)"',
+        content,
+    )
+    old_version = match.group(1) if match else "NOT FOUND"
+
+    if old_version == version:
+        return False, old_version, version
+
+    # Replace all occurrences of the old version with the new version
+    content = content.replace(f'"{old_version}"', f'"{version}"')
+
+    if content != original_content:
+        file_path.write_text(content)
+        return True, old_version, version
+
+    return False, old_version, version
+
+
 def update_composer_json(file_path: Path, version: str) -> tuple[bool, str, str]:
     """Update Composer composer.json version field."""
     content = json.loads(file_path.read_text())
@@ -457,6 +482,7 @@ def main() -> None:
         (repo_root / "crates/ts-pack-elixir/mix.exs", "mix_exs"),
         (repo_root / "crates/ts-pack-java/pom.xml", "pom_xml"),
         (repo_root / "crates/ts-pack-ruby/tree_sitter_language_pack.gemspec", "gemspec"),
+        (repo_root / "crates/ts-pack-node/index.js", "napi_index_js"),
         (repo_root / "crates/ts-pack-wasm/Cargo.toml", "cargo_toml_version"),
         (repo_root / "composer.json", "composer_json"),
         (repo_root / "packages/php/composer.json", "composer_json"),
@@ -491,6 +517,7 @@ def main() -> None:
         "mix_exs": update_mix_exs,
         "pom_xml": update_pom_xml,
         "gemspec": update_gemspec,
+        "napi_index_js": update_napi_index_js,
         "cargo_toml_version": update_cargo_toml_version,
         "composer_json": update_composer_json,
         "csproj": update_csproj,

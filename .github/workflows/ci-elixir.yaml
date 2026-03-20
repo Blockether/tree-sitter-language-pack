@@ -213,6 +213,19 @@ jobs:
           mkdir -p crates/ts-pack-elixir/priv/native
           cp target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
 
+      - name: Cache Elixir dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            crates/ts-pack-elixir/deps
+            crates/ts-pack-elixir/_build
+          key: elixir-deps-${{ runner.os }}-${{ hashFiles('crates/ts-pack-elixir/mix.lock') }}
+          restore-keys: |
+            elixir-deps-${{ runner.os }}-
+
+      - name: Install Elixir dependencies
+        run: task elixir:deps
+
       - name: Generate E2E tests
         run: task elixir:e2e:generate
         env:
@@ -224,3 +237,4 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_BUILD: "1"
+          MIX_ENV: test

@@ -156,7 +156,7 @@ jobs:
 
       - name: Build native module
         working-directory: crates/ts-pack-node
-        run: napi build --release
+        run: napi build --release --platform --target ${{ matrix.target }}
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
