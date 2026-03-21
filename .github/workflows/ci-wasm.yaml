@@ -48,6 +48,7 @@ env:
   CARGO_PROFILE_DEV_DEBUG: 0
   RUST_BACKTRACE: short
   BUILD_PROFILE: ci
+  TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"
 
 jobs:
 
@@ -122,7 +123,7 @@ jobs:
         with:
           target: wasm32-unknown-unknown
           components: ""
-          use-sccache: "false"
+          use-sccache: "true"
           install-llvm-cov: "false"
 
       - name: Install wasm-pack
@@ -198,7 +199,7 @@ jobs:
         with:
           target: wasm32-unknown-unknown
           components: ""
-          use-sccache: "false"
+          use-sccache: "true"
           install-llvm-cov: "false"
 
       - name: Install wasm-pack

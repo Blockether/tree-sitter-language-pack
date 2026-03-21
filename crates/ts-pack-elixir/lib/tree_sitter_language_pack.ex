@@ -45,7 +45,7 @@ defmodule TreeSitterLanguagePack do
       "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v#{@version}",
     version: @version,
     force_build: @force_build,
-    skip_compilation?: @force_build,
+    skip_compilation?: not @force_build,
     targets: ~w(
       aarch64-apple-darwin
       aarch64-unknown-linux-gnu

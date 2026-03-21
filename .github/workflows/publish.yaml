@@ -1752,39 +1752,29 @@ jobs:
       - name: Re-check npm before publish
         if: ${{ !inputs.dry_run }}
         id: recheck
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack/$VERSION")
-          if [[ "$STATUS" == "200" ]]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::Package already on npm; skipping publish."
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/tree-sitter-language-pack"
+          version: ${{ needs.prepare.outputs.version }}
 
       - name: Publish platform packages to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        working-directory: crates/ts-pack-node
-        run: |
-          TAG="${{ needs.prepare.outputs.npm_tag }}"
-          for pkg_dir in npm/*/; do
-            if [[ -f "$pkg_dir/package.json" ]] && find "$pkg_dir" -name '*.node' -print -quit | grep -q .; then
-              echo "Publishing $(basename "$pkg_dir") with tag $TAG..."
-              cd "$pkg_dir"
-              npm publish --access public --tag "$TAG" || echo "  (already published or failed)"
-              cd ../..
-            else
-              echo "Skipping $(basename "$pkg_dir") (no .node binary)"
-            fi
-          done
+        uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          packages-dir: crates/ts-pack-node/npm
+          npm-tag: ${{ needs.prepare.outputs.npm_tag }}
+          dry-run: ${{ inputs.dry_run }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish main package to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
-        working-directory: crates/ts-pack-node
-        run: npm publish --access public --tag "${{ needs.prepare.outputs.npm_tag }}"
+        uses: kreuzberg-dev/actions/publish-npm@v1
+        with:
+          package-dir: crates/ts-pack-node
+          npm-tag: ${{ needs.prepare.outputs.npm_tag }}
+          dry-run: ${{ inputs.dry_run }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -1834,16 +1824,11 @@ jobs:
       - name: Re-check npm before publish
         if: ${{ !inputs.dry_run }}
         id: recheck
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://registry.npmjs.org/@kreuzberg%2Ftree-sitter-language-pack-wasm/$VERSION")
-          if [[ "$STATUS" == "200" ]]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::WASM package already on npm; skipping publish."
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: npm
+          package: "@kreuzberg/tree-sitter-language-pack-wasm"
+          version: ${{ needs.prepare.outputs.version }}
 
       - name: Publish to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
@@ -1939,30 +1924,11 @@ jobs:
       - name: Re-check RubyGems before publish
         if: ${{ !inputs.dry_run }}
         id: recheck
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          RUBY_VERSION="${VERSION//-/.}"
-          RESPONSE=$(curl -s --connect-timeout 10 --max-time 30 \
-            -w "\n%{http_code}" \
-            "https://rubygems.org/api/v1/versions/tree_sitter_language_pack.json")
-          STATUS=$(echo "$RESPONSE" | tail -1)
-          BODY=$(echo "$RESPONSE" | sed '$d')
-          if [[ "$STATUS" == "200" ]]; then
-            if echo "$BODY" | python3 -c "
-          import sys, json
-          versions = json.load(sys.stdin)
-          target = '$RUBY_VERSION'
-          found = any(v.get('number') == target for v in versions)
-          print('true' if found else 'false')
-          " 2>/dev/null | grep -q "true"; then
-              echo "exists=true" >> "$GITHUB_OUTPUT"
-              echo "::notice::Gem already published; skipping."
-            else
-              echo "exists=false" >> "$GITHUB_OUTPUT"
-            fi
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: rubygems
+          package: tree_sitter_language_pack
+          version: ${{ needs.prepare.outputs.version }}
 
       - name: Configure trusted publishing credentials
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
@@ -1997,16 +1963,11 @@ jobs:
       - name: Re-check Maven Central before publish
         id: recheck
         if: ${{ !inputs.dry_run }}
-        run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://repo1.maven.org/maven2/dev/kreuzberg/tree-sitter-language-pack/$VERSION/")
-          if [[ "$STATUS" == "200" ]]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::Maven package already published; skipping."
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: maven
+          package: tree-sitter-language-pack
+          version: ${{ needs.prepare.outputs.version }}
 
       - name: Setup Java
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
@@ -2097,16 +2058,11 @@ jobs:
 
       - name: Re-check Hex.pm before publish
         id: recheck
-        run: |
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-            --retry 3 --retry-delay 5 --connect-timeout 30 --max-time 60 \
-            "https://hex.pm/api/packages/tree_sitter_language_pack/releases/${{ needs.prepare.outputs.version }}")
-          if [ "$HTTP_CODE" = "200" ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-            echo "Package already exists on Hex.pm -- skipping publish"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: hex
+          package: tree_sitter_language_pack
+          version: ${{ needs.prepare.outputs.version }}
 
       - name: Publish to Hex.pm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}

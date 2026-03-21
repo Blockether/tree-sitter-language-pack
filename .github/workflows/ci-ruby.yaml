@@ -135,7 +135,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true
           working-directory: crates/ts-pack-ruby
 
       - name: Install Ruby dependencies
@@ -183,7 +182,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
-          bundler-cache: true
           working-directory: crates/ts-pack-ruby
 
       - name: Build native extension
