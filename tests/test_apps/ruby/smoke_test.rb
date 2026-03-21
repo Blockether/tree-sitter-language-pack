@@ -2,6 +2,10 @@ require "json"
 require "tree_sitter_language_pack"
 
 RSpec.describe "TreeSitterLanguagePack smoke tests" do
+  before(:all) do
+    TreeSitterLanguagePack.download(["python", "javascript", "rust", "go", "ruby", "java", "c", "cpp"])
+  end
+
   fixtures_dir = File.expand_path("../fixtures", __dir__)
   basic_fixtures = JSON.parse(File.read(File.join(fixtures_dir, "basic.json")))
 

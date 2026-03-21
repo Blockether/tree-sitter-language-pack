@@ -45,6 +45,11 @@ if LANGS=$($BINARY list --manifest 2>&1 | wc -l) && [ "$LANGS" -ge 100 ]; then
   RESULT=$(echo "def hello(): pass" | $BINARY process - --language python --structure)
   echo "$RESULT" | grep -q '"language"' && echo "  PASS: process returns JSON with language"
 
+  # 7.5. process with chunking
+  echo "--- process with chunking ---"
+  CHUNKS=$(printf "def a():\n    pass\n\ndef b():\n    pass\n\ndef c():\n    pass\n" | $BINARY process - --language python --structure --chunk-size 30)
+  echo "$CHUNKS" | grep -q '"chunks"' && echo "  PASS: process with chunking returns chunks"
+
   # 8. clean
   echo "--- clean ---"
   $BINARY clean --force

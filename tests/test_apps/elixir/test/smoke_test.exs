@@ -3,6 +3,12 @@ defmodule SmokeTest do
 
   @fixtures_dir Path.join([__DIR__, "..", "..", "fixtures"])
 
+  setup_all do
+    config = Jason.encode!(%{"languages" => ["python", "javascript", "rust", "go", "ruby", "java", "c", "cpp"]})
+    :ok = TreeSitterLanguagePack.init(config)
+    :ok
+  end
+
   defp load_fixtures(name) do
     @fixtures_dir
     |> Path.join(name)

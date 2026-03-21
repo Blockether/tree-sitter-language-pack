@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-03-21
+
+### Changed
+
+- Docker: separated publish-docker workflow from main publish (180-minute timeout for multiplatform builds)
+- Docker: publish-docker now triggers on `release` events and includes full smoke tests before push
+- Test apps: all bindings now download languages before running tests (Ruby, Go, Elixir)
+- Test apps: Rust test app adds parse_string validation tests
+- Test apps: CLI smoke test adds chunking test
+- Test apps: added Homebrew smoke test suite
+
+### Fixed
+
+- npm publish auth, Elixir NIF build, Ruby CI, WASM timeout (rc.17)
+- CI: Elixir checksum, version sync improvements (rc.17)
+- Rust test app: VERSION const updated from rc.11 to match actual dependency
+
+## [1.0.0-rc.17] - 2026-03-21
+
+### Fixed
+
+- npm: publish authentication and registry configuration
+- Elixir: NIF binary build and checksum generation
+- Ruby: CI workflow fixes
+- WASM: test timeout increased
+
 ## [1.0.0-rc.16] - 2026-03-20
 
 ### Fixed

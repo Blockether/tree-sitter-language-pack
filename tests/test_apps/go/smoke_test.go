@@ -9,6 +9,17 @@ import (
 	tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
 )
 
+func TestMain(m *testing.M) {
+	// Initialize required languages before running tests
+	configJSON := `{"languages":["python","javascript","rust","go","ruby","java","c","cpp"]}`
+	if err := tslp.Init(configJSON); err != nil {
+		panic(err)
+	}
+
+	// Run tests
+	os.Exit(m.Run())
+}
+
 type BasicFixture struct {
 	Name             string   `json:"name"`
 	Test             string   `json:"test"`

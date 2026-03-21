@@ -1,11 +1,11 @@
 use serde::Deserialize;
 use std::fs;
 use tree_sitter_language_pack::{
-    cache_dir, downloaded_languages, manifest_languages, DownloadManager, LanguageRegistry,
-    ProcessConfig,
+    cache_dir, downloaded_languages, manifest_languages, parse_string, tree_has_error_nodes,
+    DownloadManager, LanguageRegistry, ProcessConfig,
 };
 
-const VERSION: &str = "1.0.0-rc.11";
+const VERSION: &str = "1.0.0-rc.17";
 
 #[derive(Deserialize)]
 struct BasicFixture {
@@ -226,6 +226,51 @@ fn run_download_api_tests() {
     }
 }
 
+fn run_parse_validation_tests() {
+    // Test: parse_string with valid Python code
+    let python_code = b"def hello(): pass\n";
+    let result = parse_string("python", python_code);
+    assert!(
+        result.is_ok(),
+        "parse_string('python', code) should succeed"
+    );
+    let tree = result.unwrap();
+    let root_node = tree.root_node();
+
+    // Validate root node type is "module"
+    assert_eq!(
+        root_node.kind(),
+        "module",
+        "Root node type should be 'module' for Python code"
+    );
+    println!("  PASS: python_parse_root_type_is_module");
+
+    // Validate child count >= 1
+    let child_count = root_node.child_count();
+    assert!(
+        child_count >= 1,
+        "Root node should have at least 1 child, got {}",
+        child_count
+    );
+    println!("  PASS: python_parse_child_count_min (count={})", child_count);
+
+    // Validate no error nodes
+    let has_errors = tree_has_error_nodes(&tree);
+    assert!(
+        !has_errors,
+        "Parse tree should not contain error nodes for valid code"
+    );
+    println!("  PASS: python_parse_no_error_nodes");
+
+    // Test: parse_string with invalid language should fail
+    let invalid_lang_result = parse_string("nonexistent_xyz_123", b"some code");
+    assert!(
+        invalid_lang_result.is_err(),
+        "parse_string() with invalid language should return Err"
+    );
+    println!("  PASS: parse_string_invalid_language_returns_err");
+}
+
 fn run_error_handling_tests(registry: &LanguageRegistry) {
     // Test: invalid language throws an error from process()
     let config = ProcessConfig::new("nonexistent_xyz_123");
@@ -247,6 +292,9 @@ fn main() {
 
     println!("\n=== Basic Tests ===");
     run_basic_tests(&registry);
+
+    println!("\n=== Parse Validation Tests ===");
+    run_parse_validation_tests();
 
     println!("\n=== Process Tests ===");
     run_process_tests(&registry, "../fixtures/process.json");
