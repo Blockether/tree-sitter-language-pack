@@ -2048,13 +2048,12 @@ jobs:
           mix local.hex --force
           mix local.rebar --force
 
+      - name: Generate checksums from GitHub release
+        run: ./scripts/publish/elixir/generate_checksums.sh "${{ needs.prepare.outputs.version }}"
+
       - name: Install Elixir dependencies
         working-directory: crates/ts-pack-elixir
         run: mix deps.get
-
-      - name: Generate checksums from GitHub release
-        working-directory: crates/ts-pack-elixir
-        run: mix rustler_precompiled.download TreeSitterLanguagePack --all --print
 
       - name: Compile project
         working-directory: crates/ts-pack-elixir
