@@ -41,6 +41,9 @@ on:
       - "pyproject.toml"
       - "biome.json"
       - ".clang-format"
+  workflow_run:
+    workflows: ["Publish Release"]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:

@@ -25,6 +25,9 @@ on:
       - 'crates/ts-pack-core/**'
       - 'tests/test_apps/cli/**'
       - 'tests/test_apps/fixtures/**'
+  workflow_run:
+    workflows: ["Publish Release"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:

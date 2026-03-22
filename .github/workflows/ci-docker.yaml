@@ -27,6 +27,9 @@ on:
       - ".github/workflows/ci-docker.yaml"
       - "Cargo.toml"
       - "Cargo.lock"
+  workflow_run:
+    workflows: ["Publish Release"]
+    types: [completed]
   workflow_dispatch:
 
 env:

@@ -35,6 +35,9 @@ on:
       - "Taskfile.yml"
       - "scripts/**"
       - ".github/workflows/ci-java.yaml"
+  workflow_run:
+    workflows: ["Publish Release"]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:

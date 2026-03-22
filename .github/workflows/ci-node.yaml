@@ -35,6 +35,9 @@ on:
       - 'rust-toolchain.toml'
       - 'scripts/**'
       - '.task/node.yml'
+  workflow_run:
+    workflows: ["Publish Release"]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:

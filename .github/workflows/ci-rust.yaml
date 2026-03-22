@@ -31,6 +31,9 @@ on:
       - 'scripts/**'
       - '.task/rust.yml'
       - 'Taskfile.yml'
+  workflow_run:
+    workflows: ["Publish Release"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
@@ -187,7 +190,7 @@ jobs:
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1
         with:
-          components: ""
+          components: "rustfmt"
           use-sccache: "false"
           install-llvm-cov: "false"
 

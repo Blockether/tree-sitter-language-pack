@@ -35,6 +35,9 @@ on:
       - "tools/e2e-generator/**"
       - "scripts/ci/php/**"
       - ".github/workflows/ci-php.yaml"
+  workflow_run:
+    workflows: ["Publish Release"]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:

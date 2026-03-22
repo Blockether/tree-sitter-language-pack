@@ -35,6 +35,9 @@ on:
       - 'scripts/**'
       - '.task/go.yml'
       - 'Taskfile.yml'
+  workflow_run:
+    workflows: ["Publish Release"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:

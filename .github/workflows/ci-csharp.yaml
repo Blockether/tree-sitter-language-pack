@@ -35,6 +35,9 @@ on:
       - "Taskfile.yml"
       - "scripts/**"
       - ".github/workflows/ci-csharp.yaml"
+  workflow_run:
+    workflows: ["Publish Release"]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:
