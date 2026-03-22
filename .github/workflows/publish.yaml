@@ -1083,13 +1083,21 @@ jobs:
           ARTIFACT_NAME="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
           TARBALL="${ARTIFACT_NAME}.tar.gz"
 
-          LIB_PATH="target/${TARGET}/release/${LIB_NAME}"
+          # ts-pack-elixir is a standalone workspace, output is in crates/ts-pack-elixir/target/
+          LIB_PATH="crates/ts-pack-elixir/target/${TARGET}/release/${LIB_NAME}"
+          if [[ ! -f "$LIB_PATH" ]]; then
+            LIB_PATH="crates/ts-pack-elixir/target/release/${LIB_NAME}"
+          fi
+          if [[ ! -f "$LIB_PATH" ]]; then
+            LIB_PATH="target/${TARGET}/release/${LIB_NAME}"
+          fi
           if [[ ! -f "$LIB_PATH" ]]; then
             LIB_PATH="target/release/${LIB_NAME}"
           fi
 
           if [[ ! -f "$LIB_PATH" ]]; then
             echo "ERROR: Library not found"
+            find . -name "${LIB_NAME}" -type f 2>/dev/null || true
             exit 1
           fi
 
@@ -1115,13 +1123,21 @@ jobs:
           ARTIFACT_NAME="libts_pack_elixir-v${VERSION}-nif-${NIF_VERSION}-${TARGET}.${ARCHIVE_EXT}"
           TARBALL="${ARTIFACT_NAME}.tar.gz"
 
-          LIB_PATH="target/${TARGET}/release/${LIB_NAME}"
+          # ts-pack-elixir is a standalone workspace, output is in crates/ts-pack-elixir/target/
+          LIB_PATH="crates/ts-pack-elixir/target/${TARGET}/release/${LIB_NAME}"
+          if [[ ! -f "$LIB_PATH" ]]; then
+            LIB_PATH="crates/ts-pack-elixir/target/release/${LIB_NAME}"
+          fi
+          if [[ ! -f "$LIB_PATH" ]]; then
+            LIB_PATH="target/${TARGET}/release/${LIB_NAME}"
+          fi
           if [[ ! -f "$LIB_PATH" ]]; then
             LIB_PATH="target/release/${LIB_NAME}"
           fi
 
           if [[ ! -f "$LIB_PATH" ]]; then
             echo "ERROR: Library not found"
+            find . -name "${LIB_NAME}" -type f 2>/dev/null || true
             exit 1
           fi
 
