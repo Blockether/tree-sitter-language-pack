@@ -780,6 +780,8 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: static
+          CARGO_PROFILE_RELEASE_LTO: "false"
+          CARGO_PROFILE_RELEASE_CODEGEN_UNITS: "16"
 
       - name: Verify WASM build output
         working-directory: crates/ts-pack-wasm
