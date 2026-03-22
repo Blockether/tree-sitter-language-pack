@@ -741,7 +741,7 @@ jobs:
           retention-days: 14
           compression-level: 0
 
-  # ─── Build WASM package ────────────────────────────────────────────
+  # ─── Build WASM package (split into two jobs to avoid OOM) ─────────
   build-wasm:
     name: Build WASM package
     needs: [prepare, validate-versions, clone-vendors]
@@ -765,7 +765,7 @@ jobs:
         with:
           target: wasm32-unknown-unknown
           components: ""
-          use-sccache: "false"
+          use-sccache: "true"
           install-llvm-cov: "false"
 
       - name: Install WASI SDK
@@ -777,13 +777,6 @@ jobs:
       - name: Build WASM (web target)
         working-directory: crates/ts-pack-wasm
         run: wasm-pack build --target web --release
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
-          TSLP_LINK_MODE: static
-
-      - name: Build WASM (nodejs target)
-        working-directory: crates/ts-pack-wasm
-        run: wasm-pack build --target nodejs --release --out-dir pkg-node
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: static
@@ -1736,6 +1729,17 @@ jobs:
           napi artifacts --build-output-dir artifacts --npm-dir npm
           echo "=== Generated platform packages ==="
           find npm -name '*.node' -type f
+
+      - name: Pack platform packages
+        working-directory: crates/ts-pack-node/npm
+        run: |
+          for dir in ./*/; do
+            if [ -f "$dir/package.json" ]; then
+              (cd "$dir" && npm pack && mv ./*.tgz ..)
+            fi
+          done
+          echo "=== Packed tarballs ==="
+          ls -lh ./*.tgz
 
       - name: Dry run summary
         if: ${{ inputs.dry_run }}
