@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 /// Configuration for the `process()` function.
 ///
 /// Controls which analysis features are enabled and whether chunking is performed.
@@ -20,7 +22,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcessConfig {
     /// Language name (required).
-    pub language: String,
+    pub language: Cow<'static, str>,
     /// Extract structural items (functions, classes, etc.). Default: true.
     #[cfg_attr(feature = "serde", serde(default = "default_true"))]
     pub structure: bool,
@@ -55,7 +57,7 @@ fn default_true() -> bool {
 impl Default for ProcessConfig {
     fn default() -> Self {
         Self {
-            language: String::new(),
+            language: Cow::Borrowed(""),
             structure: true,
             imports: true,
             exports: true,
@@ -72,7 +74,7 @@ impl ProcessConfig {
     /// Create a new config for the given language with default settings.
     pub fn new(language: impl Into<String>) -> Self {
         Self {
-            language: language.into(),
+            language: Cow::Owned(language.into()),
             ..Default::default()
         }
     }

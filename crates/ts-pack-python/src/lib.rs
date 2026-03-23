@@ -185,7 +185,7 @@ impl TreeHandle {
     /// Extracts source text for a node given its start_byte and end_byte.
     fn extract_text(&self, start_byte: usize, end_byte: usize) -> PyResult<String> {
         let info = tree_sitter_language_pack::NodeInfo {
-            kind: String::new(),
+            kind: std::borrow::Cow::Borrowed(""),
             is_named: false,
             start_byte,
             end_byte,
@@ -379,7 +379,7 @@ impl ProcessConfig {
 impl From<&ProcessConfig> for tree_sitter_language_pack::ProcessConfig {
     fn from(py_config: &ProcessConfig) -> Self {
         Self {
-            language: py_config.language.clone(),
+            language: std::borrow::Cow::Owned(py_config.language.clone()),
             structure: py_config.structure,
             imports: py_config.imports,
             exports: py_config.exports,

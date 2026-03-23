@@ -22,7 +22,7 @@ pub fn process(
     let root = tree.root_node();
 
     let mut result = ProcessResult {
-        language: config.language.clone(),
+        language: config.language.as_ref().to_string(),
         metrics: intelligence::compute_metrics(source, &root),
         ..Default::default()
     };

@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::Error;
 
 /// Lightweight snapshot of a tree-sitter node's properties.
@@ -8,7 +10,7 @@ use crate::Error;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NodeInfo {
     /// The grammar type name (e.g., "function_definition", "identifier").
-    pub kind: String,
+    pub kind: Cow<'static, str>,
     /// Whether this is a named node (vs anonymous like punctuation).
     pub is_named: bool,
     /// Start byte offset in source.
@@ -36,7 +38,7 @@ pub fn node_info_from_node(node: tree_sitter::Node) -> NodeInfo {
     let start = node.start_position();
     let end = node.end_position();
     NodeInfo {
-        kind: node.kind().to_string(),
+        kind: Cow::Owned(node.kind().to_string()),
         is_named: node.is_named(),
         start_byte: node.start_byte(),
         end_byte: node.end_byte(),
@@ -180,7 +182,7 @@ mod tests {
     fn test_extract_text() {
         let source = b"hello world";
         let info = NodeInfo {
-            kind: "test".to_string(),
+            kind: Cow::Owned("test".to_string()),
             is_named: true,
             start_byte: 0,
             end_byte: 5,
@@ -200,7 +202,7 @@ mod tests {
     fn test_extract_text_out_of_bounds() {
         let source = b"hi";
         let info = NodeInfo {
-            kind: "test".to_string(),
+            kind: Cow::Owned("test".to_string()),
             is_named: true,
             start_byte: 0,
             end_byte: 100,

@@ -9,6 +9,7 @@
 
 use std::ops::Range;
 
+use memchr::memchr;
 use tree_sitter::TreeCursor;
 
 /// Split source code into chunks using tree-sitter AST structure for intelligent boundaries.
@@ -248,10 +249,12 @@ fn split_at_lines(
 
     // Collect line-end offsets (byte offsets relative to region_start).
     let mut line_ends: Vec<usize> = Vec::new();
-    for (i, byte) in region.bytes().enumerate() {
-        if byte == b'\n' {
-            line_ends.push(region_start + i + 1);
-        }
+    let region_bytes = region.as_bytes();
+    let mut search_start = 0;
+    while let Some(rel_pos) = memchr(b'\n', &region_bytes[search_start..]) {
+        let abs_pos = region_start + search_start + rel_pos + 1;
+        line_ends.push(abs_pos);
+        search_start += rel_pos + 1;
     }
     // The final position is always the region end.
     if line_ends.last().copied() != Some(region_end) {

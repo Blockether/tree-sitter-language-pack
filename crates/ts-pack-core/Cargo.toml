@@ -540,6 +540,7 @@ lang-wit = []
 [dependencies]
 dirs = { workspace = true, optional = true }
 libloading = { workspace = true, optional = true }
+memchr = { workspace = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 sha2 = { workspace = true, optional = true }

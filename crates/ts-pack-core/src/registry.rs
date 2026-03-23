@@ -1,4 +1,5 @@
-use std::collections::HashMap;
+use std::borrow::Cow;
+use std::collections::{HashMap, HashSet};
 #[cfg(feature = "dynamic-loading")]
 use std::path::PathBuf;
 use tree_sitter::Language;
@@ -279,15 +280,15 @@ impl LanguageRegistry {
     /// Includes statically compiled languages, dynamically loadable languages
     /// (if the `dynamic-loading` feature is enabled), and all configured aliases.
     pub fn available_languages(&self) -> Vec<String> {
-        let mut langs: Vec<String> = self.static_lookup.keys().map(|s| s.to_string()).collect();
+        let mut seen: HashSet<String> = self.static_lookup.keys().map(|s| s.to_string()).collect();
 
         #[cfg(feature = "dynamic-loading")]
         {
-            langs.extend(self.dynamic_loader.dynamic_names.iter().map(|s| s.to_string()));
+            for name in self.dynamic_loader.dynamic_names.iter() {
+                seen.insert(name.to_string());
+            }
             for name in self.dynamic_loader.cached_names() {
-                if !langs.contains(&name) {
-                    langs.push(name);
-                }
+                seen.insert(name);
             }
 
             // Scan extra library directories for downloadable/cached libraries
@@ -295,7 +296,7 @@ impl LanguageRegistry {
                 if let Ok(entries) = std::fs::read_dir(extra_dir) {
                     for entry in entries.flatten() {
                         let filename = entry.file_name();
-                        let name = filename.to_string_lossy();
+                        let name: Cow<'_, str> = filename.to_string_lossy();
                         // Extract language name from libtree_sitter_<name>.{so,dylib,dll}
                         let stripped = name.strip_prefix("lib").unwrap_or(&name);
                         if let Some(lang) = stripped.strip_prefix("tree_sitter_") {
@@ -304,10 +305,7 @@ impl LanguageRegistry {
                                 .or_else(|| lang.strip_suffix(".dylib"))
                                 .or_else(|| lang.strip_suffix(".dll"));
                             if let Some(lang) = lang {
-                                let lang = lang.to_string();
-                                if !langs.contains(&lang) {
-                                    langs.push(lang);
-                                }
+                                seen.insert(lang.to_string());
                             }
                         }
                     }
@@ -315,13 +313,13 @@ impl LanguageRegistry {
             }
         }
         for &(alias, target) in LANGUAGE_ALIASES {
-            if langs.iter().any(|lang| lang.as_str() == target) {
-                langs.push(alias.to_string());
+            if seen.contains(target) {
+                seen.insert(alias.to_string());
             }
         }
 
+        let mut langs: Vec<String> = seen.into_iter().collect();
         langs.sort_unstable();
-        langs.dedup();
         langs
     }
 
@@ -370,9 +368,15 @@ impl LanguageRegistry {
         source: &str,
         config: &crate::process_config::ProcessConfig,
     ) -> Result<crate::intel::types::ProcessResult, Error> {
-        let mut resolved_config = config.clone();
-        resolved_config.language = resolve_alias(&config.language).to_string();
-        crate::intel::process(source, &resolved_config, self)
+        let resolved_lang = resolve_alias(&config.language);
+        // Create a lightweight copy only if alias changed
+        if resolved_lang != config.language.as_ref() {
+            let mut resolved_config = config.clone();
+            resolved_config.language = std::borrow::Cow::Owned(resolved_lang.to_string());
+            crate::intel::process(source, &resolved_config, self)
+        } else {
+            crate::intel::process(source, config, self)
+        }
     }
 }
 

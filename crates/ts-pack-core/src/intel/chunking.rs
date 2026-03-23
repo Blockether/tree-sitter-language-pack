@@ -1,3 +1,4 @@
+use memchr::memchr_iter;
 use tree_sitter::{Language, Tree};
 
 use super::types::*;
@@ -18,13 +19,16 @@ pub fn chunk_source(
     let total_chunks = raw_chunks.len();
     let root = tree.root_node();
 
+    // Precompute newline positions once for O(log n) line number lookup per chunk
+    let newline_positions: Vec<usize> = memchr_iter(b'\n', source.as_bytes()).collect();
+
     raw_chunks
         .into_iter()
         .enumerate()
         .map(|(idx, (start_byte, end_byte))| {
             let content = &source[start_byte..end_byte];
-            let start_line = source[..start_byte].matches('\n').count();
-            let end_line = start_line + content.matches('\n').count();
+            let start_line = newline_positions.partition_point(|&pos| pos < start_byte);
+            let end_line = newline_positions.partition_point(|&pos| pos < end_byte);
 
             // Collect metadata for this chunk's byte range
             let mut node_types = Vec::new();

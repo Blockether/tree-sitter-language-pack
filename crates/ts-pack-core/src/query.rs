@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::Error;
 use crate::node::{NodeInfo, node_info_from_node};
 use tree_sitter::StreamingIterator;
@@ -8,7 +10,7 @@ pub struct QueryMatch {
     /// The pattern index that matched (position in the query string).
     pub pattern_index: usize,
     /// Captures: list of (capture_name, node_info) pairs.
-    pub captures: Vec<(String, NodeInfo)>,
+    pub captures: Vec<(Cow<'static, str>, NodeInfo)>,
 }
 
 /// Execute a tree-sitter query pattern against a parsed tree.
@@ -58,7 +60,7 @@ pub fn run_query(
             .captures
             .iter()
             .map(|c| {
-                let name = capture_names[c.index as usize].clone();
+                let name = Cow::Owned(capture_names[c.index as usize].clone());
                 let info = node_info_from_node(c.node);
                 (name, info)
             })

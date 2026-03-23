@@ -96,7 +96,7 @@ pub struct JsProcessConfig {
 impl From<JsProcessConfig> for tree_sitter_language_pack::ProcessConfig {
     fn from(js: JsProcessConfig) -> Self {
         Self {
-            language: js.language,
+            language: std::borrow::Cow::Owned(js.language),
             structure: js.structure.unwrap_or(true),
             imports: js.imports.unwrap_or(true),
             exports: js.exports.unwrap_or(true),
