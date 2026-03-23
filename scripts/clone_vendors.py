@@ -253,6 +253,20 @@ async def move_src_folder(language_name: str, directory: str | None) -> None:
             file_contents = COMMON_RE_PATTERN.sub(replacement_path, file_contents)
             await AsyncPath(file).write_text(file_contents)
 
+    # Copy queries/ directory if present in the vendor repo
+    queries_source_dir = (
+        (vendor_directory / language_name / directory / "queries").resolve()
+        if directory
+        else (vendor_directory / language_name / "queries").resolve()
+    )
+    if await AsyncPath(queries_source_dir).exists():
+        print(f"Copying {language_name} queries")
+        target_queries = target_source_dir / "queries"
+        if target_queries.exists():
+            await run_sync(rmtree, target_queries)
+        await run_sync(move, queries_source_dir, target_source_dir)
+        print(f"Copied {language_name} queries successfully")
+
 
 async def process_repo(language_name: str, language_definition: LanguageDict) -> None:
     """Process a repository.

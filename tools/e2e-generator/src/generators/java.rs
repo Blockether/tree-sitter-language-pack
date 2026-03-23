@@ -1,5 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_java_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+    Fixture, escape_java_string, group_by_category, has_chunk_assertions, has_detect_assertions, has_intel_assertions,
+    sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -386,6 +387,172 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                 writeln!(
                     out,
                     "            assertFalse(intel.getAsJsonArray(\"diagnostics\").isEmpty(), \"Diagnostics should not be empty\");"
+                )
+                .unwrap();
+            }
+
+            writeln!(out, "        }}").unwrap();
+        } else if has_detect_assertions(fixture) {
+            let assertions = assertions.unwrap();
+            writeln!(out, "        try (var registry = Helpers.createRegistry()) {{").unwrap();
+
+            if let Some(ext) = &assertions.detect_from_extension {
+                writeln!(
+                    out,
+                    "            var detectResult = registry.detectLanguageFromExtension(\"{}\");",
+                    escape_java_string(ext)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(
+                        out,
+                        "            assertNull(detectResult, \"Expected no language detected for extension\");"
+                    )
+                    .unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "            assertEquals(\"{}\", detectResult, \"Expected language '{}' detected from extension\");",
+                        escape_java_string(expected),
+                        escape_java_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "            assertNotNull(detectResult, \"Expected a language to be detected from extension\");").unwrap();
+                }
+            }
+
+            if let Some(path) = &assertions.detect_from_path {
+                writeln!(
+                    out,
+                    "            var detectResult = registry.detectLanguageFromPath(\"{}\");",
+                    escape_java_string(path)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(
+                        out,
+                        "            assertNull(detectResult, \"Expected no language detected for path\");"
+                    )
+                    .unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "            assertEquals(\"{}\", detectResult, \"Expected language '{}' detected from path\");",
+                        escape_java_string(expected),
+                        escape_java_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(
+                        out,
+                        "            assertNotNull(detectResult, \"Expected a language to be detected from path\");"
+                    )
+                    .unwrap();
+                }
+            }
+
+            if let Some(content) = &assertions.detect_from_content {
+                writeln!(
+                    out,
+                    "            var detectResult = registry.detectLanguageFromContent(\"{}\");",
+                    escape_java_string(content)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(
+                        out,
+                        "            assertNull(detectResult, \"Expected no language detected from content\");"
+                    )
+                    .unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "            assertEquals(\"{}\", detectResult, \"Expected language '{}' detected from content\");",
+                        escape_java_string(expected),
+                        escape_java_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(
+                        out,
+                        "            assertNotNull(detectResult, \"Expected a language to be detected from content\");"
+                    )
+                    .unwrap();
+                }
+            }
+
+            if let Some(ext) = &assertions.ambiguity_extension {
+                writeln!(
+                    out,
+                    "            var ambiguity = registry.extensionAmbiguity(\"{}\");",
+                    escape_java_string(ext)
+                )
+                .unwrap();
+                if assertions.ambiguity_is_none == Some(true) {
+                    writeln!(
+                        out,
+                        "            assertNull(ambiguity, \"Expected no ambiguity for extension\");"
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(
+                        out,
+                        "            assertNotNull(ambiguity, \"Expected ambiguity info for extension\");"
+                    )
+                    .unwrap();
+                    if let Some(assigned) = &assertions.ambiguity_assigned {
+                        writeln!(
+                            out,
+                            "            assertEquals(\"{}\", ambiguity.getAssigned(), \"Expected assigned language '{}'\");",
+                            escape_java_string(assigned),
+                            escape_java_string(assigned)
+                        )
+                        .unwrap();
+                    }
+                    if let Some(alt) = &assertions.ambiguity_alternatives_contain {
+                        writeln!(
+                            out,
+                            "            assertTrue(ambiguity.getAlternatives().contains(\"{}\"), \"Alternatives should contain '{}'\");",
+                            escape_java_string(alt),
+                            escape_java_string(alt)
+                        )
+                        .unwrap();
+                    }
+                }
+            }
+
+            if assertions.highlights_query_not_empty == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "            var query = registry.getHighlightsQuery(\"{}\");",
+                    escape_java_string(lang)
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "            assertNotNull(query, \"Highlights query should not be null\");"
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "            assertFalse(query.isEmpty(), \"Highlights query should not be empty\");"
+                )
+                .unwrap();
+            }
+
+            if assertions.highlights_query_is_none == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "            var query = registry.getHighlightsQuery(\"{}\");",
+                    escape_java_string(lang)
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "            assertNull(query, \"Highlights query should be null\");"
                 )
                 .unwrap();
             }

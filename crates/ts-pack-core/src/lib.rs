@@ -40,6 +40,7 @@ pub mod node;
 pub mod pack_config;
 pub mod parse;
 pub mod process_config;
+pub mod queries;
 pub mod query;
 pub mod registry;
 pub mod text_splitter;
@@ -64,6 +65,7 @@ pub use node::{NodeInfo, extract_text, find_nodes_by_type, named_children_info, 
 pub use pack_config::PackConfig;
 pub use parse::{parse_string, tree_contains_node_type, tree_error_count, tree_has_error_nodes, tree_to_sexp};
 pub use process_config::ProcessConfig;
+pub use queries::{get_highlights_query, get_injections_query, get_locals_query};
 pub use query::{QueryMatch, run_query};
 pub use registry::LanguageRegistry;
 pub use text_splitter::split_code;
@@ -74,7 +76,7 @@ pub use download::DownloadManager;
 
 use std::sync::{LazyLock, RwLock};
 
-static REGISTRY: LazyLock<RwLock<LanguageRegistry>> = LazyLock::new(|| RwLock::new(LanguageRegistry::new()));
+static REGISTRY: LazyLock<LanguageRegistry> = LazyLock::new(LanguageRegistry::new);
 
 #[cfg(feature = "download")]
 static CACHE_REGISTERED: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
@@ -106,12 +108,9 @@ static CUSTOM_CACHE_DIR: LazyLock<RwLock<Option<std::path::PathBuf>>> = LazyLock
 /// assert_eq!(tree.root_node().kind(), "module");
 /// ```
 pub fn get_language(name: &str) -> Result<Language, Error> {
-    // Fast path: check registry (read lock)
-    {
-        let registry = REGISTRY.read().map_err(|e| Error::LockPoisoned(e.to_string()))?;
-        if let Ok(lang) = registry.get_language(name) {
-            return Ok(lang);
-        }
+    // Fast path: check registry directly (no outer lock needed)
+    if let Ok(lang) = REGISTRY.get_language(name) {
+        return Ok(lang);
     }
     // Slow path: auto-download if feature enabled
     #[cfg(feature = "download")]
@@ -120,8 +119,7 @@ pub fn get_language(name: &str) -> Result<Language, Error> {
         let cache_dir = effective_cache_dir()?;
         let mut dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
         dm.ensure_languages(&[name])?;
-        let registry = REGISTRY.read().map_err(|e| Error::LockPoisoned(e.to_string()))?;
-        registry.get_language(name)
+        REGISTRY.get_language(name)
     }
     #[cfg(not(feature = "download"))]
     Err(Error::LanguageNotFound(name.to_string()))
@@ -171,7 +169,7 @@ pub fn get_parser(name: &str) -> Result<tree_sitter::Parser, Error> {
 /// }
 /// ```
 pub fn available_languages() -> Vec<String> {
-    REGISTRY.read().map(|r| r.available_languages()).unwrap_or_default()
+    REGISTRY.available_languages()
 }
 
 /// Check if a language is available by name or alias.
@@ -189,7 +187,7 @@ pub fn available_languages() -> Vec<String> {
 /// assert!(!has_language("nonexistent_language"));
 /// ```
 pub fn has_language(name: &str) -> bool {
-    REGISTRY.read().map(|r| r.has_language(name)).unwrap_or(false)
+    REGISTRY.has_language(name)
 }
 
 /// Return the number of available languages.
@@ -206,7 +204,7 @@ pub fn has_language(name: &str) -> bool {
 /// println!("{} languages available", count);
 /// ```
 pub fn language_count() -> usize {
-    REGISTRY.read().map(|r| r.language_count()).unwrap_or(0)
+    REGISTRY.language_count()
 }
 
 /// Process source code and extract file intelligence using the global registry.
@@ -235,8 +233,7 @@ pub fn process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Er
     #[cfg(feature = "download")]
     ensure_cache_registered()?;
 
-    let registry = REGISTRY.read().map_err(|e| Error::LockPoisoned(e.to_string()))?;
-    registry.process(source, config)
+    REGISTRY.process(source, config)
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -249,8 +246,8 @@ fn ensure_cache_registered() -> Result<(), Error> {
         return Ok(());
     }
     let cache_dir = effective_cache_dir()?;
-    let mut registry = REGISTRY.write().map_err(|e| Error::LockPoisoned(e.to_string()))?;
-    registry.add_extra_libs_dir(cache_dir);
+    // add_extra_libs_dir uses interior mutability — no outer write lock needed
+    REGISTRY.add_extra_libs_dir(cache_dir);
     CACHE_REGISTERED.store(true, std::sync::atomic::Ordering::Release);
     Ok(())
 }

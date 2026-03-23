@@ -1,5 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_go_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+    Fixture, escape_go_string, group_by_category, has_ambiguity_assertions, has_chunk_assertions,
+    has_detect_assertions, has_highlights_assertions, has_intel_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -120,8 +121,12 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
         // Auto-skip: guard any test that requires a specific language.
         let is_availability_agnostic = assertions.is_some_and(|a| {
-            a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
-        });
+            a.expect_error == Some(true)
+                || a.language_available.is_some()
+                || a.languages_not_empty == Some(true)
+                || a.highlights_query_is_none == Some(true)
+        }) || has_detect_assertions(fixture)
+            || has_ambiguity_assertions(fixture);
         let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
             if !is_availability_agnostic {
                 fixture.language.as_deref()
@@ -168,6 +173,117 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             )
             .unwrap();
             writeln!(out, "\t}}").unwrap();
+        } else if has_detect_assertions(fixture) {
+            let assertions = assertions.unwrap();
+            if let Some(ext) = &assertions.detect_from_extension {
+                writeln!(
+                    out,
+                    "\tresult := reg.DetectLanguageFromExtension(\"{}\")",
+                    escape_go_string(ext)
+                )
+                .unwrap();
+            } else if let Some(path) = &assertions.detect_from_path {
+                writeln!(
+                    out,
+                    "\tresult := reg.DetectLanguageFromPath(\"{}\")",
+                    escape_go_string(path)
+                )
+                .unwrap();
+            } else if let Some(content) = &assertions.detect_from_content {
+                writeln!(
+                    out,
+                    "\tresult := reg.DetectLanguageFromContent(\"{}\")",
+                    escape_go_string(content)
+                )
+                .unwrap();
+            }
+            if assertions.detect_result_none == Some(true) {
+                writeln!(out, "\tif result != nil {{").unwrap();
+                writeln!(out, "\t\tt.Fatalf(\"Expected nil result, got %q\", *result)").unwrap();
+                writeln!(out, "\t}}").unwrap();
+            } else if let Some(expected) = &assertions.detect_result {
+                writeln!(out, "\tif result == nil {{").unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatalf(\"Expected %q, got nil\", \"{}\")",
+                    escape_go_string(expected)
+                )
+                .unwrap();
+                writeln!(out, "\t}}").unwrap();
+                writeln!(out, "\tif *result != \"{}\" {{", escape_go_string(expected)).unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatalf(\"Expected %q, got %q\", \"{}\", *result)",
+                    escape_go_string(expected)
+                )
+                .unwrap();
+                writeln!(out, "\t}}").unwrap();
+            }
+        } else if has_ambiguity_assertions(fixture) {
+            let assertions = assertions.unwrap();
+            let ext = assertions.ambiguity_extension.as_deref().unwrap_or("");
+            writeln!(
+                out,
+                "\tassigned, alts := reg.ExtensionAmbiguity(\"{}\")",
+                escape_go_string(ext)
+            )
+            .unwrap();
+            if assertions.ambiguity_is_none == Some(true) {
+                writeln!(out, "\tif assigned != nil {{").unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatalf(\"Expected no ambiguity, got assigned=%q\", *assigned)"
+                )
+                .unwrap();
+                writeln!(out, "\t}}").unwrap();
+            } else {
+                writeln!(out, "\tif assigned == nil {{").unwrap();
+                writeln!(out, "\t\tt.Fatal(\"Expected ambiguity result, got nil\")").unwrap();
+                writeln!(out, "\t}}").unwrap();
+                if let Some(expected_assigned) = &assertions.ambiguity_assigned {
+                    writeln!(out, "\tif *assigned != \"{}\" {{", escape_go_string(expected_assigned)).unwrap();
+                    writeln!(
+                        out,
+                        "\t\tt.Fatalf(\"Expected assigned %q, got %q\", \"{}\", *assigned)",
+                        escape_go_string(expected_assigned)
+                    )
+                    .unwrap();
+                    writeln!(out, "\t}}").unwrap();
+                }
+                if let Some(alt) = &assertions.ambiguity_alternatives_contain {
+                    writeln!(out, "\tfoundAlt := false").unwrap();
+                    writeln!(out, "\tfor _, a := range alts {{").unwrap();
+                    writeln!(out, "\t\tif a == \"{}\" {{", escape_go_string(alt)).unwrap();
+                    writeln!(out, "\t\t\tfoundAlt = true").unwrap();
+                    writeln!(out, "\t\t\tbreak").unwrap();
+                    writeln!(out, "\t\t}}").unwrap();
+                    writeln!(out, "\t}}").unwrap();
+                    writeln!(out, "\tif !foundAlt {{").unwrap();
+                    writeln!(
+                        out,
+                        "\t\tt.Fatalf(\"Alternatives should contain '{}', got %v\", alts)",
+                        escape_go_string(alt)
+                    )
+                    .unwrap();
+                    writeln!(out, "\t}}").unwrap();
+                }
+            }
+        } else if has_highlights_assertions(fixture) {
+            let assertions = assertions.unwrap();
+            let lang = fixture.language.as_deref().unwrap_or("unknown");
+            writeln!(out, "\tq := reg.GetHighlightsQuery(\"{}\")", escape_go_string(lang)).unwrap();
+            if assertions.highlights_query_is_none == Some(true) {
+                writeln!(out, "\tif q != nil {{").unwrap();
+                writeln!(out, "\t\tt.Fatal(\"Expected no highlights query for language\")").unwrap();
+                writeln!(out, "\t}}").unwrap();
+            } else if assertions.highlights_query_not_empty == Some(true) {
+                writeln!(out, "\tif q == nil {{").unwrap();
+                writeln!(out, "\t\tt.Fatal(\"Expected highlights query to be present\")").unwrap();
+                writeln!(out, "\t}}").unwrap();
+                writeln!(out, "\tif len(*q) == 0 {{").unwrap();
+                writeln!(out, "\t\tt.Fatal(\"Highlights query should not be empty\")").unwrap();
+                writeln!(out, "\t}}").unwrap();
+            }
         } else if has_intel_assertions(fixture) {
             let lang = fixture.language.as_deref().unwrap_or("unknown");
             let source = fixture.source_code.as_deref().unwrap_or("");

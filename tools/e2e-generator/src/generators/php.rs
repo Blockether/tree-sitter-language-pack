@@ -1,5 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_php_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+    Fixture, escape_php_string, group_by_category, has_chunk_assertions, has_detect_assertions, has_intel_assertions,
+    sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -251,6 +252,165 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                     out,
                     "        $this->assertGreaterThanOrEqual({}, count($intel['chunks']), 'Should have at least {} chunk(s)');",
                     min_chunks, min_chunks
+                )
+                .unwrap();
+            }
+        } else if has_detect_assertions(fixture) {
+            let assertions = assertions.unwrap();
+
+            if let Some(ext) = &assertions.detect_from_extension {
+                writeln!(
+                    out,
+                    "        $detectResult = \\TreeSitterLanguagePack::detect_language_from_extension('{}');",
+                    escape_php_string(ext)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(
+                        out,
+                        "        $this->assertNull($detectResult, 'Expected no language detected for extension');"
+                    )
+                    .unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "        $this->assertSame('{}', $detectResult, 'Expected language \\'{}\\' detected from extension');",
+                        escape_php_string(expected),
+                        escape_php_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "        $this->assertNotNull($detectResult, 'Expected a language to be detected from extension');").unwrap();
+                }
+            }
+
+            if let Some(path) = &assertions.detect_from_path {
+                writeln!(
+                    out,
+                    "        $detectResult = \\TreeSitterLanguagePack::detect_language_from_path('{}');",
+                    escape_php_string(path)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(
+                        out,
+                        "        $this->assertNull($detectResult, 'Expected no language detected for path');"
+                    )
+                    .unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "        $this->assertSame('{}', $detectResult, 'Expected language \\'{}\\' detected from path');",
+                        escape_php_string(expected),
+                        escape_php_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(
+                        out,
+                        "        $this->assertNotNull($detectResult, 'Expected a language to be detected from path');"
+                    )
+                    .unwrap();
+                }
+            }
+
+            if let Some(content) = &assertions.detect_from_content {
+                writeln!(
+                    out,
+                    "        $detectResult = \\TreeSitterLanguagePack::detect_language_from_content('{}');",
+                    escape_php_string(content)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(
+                        out,
+                        "        $this->assertNull($detectResult, 'Expected no language detected from content');"
+                    )
+                    .unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "        $this->assertSame('{}', $detectResult, 'Expected language \\'{}\\' detected from content');",
+                        escape_php_string(expected),
+                        escape_php_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "        $this->assertNotNull($detectResult, 'Expected a language to be detected from content');").unwrap();
+                }
+            }
+
+            if let Some(ext) = &assertions.ambiguity_extension {
+                writeln!(
+                    out,
+                    "        $ambiguity = \\TreeSitterLanguagePack::extension_ambiguity('{}');",
+                    escape_php_string(ext)
+                )
+                .unwrap();
+                if assertions.ambiguity_is_none == Some(true) {
+                    writeln!(
+                        out,
+                        "        $this->assertNull($ambiguity, 'Expected no ambiguity for extension');"
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(
+                        out,
+                        "        $this->assertNotNull($ambiguity, 'Expected ambiguity info for extension');"
+                    )
+                    .unwrap();
+                    if let Some(assigned) = &assertions.ambiguity_assigned {
+                        writeln!(
+                            out,
+                            "        $this->assertSame('{}', $ambiguity['assigned'], 'Expected assigned language \\'{}\\' ');",
+                            escape_php_string(assigned),
+                            escape_php_string(assigned)
+                        )
+                        .unwrap();
+                    }
+                    if let Some(alt) = &assertions.ambiguity_alternatives_contain {
+                        writeln!(
+                            out,
+                            "        $this->assertContains('{}', $ambiguity['alternatives'], 'Alternatives should contain \\'{}\\' ');",
+                            escape_php_string(alt),
+                            escape_php_string(alt)
+                        )
+                        .unwrap();
+                    }
+                }
+            }
+
+            if assertions.highlights_query_not_empty == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "        $query = \\TreeSitterLanguagePack::get_highlights_query('{}');",
+                    escape_php_string(lang)
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "        $this->assertNotNull($query, 'Highlights query should not be null');"
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "        $this->assertNotEmpty($query, 'Highlights query should not be empty');"
+                )
+                .unwrap();
+            }
+
+            if assertions.highlights_query_is_none == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "        $query = \\TreeSitterLanguagePack::get_highlights_query('{}');",
+                    escape_php_string(lang)
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "        $this->assertNull($query, 'Highlights query should be null');"
                 )
                 .unwrap();
             }

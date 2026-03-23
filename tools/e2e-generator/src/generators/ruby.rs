@@ -1,5 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_ruby_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+    Fixture, escape_ruby_string, group_by_category, has_chunk_assertions, has_detect_assertions, has_intel_assertions,
+    sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -197,6 +198,124 @@ fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 && let Some(min_chunks) = assertions.and_then(|a| a.intel_chunk_count_min)
             {
                 writeln!(out, "    expect(chunks.length).to be >= {}", min_chunks).unwrap();
+            }
+        } else if has_detect_assertions(fixture) {
+            let assertions = assertions.unwrap();
+
+            if let Some(ext) = &assertions.detect_from_extension {
+                writeln!(
+                    out,
+                    "    detect_result = TreeSitterLanguagePack.detect_language_from_extension(\"{}\")",
+                    escape_ruby_string(ext)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(out, "    expect(detect_result).to be_nil").unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "    expect(detect_result).to eq(\"{}\")",
+                        escape_ruby_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "    expect(detect_result).not_to be_nil").unwrap();
+                }
+            }
+
+            if let Some(path) = &assertions.detect_from_path {
+                writeln!(
+                    out,
+                    "    detect_result = TreeSitterLanguagePack.detect_language_from_path(\"{}\")",
+                    escape_ruby_string(path)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(out, "    expect(detect_result).to be_nil").unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "    expect(detect_result).to eq(\"{}\")",
+                        escape_ruby_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "    expect(detect_result).not_to be_nil").unwrap();
+                }
+            }
+
+            if let Some(content) = &assertions.detect_from_content {
+                writeln!(
+                    out,
+                    "    detect_result = TreeSitterLanguagePack.detect_language_from_content(\"{}\")",
+                    escape_ruby_string(content)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(out, "    expect(detect_result).to be_nil").unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "    expect(detect_result).to eq(\"{}\")",
+                        escape_ruby_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "    expect(detect_result).not_to be_nil").unwrap();
+                }
+            }
+
+            if let Some(ext) = &assertions.ambiguity_extension {
+                writeln!(
+                    out,
+                    "    ambiguity = TreeSitterLanguagePack.extension_ambiguity(\"{}\")",
+                    escape_ruby_string(ext)
+                )
+                .unwrap();
+                if assertions.ambiguity_is_none == Some(true) {
+                    writeln!(out, "    expect(ambiguity).to be_nil").unwrap();
+                } else {
+                    writeln!(out, "    expect(ambiguity).not_to be_nil").unwrap();
+                    if let Some(assigned) = &assertions.ambiguity_assigned {
+                        writeln!(
+                            out,
+                            "    expect(ambiguity[:assigned]).to eq(\"{}\")",
+                            escape_ruby_string(assigned)
+                        )
+                        .unwrap();
+                    }
+                    if let Some(alt) = &assertions.ambiguity_alternatives_contain {
+                        writeln!(
+                            out,
+                            "    expect(ambiguity[:alternatives]).to include(\"{}\")",
+                            escape_ruby_string(alt)
+                        )
+                        .unwrap();
+                    }
+                }
+            }
+
+            if assertions.highlights_query_not_empty == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "    query = TreeSitterLanguagePack.get_highlights_query(\"{}\")",
+                    escape_ruby_string(lang)
+                )
+                .unwrap();
+                writeln!(out, "    expect(query).not_to be_nil").unwrap();
+                writeln!(out, "    expect(query).not_to be_empty").unwrap();
+            }
+
+            if assertions.highlights_query_is_none == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "    query = TreeSitterLanguagePack.get_highlights_query(\"{}\")",
+                    escape_ruby_string(lang)
+                )
+                .unwrap();
+                writeln!(out, "    expect(query).to be_nil").unwrap();
             }
         } else if let Some(lang) = &fixture.language {
             let source = fixture.source_code.as_deref().unwrap_or("");

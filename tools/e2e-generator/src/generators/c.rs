@@ -1,4 +1,6 @@
-use crate::fixtures::{Fixture, escape_c_string, has_chunk_assertions, has_intel_assertions, sanitize_name};
+use crate::fixtures::{
+    Fixture, escape_c_string, has_chunk_assertions, has_detect_assertions, has_intel_assertions, sanitize_name,
+};
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
 use std::path::Path;
@@ -288,7 +290,15 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
 
     // Auto-skip: guard any test that requires a specific language.
     let is_availability_agnostic = assertions.is_some_and(|a| {
-        a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
+        a.expect_error == Some(true)
+            || a.language_available.is_some()
+            || a.languages_not_empty == Some(true)
+            || a.detect_from_extension.is_some()
+            || a.detect_from_path.is_some()
+            || a.detect_from_content.is_some()
+            || a.ambiguity_extension.is_some()
+            || a.highlights_query_not_empty.is_some()
+            || a.highlights_query_is_none.is_some()
     });
     let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
         if !is_availability_agnostic {
@@ -445,6 +455,185 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
         }
 
         writeln!(out, "    ts_pack_free_string(result);").unwrap();
+    } else if has_detect_assertions(fixture) {
+        let assertions = assertions.unwrap();
+
+        if let Some(ext) = &assertions.detect_from_extension {
+            writeln!(
+                out,
+                "    const char *detect_result = ts_pack_detect_language_from_extension(reg, \"{}\");",
+                escape_c_string(ext)
+            )
+            .unwrap();
+            if assertions.detect_result_none == Some(true) {
+                writeln!(
+                    out,
+                    "    ASSERT_NULL(detect_result, \"Expected no language detected for extension\");"
+                )
+                .unwrap();
+            } else if let Some(expected) = &assertions.detect_result {
+                writeln!(
+                    out,
+                    "    ASSERT_NOT_NULL(detect_result, \"Expected a language to be detected from extension\");"
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "    ASSERT_TRUE(strcmp(detect_result, \"{}\") == 0, \"Expected language '{}' detected from extension\");",
+                    escape_c_string(expected),
+                    escape_c_string(expected)
+                )
+                .unwrap();
+            } else {
+                writeln!(
+                    out,
+                    "    ASSERT_NOT_NULL(detect_result, \"Expected a language to be detected from extension\");"
+                )
+                .unwrap();
+            }
+        }
+
+        if let Some(path) = &assertions.detect_from_path {
+            writeln!(
+                out,
+                "    const char *detect_result = ts_pack_detect_language_from_path(reg, \"{}\");",
+                escape_c_string(path)
+            )
+            .unwrap();
+            if assertions.detect_result_none == Some(true) {
+                writeln!(
+                    out,
+                    "    ASSERT_NULL(detect_result, \"Expected no language detected for path\");"
+                )
+                .unwrap();
+            } else if let Some(expected) = &assertions.detect_result {
+                writeln!(
+                    out,
+                    "    ASSERT_NOT_NULL(detect_result, \"Expected a language to be detected from path\");"
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "    ASSERT_TRUE(strcmp(detect_result, \"{}\") == 0, \"Expected language '{}' detected from path\");",
+                    escape_c_string(expected),
+                    escape_c_string(expected)
+                )
+                .unwrap();
+            } else {
+                writeln!(
+                    out,
+                    "    ASSERT_NOT_NULL(detect_result, \"Expected a language to be detected from path\");"
+                )
+                .unwrap();
+            }
+        }
+
+        if let Some(content) = &assertions.detect_from_content {
+            writeln!(
+                out,
+                "    const char *detect_result = ts_pack_detect_language_from_content(reg, \"{}\");",
+                escape_c_string(content)
+            )
+            .unwrap();
+            if assertions.detect_result_none == Some(true) {
+                writeln!(
+                    out,
+                    "    ASSERT_NULL(detect_result, \"Expected no language detected from content\");"
+                )
+                .unwrap();
+            } else if let Some(expected) = &assertions.detect_result {
+                writeln!(
+                    out,
+                    "    ASSERT_NOT_NULL(detect_result, \"Expected a language to be detected from content\");"
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "    ASSERT_TRUE(strcmp(detect_result, \"{}\") == 0, \"Expected language '{}' detected from content\");",
+                    escape_c_string(expected),
+                    escape_c_string(expected)
+                )
+                .unwrap();
+            } else {
+                writeln!(
+                    out,
+                    "    ASSERT_NOT_NULL(detect_result, \"Expected a language to be detected from content\");"
+                )
+                .unwrap();
+            }
+        }
+
+        if let Some(ext) = &assertions.ambiguity_extension {
+            writeln!(
+                out,
+                "    TsPackAmbiguity *ambiguity = ts_pack_extension_ambiguity(reg, \"{}\");",
+                escape_c_string(ext)
+            )
+            .unwrap();
+            if assertions.ambiguity_is_none == Some(true) {
+                writeln!(
+                    out,
+                    "    ASSERT_NULL(ambiguity, \"Expected no ambiguity for extension\");"
+                )
+                .unwrap();
+            } else {
+                writeln!(
+                    out,
+                    "    ASSERT_NOT_NULL(ambiguity, \"Expected ambiguity info for extension\");"
+                )
+                .unwrap();
+                if let Some(assigned) = &assertions.ambiguity_assigned {
+                    writeln!(
+                        out,
+                        "    ASSERT_TRUE(strcmp(ambiguity->assigned, \"{}\") == 0, \"Expected assigned language '{}'\");",
+                        escape_c_string(assigned),
+                        escape_c_string(assigned)
+                    )
+                    .unwrap();
+                }
+                if let Some(alt) = &assertions.ambiguity_alternatives_contain {
+                    writeln!(
+                        out,
+                        "    ASSERT_TRUE(ts_pack_ambiguity_contains(ambiguity, \"{}\"), \"Alternatives should contain '{}'\");",
+                        escape_c_string(alt),
+                        escape_c_string(alt)
+                    )
+                    .unwrap();
+                }
+                writeln!(out, "    ts_pack_ambiguity_free(ambiguity);").unwrap();
+            }
+        }
+
+        if assertions.highlights_query_not_empty == Some(true) {
+            let lang = fixture.language.as_deref().unwrap_or("unknown");
+            writeln!(
+                out,
+                "    const char *query = ts_pack_get_highlights_query(reg, \"{}\");",
+                escape_c_string(lang)
+            )
+            .unwrap();
+            writeln!(
+                out,
+                "    ASSERT_NOT_NULL(query, \"Highlights query should not be NULL\");"
+            )
+            .unwrap();
+            writeln!(
+                out,
+                "    ASSERT_TRUE(strlen(query) > 0, \"Highlights query should not be empty\");"
+            )
+            .unwrap();
+        }
+
+        if assertions.highlights_query_is_none == Some(true) {
+            let lang = fixture.language.as_deref().unwrap_or("unknown");
+            writeln!(
+                out,
+                "    const char *query = ts_pack_get_highlights_query(reg, \"{}\");",
+                escape_c_string(lang)
+            )
+            .unwrap();
+            writeln!(out, "    ASSERT_NULL(query, \"Highlights query should be NULL\");").unwrap();
+        }
     } else if let Some(lang) = &fixture.language {
         writeln!(
             out,

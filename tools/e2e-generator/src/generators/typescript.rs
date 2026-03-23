@@ -1,5 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_js_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+    Fixture, escape_js_string, group_by_category, has_ambiguity_assertions, has_chunk_assertions,
+    has_detect_assertions, has_highlights_assertions, has_intel_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -73,6 +74,11 @@ import {
   treeContainsNodeType as _treeContainsNodeType,
   treeHasErrorNodes as _treeHasErrorNodes,
   process as _process,
+  detectLanguageFromExtension as _detectLanguageFromExtension,
+  detectLanguageFromPath as _detectLanguageFromPath,
+  detectLanguageFromContent as _detectLanguageFromContent,
+  extensionAmbiguity as _extensionAmbiguity,
+  getHighlightsQuery as _getHighlightsQuery,
 } from "@kreuzberg/tree-sitter-language-pack";
 
 /**
@@ -123,6 +129,11 @@ export const hasLanguage = _hasLanguage;
 export const getLanguagePtr = _getLanguagePtr;
 export const parseString = _parseString;
 export const process = _process;
+export const detectLanguageFromExtension = _detectLanguageFromExtension;
+export const detectLanguageFromPath = _detectLanguageFromPath;
+export const detectLanguageFromContent = _detectLanguageFromContent;
+export const extensionAmbiguity = _extensionAmbiguity;
+export const getHighlightsQuery = _getHighlightsQuery;
 "#;
     std::fs::write(dir.join("tests").join("helpers.ts"), content)
         .map_err(|e| format!("Failed to write helpers.ts: {e}"))
@@ -136,7 +147,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
     writeln!(out, "import {{ describe, it, expect }} from \"vitest\";").unwrap();
     writeln!(
         out,
-        "import {{ availableLanguages, hasLanguage, getLanguagePtr, process }} from \"./helpers\";"
+        "import {{ availableLanguages, hasLanguage, getLanguagePtr, process, detectLanguageFromExtension, detectLanguageFromPath, detectLanguageFromContent, extensionAmbiguity, getHighlightsQuery }} from \"./helpers\";"
     )
     .unwrap();
     writeln!(out).unwrap();
@@ -153,8 +164,12 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
         // Auto-skip: guard any test that requires a specific language.
         let is_availability_agnostic = assertions.is_some_and(|a| {
-            a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
-        });
+            a.expect_error == Some(true)
+                || a.language_available.is_some()
+                || a.languages_not_empty == Some(true)
+                || a.highlights_query_is_none == Some(true)
+        }) || has_detect_assertions(fixture)
+            || has_ambiguity_assertions(fixture);
         let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
             if !is_availability_agnostic {
                 fixture.language.as_deref()
@@ -197,6 +212,66 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 expected
             )
             .unwrap();
+        } else if has_detect_assertions(fixture) {
+            let assertions = assertions.unwrap();
+            if let Some(ext) = &assertions.detect_from_extension {
+                writeln!(
+                    out,
+                    "    const result = detectLanguageFromExtension(\"{}\");",
+                    escape_js_string(ext)
+                )
+                .unwrap();
+            } else if let Some(path) = &assertions.detect_from_path {
+                writeln!(
+                    out,
+                    "    const result = detectLanguageFromPath(\"{}\");",
+                    escape_js_string(path)
+                )
+                .unwrap();
+            } else if let Some(content) = &assertions.detect_from_content {
+                writeln!(
+                    out,
+                    "    const result = detectLanguageFromContent(\"{}\");",
+                    escape_js_string(content)
+                )
+                .unwrap();
+            }
+            if assertions.detect_result_none == Some(true) {
+                writeln!(out, "    expect(result).toBeNull();").unwrap();
+            } else if let Some(expected) = &assertions.detect_result {
+                writeln!(out, "    expect(result).toBe(\"{}\");", escape_js_string(expected)).unwrap();
+            }
+        } else if has_ambiguity_assertions(fixture) {
+            let assertions = assertions.unwrap();
+            let ext = assertions.ambiguity_extension.as_deref().unwrap_or("");
+            writeln!(
+                out,
+                "    const ambiguity = extensionAmbiguity(\"{}\");",
+                escape_js_string(ext)
+            )
+            .unwrap();
+            if assertions.ambiguity_is_none == Some(true) {
+                writeln!(out, "    expect(ambiguity).toBeNull();").unwrap();
+            } else {
+                writeln!(out, "    expect(ambiguity).not.toBeNull();").unwrap();
+                writeln!(out, "    const [assigned, alts] = ambiguity!;").unwrap();
+                if let Some(assigned) = &assertions.ambiguity_assigned {
+                    writeln!(out, "    expect(assigned).toBe(\"{}\");", escape_js_string(assigned)).unwrap();
+                }
+                if let Some(alt) = &assertions.ambiguity_alternatives_contain {
+                    writeln!(out, "    expect(alts).toContain(\"{}\");", escape_js_string(alt)).unwrap();
+                }
+            }
+        } else if has_highlights_assertions(fixture) {
+            let assertions = assertions.unwrap();
+            let lang = fixture.language.as_deref().unwrap_or("unknown");
+            writeln!(out, "    const q = getHighlightsQuery(\"{}\");", escape_js_string(lang)).unwrap();
+            if assertions.highlights_query_is_none == Some(true) {
+                writeln!(out, "    expect(q).toBeNull();").unwrap();
+            } else if assertions.highlights_query_not_empty == Some(true) {
+                writeln!(out, "    expect(q).not.toBeNull();").unwrap();
+                writeln!(out, "    expect(q!.length).toBeGreaterThan(0);").unwrap();
+            }
         } else if has_intel_assertions(fixture) {
             let lang = fixture.language.as_deref().unwrap_or("unknown");
             let source = fixture.source_code.as_deref().unwrap_or("");

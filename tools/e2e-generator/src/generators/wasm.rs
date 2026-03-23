@@ -1,5 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_js_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+    Fixture, escape_js_string, group_by_category, has_chunk_assertions, has_detect_assertions, has_intel_assertions,
+    sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -111,6 +112,11 @@ export {
   treeHasErrorNodes,
   freeTree,
   process,
+  detectLanguageFromExtension,
+  detectLanguageFromPath,
+  detectLanguageFromContent,
+  extensionAmbiguity,
+  getHighlightsQuery,
 } from "@kreuzberg/tree-sitter-language-pack-wasm";
 "#;
     std::fs::write(dir.join("tests").join("helpers.ts"), content)
@@ -136,6 +142,11 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
   treeHasErrorNodes,
   freeTree,
   process,
+  detectLanguageFromExtension,
+  detectLanguageFromPath,
+  detectLanguageFromContent,
+  extensionAmbiguity,
+  getHighlightsQuery,
 }} from \"./helpers\";"
     )
     .unwrap();
@@ -153,7 +164,15 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
         // Auto-skip: guard any test that requires a specific language.
         let is_availability_agnostic = assertions.is_some_and(|a| {
-            a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
+            a.expect_error == Some(true)
+                || a.language_available.is_some()
+                || a.languages_not_empty == Some(true)
+                || a.detect_from_extension.is_some()
+                || a.detect_from_path.is_some()
+                || a.detect_from_content.is_some()
+                || a.ambiguity_extension.is_some()
+                || a.highlights_query_not_empty.is_some()
+                || a.highlights_query_is_none.is_some()
         });
         let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
             if !is_availability_agnostic {
@@ -289,6 +308,124 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                     min_chunks
                 )
                 .unwrap();
+            }
+        } else if has_detect_assertions(fixture) {
+            let assertions = assertions.unwrap();
+
+            if let Some(ext) = &assertions.detect_from_extension {
+                writeln!(
+                    out,
+                    "    const detectResult = detectLanguageFromExtension(\"{}\");",
+                    escape_js_string(ext)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(out, "    expect(detectResult).toBeNull();").unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "    expect(detectResult).toBe(\"{}\");",
+                        escape_js_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "    expect(detectResult).not.toBeNull();").unwrap();
+                }
+            }
+
+            if let Some(path) = &assertions.detect_from_path {
+                writeln!(
+                    out,
+                    "    const detectResult = detectLanguageFromPath(\"{}\");",
+                    escape_js_string(path)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(out, "    expect(detectResult).toBeNull();").unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "    expect(detectResult).toBe(\"{}\");",
+                        escape_js_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "    expect(detectResult).not.toBeNull();").unwrap();
+                }
+            }
+
+            if let Some(content) = &assertions.detect_from_content {
+                writeln!(
+                    out,
+                    "    const detectResult = detectLanguageFromContent(\"{}\");",
+                    escape_js_string(content)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(out, "    expect(detectResult).toBeNull();").unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "    expect(detectResult).toBe(\"{}\");",
+                        escape_js_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "    expect(detectResult).not.toBeNull();").unwrap();
+                }
+            }
+
+            if let Some(ext) = &assertions.ambiguity_extension {
+                writeln!(
+                    out,
+                    "    const ambiguity = extensionAmbiguity(\"{}\");",
+                    escape_js_string(ext)
+                )
+                .unwrap();
+                if assertions.ambiguity_is_none == Some(true) {
+                    writeln!(out, "    expect(ambiguity).toBeNull();").unwrap();
+                } else {
+                    writeln!(out, "    expect(ambiguity).not.toBeNull();").unwrap();
+                    if let Some(assigned) = &assertions.ambiguity_assigned {
+                        writeln!(
+                            out,
+                            "    expect(ambiguity?.assigned).toBe(\"{}\");",
+                            escape_js_string(assigned)
+                        )
+                        .unwrap();
+                    }
+                    if let Some(alt) = &assertions.ambiguity_alternatives_contain {
+                        writeln!(
+                            out,
+                            "    expect(ambiguity?.alternatives ?? []).toContain(\"{}\");",
+                            escape_js_string(alt)
+                        )
+                        .unwrap();
+                    }
+                }
+            }
+
+            if assertions.highlights_query_not_empty == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "    const query = getHighlightsQuery(\"{}\");",
+                    escape_js_string(lang)
+                )
+                .unwrap();
+                writeln!(out, "    expect(query).not.toBeNull();").unwrap();
+                writeln!(out, "    expect(query?.length ?? 0).toBeGreaterThan(0);").unwrap();
+            }
+
+            if assertions.highlights_query_is_none == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "    const query = getHighlightsQuery(\"{}\");",
+                    escape_js_string(lang)
+                )
+                .unwrap();
+                writeln!(out, "    expect(query).toBeNull();").unwrap();
             }
         } else if let Some(lang) = &fixture.language {
             // WASM has full parse API — use parseString + tree inspection

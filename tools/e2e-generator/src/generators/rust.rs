@@ -1,5 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_rust_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+    Fixture, escape_rust_string, group_by_category, has_ambiguity_assertions, has_chunk_assertions,
+    has_detect_assertions, has_highlights_assertions, has_intel_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -231,6 +232,136 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
     }
 }
 
+/// Write language-detection assertion code for a fixture.
+fn write_detect_assertions(out: &mut String, fixture: &Fixture) {
+    let assertions = fixture.assertions.as_ref().unwrap();
+    writeln!(out, "    // {}", fixture.description).unwrap();
+
+    if let Some(ext) = &assertions.detect_from_extension {
+        let call = format!(
+            "tree_sitter_language_pack::detect_language_from_extension(\"{}\")",
+            escape_rust_string(ext)
+        );
+        if assertions.detect_result_none == Some(true) {
+            writeln!(out, "    assert_eq!({call}, None);").unwrap();
+        } else if let Some(expected) = &assertions.detect_result {
+            writeln!(
+                out,
+                "    assert_eq!({call}, Some(\"{}\"));",
+                escape_rust_string(expected)
+            )
+            .unwrap();
+        }
+    } else if let Some(path) = &assertions.detect_from_path {
+        let call = format!(
+            "tree_sitter_language_pack::detect_language_from_path(\"{}\")",
+            escape_rust_string(path)
+        );
+        if assertions.detect_result_none == Some(true) {
+            writeln!(out, "    assert_eq!({call}, None);").unwrap();
+        } else if let Some(expected) = &assertions.detect_result {
+            writeln!(
+                out,
+                "    assert_eq!({call}, Some(\"{}\"));",
+                escape_rust_string(expected)
+            )
+            .unwrap();
+        }
+    } else if let Some(content) = &assertions.detect_from_content {
+        let call = format!(
+            "tree_sitter_language_pack::detect_language_from_content(\"{}\")",
+            escape_rust_string(content)
+        );
+        if assertions.detect_result_none == Some(true) {
+            writeln!(out, "    assert_eq!({call}, None);").unwrap();
+        } else if let Some(expected) = &assertions.detect_result {
+            writeln!(
+                out,
+                "    assert_eq!({call}, Some(\"{}\"));",
+                escape_rust_string(expected)
+            )
+            .unwrap();
+        }
+    }
+}
+
+/// Write extension-ambiguity assertion code for a fixture.
+fn write_ambiguity_assertions(out: &mut String, fixture: &Fixture) {
+    let assertions = fixture.assertions.as_ref().unwrap();
+    let ext = assertions.ambiguity_extension.as_deref().unwrap_or("");
+    writeln!(out, "    // {}", fixture.description).unwrap();
+    writeln!(
+        out,
+        "    let result = tree_sitter_language_pack::extension_ambiguity(\"{}\");",
+        escape_rust_string(ext)
+    )
+    .unwrap();
+
+    if assertions.ambiguity_is_none == Some(true) {
+        writeln!(
+            out,
+            "    assert!(result.is_none(), \"Expected no ambiguity for extension\");"
+        )
+        .unwrap();
+    } else {
+        writeln!(
+            out,
+            "    assert!(result.is_some(), \"Expected ambiguity result for extension\");"
+        )
+        .unwrap();
+        writeln!(out, "    let (assigned, alts) = result.unwrap();").unwrap();
+        if let Some(assigned) = &assertions.ambiguity_assigned {
+            writeln!(
+                out,
+                "    assert_eq!(assigned, \"{}\", \"Assigned language mismatch\");",
+                escape_rust_string(assigned)
+            )
+            .unwrap();
+        }
+        if let Some(alt) = &assertions.ambiguity_alternatives_contain {
+            writeln!(
+                out,
+                "    assert!(alts.contains(&\"{}\"), \"Alternatives should contain '{}'\");",
+                escape_rust_string(alt),
+                escape_rust_string(alt)
+            )
+            .unwrap();
+        }
+    }
+}
+
+/// Write highlights query assertion code for a fixture.
+fn write_highlights_assertions(out: &mut String, fixture: &Fixture) {
+    let assertions = fixture.assertions.as_ref().unwrap();
+    let lang = fixture.language.as_deref().unwrap_or("unknown");
+    writeln!(out, "    // {}", fixture.description).unwrap();
+    writeln!(
+        out,
+        "    let q = tree_sitter_language_pack::get_highlights_query(\"{}\");",
+        escape_rust_string(lang)
+    )
+    .unwrap();
+
+    if assertions.highlights_query_is_none == Some(true) {
+        writeln!(
+            out,
+            "    assert!(q.is_none(), \"Expected no highlights query for language\");"
+        )
+        .unwrap();
+    } else if assertions.highlights_query_not_empty == Some(true) {
+        writeln!(
+            out,
+            "    assert!(q.is_some(), \"Expected highlights query to be present\");"
+        )
+        .unwrap();
+        writeln!(
+            out,
+            "    assert!(!q.unwrap().is_empty(), \"Highlights query should not be empty\");"
+        )
+        .unwrap();
+    }
+}
+
 fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
     let mut out = String::new();
 
@@ -247,8 +378,12 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
         // Explicit skip.requires_language takes precedence; otherwise infer from fixture.language.
         let assertions = fixture.assertions.as_ref();
         let is_availability_agnostic = assertions.is_some_and(|a| {
-            a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
-        });
+            a.expect_error == Some(true)
+                || a.language_available.is_some()
+                || a.languages_not_empty == Some(true)
+                || a.highlights_query_is_none == Some(true)
+        }) || has_detect_assertions(fixture)
+            || has_ambiguity_assertions(fixture);
         let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
             if !is_availability_agnostic {
                 fixture.language.as_deref()
@@ -309,6 +444,12 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 escape_rust_string(lang)
             )
             .unwrap();
+        } else if has_detect_assertions(fixture) {
+            write_detect_assertions(&mut out, fixture);
+        } else if has_ambiguity_assertions(fixture) {
+            write_ambiguity_assertions(&mut out, fixture);
+        } else if has_highlights_assertions(fixture) {
+            write_highlights_assertions(&mut out, fixture);
         } else if has_intel_assertions(fixture) {
             // Intel test: call process() with ProcessConfig
             write_intel_assertions(&mut out, fixture);

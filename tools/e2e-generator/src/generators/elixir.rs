@@ -1,5 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_elixir_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+    Fixture, escape_elixir_string, group_by_category, has_chunk_assertions, has_detect_assertions,
+    has_intel_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -229,6 +230,165 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 && let Some(min_chunks) = assertions.and_then(|a| a.intel_chunk_count_min)
             {
                 writeln!(out, "    assert length(chunks) >= {}", min_chunks).unwrap();
+            }
+        } else if has_detect_assertions(fixture) {
+            let assertions = assertions.unwrap();
+
+            if let Some(ext) = &assertions.detect_from_extension {
+                writeln!(
+                    out,
+                    "    detect_result = TreeSitterLanguagePack.detect_language_from_extension(\"{}\")",
+                    escape_elixir_string(ext)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(
+                        out,
+                        "    assert detect_result == nil, \"Expected no language detected for extension\""
+                    )
+                    .unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "    assert detect_result == \"{}\", \"Expected language '{}' detected from extension\"",
+                        escape_elixir_string(expected),
+                        escape_elixir_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(
+                        out,
+                        "    assert detect_result != nil, \"Expected a language to be detected from extension\""
+                    )
+                    .unwrap();
+                }
+            }
+
+            if let Some(path) = &assertions.detect_from_path {
+                writeln!(
+                    out,
+                    "    detect_result = TreeSitterLanguagePack.detect_language_from_path(\"{}\")",
+                    escape_elixir_string(path)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(
+                        out,
+                        "    assert detect_result == nil, \"Expected no language detected for path\""
+                    )
+                    .unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "    assert detect_result == \"{}\", \"Expected language '{}' detected from path\"",
+                        escape_elixir_string(expected),
+                        escape_elixir_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(
+                        out,
+                        "    assert detect_result != nil, \"Expected a language to be detected from path\""
+                    )
+                    .unwrap();
+                }
+            }
+
+            if let Some(content) = &assertions.detect_from_content {
+                writeln!(
+                    out,
+                    "    detect_result = TreeSitterLanguagePack.detect_language_from_content(\"{}\")",
+                    escape_elixir_string(content)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(
+                        out,
+                        "    assert detect_result == nil, \"Expected no language detected from content\""
+                    )
+                    .unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "    assert detect_result == \"{}\", \"Expected language '{}' detected from content\"",
+                        escape_elixir_string(expected),
+                        escape_elixir_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(
+                        out,
+                        "    assert detect_result != nil, \"Expected a language to be detected from content\""
+                    )
+                    .unwrap();
+                }
+            }
+
+            if let Some(ext) = &assertions.ambiguity_extension {
+                writeln!(
+                    out,
+                    "    ambiguity = TreeSitterLanguagePack.extension_ambiguity(\"{}\")",
+                    escape_elixir_string(ext)
+                )
+                .unwrap();
+                if assertions.ambiguity_is_none == Some(true) {
+                    writeln!(
+                        out,
+                        "    assert ambiguity == nil, \"Expected no ambiguity for extension\""
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(
+                        out,
+                        "    assert ambiguity != nil, \"Expected ambiguity info for extension\""
+                    )
+                    .unwrap();
+                    if let Some(assigned) = &assertions.ambiguity_assigned {
+                        writeln!(
+                            out,
+                            "    assert ambiguity[\"assigned\"] == \"{}\", \"Expected assigned language '{}'\"",
+                            escape_elixir_string(assigned),
+                            escape_elixir_string(assigned)
+                        )
+                        .unwrap();
+                    }
+                    if let Some(alt) = &assertions.ambiguity_alternatives_contain {
+                        writeln!(
+                            out,
+                            "    assert \"{}\" in ambiguity[\"alternatives\"], \"Alternatives should contain '{}'\"",
+                            escape_elixir_string(alt),
+                            escape_elixir_string(alt)
+                        )
+                        .unwrap();
+                    }
+                }
+            }
+
+            if assertions.highlights_query_not_empty == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "    query = TreeSitterLanguagePack.get_highlights_query(\"{}\")",
+                    escape_elixir_string(lang)
+                )
+                .unwrap();
+                writeln!(out, "    assert query != nil, \"Highlights query should not be nil\"").unwrap();
+                writeln!(
+                    out,
+                    "    assert String.length(query) > 0, \"Highlights query should not be empty\""
+                )
+                .unwrap();
+            }
+
+            if assertions.highlights_query_is_none == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "    query = TreeSitterLanguagePack.get_highlights_query(\"{}\")",
+                    escape_elixir_string(lang)
+                )
+                .unwrap();
+                writeln!(out, "    assert query == nil, \"Highlights query should be nil\"").unwrap();
             }
         } else if let Some(lang) = &fixture.language {
             // Parsing test: use parse_string and tree inspection functions

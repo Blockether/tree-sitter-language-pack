@@ -2,6 +2,8 @@ use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 #[cfg(feature = "dynamic-loading")]
 use std::path::PathBuf;
+#[cfg(feature = "dynamic-loading")]
+use std::sync::Arc;
 use tree_sitter::Language;
 
 use crate::error::Error;
@@ -185,8 +187,10 @@ pub struct LanguageRegistry {
     #[cfg(feature = "dynamic-loading")]
     dynamic_loader: dynamic::DynamicLoader,
     /// Additional library directories to search (e.g. download cache).
+    /// Wrapped in Arc<RwLock<...>> so the outer struct is Send+Sync without
+    /// requiring &mut self for mutation — interior mutability via the inner lock.
     #[cfg(feature = "dynamic-loading")]
-    extra_lib_dirs: Vec<PathBuf>,
+    extra_lib_dirs: Arc<std::sync::RwLock<Vec<PathBuf>>>,
 }
 
 impl LanguageRegistry {
@@ -205,7 +209,7 @@ impl LanguageRegistry {
             #[cfg(feature = "dynamic-loading")]
             dynamic_loader: dynamic::DynamicLoader::new(PathBuf::from(LIBS_DIR), DYNAMIC_LANGUAGE_NAMES.to_vec()),
             #[cfg(feature = "dynamic-loading")]
-            extra_lib_dirs: Vec::new(),
+            extra_lib_dirs: Arc::new(std::sync::RwLock::new(Vec::new())),
         }
     }
 
@@ -225,10 +229,16 @@ impl LanguageRegistry {
     /// When [`get_language`](Self::get_language) cannot find a grammar in the
     /// primary library directory, it searches these extra directories in order.
     /// Typically used by the download system to register its cache directory.
+    ///
+    /// Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
+    /// mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
+    /// immutable while the directory list is updated.
     #[cfg(feature = "dynamic-loading")]
-    pub fn add_extra_libs_dir(&mut self, dir: PathBuf) {
-        if !self.extra_lib_dirs.contains(&dir) {
-            self.extra_lib_dirs.push(dir);
+    pub fn add_extra_libs_dir(&self, dir: PathBuf) {
+        if let Ok(mut dirs) = self.extra_lib_dirs.write()
+            && !dirs.contains(&dir)
+        {
+            dirs.push(dir);
         }
     }
 
@@ -262,7 +272,8 @@ impl LanguageRegistry {
             }
 
             // Try loading from extra dirs (e.g. download cache)
-            for extra_dir in &self.extra_lib_dirs {
+            let extra_dirs: Vec<PathBuf> = self.extra_lib_dirs.read().map(|dirs| dirs.clone()).unwrap_or_default();
+            for extra_dir in &extra_dirs {
                 if self.dynamic_loader.load_from_dir(name, extra_dir).is_ok() {
                     // Re-fetch from cache — load_from_dir inserted it
                     if let Some(lang) = self.dynamic_loader.get_cached(name)? {
@@ -292,12 +303,12 @@ impl LanguageRegistry {
             }
 
             // Scan extra library directories for downloadable/cached libraries
-            for extra_dir in &self.extra_lib_dirs {
+            let extra_dirs: Vec<PathBuf> = self.extra_lib_dirs.read().map(|dirs| dirs.clone()).unwrap_or_default();
+            for extra_dir in &extra_dirs {
                 if let Ok(entries) = std::fs::read_dir(extra_dir) {
                     for entry in entries.flatten() {
                         let filename = entry.file_name();
                         let name: Cow<'_, str> = filename.to_string_lossy();
-                        // Extract language name from libtree_sitter_<name>.{so,dylib,dll}
                         let stripped = name.strip_prefix("lib").unwrap_or(&name);
                         if let Some(lang) = stripped.strip_prefix("tree_sitter_") {
                             let lang = lang
@@ -339,7 +350,8 @@ impl LanguageRegistry {
                 return true;
             }
 
-            for extra_dir in &self.extra_lib_dirs {
+            let extra_dirs: Vec<PathBuf> = self.extra_lib_dirs.read().map(|dirs| dirs.clone()).unwrap_or_default();
+            for extra_dir in &extra_dirs {
                 let lib_name = format!("tree_sitter_{name}");
                 let (prefix, ext) = if cfg!(target_os = "macos") {
                     ("lib", "dylib")
@@ -369,7 +381,6 @@ impl LanguageRegistry {
         config: &crate::process_config::ProcessConfig,
     ) -> Result<crate::intel::types::ProcessResult, Error> {
         let resolved_lang = resolve_alias(&config.language);
-        // Create a lightweight copy only if alias changed
         if resolved_lang != config.language.as_ref() {
             let mut resolved_config = config.clone();
             resolved_config.language = std::borrow::Cow::Owned(resolved_lang.to_string());

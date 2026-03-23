@@ -1,5 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_csharp_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+    Fixture, escape_csharp_string, group_by_category, has_chunk_assertions, has_detect_assertions,
+    has_intel_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -228,6 +229,124 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                     min_chunks, min_chunks
                 )
                 .unwrap();
+            }
+        } else if has_detect_assertions(fixture) {
+            let assertions = assertions.unwrap();
+
+            if let Some(ext) = &assertions.detect_from_extension {
+                writeln!(
+                    out,
+                    "        var detectResult = TsPackClient.DetectLanguageFromExtension(\"{}\");",
+                    escape_csharp_string(ext)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(out, "        Assert.Null(detectResult);").unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "        Assert.Equal(\"{}\", detectResult);",
+                        escape_csharp_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "        Assert.NotNull(detectResult);").unwrap();
+                }
+            }
+
+            if let Some(path) = &assertions.detect_from_path {
+                writeln!(
+                    out,
+                    "        var detectResult = TsPackClient.DetectLanguageFromPath(\"{}\");",
+                    escape_csharp_string(path)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(out, "        Assert.Null(detectResult);").unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "        Assert.Equal(\"{}\", detectResult);",
+                        escape_csharp_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "        Assert.NotNull(detectResult);").unwrap();
+                }
+            }
+
+            if let Some(content) = &assertions.detect_from_content {
+                writeln!(
+                    out,
+                    "        var detectResult = TsPackClient.DetectLanguageFromContent(\"{}\");",
+                    escape_csharp_string(content)
+                )
+                .unwrap();
+                if assertions.detect_result_none == Some(true) {
+                    writeln!(out, "        Assert.Null(detectResult);").unwrap();
+                } else if let Some(expected) = &assertions.detect_result {
+                    writeln!(
+                        out,
+                        "        Assert.Equal(\"{}\", detectResult);",
+                        escape_csharp_string(expected)
+                    )
+                    .unwrap();
+                } else {
+                    writeln!(out, "        Assert.NotNull(detectResult);").unwrap();
+                }
+            }
+
+            if let Some(ext) = &assertions.ambiguity_extension {
+                writeln!(
+                    out,
+                    "        var ambiguity = TsPackClient.ExtensionAmbiguity(\"{}\");",
+                    escape_csharp_string(ext)
+                )
+                .unwrap();
+                if assertions.ambiguity_is_none == Some(true) {
+                    writeln!(out, "        Assert.Null(ambiguity);").unwrap();
+                } else {
+                    writeln!(out, "        Assert.NotNull(ambiguity);").unwrap();
+                    if let Some(assigned) = &assertions.ambiguity_assigned {
+                        writeln!(
+                            out,
+                            "        Assert.Equal(\"{}\", ambiguity!.Assigned);",
+                            escape_csharp_string(assigned)
+                        )
+                        .unwrap();
+                    }
+                    if let Some(alt) = &assertions.ambiguity_alternatives_contain {
+                        writeln!(
+                            out,
+                            "        Assert.Contains(\"{}\", ambiguity!.Alternatives);",
+                            escape_csharp_string(alt)
+                        )
+                        .unwrap();
+                    }
+                }
+            }
+
+            if assertions.highlights_query_not_empty == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "        var query = TsPackClient.GetHighlightsQuery(\"{}\");",
+                    escape_csharp_string(lang)
+                )
+                .unwrap();
+                writeln!(out, "        Assert.NotNull(query);").unwrap();
+                writeln!(out, "        Assert.NotEmpty(query!);").unwrap();
+            }
+
+            if assertions.highlights_query_is_none == Some(true) {
+                let lang = fixture.language.as_deref().unwrap_or("unknown");
+                writeln!(
+                    out,
+                    "        var query = TsPackClient.GetHighlightsQuery(\"{}\");",
+                    escape_csharp_string(lang)
+                )
+                .unwrap();
+                writeln!(out, "        Assert.Null(query);").unwrap();
             }
         } else if let Some(lang) = &fixture.language {
             writeln!(

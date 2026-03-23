@@ -57,6 +57,31 @@ pub struct Assertions {
     pub intel_chunk_count_min: Option<usize>,
     #[serde(default)]
     pub intel_chunk_max_size: Option<usize>,
+    // Language detection
+    #[serde(default)]
+    pub detect_from_extension: Option<String>,
+    #[serde(default)]
+    pub detect_from_path: Option<String>,
+    #[serde(default)]
+    pub detect_from_content: Option<String>,
+    #[serde(default)]
+    pub detect_result: Option<String>,
+    #[serde(default)]
+    pub detect_result_none: Option<bool>,
+    // Ambiguity
+    #[serde(default)]
+    pub ambiguity_extension: Option<String>,
+    #[serde(default)]
+    pub ambiguity_assigned: Option<String>,
+    #[serde(default)]
+    pub ambiguity_alternatives_contain: Option<String>,
+    #[serde(default)]
+    pub ambiguity_is_none: Option<bool>,
+    // Highlight queries
+    #[serde(default)]
+    pub highlights_query_not_empty: Option<bool>,
+    #[serde(default)]
+    pub highlights_query_is_none: Option<bool>,
 }
 
 /// Configuration for when a test should be skipped.
@@ -106,10 +131,19 @@ fn walk_dir(dir: &Path, fixtures: &mut Vec<Fixture>) -> Result<(), String> {
             let content =
                 std::fs::read_to_string(&path).map_err(|e| format!("Failed to read {}: {}", path.display(), e))?;
 
-            let fixture: Fixture =
+            // Support both single-fixture objects and arrays of fixtures.
+            let value: serde_json::Value =
                 serde_json::from_str(&content).map_err(|e| format!("Failed to parse {}: {}", path.display(), e))?;
 
-            fixtures.push(fixture);
+            if value.is_array() {
+                let batch: Vec<Fixture> = serde_json::from_value(value)
+                    .map_err(|e| format!("Failed to parse fixture array in {}: {}", path.display(), e))?;
+                fixtures.extend(batch);
+            } else {
+                let fixture: Fixture = serde_json::from_value(value)
+                    .map_err(|e| format!("Failed to parse fixture in {}: {}", path.display(), e))?;
+                fixtures.push(fixture);
+            }
         }
     }
 
@@ -234,6 +268,29 @@ pub fn escape_csharp_string(s: &str) -> String {
         .replace('\n', "\\n")
         .replace('\r', "\\r")
         .replace('\t', "\\t")
+}
+
+/// Check if a fixture has any language-detection assertions.
+pub fn has_detect_assertions(fixture: &Fixture) -> bool {
+    fixture.assertions.as_ref().is_some_and(|a| {
+        a.detect_from_extension.is_some() || a.detect_from_path.is_some() || a.detect_from_content.is_some()
+    })
+}
+
+/// Check if a fixture has any ambiguity assertions.
+pub fn has_ambiguity_assertions(fixture: &Fixture) -> bool {
+    fixture
+        .assertions
+        .as_ref()
+        .is_some_and(|a| a.ambiguity_extension.is_some())
+}
+
+/// Check if a fixture has any highlights query assertions.
+pub fn has_highlights_assertions(fixture: &Fixture) -> bool {
+    fixture
+        .assertions
+        .as_ref()
+        .is_some_and(|a| a.highlights_query_not_empty.is_some() || a.highlights_query_is_none.is_some())
 }
 
 /// Check if a fixture has any intel-related assertions.

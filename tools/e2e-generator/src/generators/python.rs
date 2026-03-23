@@ -1,5 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_python_string, group_by_category, has_chunk_assertions, has_intel_assertions, sanitize_name,
+    Fixture, escape_python_string, group_by_category, has_ambiguity_assertions, has_chunk_assertions,
+    has_detect_assertions, has_highlights_assertions, has_intel_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -138,6 +139,26 @@ fn fixture_needs_process(f: &Fixture) -> bool {
     has_intel_assertions(f)
 }
 
+fn fixture_needs_detect_from_extension(f: &Fixture) -> bool {
+    f.assertions.as_ref().is_some_and(|a| a.detect_from_extension.is_some())
+}
+
+fn fixture_needs_detect_from_path(f: &Fixture) -> bool {
+    f.assertions.as_ref().is_some_and(|a| a.detect_from_path.is_some())
+}
+
+fn fixture_needs_detect_from_content(f: &Fixture) -> bool {
+    f.assertions.as_ref().is_some_and(|a| a.detect_from_content.is_some())
+}
+
+fn fixture_needs_extension_ambiguity(f: &Fixture) -> bool {
+    has_ambiguity_assertions(f)
+}
+
+fn fixture_needs_get_highlights_query(f: &Fixture) -> bool {
+    has_highlights_assertions(f)
+}
+
 fn fixture_needs_tree_contains(f: &Fixture) -> bool {
     f.assertions
         .as_ref()
@@ -155,21 +176,32 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
     let need_get_parser = needs_import(fixtures, fixture_needs_get_parser);
     let need_get_language = needs_import(fixtures, fixture_needs_get_language);
     let need_available_languages = needs_import(fixtures, fixture_needs_available_languages);
+    let need_detect_from_extension = needs_import(fixtures, fixture_needs_detect_from_extension);
+    let need_detect_from_path = needs_import(fixtures, fixture_needs_detect_from_path);
+    let need_detect_from_content = needs_import(fixtures, fixture_needs_detect_from_content);
+    let need_extension_ambiguity = needs_import(fixtures, fixture_needs_extension_ambiguity);
+    let need_get_highlights_query = needs_import(fixtures, fixture_needs_get_highlights_query);
     let need_has_language = fixtures.iter().any(|f| {
-        fixture_needs_has_language(f) || {
-            let is_agnostic = f.assertions.as_ref().is_some_and(|a| {
-                a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
-            });
-            f.language.is_some() && !is_agnostic
-        }
+        let is_agnostic = f.assertions.as_ref().is_some_and(|a| {
+            a.expect_error == Some(true)
+                || a.language_available.is_some()
+                || a.languages_not_empty == Some(true)
+                || a.highlights_query_is_none == Some(true)
+        }) || has_detect_assertions(f)
+            || has_ambiguity_assertions(f);
+        fixture_needs_has_language(f) || (f.language.is_some() && !is_agnostic)
     });
     let need_process = needs_import(fixtures, fixture_needs_process);
     let need_tree_contains = needs_import(fixtures, fixture_needs_tree_contains);
     let need_tree_has_error = needs_import(fixtures, fixture_needs_tree_has_error);
     let need_pytest = fixtures.iter().any(|f| {
         let is_agnostic = f.assertions.as_ref().is_some_and(|a| {
-            a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
-        });
+            a.expect_error == Some(true)
+                || a.language_available.is_some()
+                || a.languages_not_empty == Some(true)
+                || a.highlights_query_is_none == Some(true)
+        }) || has_detect_assertions(f)
+            || has_ambiguity_assertions(f);
         // pytest needed for expect_error tests AND for auto-skip guards
         f.assertions.as_ref().is_some_and(|a| a.expect_error == Some(true))
             || f.skip.as_ref().is_some_and(|s| s.requires_language.is_some())
@@ -183,6 +215,21 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
     let mut pack_imports = Vec::new();
     if need_available_languages {
         pack_imports.push("available_languages");
+    }
+    if need_detect_from_content {
+        pack_imports.push("detect_language_from_content");
+    }
+    if need_detect_from_extension {
+        pack_imports.push("detect_language_from_extension");
+    }
+    if need_detect_from_path {
+        pack_imports.push("detect_language_from_path");
+    }
+    if need_extension_ambiguity {
+        pack_imports.push("extension_ambiguity");
+    }
+    if need_get_highlights_query {
+        pack_imports.push("get_highlights_query");
     }
     if need_get_language {
         pack_imports.push("get_language");
@@ -241,8 +288,12 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
         // Auto-skip: guard any test that requires a specific language.
         let is_availability_agnostic = assertions.is_some_and(|a| {
-            a.expect_error == Some(true) || a.language_available.is_some() || a.languages_not_empty == Some(true)
-        });
+            a.expect_error == Some(true)
+                || a.language_available.is_some()
+                || a.languages_not_empty == Some(true)
+                || a.highlights_query_is_none == Some(true)
+        }) || has_detect_assertions(fixture)
+            || has_ambiguity_assertions(fixture);
         let skip_lang = fixture.skip.as_ref().and_then(|s| s.requires_language.as_deref()).or({
             if !is_availability_agnostic {
                 fixture.language.as_deref()
@@ -289,6 +340,100 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 expected
             )
             .unwrap();
+        } else if has_detect_assertions(fixture) {
+            let assertions = assertions.unwrap();
+            if let Some(ext) = &assertions.detect_from_extension {
+                writeln!(
+                    out,
+                    "    result = detect_language_from_extension(\"{}\")",
+                    escape_python_string(ext)
+                )
+                .unwrap();
+            } else if let Some(path) = &assertions.detect_from_path {
+                writeln!(
+                    out,
+                    "    result = detect_language_from_path(\"{}\")",
+                    escape_python_string(path)
+                )
+                .unwrap();
+            } else if let Some(content) = &assertions.detect_from_content {
+                writeln!(
+                    out,
+                    "    result = detect_language_from_content(\"{}\")",
+                    escape_python_string(content)
+                )
+                .unwrap();
+            }
+            if assertions.detect_result_none == Some(true) {
+                writeln!(out, "    assert result is None, f\"Expected None, got {{result!r}}\"").unwrap();
+            } else if let Some(expected) = &assertions.detect_result {
+                writeln!(
+                    out,
+                    "    assert result == \"{}\", f\"Expected '{}', got {{result!r}}\"",
+                    escape_python_string(expected),
+                    escape_python_string(expected)
+                )
+                .unwrap();
+            }
+        } else if has_ambiguity_assertions(fixture) {
+            let assertions = assertions.unwrap();
+            let ext = assertions.ambiguity_extension.as_deref().unwrap_or("");
+            writeln!(
+                out,
+                "    result = extension_ambiguity(\"{}\")",
+                escape_python_string(ext)
+            )
+            .unwrap();
+            if assertions.ambiguity_is_none == Some(true) {
+                writeln!(
+                    out,
+                    "    assert result is None, \"Expected no ambiguity for extension\""
+                )
+                .unwrap();
+            } else {
+                writeln!(
+                    out,
+                    "    assert result is not None, \"Expected ambiguity result for extension\""
+                )
+                .unwrap();
+                writeln!(out, "    assigned, alts = result").unwrap();
+                if let Some(assigned) = &assertions.ambiguity_assigned {
+                    writeln!(
+                        out,
+                        "    assert assigned == \"{}\", f\"Expected assigned '{}', got {{assigned!r}}\"",
+                        escape_python_string(assigned),
+                        escape_python_string(assigned)
+                    )
+                    .unwrap();
+                }
+                if let Some(alt) = &assertions.ambiguity_alternatives_contain {
+                    writeln!(
+                        out,
+                        "    assert \"{}\" in alts, f\"Alternatives should contain '{}', got {{alts!r}}\"",
+                        escape_python_string(alt),
+                        escape_python_string(alt)
+                    )
+                    .unwrap();
+                }
+            }
+        } else if has_highlights_assertions(fixture) {
+            let assertions = assertions.unwrap();
+            let lang = fixture.language.as_deref().unwrap_or("unknown");
+            writeln!(out, "    q = get_highlights_query(\"{}\")", escape_python_string(lang)).unwrap();
+            if assertions.highlights_query_is_none == Some(true) {
+                writeln!(
+                    out,
+                    "    assert q is None, \"Expected no highlights query for language\""
+                )
+                .unwrap();
+            } else if assertions.highlights_query_not_empty == Some(true) {
+                writeln!(
+                    out,
+                    "    assert q is not None, \"Expected highlights query to be present\""
+                )
+                .unwrap();
+                writeln!(out, "    assert len(q) > 0, \"Highlights query should not be empty\"").unwrap();
+            }
         } else if has_intel_assertions(fixture) {
             let lang = fixture.language.as_deref().unwrap_or("unknown");
             let source = fixture.source_code.as_deref().unwrap_or("");
