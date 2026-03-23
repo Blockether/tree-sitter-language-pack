@@ -180,6 +180,7 @@
 	},
 	"csharp": {
 		"branch": "master",
+		"c_symbol": "c_sharp",
 		"extensions": ["cs"],
 		"generate": true,
 		"repo": "https://github.com/tree-sitter/tree-sitter-c-sharp",
@@ -266,6 +267,7 @@
 	},
 	"embeddedtemplate": {
 		"branch": "master",
+		"c_symbol": "embedded_template",
 		"extensions": ["erb"],
 		"generate": true,
 		"repo": "https://github.com/tree-sitter/tree-sitter-embedded-template",
@@ -1028,6 +1030,7 @@
 		"rev": "fee18d64a51127b32a221a56509f77c942d9923f"
 	},
 	"vb": {
+		"c_symbol": "vb_dotnet",
 		"extensions": ["vb"],
 		"generate": true,
 		"repo": "https://github.com/CodeAnt-AI/tree-sitter-vb-dotnet",

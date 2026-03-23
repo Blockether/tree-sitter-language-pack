@@ -16,6 +16,9 @@ pub struct LanguageDefinition {
     pub abi_version: Option<u32>,
     #[serde(default)]
     pub extensions: Vec<String>,
+    /// Override for the C symbol name when it differs from the language name.
+    #[serde(default)]
+    pub c_symbol: Option<String>,
     /// Known ambiguous extensions mapped to the other languages they could belong to.
     /// Key: extension, Value: list of alternative language names.
     /// Example: `{"m": ["matlab"]}` on the `objc` definition means `.m` could also be MATLAB.

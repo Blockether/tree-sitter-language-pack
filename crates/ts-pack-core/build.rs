@@ -23,6 +23,10 @@ struct LanguageDefinition {
     extensions: Vec<String>,
     #[serde(default)]
     ambiguous: BTreeMap<String, Vec<String>>,
+    /// Override for the C symbol name when it differs from the language name.
+    /// E.g. language "csharp" exports `tree_sitter_c_sharp()`.
+    #[serde(default)]
+    c_symbol: Option<String>,
 }
 
 fn find_project_root() -> PathBuf {
@@ -397,7 +401,13 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
     true
 }
 
-fn generate_registry(static_langs: &[String], dynamic_langs: &[String], libs_dir: &Path, out_dir: &Path) {
+fn generate_registry(
+    static_langs: &[String],
+    dynamic_langs: &[String],
+    definitions: &BTreeMap<String, LanguageDefinition>,
+    libs_dir: &Path,
+    out_dir: &Path,
+) {
     let path = out_dir.join("registry_generated.rs");
     let mut f = fs::File::create(&path).expect("Failed to create registry_generated.rs");
 
@@ -409,11 +419,21 @@ fn generate_registry(static_langs: &[String], dynamic_langs: &[String], libs_dir
     .unwrap();
     writeln!(f).unwrap();
 
+    // Resolve C symbol name: use c_symbol override if present, otherwise use language name
+    let c_sym = |name: &str| -> String {
+        definitions
+            .get(name)
+            .and_then(|d| d.c_symbol.as_deref())
+            .unwrap_or(name)
+            .to_string()
+    };
+
     // Static extern declarations
     if !static_langs.is_empty() {
         for name in static_langs {
+            let sym = c_sym(name);
             writeln!(f, "unsafe extern \"C\" {{").unwrap();
-            writeln!(f, "    fn tree_sitter_{name}() -> *const tree_sitter::ffi::TSLanguage;").unwrap();
+            writeln!(f, "    fn tree_sitter_{sym}() -> *const tree_sitter::ffi::TSLanguage;").unwrap();
             writeln!(f, "}}").unwrap();
         }
         writeln!(f).unwrap();
@@ -426,9 +446,10 @@ fn generate_registry(static_langs: &[String], dynamic_langs: &[String], libs_dir
     )
     .unwrap();
     for name in static_langs {
+        let sym = c_sym(name);
         writeln!(
             f,
-            "    (\"{name}\", || unsafe {{ Language::from_raw(tree_sitter_{name}()) }}),",
+            "    (\"{name}\", || unsafe {{ Language::from_raw(tree_sitter_{sym}()) }}),",
         )
         .unwrap();
     }
@@ -744,7 +765,7 @@ fn main() {
         }
     }
 
-    generate_registry(&static_compiled, &dynamic_compiled, &libs_dir, &out_dir);
+    generate_registry(&static_compiled, &dynamic_compiled, &definitions, &libs_dir, &out_dir);
     generate_extensions_lookup(&definitions, &out_dir);
     generate_queries_registry(&definitions, &parsers_dir, &out_dir);
 }
