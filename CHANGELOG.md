@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-03-23
+
+### Added
+
+- Centralized extension-to-language mapping: `sources/language_definitions.json` is now the single source of truth for file extensions (213 extensions across 177 languages)
+- Build-time code generation: `build.rs` generates the extension lookup from JSON with strict validation (panics on duplicates, non-ASCII, uppercase, dots, or invalid characters)
+- `extension_ambiguity(ext)` API: query whether a file extension is ambiguous (e.g. `.m` could be Objective-C or MATLAB, `.h` could be C, C++, or Objective-C)
+- `ambiguous` field in `language_definitions.json` for declaring known extension ambiguities
+- Round-trip test that validates every extension in the JSON resolves correctly through the generated code
+- New extensions: `.cts` (TypeScript), `.pyw` (Python), `.f08` (Fortran), `.erb` (embedded template), `.heex` (HEEx), `.agda`, `.qml`, `.tal` (Uxntal), `.yuck`, `.td` (TableGen), and more
+- New language support: C#, YAML, regex, embedded template (#77)
+
+### Changed
+
+- `detect_language_from_extension()` and `detect_language_from_path()` are now generated from JSON at build time instead of a handwritten match statement
+- `LanguageDefinition` struct gains `extensions: Vec<String>` and `ambiguous: BTreeMap<String, Vec<String>>` fields
+
+### Fixed
+
+- Pre-existing test failures: registry tests (`test_registry_process`, `test_registry_process_with_chunking`) no longer fail when run alongside other tests due to global `RwLock` poisoning
+- Test helpers in `intel::chunking`, `intel::intelligence`, and `registry` now use local `LanguageRegistry::new()` instead of the global singleton
+
 ## [1.0.0] - 2026-03-21
 
 ### Changed

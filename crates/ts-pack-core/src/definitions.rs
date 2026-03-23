@@ -14,6 +14,13 @@ pub struct LanguageDefinition {
     pub generate: Option<bool>,
     #[serde(default)]
     pub abi_version: Option<u32>,
+    #[serde(default)]
+    pub extensions: Vec<String>,
+    /// Known ambiguous extensions mapped to the other languages they could belong to.
+    /// Key: extension, Value: list of alternative language names.
+    /// Example: `{"m": ["matlab"]}` on the `objc` definition means `.m` could also be MATLAB.
+    #[serde(default)]
+    pub ambiguous: BTreeMap<String, Vec<String>>,
 }
 
 pub type LanguageDefinitions = BTreeMap<String, LanguageDefinition>;

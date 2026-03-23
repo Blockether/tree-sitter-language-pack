@@ -52,7 +52,7 @@ pub mod definitions;
 pub mod download;
 
 pub use error::Error;
-pub use extensions::{detect_language_from_extension, detect_language_from_path};
+pub use extensions::{detect_language_from_extension, detect_language_from_path, extension_ambiguity};
 pub use intel::types::{
     ChunkContext, CodeChunk, CommentInfo, CommentKind, Diagnostic, DiagnosticSeverity, DocSection, DocstringFormat,
     DocstringInfo, ExportInfo, ExportKind, FileMetrics, ImportInfo, ProcessResult, Span, StructureItem, StructureKind,

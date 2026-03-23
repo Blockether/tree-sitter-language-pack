@@ -1908,7 +1908,7 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "snippet-runner"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "clap",
  "rayon",
@@ -2105,7 +2105,7 @@ checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "cc",
  "dirs",
@@ -2123,7 +2123,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-cli"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "clap",
  "clap_complete",
@@ -2133,7 +2133,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-ffi"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "cbindgen",
  "serde_json",
@@ -2143,7 +2143,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-node"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "napi",
  "napi-build",
@@ -2155,7 +2155,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-php"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "ext-php-rs",
  "serde_json",
@@ -2164,7 +2164,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-python"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "pyo3",
  "serde_json",
@@ -2174,7 +2174,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-ruby"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "magnus",
  "rb-sys",
@@ -2185,7 +2185,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-wasm"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "js-sys",
  "serde_json",

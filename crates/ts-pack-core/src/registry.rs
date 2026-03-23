@@ -388,7 +388,8 @@ mod tests {
     use crate::process_config::ProcessConfig;
 
     fn first_available_lang() -> Option<String> {
-        let langs = crate::available_languages();
+        let registry = LanguageRegistry::new();
+        let langs = registry.available_languages();
         langs.into_iter().next()
     }
 

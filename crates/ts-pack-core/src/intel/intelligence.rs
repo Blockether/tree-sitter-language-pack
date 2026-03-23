@@ -337,7 +337,8 @@ mod tests {
 
     /// Helper: parse source using the global registry (avoids Language lifetime issues).
     fn parse_with_language(source: &str, lang_name: &str) -> Option<(tree_sitter::Language, tree_sitter::Tree)> {
-        let lang = crate::get_language(lang_name).ok()?;
+        let registry = crate::LanguageRegistry::new();
+        let lang = registry.get_language(lang_name).ok()?;
         let mut parser = tree_sitter::Parser::new();
         parser.set_language(&lang).ok()?;
         let tree = parser.parse(source, None)?;
