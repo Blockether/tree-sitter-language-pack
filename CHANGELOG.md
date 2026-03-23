@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-03-23
+
+### Fixed
+
+- WASM build: ahash uses compile-time-rng instead of runtime-rng (avoids getrandom on wasm32)
+- Docker/static build: add `c_symbol` override for grammars with non-standard C symbol names (csharp, vb, embeddedtemplate)
+- Unused imports when `dynamic-loading` feature disabled (WASM builds)
+- Python sdist: `.pyi` and `py.typed` now included in both wheel and sdist
+- C# build: add missing `ExtensionAmbiguityResult` model class
+- Set `generate: true` for csharp, vb, embeddedtemplate grammars
+
+### Changed
+
+- Switch from `std::HashMap`/`HashSet` to `ahash::AHashMap`/`AHashSet` for faster hashing in registry
+
 ## [1.1.0] - 2026-03-23
 
 ### Added
