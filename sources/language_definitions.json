@@ -621,10 +621,9 @@
 		"rev": "1c166a97a3481f385136394b950d9556d28af7b8"
 	},
 	"nim": {
-		"branch": "main",
 		"extensions": ["nim", "nims"],
-		"repo": "https://github.com/alaviss/tree-sitter-nim",
-		"rev": "3878440d9398515ae053c6f6024986e69868bb74"
+		"repo": "https://github.com/paranim/tree-sitter-nim",
+		"rev": "8b63677f5372b452881aac3aeb18b2b56c432554"
 	},
 	"ninja": {
 		"extensions": ["ninja"],
@@ -744,10 +743,9 @@
 		"rev": "f1c30d82a5bf0b70ce33ef431f4acd7fd69968a3"
 	},
 	"prolog": {
-		"directory": "grammars/prolog",
 		"extensions": ["pro"],
-		"repo": "https://codeberg.org/foxy/tree-sitter-prolog",
-		"rev": "d8d415f6a1cf80ca138524bcc395810b176d40fa"
+		"repo": "https://github.com/Rukiza/tree-sitter-prolog",
+		"rev": "c246cf2bf36590a3cb4de380205376d3c46208e8"
 	},
 	"properties": {
 		"extensions": ["properties"],
