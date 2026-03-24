@@ -163,13 +163,13 @@ jobs:
         run: |
           mkdir -p crates/ts-pack-elixir/priv/native
           cp crates/ts-pack-elixir/target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
+          ln -sf ts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts-pack-elixir.so
 
       - name: Patch Rustler --cfg flag placement
         working-directory: crates/ts-pack-elixir
         run: |
-          # Fix Rustler 0.37.3 --cfg argument incompatibility with newer cargo
-          # by moving --cfg after -- separator (rustc flags, not cargo flags)
           sed -i 's/args ++ \["--cfg", "build_#{System.system_time(:millisecond)}"\]/args ++ ["--", "--cfg", "build_#{System.system_time(:millisecond)}"]/' deps/rustler/lib/rustler/compiler.ex
+          mix deps.compile rustler --force
 
       - name: Compile Elixir (warnings as errors)
         working-directory: crates/ts-pack-elixir
@@ -229,6 +229,7 @@ jobs:
         run: |
           mkdir -p crates/ts-pack-elixir/priv/native
           cp crates/ts-pack-elixir/target/release/libts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts_pack_elixir.so
+          ln -sf ts_pack_elixir.so crates/ts-pack-elixir/priv/native/ts-pack-elixir.so
 
       - name: Cache Elixir dependencies
         uses: actions/cache@v5
@@ -247,6 +248,7 @@ jobs:
         working-directory: crates/ts-pack-elixir
         run: |
           sed -i 's/args ++ \["--cfg", "build_#{System.system_time(:millisecond)}"\]/args ++ ["--", "--cfg", "build_#{System.system_time(:millisecond)}"]/' deps/rustler/lib/rustler/compiler.ex
+          mix deps.compile rustler --force
 
       - name: Generate E2E tests
         run: task elixir:e2e:generate
