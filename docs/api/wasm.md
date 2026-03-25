@@ -10,7 +10,7 @@ description: "WebAssembly API reference for tree-sitter-language-pack"
 
 ```bash
 npm install @kreuzberg/tree-sitter-language-pack-wasm
-```text
+```
 
 ### Browser (ES Module)
 
@@ -18,101 +18,45 @@ npm install @kreuzberg/tree-sitter-language-pack-wasm
 <script type="module">
   import * as tsp from "https://cdn.jsdelivr.net/npm/@kreuzberg/tree-sitter-language-pack-wasm";
 </script>
-```text
+```
 
 ## Quick Start
 
 ```javascript
 import * as tsp from "@kreuzberg/tree-sitter-language-pack-wasm";
 
-// Get a language (note: download functions are stubs in WASM)
-const language = tsp.getLanguage("python");
+// List available languages
+const langs = tsp.availableLanguages();
+console.log(`${langs.length} languages available`);
 
-// Parse source code
-const tree = tsp.parseString("def hello(): pass", language);
-console.log(tree.rootNode.sexp());
+// Parse source code (returns a WasmTree handle)
+const tree = tsp.parseString("python", "def hello(): pass");
+console.log(tsp.treeRootNodeType(tree));         // "module"
+console.log(tsp.treeHasErrorNodes(tree));         // false
+console.log(tsp.treeContainsNodeType(tree, "function_definition")); // true
 
-// Extract code intelligence
-const config = new tsp.ProcessConfig("python").all();
-const result = tsp.process("def hello(): pass", config);
-console.log("Functions:", result.structure.length);
-```text
+// Free the tree when done (also freed by GC)
+tsp.freeTree(tree);
 
-## Browser Usage
-
-### ES Module
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Tree-Sitter Language Pack</title>
-  </head>
-  <body>
-    <textarea id="code" placeholder="Enter code..."></textarea>
-    <button id="analyze">Analyze</button>
-    <pre id="output"></pre>
-
-    <script type="module">
-      import * as tsp from "https://cdn.jsdelivr.net/npm/@kreuzberg/tree-sitter-language-pack-wasm";
-
-      document.getElementById("analyze").addEventListener("click", () => {
-        const code = document.getElementById("code").value;
-        const config = new tsp.ProcessConfig("python").all();
-        const result = tsp.process(code, config);
-        document.getElementById("output").textContent = JSON.stringify(result, null, 2);
-      });
-    </script>
-  </body>
-</html>
-```text
-
-### CommonJS (Node.js)
-
-```javascript
-const tsp = require("@kreuzberg/tree-sitter-language-pack-wasm");
-
-const language = tsp.getLanguage("python");
-const tree = tsp.parseString("x = 1", language);
-console.log(tree.rootNode.type); // "module"
-```text
+// Extract code intelligence (config is a JS object)
+const result = tsp.process("def hello(): pass", { language: "python" });
+console.log("Structure items:", result.structure.length);
+```
 
 ## Language Discovery
-
-### `getLanguage(name: string): Language`
-
-Get a tree-sitter Language by name.
-
-Resolves aliases (e.g., `"shell"` → `"bash"`). Does **not** download (use pre-loaded grammars).
-
-**Parameters:**
-
-- `name` (string): Language name or alias
-
-**Returns:** Language - tree-sitter Language object
-
-**Throws:** Error if language not available
-
-**Example:**
-
-```javascript
-const language = tsp.getLanguage("python");
-console.log(language.name);
-```text
 
 ### `availableLanguages(): string[]`
 
 List all available language names.
 
-**Returns:** string[] - Sorted language names
+**Returns:** Array of strings (as JsValue array)
 
 **Example:**
 
 ```javascript
 const langs = tsp.availableLanguages();
 console.log(`Available: ${langs.length} languages`);
-```text
+```
 
 ### `hasLanguage(name: string): boolean`
 
@@ -120,9 +64,9 @@ Check if a language is available.
 
 **Parameters:**
 
-- `name` (string): Language name or alias
+- `name` (string): Language name
 
-**Returns:** boolean - True if available
+**Returns:** boolean
 
 **Example:**
 
@@ -130,214 +74,268 @@ Check if a language is available.
 if (tsp.hasLanguage("python")) {
   console.log("Python available");
 }
-```text
+```
 
 ### `languageCount(): number`
 
 Get total number of available languages.
 
-**Returns:** number - Language count
+**Returns:** number (u32)
 
 **Example:**
 
 ```javascript
-const count = tsp.languageCount();
-console.log(`${count} languages available`);
-```text
+console.log(`${tsp.languageCount()} languages available`);
+```
+
+### `detectLanguage(path: string): string | null`
+
+Detect language name from a file path or extension.
+
+**Parameters:**
+
+- `path` (string): File path or extension
+
+**Returns:** string or null
+
+**Example:**
+
+```javascript
+const lang = tsp.detectLanguage("script.py"); // "python"
+```
+
+### `detectLanguageFromContent(content: string): string | null`
+
+Detect language name from file content (shebang-based detection).
+
+**Parameters:**
+
+- `content` (string): File content
+
+**Returns:** string or null
+
+**Example:**
+
+```javascript
+const lang = tsp.detectLanguageFromContent("#!/usr/bin/env python3\nprint('hello')");
+// "python"
+```
+
+### `extensionAmbiguity(ext: string): string | null`
+
+Returns extension ambiguity information as a JSON string, or null.
+
+When non-null, parses to an object with `assigned` (string) and `alternatives` (string[]) fields.
+
+**Parameters:**
+
+- `ext` (string): File extension (without dot)
+
+**Returns:** string (JSON) or null
+
+**Example:**
+
+```javascript
+const info = tsp.extensionAmbiguity("h");
+if (info) {
+  const data = JSON.parse(info);
+  console.log("Assigned:", data.assigned);
+}
+```
+
+### `getLanguagePtr(name: string): number`
+
+Returns the raw `TSLanguage` pointer as a u32 integer for wasm32 interop.
+
+**Parameters:**
+
+- `name` (string): Language name
+
+**Returns:** number (u32 pointer)
+
+**Throws:** Error if the language is not found.
+
+**Example:**
+
+```javascript
+const ptr = tsp.getLanguagePtr("python");
+console.log("Language pointer:", ptr);
+```
+
+## Queries
+
+### `getHighlightsQuery(language: string): string | null`
+
+Returns the bundled highlights query for the given language, or null.
+
+### `getInjectionsQuery(language: string): string | null`
+
+Returns the bundled injections query for the given language, or null.
+
+### `getLocalsQuery(language: string): string | null`
+
+Returns the bundled locals query for the given language, or null.
+
+**Example:**
+
+```javascript
+const highlights = tsp.getHighlightsQuery("python");
+if (highlights) {
+  console.log(`Highlights query: ${highlights.length} bytes`);
+}
+```
 
 ## Parsing
 
-### `parseString(source: string, language: Language): Tree`
+### `parseString(language: string, source: string): WasmTree`
 
-Parse source code into a syntax tree.
+Parse source code and return an opaque `WasmTree` handle. Pass this handle to the `tree*` inspection functions.
 
 **Parameters:**
 
-- `source` (string): Source code
-- `language` (Language): tree-sitter Language object
+- `language` (string): Language name
+- `source` (string): Source code to parse
 
-**Returns:** Tree - Parsed syntax tree
+**Returns:** WasmTree - opaque tree handle
 
-**Throws:** Error if parsing fails
-
-**Example:**
-
-```javascript
-const language = tsp.getLanguage("python");
-const tree = tsp.parseString("def foo(): pass", language);
-console.log(tree.rootNode.sexp());
-```text
-
-### `TreeNode`
-
-Parsed syntax tree node.
-
-**Properties:**
-
-- `type` (string) - Node type
-- `kind` (string) - Node kind
-- `startPoint` (Point) - Start {row, column}
-- `endPoint` (Point) - End {row, column}
-- `childCount` (number) - Number of children
-- `children` (TreeNode[]) - Child nodes
-- `sexp` (string) - S-expression
-
-**Methods:**
-
-- `child(index: number): TreeNode | null` - Get child by index
-- `text(source: string): string` - Get node text from source
+**Throws:** Error if the language is not found or parsing fails.
 
 **Example:**
 
 ```javascript
-const tree = tsp.parseString("x = 1", language);
-console.log(tree.rootNode.type); // "module"
-console.log(tree.rootNode.childCount); // number of children
+const tree = tsp.parseString("python", "def foo(): pass");
+console.log(tsp.treeRootNodeType(tree)); // "module"
+```
 
-for (const child of tree.rootNode.children) {
-  console.log(child.type);
-}
-```text
+## Tree Inspection Functions
+
+These functions accept a `WasmTree` handle returned by `parseString`.
+
+### `treeRootNodeType(tree: WasmTree): string`
+
+Get the type name of the root node.
+
+**Example:**
+
+```javascript
+const tree = tsp.parseString("python", "x = 1");
+tsp.treeRootNodeType(tree); // "module"
+```
+
+### `treeRootChildCount(tree: WasmTree): number`
+
+Get the number of named children of the root node.
+
+**Returns:** number (u32)
+
+**Example:**
+
+```javascript
+const tree = tsp.parseString("python", "x = 1\ny = 2");
+tsp.treeRootChildCount(tree); // 2
+```
+
+### `treeContainsNodeType(tree: WasmTree, nodeType: string): boolean`
+
+Check whether any node in the tree has the given type name.
+
+**Example:**
+
+```javascript
+const tree = tsp.parseString("python", "def hello(): pass");
+tsp.treeContainsNodeType(tree, "function_definition"); // true
+```
+
+### `treeHasErrorNodes(tree: WasmTree): boolean`
+
+Check whether the tree contains any ERROR or MISSING nodes.
+
+**Example:**
+
+```javascript
+const tree = tsp.parseString("python", "def (broken @@@ !!!");
+tsp.treeHasErrorNodes(tree); // true
+```
+
+### `freeTree(tree: WasmTree): void`
+
+Free the tree handle. Called automatically by JS garbage collection, but can be called manually to release memory sooner.
+
+**Example:**
+
+```javascript
+const tree = tsp.parseString("python", "x = 1");
+// ... use tree ...
+tsp.freeTree(tree);
+```
 
 ## Code Intelligence
 
-### `process(source: string, config: ProcessConfig): ProcessResult`
+### `process(source: string, config: object): object`
 
-Extract code intelligence from source code.
+Process source code and extract metadata as a JavaScript object.
+
+The config is a plain JS object (not a JSON string). It is converted internally via `JSON.stringify`.
 
 **Parameters:**
 
 - `source` (string): Source code
-- `config` (ProcessConfig): Configuration
+- `config` (object): Configuration object. Must contain at least `language`. Optional fields:
+    - `structure` (bool, default true): Extract structural items
+    - `imports` (bool, default true): Extract import statements
+    - `exports` (bool, default true): Extract export statements
+    - `comments` (bool, default false): Extract comments
+    - `docstrings` (bool, default false): Extract docstrings
+    - `symbols` (bool, default false): Extract symbol definitions
+    - `diagnostics` (bool, default false): Include parse diagnostics
+    - `chunk_max_size` (number or null, default null): Maximum chunk size in bytes
 
-**Returns:** ProcessResult - Analysis result
+**Returns:** object - Parsed result as a native JS object
 
-**Throws:** Error if analysis fails
-
-**Example:**
-
-```javascript
-const config = new tsp.ProcessConfig("python")
-  .structure()
-  .importExports()
-  .withChunks(1000, 200);
-
-const result = tsp.process("def hello(): pass", config);
-console.log("Functions:", result.structure.length);
-console.log("Lines:", result.metrics.totalLines);
-```text
-
-## Types
-
-### `ProcessConfig`
-
-Configuration for code intelligence analysis.
-
-**Constructor:**
-
-```javascript
-const config = new tsp.ProcessConfig("python");
-```text
-
-**Methods:**
-
-- `structure(): ProcessConfig` - Enable structure extraction
-- `importExports(): ProcessConfig` - Enable imports/exports
-- `comments(): ProcessConfig` - Enable comments
-- `docstrings(): ProcessConfig` - Enable docstrings
-- `symbols(): ProcessConfig` - Enable symbols
-- `metrics(): ProcessConfig` - Enable metrics
-- `diagnostics(): ProcessConfig` - Enable diagnostics
-- `withChunks(maxSize: number, overlap: number): ProcessConfig` - Configure chunking
-- `all(): ProcessConfig` - Enable all features
+**Throws:** Error on invalid config, unknown language, or processing failure.
 
 **Example:**
 
 ```javascript
-const config = new tsp.ProcessConfig("python")
-  .structure()
-  .importExports()
-  .comments()
-  .withChunks(2000, 400);
-```text
-
-### `ProcessResult`
-
-Result from code intelligence analysis.
-
-**Properties:**
-
-```javascript
-{
-  language: string,
-  metrics: FileMetrics,
-  structure: StructureItem[],
-  imports: ImportInfo[],
-  exports: ExportInfo[],
-  comments: CommentInfo[],
-  docstrings: DocstringInfo[],
-  symbols: SymbolInfo[],
-  diagnostics: Diagnostic[],
-  chunks: CodeChunk[],
-  parseErrors: number
-}
-```text
-
-**Example:**
-
-```javascript
-const result = tsp.process(source, config);
-
-console.log(`Language: ${result.language}`);
-console.log(`Functions: ${result.structure.length}`);
-console.log(`Lines: ${result.metrics.totalLines}`);
+const result = tsp.process("def hello(): pass", {
+  language: "python",
+  structure: true,
+  comments: true,
+  chunk_max_size: 2000,
+});
 
 for (const item of result.structure) {
-  console.log(`  ${item.kind}: ${item.name}`);
+  console.log(`${item.kind}: ${item.name}`);
 }
-```text
+```
 
-### `FileMetrics`
+## Download/Configure API (Not Supported in WASM)
 
-**Properties:**
+The following functions exist for API parity but are stubs. WASM cannot perform network I/O or maintain a persistent cache. All grammars are pre-bundled at compile time.
 
-- `totalLines` (number) - Total lines
-- `codeLines` (number) - Code lines
-- `commentLines` (number) - Comment lines
-- `blankLines` (number) - Blank lines
+| Function | Behavior |
+|----------|----------|
+| `init(config)` | Always throws: "init/download not supported in WASM" |
+| `configure(config)` | Always throws: "configure not supported in WASM" |
+| `download(languages)` | Always throws: "download not supported in WASM" |
+| `downloadAll()` | Always throws: "downloadAll not supported in WASM" |
+| `manifestLanguages()` | Always throws: "manifestLanguages not supported in WASM" |
+| `downloadedLanguages()` | Returns empty array |
+| `cleanCache()` | No-op, returns successfully |
+| `cacheDir()` | Always throws: "cacheDir not supported in WASM" |
 
-### `StructureItem`
+## Language Support
 
-**Properties:**
+The WASM package includes a curated subset of languages optimized for browser and edge runtime use cases. Compiling all 248 supported languages into a single WASM binary exceeds the memory limits of standard build environments. Native bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP) include all 248 languages.
 
-- `kind` (string) - Item kind (function, class, etc.)
-- `name` (string) - Item name
-- `line` (number) - Start line
-- `column` (number) - Start column
+Use `availableLanguages()` at runtime to get the exact list of included languages.
 
-### `ImportInfo`
+## Limitations
 
-**Properties:**
-
-- `module` (string) - Module name
-- `specifiers` (string[]) - Imported names
-- `line` (number) - Line number
-
-### `ExportInfo`
-
-**Properties:**
-
-- `name` (string) - Export name
-- `kind` (string) - Export kind
-- `line` (number) - Line number
-
-### `CodeChunk`
-
-**Properties:**
-
-- `content` (string) - Chunk text
-- `startLine` (number) - Start line
-- `endLine` (number) - End line
+1. **Language subset**: Not all 248 languages are included. For the full set, use native bindings.
+2. **No download API**: Grammars are pre-bundled. Download functions throw errors.
+3. **Single-threaded**: Run CPU-intensive parsing in Web Workers.
+4. **No file I/O**: Read files into memory before parsing.
 
 ## Usage Patterns
 
@@ -354,229 +352,68 @@ for (const item of result.structure) {
 <pre id="output"></pre>
 
 <script type="module">
-  import * as tsp from "https://cdn.jsdelivr.net/npm/@kreuzberg/tree-sitter-language-pack-wasm";
+  import * as tsp from "@kreuzberg/tree-sitter-language-pack-wasm";
 
   window.parseCode = function() {
     const code = document.getElementById("code").value;
     const lang = document.getElementById("language").value;
 
     try {
-      const language = tsp.getLanguage(lang);
-      const tree = tsp.parseString(code, language);
-      document.getElementById("output").textContent = tree.rootNode.sexp();
+      const tree = tsp.parseString(lang, code);
+      document.getElementById("output").textContent = tsp.treeRootNodeType(tree);
+      tsp.freeTree(tree);
     } catch (error) {
       document.getElementById("output").textContent = `Error: ${error.message}`;
     }
   };
 </script>
-```text
+```
 
 ### Node.js: Batch Processing
 
 ```javascript
 import * as tsp from "@kreuzberg/tree-sitter-language-pack-wasm";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
 function analyzeFiles(dir, lang) {
-  const language = tsp.getLanguage(lang);
-  const config = new tsp.ProcessConfig(lang).all();
-
-  const files = fs.readdirSync(dir)
-    .filter(f => f.endsWith(`.${lang === 'python' ? 'py' : lang}`));
+  const files = fs.readdirSync(dir).filter(f => f.endsWith(".py"));
 
   for (const file of files) {
-    const source = fs.readFileSync(path.join(dir, file), 'utf-8');
-    const result = tsp.process(source, config);
+    const source = fs.readFileSync(path.join(dir, file), "utf-8");
+    const result = tsp.process(source, { language: lang });
     console.log(`${file}: ${result.structure.length} items`);
   }
 }
 
-analyzeFiles('./src', 'python');
-```text
+analyzeFiles("./src", "python");
+```
 
-### Deno Integration
-
-```javascript
-import * as tsp from "https://cdn.jsdelivr.net/npm/@kreuzberg/tree-sitter-language-pack-wasm";
-
-const code = await Deno.readTextFile("code.py");
-const language = tsp.getLanguage("python");
-const tree = tsp.parseString(code, language);
-console.log(tree.rootNode.sexp());
-```text
-
-### Cloudflare Workers
-
-```javascript
-import * as tsp from "@kreuzberg/tree-sitter-language-pack-wasm";
-
-export default {
-  async fetch(request) {
-    const { code, language } = await request.json();
-
-    try {
-      const lang = tsp.getLanguage(language);
-      const tree = tsp.parseString(code, lang);
-
-      return new Response(
-        JSON.stringify({ sexp: tree.rootNode.sexp() }),
-        { headers: { "Content-Type": "application/json" } }
-      );
-    } catch (error) {
-      return new Response(
-        JSON.stringify({ error: error.message }),
-        { status: 400 }
-      );
-    }
-  },
-};
-```text
-
-### Worker Threads (for CPU-intensive parsing)
+### Web Worker
 
 ```javascript
 // worker.js
 import * as tsp from "@kreuzberg/tree-sitter-language-pack-wasm";
 
-parentPort.on('message', (message) => {
-  const { code, language } = message;
-  const lang = tsp.getLanguage(language);
-  const result = tsp.process(code, new tsp.ProcessConfig(language).all());
-  parentPort.postMessage(result);
-});
+self.onmessage = (event) => {
+  const { code, language } = event.data;
+  const result = tsp.process(code, { language });
+  self.postMessage(result);
+};
 
 // main.js
-import { Worker } from 'worker_threads';
-import path from 'path';
+const worker = new Worker("worker.js", { type: "module" });
 
-const worker = new Worker(path.resolve('worker.js'));
+worker.postMessage({ code: "def hello(): pass", language: "python" });
 
-worker.postMessage({
-  code: 'def hello(): pass',
-  language: 'python'
-});
-
-worker.on('message', (result) => {
-  console.log('Functions:', result.structure.length);
-});
-```text
-
-### React Component
-
-```jsx
-import React, { useState } from 'react';
-import * as tsp from '@kreuzberg/tree-sitter-language-pack-wasm';
-
-export function CodeAnalyzer() {
-  const [code, setCode] = useState('');
-  const [language, setLanguage] = useState('python');
-  const [result, setResult] = useState(null);
-
-  const handleAnalyze = () => {
-    try {
-      const config = new tsp.ProcessConfig(language).all();
-      const analyzed = tsp.process(code, config);
-      setResult(analyzed);
-    } catch (error) {
-      setResult({ error: error.message });
-    }
-  };
-
-  return (
-    <div>
-      <textarea value={code} onChange={(e) => setCode(e.target.value)} />
-      <select value={language} onChange={(e) => setLanguage(e.target.value)}>
-        <option>python</option>
-        <option>javascript</option>
-        <option>rust</option>
-      </select>
-      <button onClick={handleAnalyze}>Analyze</button>
-      {result && <pre>{JSON.stringify(result, null, 2)}</pre>}
-    </div>
-  );
-}
-```text
-
-### Vue.js Component
-
-```vue
-<template>
-  <div class="analyzer">
-    <textarea v-model="code" placeholder="Enter code..."></textarea>
-    <select v-model="language">
-      <option value="python">Python</option>
-      <option value="javascript">JavaScript</option>
-      <option value="rust">Rust</option>
-    </select>
-    <button @click="analyze">Analyze</button>
-    <pre v-if="result">{{ JSON.stringify(result, null, 2) }}</pre>
-  </div>
-</template>
-
-<script setup>
-import { ref } from 'vue';
-import * as tsp from '@kreuzberg/tree-sitter-language-pack-wasm';
-
-const code = ref('');
-const language = ref('python');
-const result = ref(null);
-
-function analyze() {
-  try {
-    const config = new tsp.ProcessConfig(language.value).all();
-    result.value = tsp.process(code.value, config);
-  } catch (error) {
-    result.value = { error: error.message };
-  }
-}
-</script>
-```text
-
-## Language Support
-
-The WASM package includes a curated subset of **30 languages** optimized for browser and edge runtime use cases. This covers the most popular web, systems, scripting, and data format languages.
-
-Compiling all 248 supported languages into a single WASM binary exceeds the memory limits of standard build environments. Native bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP, CLI) include **all 248 languages**.
-
-**Included languages:**
-
-- **Web**: HTML, CSS, JavaScript, TypeScript, TSX, JSON, GraphQL, SCSS
-- **Data formats**: TOML, XML, SQL, Markdown
-- **Systems**: C, C++, Rust, Go, Swift
-- **Scripting**: Python, Ruby, Bash, PHP, Lua, Elixir
-- **JVM**: Java, Kotlin, Scala
-- **Other**: Dart, Dockerfile, HCL
-
-Use `availableLanguages()` at runtime to get the exact list of supported languages.
-
-## Limitations
-
-WASM builds have some limitations:
-
-1. **Language subset**: 30 of 248 languages are included (see above). For all languages, use native bindings.
-2. **No download API**: Grammars are pre-bundled. For dynamic downloading, use platform-specific bindings (Python, Node.js, etc.)
-3. **Single-threaded**: Run CPU-intensive parsing in Web Workers
-4. **No file I/O**: Read files from memory or streams
-5. **Module size**: ~5-10MB for bundled grammars
+worker.onmessage = (event) => {
+  console.log("Structure items:", event.data.structure.length);
+};
+```
 
 ## Performance Tips
 
-1. **Reuse language objects** - Get language once, use many times
-2. **Use Web Workers** - Parse large files in background threads
-3. **Batch processing** - Parse multiple files together
-4. **Memory management** - Clear trees after processing if memory is tight
-
-```javascript
-// Good: Reuse language
-const pythonLang = tsp.getLanguage('python');
-for (const file of files) {
-  const tree = tsp.parseString(file.content, pythonLang);
-  // ...
-}
-
-// Avoid: Getting language repeatedly
-for (const file of files) {
-  const tree = tsp.parseString(file.content, tsp.getLanguage('python'));
-}
-```
+1. **Reuse results** - Parse once, inspect multiple times using tree inspection functions.
+2. **Free trees** - Call `freeTree()` when done to release memory promptly.
+3. **Use Web Workers** - Parse large files in background threads.
+4. **Batch processing** - Process multiple files in sequence to avoid repeated module initialization.

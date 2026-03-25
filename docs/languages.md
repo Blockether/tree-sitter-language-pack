@@ -1,8 +1,7 @@
 ---
+title: Supported Languages
 description: "All 248 languages supported by tree-sitter-language-pack."
 ---
-
-# Supported Languages
 
 tree-sitter-language-pack supports **248 languages**. All parsers are available for download on demand via `ts-pack download <language>` or automatically on first use.
 

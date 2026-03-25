@@ -19,8 +19,40 @@ Part of the kreuzberg.dev ecosystem:
 
 - Website: https://kreuzberg.dev
 - Documentation: https://docs.tree-sitter-language-pack.kreuzberg.dev
+- Repository: https://github.com/kreuzberg-dev/tree-sitter-language-pack
 - Discord: https://discord.gg/xt9WY3GnKR
 - Contact: naaman@kreuzberg.dev
+- License: MIT
+
+## Packages
+
+- Python: https://pypi.org/project/tree-sitter-language-pack/
+- Node.js: https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack
+- Rust: https://crates.io/crates/tree-sitter-language-pack
+- Go: https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1
+- Java: https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack
+- C# / .NET: https://www.nuget.org/packages/TreeSitterLanguagePack
+- Ruby: https://rubygems.org/gems/tree_sitter_language_pack
+- Elixir: https://hex.pm/packages/tree_sitter_language_pack
+- PHP: https://packagist.org/packages/kreuzberg/tree-sitter-language-pack
+- WebAssembly: https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm
+- CLI: https://github.com/kreuzberg-dev/homebrew-tap
+
+## Documentation Pages
+
+- Installation: https://docs.tree-sitter-language-pack.kreuzberg.dev/getting-started/installation/
+- Quick Start: https://docs.tree-sitter-language-pack.kreuzberg.dev/getting-started/quickstart/
+- Architecture: https://docs.tree-sitter-language-pack.kreuzberg.dev/concepts/architecture/
+- Download Model: https://docs.tree-sitter-language-pack.kreuzberg.dev/concepts/download-model/
+- Code Intelligence: https://docs.tree-sitter-language-pack.kreuzberg.dev/concepts/code-intelligence/
+- Parsing Guide: https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/parsing/
+- Chunking for LLMs: https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/chunking/
+- Configuration: https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/configuration/
+- CLI Usage: https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/cli/
+- Python API: https://docs.tree-sitter-language-pack.kreuzberg.dev/api/python/
+- TypeScript API: https://docs.tree-sitter-language-pack.kreuzberg.dev/api/typescript/
+- Rust API: https://docs.tree-sitter-language-pack.kreuzberg.dev/api/rust/
+- Supported Languages: https://docs.tree-sitter-language-pack.kreuzberg.dev/languages/
 
 ## Key APIs
 
@@ -44,10 +76,18 @@ The `ts-pack` CLI bundles all 248 parsers into a single static binary:
 
 Install: `curl -fsSL https://raw.githubusercontent.com/kreuzberg-dev/tree-sitter-language-pack/main/install.sh | bash`
 
-## Available From
-
-Rust (crates.io), Python (PyPI), Node.js (npm), Ruby (RubyGems), Go (pkg.go.dev), Java (Maven Central), C# (NuGet), Elixir (Hex.pm), PHP (Packagist), WebAssembly (npm), C FFI, CLI (Homebrew, Docker)
-
 ## Supported Languages
 
-248 languages including: Python, JavaScript, TypeScript, Rust, Go, Java, C, C++, C#, Ruby, PHP, Swift, Kotlin, Scala, Haskell, Elixir, Erlang, Lua, R, Julia, Dart, Zig, Nim, and 150+ more.
+248 languages including: Python, JavaScript, TypeScript, Rust, Go, Java, C, C++, C#, Ruby, PHP, Swift, Kotlin, Scala, Haskell, Elixir, Erlang, Lua, R, Julia, Dart, Zig, Nim, and 225+ more.
+
+## Minimum Versions
+
+- Python: 3.10+
+- Node.js: 18+
+- Rust: 1.75+
+- Go: 1.26+
+- Java: 21+
+- C# / .NET: 10+
+- Ruby: 3.4+
+- Elixir: 1.14+ / OTP 25+
+- PHP: 8.2+

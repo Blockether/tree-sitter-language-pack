@@ -1,8 +1,7 @@
 ---
+title: Chunking for LLMs
 description: "Syntax-aware code chunking for LLMs — split code at natural boundaries, never mid-function."
 ---
-
-# Chunking for LLMs
 
 When feeding source code to a language model, naive line-count or character-count splitting produces broken, incoherent fragments. A function split across two chunks loses its signature. A class split mid-method gives the model half a definition. tree-sitter-language-pack solves this with **syntax-aware chunking**: it walks the concrete syntax tree and splits only at natural boundaries.
 

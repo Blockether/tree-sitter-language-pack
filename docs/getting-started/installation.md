@@ -1,8 +1,7 @@
 ---
+title: Installation
 description: "Install tree-sitter-language-pack in Python, Node.js, Rust, Go, Java, C#, Ruby, Elixir, PHP, WebAssembly, or via the CLI."
 ---
-
-# Installation
 
 tree-sitter-language-pack is available for every major ecosystem. All packages share the same version and API surface.
 
@@ -109,7 +108,7 @@ The Go binding uses cgo and links against the pre-compiled C FFI library.
 
 ## Java
 
-Requires Java 21+ (uses Panama FFM API).
+Requires JDK 25+ (uses Panama FFM API).
 
 === "Maven"
 
@@ -117,7 +116,7 @@ Requires Java 21+ (uses Panama FFM API).
     <dependency>
         <groupId>dev.kreuzberg</groupId>
         <artifactId>tree-sitter-language-pack</artifactId>
-        <version>1.1.4</version>
+        <version>1.2.0</version>
     </dependency>
     ```
 
@@ -125,7 +124,7 @@ Requires Java 21+ (uses Panama FFM API).
 
     ```kotlin
     dependencies {
-        implementation("dev.kreuzberg:tree-sitter-language-pack:1.1.4")
+        implementation("dev.kreuzberg:tree-sitter-language-pack:1.2.0")
     }
     ```
 
@@ -133,7 +132,7 @@ Requires Java 21+ (uses Panama FFM API).
 
     ```groovy
     dependencies {
-        implementation 'dev.kreuzberg:tree-sitter-language-pack:1.1.4'
+        implementation 'dev.kreuzberg:tree-sitter-language-pack:1.2.0'
     }
     ```
 
@@ -166,13 +165,13 @@ Requires .NET 10+.
 === ".csproj"
 
     ```xml
-    <PackageReference Include="TreeSitterLanguagePack" Version="1.1.4" />
+    <PackageReference Include="TreeSitterLanguagePack" Version="1.2.0" />
     ```
 
 ```csharp
 using TreeSitterLanguagePack;
 
-Console.WriteLine(Pack.LanguageCount()); // 248
+Console.WriteLine(TsPackClient.LanguageCount()); // 248
 ```
 
 ## Ruby
@@ -264,16 +263,16 @@ Use from any JavaScript environment including browsers, Deno, and Cloudflare Wor
 
     ```html
     <script type="module">
-      import { init, getParser } from "https://cdn.jsdelivr.net/npm/@kreuzberg/tree-sitter-language-pack-wasm/+esm";
-      await init();
+      import { availableLanguages, parseString } from "https://cdn.jsdelivr.net/npm/@kreuzberg/tree-sitter-language-pack-wasm/+esm";
+      console.log(availableLanguages());
     </script>
     ```
 
 === "Deno"
 
     ```typescript
-    import { init, getParser } from "npm:@kreuzberg/tree-sitter-language-pack-wasm";
-    await init();
+    import { availableLanguages, parseString } from "npm:@kreuzberg/tree-sitter-language-pack-wasm";
+    console.log(availableLanguages());
     ```
 
 ## CLI

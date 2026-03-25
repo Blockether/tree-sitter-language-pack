@@ -10,103 +10,91 @@ Add to `Gemfile`:
 
 ```ruby
 gem "tree_sitter_language_pack"
-```text
+```
 
 Then run:
 
 ```bash
 bundle install
-```text
+```
 
 Or install directly:
 
 ```bash
 gem install tree_sitter_language_pack
-```text
+```
 
 ## Quick Start
 
 ```ruby
 require "tree_sitter_language_pack"
 
-# Pre-download languages
-TreeSitterLanguagePack.init(["python", "rust"])
+# List available languages
+langs = TreeSitterLanguagePack.available_languages
+puts "#{langs.length} languages available"
 
-# Get a language
-language = TreeSitterLanguagePack.get_language("python")
+# Parse source code
+tree = TreeSitterLanguagePack.parse_string("python", "def hello(): pass")
+puts tree.root_node_type         # "module"
+puts tree.has_error_nodes        # false
+puts tree.contains_node_type("function_definition") # true
 
-# Get a pre-configured parser
-parser = TreeSitterLanguagePack.get_parser("python")
-tree = parser.parse("def hello(): pass")
-puts tree.root_node.sexp
-
-# Extract code intelligence
-config = TreeSitterLanguagePack::ProcessConfig.new("python").all
-result = TreeSitterLanguagePack.process("def hello(): pass", config)
-puts "Functions: #{result["structure"].length}"
-```text
+# Extract code intelligence (config is a JSON string)
+result_json = TreeSitterLanguagePack.process(
+  "def hello(): pass",
+  '{"language":"python"}'
+)
+result = JSON.parse(result_json)
+puts "Structure items: #{result['structure'].length}"
+```
 
 ## Download Management
 
-### `TreeSitterLanguagePack.init(languages = nil, groups = nil, cache_dir = nil)`
+### `TreeSitterLanguagePack.init(config_json)`
 
 Initialize the language pack with optional pre-downloads.
 
 **Parameters:**
 
-- `languages` (Array<String> | nil): Languages to download
-- `groups` (Array<String> | nil): Language groups to download
-- `cache_dir` (String | nil): Custom cache directory
+- `config_json` (String): JSON string with optional fields:
+    - `cache_dir` (string): Custom cache directory
+    - `languages` (array): Language names to download
+    - `groups` (array): Language groups to download
 
 **Returns:** nil
 
-**Raises:**
-
-- `DownloadError`: If downloads fail or network unavailable
+**Raises:** `RuntimeError` on invalid JSON, download failure, or network error.
 
 **Example:**
 
 ```ruby
-# Pre-download specific languages
-TreeSitterLanguagePack.init(["python", "javascript", "rust"])
+TreeSitterLanguagePack.init('{"languages":["python","javascript","rust"]}')
 
-# Or download language groups
-TreeSitterLanguagePack.init(groups: ["web", "data"])
+TreeSitterLanguagePack.init('{"cache_dir":"/opt/ts-pack","languages":["python"]}')
+```
 
-# With custom cache directory
-TreeSitterLanguagePack.init(
-  languages: ["python"],
-  cache_dir: "/opt/ts-pack"
-)
-```text
+### `TreeSitterLanguagePack.configure(config_json)`
 
-### `TreeSitterLanguagePack.configure(cache_dir = nil)`
-
-Apply configuration without downloading.
-
-Use to set custom cache directory before first `get_language` call.
+Apply configuration without downloading. Use to set a custom cache directory before calling `get_language_ptr` or any download function.
 
 **Parameters:**
 
-- `cache_dir` (String | nil): Custom cache directory
+- `config_json` (String): JSON string with optional fields:
+    - `cache_dir` (string): Custom cache directory
 
 **Returns:** nil
 
-**Raises:**
-
-- `DownloadError`: If lock cannot be acquired
+**Raises:** `RuntimeError` on invalid JSON or configuration error.
 
 **Example:**
 
 ```ruby
-TreeSitterLanguagePack.configure(cache_dir: "/data/ts-pack")
-
-language = TreeSitterLanguagePack.get_language("python")
-```text
+TreeSitterLanguagePack.configure('{"cache_dir":"/data/ts-pack"}')
+```
 
 ### `TreeSitterLanguagePack.download(names)`
 
-Download specific languages to cache.
+Download specific languages to the cache.
 
 **Parameters:**
 
@@ -114,61 +102,50 @@ Download specific languages to cache.
 
 **Returns:** Integer - Count of newly downloaded languages
 
-**Raises:**
-
-- `DownloadError`: If language not found or download fails
-- `LanguageNotFoundError`: If language not in manifest
+**Raises:** `RuntimeError` if a language is not found or download fails.
 
 **Example:**
 
 ```ruby
-count = TreeSitterLanguagePack.download(
-  ["python", "rust", "typescript"]
-)
+count = TreeSitterLanguagePack.download(["python", "rust", "typescript"])
 puts "Downloaded #{count} new languages"
-```text
+```
 
 ### `TreeSitterLanguagePack.download_all`
 
-Download all available languages (248).
+Download all available languages from the remote manifest.
 
 **Returns:** Integer - Count of newly downloaded languages
 
-**Raises:**
-
-- `DownloadError`: If manifest fetch fails
+**Raises:** `RuntimeError` if manifest fetch fails.
 
 **Example:**
 
 ```ruby
 count = TreeSitterLanguagePack.download_all
-puts "Downloaded #{count} languages total"
-```text
+puts "Downloaded #{count} languages"
+```
 
 ### `TreeSitterLanguagePack.manifest_languages`
 
-Get all available languages from remote manifest.
+Get all available language names from the remote manifest.
 
 Fetches and caches the manifest.
 
 **Returns:** Array<String> - Sorted language names
 
-**Raises:**
-
-- `DownloadError`: If manifest fetch fails
+**Raises:** `RuntimeError` if manifest fetch fails.
 
 **Example:**
 
 ```ruby
 languages = TreeSitterLanguagePack.manifest_languages
 puts "Available: #{languages.length} languages"
-```text
+```
 
 ### `TreeSitterLanguagePack.downloaded_languages`
 
-Get languages already cached locally.
-
-Does not perform network requests.
+Get languages already cached locally. Does not perform network requests.
 
 **Returns:** Array<String> - Cached language names
 
@@ -177,7 +154,7 @@ Does not perform network requests.
 ```ruby
 cached = TreeSitterLanguagePack.downloaded_languages
 cached.each { |lang| puts lang }
-```text
+```
 
 ### `TreeSitterLanguagePack.clean_cache`
 
@@ -185,83 +162,30 @@ Delete all cached parser shared libraries.
 
 **Returns:** nil
 
-**Raises:**
-
-- `DownloadError`: If cache cannot be removed
+**Raises:** `RuntimeError` if cache cannot be removed.
 
 **Example:**
 
 ```ruby
 TreeSitterLanguagePack.clean_cache
-puts "Cache cleaned"
-```text
+```
 
 ### `TreeSitterLanguagePack.cache_dir`
 
-Get the current cache directory path.
+Get the effective cache directory path.
 
 **Returns:** String - Absolute cache directory path
+
+**Raises:** `RuntimeError` if cache path cannot be determined or is not valid UTF-8.
 
 **Example:**
 
 ```ruby
 dir = TreeSitterLanguagePack.cache_dir
 puts "Cache at: #{dir}"
-```text
+```
 
 ## Language Discovery
-
-### `TreeSitterLanguagePack.get_language(name)`
-
-Get a tree-sitter Language by name.
-
-Resolves aliases (e.g., `"shell"` → `"bash"`). Auto-downloads if needed.
-
-**Parameters:**
-
-- `name` (String): Language name or alias
-
-**Returns:** Language - tree-sitter Language object
-
-**Raises:**
-
-- `LanguageNotFoundError`: If language not recognized
-- `DownloadError`: If auto-download fails
-
-**Example:**
-
-```ruby
-language = TreeSitterLanguagePack.get_language("python")
-
-parser = TreeSitter::Parser.new
-parser.set_language(language)
-tree = parser.parse("x = 1")
-puts tree.root_node.type # "module"
-```text
-
-### `TreeSitterLanguagePack.get_parser(name)`
-
-Get a pre-configured Parser for a language.
-
-**Parameters:**
-
-- `name` (String): Language name or alias
-
-**Returns:** Parser - Pre-configured tree-sitter Parser
-
-**Raises:**
-
-- `LanguageNotFoundError`: If language not recognized
-- `DownloadError`: If auto-download fails
-- `ParserError`: If parser setup fails
-
-**Example:**
-
-```ruby
-parser = TreeSitterLanguagePack.get_parser("rust")
-tree = parser.parse("fn main() {}")
-puts tree.root_node.has_error? # false
-```text
 
 ### `TreeSitterLanguagePack.available_languages`
 
@@ -274,322 +198,308 @@ List all available language names.
 ```ruby
 langs = TreeSitterLanguagePack.available_languages
 langs.each { |lang| puts lang }
-```text
+```
 
-### `TreeSitterLanguagePack.has_language?(name)`
+### `TreeSitterLanguagePack.has_language(name)`
 
 Check if a language is available.
 
 **Parameters:**
 
-- `name` (String): Language name or alias
+- `name` (String): Language name
 
-**Returns:** Boolean - True if available
+**Returns:** Boolean
 
 **Example:**
 
 ```ruby
-if TreeSitterLanguagePack.has_language?("python")
+if TreeSitterLanguagePack.has_language("python")
   puts "Python available"
 end
-
-raise "Shell not available" unless TreeSitterLanguagePack.has_language?("shell")
-```text
+```
 
 ### `TreeSitterLanguagePack.language_count`
 
 Get total number of available languages.
 
-**Returns:** Integer - Language count
+**Returns:** Integer
 
 **Example:**
 
 ```ruby
 count = TreeSitterLanguagePack.language_count
 puts "#{count} languages available"
-```text
+```
+
+### `TreeSitterLanguagePack.detect_language(path)`
+
+Detect language name from a file path or extension.
+
+**Parameters:**
+
+- `path` (String): File path or extension
+
+**Returns:** String or nil
+
+**Example:**
+
+```ruby
+lang = TreeSitterLanguagePack.detect_language("script.py")
+puts lang # "python"
+```
+
+### `TreeSitterLanguagePack.detect_language_from_content(content)`
+
+Detect language name from file content using shebang-based detection.
+
+**Parameters:**
+
+- `content` (String): File content
+
+**Returns:** String or nil
+
+**Example:**
+
+```ruby
+lang = TreeSitterLanguagePack.detect_language_from_content("#!/usr/bin/env python3\nprint('hello')")
+puts lang # "python"
+```
+
+### `TreeSitterLanguagePack.extension_ambiguity(ext)`
+
+Returns extension ambiguity information as a JSON string, or nil if the extension is unambiguous.
+
+**Parameters:**
+
+- `ext` (String): File extension (without dot)
+
+**Returns:** String (JSON) or nil. When non-nil, decodes to an object with `"assigned"` and `"alternatives"` fields.
+
+**Example:**
+
+```ruby
+info = TreeSitterLanguagePack.extension_ambiguity("h")
+if info
+  data = JSON.parse(info)
+  puts "Assigned: #{data['assigned']}"
+  puts "Alternatives: #{data['alternatives'].join(', ')}"
+end
+```
+
+### `TreeSitterLanguagePack.get_language_ptr(name)`
+
+Get the raw `TSLanguage` pointer as an integer handle. Useful for interop with tree-sitter Ruby bindings that accept a language pointer.
+
+**Parameters:**
+
+- `name` (String): Language name
+
+**Returns:** Integer - Raw language pointer as u64
+
+**Raises:** `RuntimeError` if the language is not found.
+
+**Example:**
+
+```ruby
+ptr = TreeSitterLanguagePack.get_language_ptr("python")
+puts "Language pointer: #{ptr}"
+```
+
+## Queries
+
+### `TreeSitterLanguagePack.get_highlights_query(language)`
+
+Returns the bundled highlights query for the given language, or nil.
+
+**Parameters:**
+
+- `language` (String): Language name
+
+**Returns:** String or nil
+
+### `TreeSitterLanguagePack.get_injections_query(language)`
+
+Returns the bundled injections query for the given language, or nil.
+
+**Parameters:**
+
+- `language` (String): Language name
+
+**Returns:** String or nil
+
+### `TreeSitterLanguagePack.get_locals_query(language)`
+
+Returns the bundled locals query for the given language, or nil.
+
+**Parameters:**
+
+- `language` (String): Language name
+
+**Returns:** String or nil
 
 ## Parsing
 
-### `TreeSitterLanguagePack.parse_string(source, language)`
+### `TreeSitterLanguagePack.parse_string(language, source)`
 
-Parse source code into a syntax tree.
+Parse source code and return a `TreeSitterLanguagePack::Tree` object.
 
 **Parameters:**
 
-- `source` (String): Source code
 - `language` (String): Language name
+- `source` (String): Source code to parse
 
-**Returns:** Tree - Parsed syntax tree
+**Returns:** `TreeSitterLanguagePack::Tree`
 
-**Raises:**
-
-- `LanguageNotFoundError`: If language not found
-- `ParseError`: If parsing fails
-- `DownloadError`: If auto-download fails
+**Raises:** `RuntimeError` if the language is not found or parsing fails.
 
 **Example:**
 
 ```ruby
-tree = TreeSitterLanguagePack.parse_string(
-  "def foo(): pass",
-  "python"
-)
-puts tree.root_node.sexp
-```text
+tree = TreeSitterLanguagePack.parse_string("python", "def foo(): pass")
+puts tree.root_node_type        # "module"
+puts tree.root_child_count      # 1
+puts tree.has_error_nodes        # false
+puts tree.contains_node_type("function_definition") # true
+```
+
+## Tree Class
+
+`TreeSitterLanguagePack::Tree` is returned by `parse_string`. It wraps an opaque tree-sitter tree and provides the following instance methods.
+
+### `#root_node_type`
+
+Returns the type name of the root node as a String.
+
+**Example:**
+
+```ruby
+tree = TreeSitterLanguagePack.parse_string("python", "x = 1")
+tree.root_node_type # "module"
+```
+
+### `#root_child_count`
+
+Returns the number of named children of the root node as an Integer.
+
+**Example:**
+
+```ruby
+tree = TreeSitterLanguagePack.parse_string("python", "x = 1\ny = 2")
+tree.root_child_count # 2
+```
+
+### `#contains_node_type(node_type)`
+
+Checks whether any node in the tree has the given type name.
+
+**Parameters:**
+
+- `node_type` (String): The node type to search for
+
+**Returns:** Boolean
+
+**Example:**
+
+```ruby
+tree = TreeSitterLanguagePack.parse_string("python", "def hello(): pass")
+tree.contains_node_type("function_definition") # true
+tree.contains_node_type("class_definition")    # false
+```
+
+### `#has_error_nodes`
+
+Checks whether the tree contains any ERROR or MISSING nodes.
+
+**Returns:** Boolean
+
+**Example:**
+
+```ruby
+tree = TreeSitterLanguagePack.parse_string("python", "def (broken @@@ !!!")
+tree.has_error_nodes # true
+```
 
 ## Code Intelligence
 
-### `TreeSitterLanguagePack.process(source, config)`
+### `TreeSitterLanguagePack.process(source, config_json)`
 
-Extract code intelligence from source code.
+Process source code and extract metadata as a JSON string.
 
 **Parameters:**
 
 - `source` (String): Source code
-- `config` (ProcessConfig): Configuration
+- `config_json` (String): JSON string with processing configuration. Must contain at least `"language"`. Optional fields:
+    - `structure` (bool, default true): Extract structural items
+    - `imports` (bool, default true): Extract import statements
+    - `exports` (bool, default true): Extract export statements
+    - `comments` (bool, default false): Extract comments
+    - `docstrings` (bool, default false): Extract docstrings
+    - `symbols` (bool, default false): Extract symbol definitions
+    - `diagnostics` (bool, default false): Include parse diagnostics
+    - `chunk_max_size` (int or null, default null): Maximum chunk size in bytes
 
-**Returns:** Hash - Result with structure, imports, exports, etc.
+**Returns:** String - JSON string with extraction results
 
-**Raises:**
-
-- `LanguageNotFoundError`: If language not found
-- `ParseError`: If parsing fails
-- `ProcessError`: If analysis fails
-
-**Example:**
-
-```ruby
-config = TreeSitterLanguagePack::ProcessConfig.new("python")
-  .structure
-  .import_exports
-  .with_chunks(2000, 400)
-
-result = TreeSitterLanguagePack.process(
-  "def hello(): pass",
-  config
-)
-
-puts "Functions: #{result["structure"].length}"
-puts "Lines: #{result["metrics"]["total_lines"]}"
-```text
-
-## Types
-
-### `ProcessConfig`
-
-Configuration for code intelligence analysis.
-
-**Constructor:**
-
-```ruby
-config = TreeSitterLanguagePack::ProcessConfig.new("python")
-```text
-
-**Methods:**
-
-#### `#structure`
-
-Enable structure extraction.
-
-#### `#import_exports`
-
-Enable imports/exports extraction.
-
-#### `#comments`
-
-Enable comment extraction.
-
-#### `#docstrings`
-
-Enable docstring extraction.
-
-#### `#symbols`
-
-Enable symbol extraction.
-
-#### `#metrics`
-
-Enable metric extraction.
-
-#### `#diagnostics`
-
-Enable diagnostic extraction.
-
-#### `#with_chunks(max_size, overlap)`
-
-Configure code chunking.
-
-#### `#all`
-
-Enable all features.
+**Raises:** `RuntimeError` on invalid config JSON, unknown language, or processing failure.
 
 **Example:**
 
 ```ruby
-config = TreeSitterLanguagePack::ProcessConfig.new("python")
-  .structure
-  .import_exports
-  .comments
-  .with_chunks(2000, 400)
-```text
+require "json"
 
-### Result Hash
+config = { language: "python", structure: true, imports: true }.to_json
+result_json = TreeSitterLanguagePack.process("def hello(): pass", config)
+result = JSON.parse(result_json)
 
-Result from `process` method.
-
-**Keys:**
-
-- `"language"` (String) - Language name
-- `"metrics"` (Hash) - File metrics
-    - `"total_lines"` (Integer)
-    - `"code_lines"` (Integer)
-    - `"comment_lines"` (Integer)
-    - `"blank_lines"` (Integer)
-- `"structure"` (Array) - Code structure items
-    - Each item has `"kind"`, `"name"`, `"line"`, `"column"`, etc.
-- `"imports"` (Array) - Import statements
-- `"exports"` (Array) - Export statements
-- `"comments"` (Array) - Comments
-- `"docstrings"` (Array) - Docstrings
-- `"symbols"` (Array) - Symbols
-- `"diagnostics"` (Array) - Diagnostics
-- `"chunks"` (Array) - Code chunks
-- `"parse_errors"` (Integer) - Number of parse errors
-
-**Example:**
-
-```ruby
-result = TreeSitterLanguagePack.process(source, config)
-
-puts result["language"]
 result["structure"].each do |item|
-  puts "  #{item["kind"]}: #{item["name"]}"
+  puts "#{item['kind']}: #{item['name']}"
 end
-```text
+```
 
-## Exception Handling
+## Error Handling
+
+All errors from the native extension are raised as `RuntimeError`. There are no custom exception classes.
 
 ```ruby
 require "tree_sitter_language_pack"
 
 begin
-  language = TreeSitterLanguagePack.get_language("python")
-  parser = TreeSitter::Parser.new
-  parser.set_language(language)
-  tree = parser.parse("x = 1")
-rescue TreeSitterLanguagePack::LanguageNotFoundError => e
-  puts "Language not found: #{e.message}"
-rescue TreeSitterLanguagePack::DownloadError => e
-  puts "Download failed: #{e.message}"
-rescue TreeSitterLanguagePack::ParseError => e
-  puts "Parse error: #{e.message}"
-rescue => e
-  puts "Unexpected error: #{e.message}"
+  TreeSitterLanguagePack.parse_string("nonexistent_language", "code")
+rescue RuntimeError => e
+  puts "Error: #{e.message}"
 end
-```text
+```
 
 ## Usage Patterns
 
-### Pre-download Languages
+### Pre-download Languages at Startup
 
 ```ruby
 # config/initializers/tree_sitter.rb
-TreeSitterLanguagePack.init(
-  languages: %w[python rust typescript javascript]
-)
-```text
-
-Then use in your application:
-
-```ruby
 require "tree_sitter_language_pack"
-
-# Fast, no network required
-parser = TreeSitterLanguagePack.get_parser("python")
-```text
+TreeSitterLanguagePack.init('{"languages":["python","rust","typescript","javascript"]}')
+```
 
 ### Custom Cache Directory
 
 ```ruby
-TreeSitterLanguagePack.configure(
-  cache_dir: "/data/ts-pack-cache"
-)
-
-language = TreeSitterLanguagePack.get_language("python")
-```text
+TreeSitterLanguagePack.configure('{"cache_dir":"/data/ts-pack-cache"}')
+```
 
 ### Batch Processing
 
 ```ruby
+require "json"
+
 def analyze_files(dir, language)
-  Dir.glob("#{dir}/**/*.#{language}").each do |file|
-    begin
-      source = File.read(file)
-      config = TreeSitterLanguagePack::ProcessConfig.new(language).all
-      result = TreeSitterLanguagePack.process(source, config)
+  config = { language: language }.to_json
 
-      puts "#{file}: #{result["structure"].length} items"
-    rescue => e
-      puts "Error: #{e.message}"
-    end
+  Dir.glob("#{dir}/**/*.py").each do |file|
+    source = File.read(file)
+    result = JSON.parse(TreeSitterLanguagePack.process(source, config))
+    puts "#{file}: #{result['structure'].length} items"
+  rescue RuntimeError => e
+    puts "Error processing #{file}: #{e.message}"
   end
 end
-
-analyze_files("./src", "py")
-```text
-
-### Parse and Walk Tree
-
-```ruby
-parser = TreeSitterLanguagePack.get_parser("python")
-tree = parser.parse("def hello(): pass")
-
-def walk_tree(node, depth = 0)
-  indent = "  " * depth
-  puts "#{indent}#{node.type}"
-
-  node.children.each { |child| walk_tree(child, depth + 1) }
-end
-
-walk_tree(tree.root_node)
-```text
-
-### Extract Specific Patterns
-
-```ruby
-config = TreeSitterLanguagePack::ProcessConfig.new("python")
-  .structure
-
-result = TreeSitterLanguagePack.process(File.read("code.py"), config)
-
-# Find all functions
-functions = result["structure"].select { |item| item["kind"] == "function" }
-functions.each do |func|
-  puts func["name"]
-end
-```text
-
-### Concurrent Processing (with Mutex)
-
-```ruby
-require "concurrent"
-
-parser_pool = Concurrent::Array.new
-
-def get_or_create_parser(pool, language)
-  # Ensure thread safety
-  pool.find { |p| p.language == language } ||
-    pool << TreeSitterLanguagePack.get_parser(language)
-end
-
-# Use pool in threads
-(1..10).map do |i|
-  Thread.new do
-    parser = get_or_create_parser(parser_pool, "python")
-    source = File.read("file#{i}.py")
-    tree = parser.parse(source)
-    puts "Parsed file #{i}"
-  end
-end.each(&:join)
 ```

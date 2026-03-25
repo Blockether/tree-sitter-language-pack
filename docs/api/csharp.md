@@ -4,719 +4,476 @@ description: "C# / .NET API reference for tree-sitter-language-pack"
 
 # C# / .NET API Reference
 
+Requires .NET 10+.
+
+Namespace: `TreeSitterLanguagePack`
+
 ## Installation
 
 Add to `.csproj`:
 
 ```xml
 <PackageReference Include="TreeSitterLanguagePack" Version="1.0.0" />
-```text
+```
 
 Or via dotnet CLI:
 
 ```bash
 dotnet add package TreeSitterLanguagePack
-```text
+```
 
 ## Quick Start
 
 ```csharp
 using TreeSitterLanguagePack;
-using System.Collections.Generic;
 
-class Program
-{
-    static async Task Main(string[] args)
-    {
-        // Pre-download languages
-        await TsPackClient.Download(new[] { "python", "rust" });
+// List available languages
+string[] langs = TsPackClient.AvailableLanguages();
+Console.WriteLine($"{langs.Length} languages available");
 
-        // Get a language
-        var language = await TsPackClient.GetLanguage("python");
+// Parse source code
+using var tree = TsPackClient.Parse("python", "def hello(): pass");
+Console.WriteLine(tree.RootNodeType());           // "module"
+Console.WriteLine(tree.ContainsNodeType("function_definition")); // True
 
-        // Get a pre-configured parser
-        var parser = await TsPackClient.GetParser("python");
-        var tree = parser.Parse("def hello(): pass");
-        Console.WriteLine(tree.RootNode.Sexp);
+// Extract code intelligence
+var config = new ProcessConfig { Language = "python" };
+var result = TsPackClient.Process("def hello(): pass", config);
+Console.WriteLine($"Functions: {result.Structure.Count}");
+```
 
-        // Extract code intelligence
-        var config = new ProcessConfig("python").All();
-        var result = TsPackClient.Process("def hello(): pass", config);
-        Console.WriteLine($"Functions: {result.Structure.Count}");
-    }
-}
-```text
+## TsPackClient
 
-## Download Management
+Static class providing the high-level API. Manages a shared registry instance internally.
 
-### `TsPackClient.Download(string[] names): Task`
+### Language Discovery
 
-Download specific languages to cache.
+#### `AvailableLanguages(): string[]`
 
-**Parameters:**
+Get the list of all available language names.
 
-- `names` (string[]): Language names to download
-
-**Returns:** Task
-
-**Throws:**
-
-- `DownloadException`: If language not found or download fails
+**Returns:** string[]
 
 **Example:**
 
 ```csharp
-try
-{
-    await TsPackClient.Download(new[] { "python", "rust", "typescript" });
-}
-catch (DownloadException ex)
-{
-    Console.WriteLine($"Download failed: {ex.Message}");
-}
-```text
-
-### `TsPackClient.DownloadAll(): Task`
-
-Download all available languages (248).
-
-**Returns:** Task
-
-**Throws:**
-
-- `DownloadException`: If manifest fetch or download fails
-
-**Example:**
-
-```csharp
-try
-{
-    await TsPackClient.DownloadAll();
-    Console.WriteLine("All languages downloaded");
-}
-catch (DownloadException ex)
-{
-    Console.WriteLine($"Error: {ex.Message}");
-}
-```text
-
-### `TsPackClient.ManifestLanguages(): Task<List<string>>`
-
-Get all available languages from remote manifest.
-
-**Returns:** Task<List<string>> - Available language names
-
-**Throws:**
-
-- `DownloadException`: If manifest fetch fails
-
-**Example:**
-
-```csharp
-try
-{
-    var languages = await TsPackClient.ManifestLanguages();
-    Console.WriteLine($"Available: {languages.Count} languages");
-}
-catch (DownloadException ex)
-{
-    Console.WriteLine($"Error: {ex.Message}");
-}
-```text
-
-### `TsPackClient.DownloadedLanguages(): List<string>`
-
-Get languages already cached locally.
-
-Does not perform network requests.
-
-**Returns:** List<string> - Cached language names
-
-**Example:**
-
-```csharp
-var cached = TsPackClient.DownloadedLanguages();
-foreach (var lang in cached)
-{
-    Console.WriteLine(lang);
-}
-```text
-
-### `TsPackClient.CleanCache(): Task`
-
-Delete all cached parser shared libraries.
-
-**Returns:** Task
-
-**Throws:**
-
-- `DownloadException`: If cache cannot be removed
-
-**Example:**
-
-```csharp
-try
-{
-    await TsPackClient.CleanCache();
-    Console.WriteLine("Cache cleaned");
-}
-catch (DownloadException ex)
-{
-    Console.WriteLine($"Error: {ex.Message}");
-}
-```text
-
-### `TsPackClient.CacheDir(): string`
-
-Get the current cache directory path.
-
-**Returns:** string - Absolute cache directory path
-
-**Example:**
-
-```csharp
-var dir = TsPackClient.CacheDir();
-Console.WriteLine($"Cache at: {dir}");
-```text
-
-### `TsPackClient.Init(string[]? languages, string? cacheDir): Task`
-
-Initialize with optional pre-downloads and cache directory.
-
-**Parameters:**
-
-- `languages` (string[]?): Languages to download (null = skip)
-- `cacheDir` (string?): Custom cache directory (null = default)
-
-**Returns:** Task
-
-**Throws:**
-
-- `DownloadException`: If configuration or download fails
-
-**Example:**
-
-```csharp
-try
-{
-    await TsPackClient.Init(
-        languages: new[] { "python", "javascript" },
-        cacheDir: "/opt/ts-pack"
-    );
-}
-catch (DownloadException ex)
-{
-    Console.WriteLine($"Error: {ex.Message}");
-}
-```text
-
-### `TsPackClient.Configure(string? cacheDir): Task`
-
-Apply configuration without downloading.
-
-**Parameters:**
-
-- `cacheDir` (string?): Custom cache directory (null = default)
-
-**Returns:** Task
-
-**Throws:**
-
-- `DownloadException`: If lock cannot be acquired
-
-**Example:**
-
-```csharp
-try
-{
-    await TsPackClient.Configure(cacheDir: "/data/ts-pack");
-}
-catch (DownloadException ex)
-{
-    Console.WriteLine($"Error: {ex.Message}");
-}
-```text
-
-## Language Discovery
-
-### `TsPackClient.GetLanguage(string name): Task<Language>`
-
-Get a tree-sitter Language by name.
-
-Resolves aliases (e.g., `"shell"` → `"bash"`). Auto-downloads if needed.
-
-**Parameters:**
-
-- `name` (string): Language name or alias
-
-**Returns:** Task<Language> - tree-sitter Language object
-
-**Throws:**
-
-- `LanguageNotFoundException`: If language not recognized
-- `DownloadException`: If auto-download fails
-
-**Example:**
-
-```csharp
-try
-{
-    var language = await TsPackClient.GetLanguage("python");
-    var parser = new Parser();
-    parser.SetLanguage(language);
-    var tree = parser.Parse("x = 1");
-    Console.WriteLine(tree.RootNode.Type); // "module"
-}
-catch (LanguageNotFoundException ex)
-{
-    Console.WriteLine($"Language not found: {ex.Message}");
-}
-```text
-
-### `TsPackClient.GetParser(string name): Task<Parser>`
-
-Get a pre-configured Parser for a language.
-
-**Parameters:**
-
-- `name` (string): Language name or alias
-
-**Returns:** Task<Parser> - Pre-configured tree-sitter Parser
-
-**Throws:**
-
-- `LanguageNotFoundException`: If language not recognized
-- `DownloadException`: If auto-download fails
-- `ParserException`: If parser setup fails
-
-**Example:**
-
-```csharp
-try
-{
-    var parser = await TsPackClient.GetParser("rust");
-    var tree = parser.Parse("fn main() {}");
-    Console.WriteLine(!tree.HasError); // true
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Error: {ex.Message}");
-}
-```text
-
-### `TsPackClient.AvailableLanguages(): List<string>`
-
-List all available language names.
-
-**Returns:** List<string> - Sorted language names
-
-**Example:**
-
-```csharp
-var languages = TsPackClient.AvailableLanguages();
+string[] languages = TsPackClient.AvailableLanguages();
 foreach (var lang in languages)
 {
     Console.WriteLine(lang);
 }
-```text
+```
 
-### `TsPackClient.HasLanguage(string name): bool`
+#### `HasLanguage(string name): bool`
 
-Check if a language is available.
-
-**Parameters:**
-
-- `name` (string): Language name or alias
-
-**Returns:** bool - True if available
-
-**Example:**
-
-```csharp
-if (TsPackClient.HasLanguage("python"))
-{
-    Console.WriteLine("Python available");
-}
-Debug.Assert(TsPackClient.HasLanguage("shell")); // alias for bash
-```text
-
-### `TsPackClient.LanguageCount(): int`
-
-Get total number of available languages.
-
-**Returns:** int - Language count
-
-**Example:**
-
-```csharp
-int count = TsPackClient.LanguageCount();
-Console.WriteLine($"{count} languages available");
-```text
-
-## Parsing
-
-### `TsPackClient.Parse(byte[] source, string language): Tree`
-
-Parse source code into a syntax tree.
+Check whether a language with the given name is available.
 
 **Parameters:**
 
-- `source` (byte[]): Source code bytes
-- `language` (string): Language name
+- `name` (string): Language name
 
-**Returns:** Tree - Parsed syntax tree
+**Returns:** bool
+
+#### `LanguageCount(): int`
+
+Get the number of available languages.
+
+**Returns:** int
+
+#### `GetLanguage(string name): IntPtr`
+
+Get a raw TSLanguage pointer for the given language name.
+
+**Parameters:**
+
+- `name` (string): Language name
+
+**Returns:** IntPtr
 
 **Throws:**
 
-- `LanguageNotFoundException`: If language not found
-- `ParseException`: If parsing fails
+- `TsPackException`: If the language is not available
+
+### Language Detection
+
+#### `DetectLanguage(string path): string?`
+
+Detect language name from a file path or extension. Returns null if not recognized.
+
+**Parameters:**
+
+- `path` (string): File path
+
+**Returns:** string?
 
 **Example:**
 
 ```csharp
-try
-{
-    var tree = TsPackClient.Parse("def foo(): pass"u8, "python");
-    Console.WriteLine(tree.RootNode.Sexp);
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Error: {ex.Message}");
-}
-```text
+string? lang = TsPackClient.DetectLanguage("src/main.rs");
+// lang == "rust"
+```
 
-## Code Intelligence
+#### `DetectLanguageFromContent(string content): string?`
 
-### `TsPackClient.Process(string source, ProcessConfig config): ProcessResult`
+Detect language name from file content using shebang-based detection. Returns null if no shebang is recognized.
 
-Extract code intelligence from source code.
+**Parameters:**
+
+- `content` (string): File content
+
+**Returns:** string?
+
+#### `ExtensionAmbiguity(string ext): ExtensionAmbiguityResult?`
+
+Return ambiguity information for the given file extension. Returns null if the extension is not ambiguous.
+
+**Parameters:**
+
+- `ext` (string): File extension
+
+**Returns:** ExtensionAmbiguityResult?
+
+### Bundled Queries
+
+#### `GetHighlightsQuery(string language): string?`
+
+Return the bundled highlights query for the given language. Returns null if not available.
+
+#### `GetInjectionsQuery(string language): string?`
+
+Return the bundled injections query for the given language. Returns null if not available.
+
+#### `GetLocalsQuery(string language): string?`
+
+Return the bundled locals query for the given language. Returns null if not available.
+
+### Parsing
+
+#### `Parse(string languageName, string source): ParseTree`
+
+Parse source code with the given language and return a `ParseTree` handle. The caller must dispose the returned `ParseTree`.
+
+**Parameters:**
+
+- `languageName` (string): Language name
+- `source` (string): Source code
+
+**Returns:** ParseTree
+
+**Throws:**
+
+- `TsPackException`: If parsing fails
+
+**Example:**
+
+```csharp
+using var tree = TsPackClient.Parse("python", "def foo(): pass");
+Console.WriteLine(tree.RootNodeType());  // "module"
+Console.WriteLine(tree.RootChildCount()); // 1
+```
+
+### Code Intelligence
+
+#### `Process(string source, ProcessConfig config): ProcessResult`
+
+Process source code with the given configuration and return analysis results.
 
 **Parameters:**
 
 - `source` (string): Source code
 - `config` (ProcessConfig): Configuration
 
-**Returns:** ProcessResult - Analysis result
+**Returns:** ProcessResult
 
 **Throws:**
 
-- `LanguageNotFoundException`: If language not found
-- `ParseException`: If parsing fails
-- `ProcessException`: If analysis fails
+- `TsPackException`: If processing fails
 
 **Example:**
 
 ```csharp
-try
+var config = new ProcessConfig
 {
-    var config = new ProcessConfig("python").All();
-    var result = TsPackClient.Process("def hello(): pass", config);
+    Language = "python",
+    Comments = true,
+    Docstrings = true,
+};
+var result = TsPackClient.Process("def hello(): pass", config);
+Console.WriteLine($"Structure: {result.Structure.Count}");
+Console.WriteLine($"Lines: {result.Metrics.TotalLines}");
+```
 
-    Console.WriteLine($"Functions: {result.Structure.Count}");
-    Console.WriteLine($"Lines: {result.Metrics.TotalLines}");
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Error: {ex.Message}");
-}
-```text
+### Download Management
+
+#### `Init(string? configJson = null): void`
+
+Initialize the language pack with configuration. `configJson` is a JSON string with optional fields: `"cache_dir"` (string), `"languages"` (array), `"groups"` (array).
+
+**Parameters:**
+
+- `configJson` (string?): JSON configuration (null for defaults)
+
+**Throws:**
+
+- `TsPackException`: If initialization fails
+
+**Example:**
+
+```csharp
+TsPackClient.Init("""{"languages": ["python", "rust"]}""");
+```
+
+#### `Configure(string? configJson = null): void`
+
+Configure the language pack cache directory without downloading.
+
+**Parameters:**
+
+- `configJson` (string?): JSON with optional `"cache_dir"` field
+
+**Throws:**
+
+- `TsPackException`: If configuration fails
+
+#### `Download(params string[] languages): int`
+
+Download specific languages to the cache. Returns the number of newly downloaded languages.
+
+**Parameters:**
+
+- `languages` (string[]): Language names to download
+
+**Returns:** int
+
+**Throws:**
+
+- `TsPackException`: If download fails
+
+**Example:**
+
+```csharp
+int count = TsPackClient.Download("python", "rust", "typescript");
+Console.WriteLine($"Downloaded {count} new languages");
+```
+
+#### `DownloadAll(): int`
+
+Download all available languages from the remote manifest. Returns the number of newly downloaded languages.
+
+**Returns:** int
+
+**Throws:**
+
+- `TsPackException`: If download fails
+
+#### `ManifestLanguages(): string[]`
+
+Get all language names available in the remote manifest.
+
+**Returns:** string[]
+
+**Throws:**
+
+- `TsPackException`: If the operation fails
+
+#### `DownloadedLanguages(): string[]`
+
+Get all languages that are already downloaded and cached locally. Returns an empty array if unavailable.
+
+**Returns:** string[]
+
+#### `CleanCache(): void`
+
+Delete all cached parser shared libraries.
+
+**Throws:**
+
+- `TsPackException`: If the operation fails
+
+#### `CacheDir(): string?`
+
+Get the effective cache directory path.
+
+**Returns:** string?
+
+**Throws:**
+
+- `TsPackException`: If the operation fails
+
+## ParseTree
+
+Opaque handle to a parsed syntax tree. Implements `IDisposable`. Must be disposed to free native memory.
+
+### Methods
+
+#### `RootNodeType(): string?`
+
+Get the type name of the root node.
+
+#### `RootChildCount(): uint`
+
+Get the number of named children of the root node.
+
+#### `ContainsNodeType(string nodeType): bool`
+
+Check whether the tree contains a node with the given type name.
+
+#### `HasErrorNodes(): bool`
+
+Check whether the tree contains any ERROR or MISSING nodes.
+
+#### `ToSexp(): string?`
+
+Return the S-expression representation of the tree.
+
+#### `ErrorCount(): int`
+
+Return the count of ERROR and MISSING nodes in the tree.
+
+#### `Dispose(): void`
+
+Free the native tree handle.
+
+**Example:**
+
+```csharp
+using var tree = TsPackClient.Parse("python", "def foo(): pass");
+Console.WriteLine(tree.RootNodeType());                      // "module"
+Console.WriteLine(tree.ContainsNodeType("function_definition")); // True
+Console.WriteLine(tree.HasErrorNodes());                     // False
+Console.WriteLine(tree.ToSexp());
+```
 
 ## Types
 
 ### `ProcessConfig`
 
-Configuration for code intelligence analysis.
+Configuration for `TsPackClient.Process()`. Serialized to JSON before passing to the FFI layer.
 
-**Constructor:**
+**Properties:**
 
 ```csharp
-var config = new ProcessConfig("python");
-```text
-
-**Methods:**
-
-#### `Structure(): ProcessConfig`
-
-Enable structure extraction.
-
-#### `ImportExports(): ProcessConfig`
-
-Enable imports/exports extraction.
-
-#### `Comments(): ProcessConfig`
-
-Enable comment extraction.
-
-#### `Docstrings(): ProcessConfig`
-
-Enable docstring extraction.
-
-#### `Symbols(): ProcessConfig`
-
-Enable symbol extraction.
-
-#### `Metrics(): ProcessConfig`
-
-Enable metric extraction.
-
-#### `Diagnostics(): ProcessConfig`
-
-Enable diagnostic extraction.
-
-#### `WithChunks(int maxSize, int overlap): ProcessConfig`
-
-Configure code chunking.
-
-#### `All(): ProcessConfig`
-
-Enable all features.
+public sealed class ProcessConfig
+{
+    public required string Language { get; set; }
+    public bool Structure { get; set; } = true;     // default: true
+    public bool Imports { get; set; } = true;        // default: true
+    public bool Exports { get; set; } = true;        // default: true
+    public bool Comments { get; set; }               // default: false
+    public bool Docstrings { get; set; }             // default: false
+    public bool Symbols { get; set; }                // default: false
+    public bool Diagnostics { get; set; }            // default: false
+    public int? ChunkMaxSize { get; set; }           // default: null (no chunking)
+}
+```
 
 **Example:**
 
 ```csharp
-var config = new ProcessConfig("python")
-    .Structure()
-    .ImportExports()
-    .Comments()
-    .WithChunks(2000, 400);
-```text
+var config = new ProcessConfig
+{
+    Language = "python",
+    Structure = true,
+    Comments = true,
+    ChunkMaxSize = 2000,
+};
+```
 
 ### `ProcessResult`
 
-Result from code intelligence analysis.
-
-**Properties:**
-
 ```csharp
-public class ProcessResult
+public sealed class ProcessResult
 {
-    public string Language { get; }
-    public FileMetrics Metrics { get; }
-    public List<StructureItem> Structure { get; }
-    public List<ImportInfo> Imports { get; }
-    public List<ExportInfo> Exports { get; }
-    public List<CommentInfo> Comments { get; }
-    public List<DocstringInfo> Docstrings { get; }
-    public List<SymbolInfo> Symbols { get; }
-    public List<Diagnostic> Diagnostics { get; }
-    public List<CodeChunk> Chunks { get; }
-    public int ParseErrors { get; }
+    public string Language { get; set; }
+    public FileMetrics Metrics { get; set; }
+    public List<StructureItem> Structure { get; set; }
+    public List<ImportInfo> Imports { get; set; }
+    public List<ExportInfo> Exports { get; set; }
+    public List<CommentInfo> Comments { get; set; }
+    public List<DocstringInfo> Docstrings { get; set; }
+    public List<SymbolInfo> Symbols { get; set; }
+    public List<Diagnostic> Diagnostics { get; set; }
+    public List<CodeChunk> Chunks { get; set; }
 }
-```text
-
-**Example:**
-
-```csharp
-var result = TsPackClient.Process(source, config);
-
-Console.WriteLine($"Language: {result.Language}");
-foreach (var item in result.Structure)
-{
-    Console.WriteLine($"  {item.Kind}: {item.Name}");
-}
-```text
-
-### `Language`
-
-tree-sitter Language object.
-
-**Properties:**
-
-- `string Name { get; }` - Get language name
-
-**Methods:**
-
-- `Parser CreateParser()` - Create a new parser
-
-### `Parser`
-
-tree-sitter Parser object.
-
-**Methods:**
-
-- `Tree Parse(byte[] source)` - Parse source code
-- `Tree Parse(byte[] source, Tree? oldTree)` - Parse with incremental update
-- `void SetTimeoutMicros(ulong micros)` - Set parse timeout
-
-### `Tree`
-
-Parsed syntax tree.
-
-**Properties:**
-
-- `Node RootNode { get; }` - Get root node
-
-**Methods:**
-
-- `Tree Copy()` - Copy tree
-
-### `Node`
-
-Syntax tree node.
-
-**Properties:**
-
-- `string Type { get; }` - Get node type
-- `string Kind { get; }` - Get node kind
-- `Point StartPoint { get; }` - Get start position
-- `Point EndPoint { get; }` - Get end position
-- `int ChildCount { get; }` - Get number of children
-- `string Sexp { get; }` - Get S-expression
-
-**Methods:**
-
-- `string GetText(byte[] source)` - Get node text
-- `Node? GetChild(int index)` - Get child node
-
-## Exception Handling
-
-```csharp
-using TreeSitterLanguagePack;
-
-try
-{
-    var language = await TsPackClient.GetLanguage("python");
-    var parser = new Parser();
-    parser.SetLanguage(language);
-    var tree = parser.Parse("x = 1");
-}
-catch (LanguageNotFoundException ex)
-{
-    Console.WriteLine("Language not available");
-}
-catch (DownloadException ex)
-{
-    Console.WriteLine("Download failed");
-}
-catch (ParseException ex)
-{
-    Console.WriteLine("Parse error");
-}
-catch (Exception ex)
-{
-    Console.WriteLine("Unexpected error");
-}
-```text
-
-## Usage Patterns
-
-### Pre-download Languages
-
-```csharp
-public class AppConfiguration
-{
-    public static async Task Initialize()
-    {
-        try
-        {
-            await TsPackClient.Download(new[]
-            {
-                "python", "rust", "typescript"
-            });
-        }
-        catch (DownloadException ex)
-        {
-            throw new InvalidOperationException(
-                "Failed to download languages", ex);
-        }
-    }
-}
-
-class Program
-{
-    static async Task Main()
-    {
-        await AppConfiguration.Initialize();
-
-        // Fast, no network required
-        var parser = await TsPackClient.GetParser("python");
-        // ...
-    }
-}
-```text
-
-### Custom Cache Directory
-
-```csharp
-try
-{
-    await TsPackClient.Configure(cacheDir: "/opt/ts-pack-cache");
-}
-catch (DownloadException ex)
-{
-    throw new InvalidOperationException("Configuration failed", ex);
-}
-```text
-
-### Batch Processing
-
-```csharp
-public class CodeAnalyzer
-{
-    private readonly Parser _parser;
-
-    public CodeAnalyzer(string language)
-    {
-        _parser = TsPackClient.GetParser(language).Result;
-    }
-
-    public void AnalyzeFiles(List<string> files)
-    {
-        foreach (var file in files)
-        {
-            try
-            {
-                var source = File.ReadAllBytes(file);
-                var tree = _parser.Parse(source);
-                Console.WriteLine($"{file}: {tree.RootNode.ChildCount} nodes");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-        }
-    }
-}
-```text
-
-### Async Processing
-
-```csharp
-public class AsyncAnalyzer
-{
-    public static async Task AnalyzeFilesAsync(
-        List<string> files,
-        string language)
-    {
-        var parser = await TsPackClient.GetParser(language);
-
-        var tasks = files.Select(async file =>
-        {
-            var source = await File.ReadAllBytesAsync(file);
-            var tree = parser.Parse(source);
-            Console.WriteLine($"{file}: analyzed");
-        });
-
-        await Task.WhenAll(tasks);
-    }
-}
-```text
-
-### Type-Safe Code Intelligence
-
-```csharp
-public static class ProcessingExtensions
-{
-    public static ProcessResult AnalyzeCode(
-        this string source,
-        string language)
-    {
-        var config = new ProcessConfig(language).All();
-        return TsPackClient.Process(source, config);
-    }
-}
-
-// Usage
-var result = "def foo(): pass".AnalyzeCode("python");
-Console.WriteLine($"Functions: {result.Structure.Count}");
 ```
+
+### `FileMetrics`
+
+Properties: `TotalLines`, `CodeLines`, `CommentLines`, `BlankLines`, `TotalBytes`, `NodeCount`, `ErrorCount`, `MaxDepth` (all int).
+
+### `Span`
+
+Properties: `StartByte`, `EndByte`, `StartLine`, `StartColumn`, `EndLine`, `EndColumn` (all int).
+
+### `StructureItem`
+
+Properties: `Kind` (string), `Name` (string?), `Visibility` (string?), `Span` (Span), `Children` (List<StructureItem>), `Decorators` (List<string>), `DocComment` (string?), `Signature` (string?), `BodySpan` (Span?).
+
+### `ImportInfo`
+
+Properties: `Source` (string), `Items` (List<string>), `Alias` (string?), `IsWildcard` (bool), `Span` (Span).
+
+### `ExportInfo`
+
+Properties: `Name` (string), `Kind` (string), `Span` (Span).
+
+### `CommentInfo`
+
+Properties: `Text` (string), `Kind` (string), `Span` (Span), `AssociatedNode` (string?).
+
+### `DocstringInfo`
+
+Properties: `Text` (string), `Format` (string), `Span` (Span), `AssociatedItem` (string?), `ParsedSections` (List<DocSection>).
+
+### `DocSection`
+
+Properties: `Kind` (string), `Name` (string?), `Description` (string).
+
+### `SymbolInfo`
+
+Properties: `Name` (string), `Kind` (string), `Span` (Span), `TypeAnnotation` (string?), `Doc` (string?).
+
+### `Diagnostic`
+
+Properties: `Message` (string), `Severity` (string), `Span` (Span).
+
+### `CodeChunk`
+
+Properties: `Content` (string), `StartByte` (int), `EndByte` (int), `StartLine` (int), `EndLine` (int), `Metadata` (ChunkContext).
+
+### `ChunkContext`
+
+Properties: `Language` (string), `ChunkIndex` (int), `TotalChunks` (int), `NodeTypes` (List<string>), `ContextPath` (List<string>), `SymbolsDefined` (List<string>), `Comments` (List<CommentInfo>), `Docstrings` (List<DocstringInfo>), `HasErrorNodes` (bool).
+
+### `ExtensionAmbiguityResult`
+
+Properties: `Assigned` (string), `Alternatives` (string[]).
+
+## Kind Constants
+
+String constants are provided as static classes for type-safe comparisons:
+
+- `StructureKind`: Function, Class, Method, Struct, Enum, Interface, Module, Namespace, Trait, TypeAlias, Constant, Field, Property, Other
+- `ExportKind`: Function, Class, Constant, Type, Default, Namespace, Other
+- `CommentKind`: Line, Block, Doc
+- `DocstringFormat`: Markdown, ReStructuredText, GoogleStyle, NumpyStyle, Javadoc, XmlDoc, Plain, Other
+- `SymbolKind`: Variable, Function, Class, Constant, Parameter, Field, Property, Type, Other
+- `DiagnosticSeverity`: Error, Warning, Information, Hint
+
+## Exception
+
+### `TsPackException`
+
+Thrown when a native FFI call fails. Extends `Exception`.
+
+```csharp
+public sealed class TsPackException : Exception
+{
+    public TsPackException(string message);
+    public TsPackException(string message, Exception innerException);
+}
+```
+
+## Thread Safety
+
+`TsPackClient` methods are safe to call from multiple threads. The shared registry instance is initialized with `LazyThreadSafetyMode.ExecutionAndPublication`.

@@ -11,466 +11,501 @@ Add to `mix.exs`:
 ```elixir
 def deps do
   [
-    {:tree_sitter_language_pack, "~> 1.0"}
+    {:tree_sitter_language_pack, "~> 1.2"}
   ]
 end
-```text
+```
 
 Then run:
 
 ```bash
 mix deps.get
-```text
+```
 
 ## Quick Start
 
 ```elixir
-# Pre-download languages
-TreeSitterLanguagePack.init(languages: ["python", "rust"])
+# List available languages
+languages = TreeSitterLanguagePack.available_languages()
+IO.puts("#{length(languages)} languages available")
 
-# Get a language
-{:ok, language} = TreeSitterLanguagePack.get_language("python")
+# Parse source code (returns an opaque tree reference)
+tree = TreeSitterLanguagePack.parse_string("python", "def hello(): pass")
+TreeSitterLanguagePack.tree_root_node_type(tree)
+#=> "module"
 
-# Get a pre-configured parser
-{:ok, parser} = TreeSitterLanguagePack.get_parser("python")
-tree = TreeSitter.Parser.parse(parser, "def hello(): pass")
-IO.puts(TreeSitter.Tree.sexp(tree))
+TreeSitterLanguagePack.tree_contains_node_type(tree, "function_definition")
+#=> true
 
-# Extract code intelligence
-config = TreeSitterLanguagePack.ProcessConfig.new("python")
-  |> TreeSitterLanguagePack.ProcessConfig.all()
-
-{:ok, result} = TreeSitterLanguagePack.process("def hello(): pass", config)
+# Extract code intelligence (config is a JSON string)
+result = TreeSitterLanguagePack.process(
+  "def hello(): pass",
+  ~s({"language":"python"})
+)
 IO.inspect(result["structure"])
-```text
+```
 
 ## Download Management
 
-### `TreeSitterLanguagePack.init(options \\ [])`
+### `init(config_json)`
 
 Initialize the language pack with optional pre-downloads.
 
 **Parameters:**
 
-- `options` (keyword list):
-    - `languages` (list[String]): Languages to download
-    - `groups` (list[String]): Language groups to download
-    - `cache_dir` (String): Custom cache directory
+- `config_json` (String): JSON string with optional fields:
+    - `cache_dir` (string): Custom cache directory path
+    - `languages` (list): Language names to download
+    - `groups` (list): Language groups to download
 
-**Returns:** {:ok, nil} | {:error, reason}
+**Returns:** `:ok`
+
+**Raises:** Erlang error on invalid JSON, download failure, or network error.
+
+This NIF runs on the DirtyIo scheduler and will not block the BEAM scheduler.
 
 **Example:**
 
 ```elixir
-# Pre-download specific languages
-TreeSitterLanguagePack.init(languages: ["python", "javascript", "rust"])
+TreeSitterLanguagePack.init(~s({"languages":["python","javascript","rust"]}))
 
-# Or download language groups
-TreeSitterLanguagePack.init(groups: ["web", "data"])
+TreeSitterLanguagePack.init(~s({"cache_dir":"/opt/ts-pack","languages":["python"]}))
+```
 
-# With custom cache directory
-TreeSitterLanguagePack.init(
-  languages: ["python"],
-  cache_dir: "/opt/ts-pack"
-)
-```text
+### `configure(config_json)`
 
-### `TreeSitterLanguagePack.configure(options \\ [])`
-
-Apply configuration without downloading.
-
-Use to set custom cache directory before first `get_language` call.
+Apply configuration without downloading. Use to set a custom cache directory before calling `get_language_ptr/1` or any download function.
 
 **Parameters:**
 
-- `options` (keyword list):
-    - `cache_dir` (String): Custom cache directory
+- `config_json` (String): JSON string with optional fields:
+    - `cache_dir` (string): Custom cache directory path
 
-**Returns:** {:ok, nil} | {:error, reason}
+**Returns:** `:ok`
+
+**Raises:** Erlang error on invalid JSON or configuration failure.
 
 **Example:**
 
 ```elixir
-TreeSitterLanguagePack.configure(cache_dir: "/data/ts-pack")
+TreeSitterLanguagePack.configure(~s({"cache_dir":"/data/ts-pack"}))
+```
 
-{:ok, language} = TreeSitterLanguagePack.get_language("python")
-```text
+### `download(names)`
 
-### `TreeSitterLanguagePack.download(names)`
-
-Download specific languages to cache.
+Download specific languages to the local cache.
 
 **Parameters:**
 
-- `names` (list[String]): Language names to download
+- `names` (list of String): Language names to download
 
-**Returns:** {:ok, count} | {:error, reason} where count is Integer
+**Returns:** non_neg_integer - Count of newly downloaded languages
 
-**Example:**
+**Raises:** Erlang error if a language is not found or download fails.
 
-```elixir
-case TreeSitterLanguagePack.download(["python", "rust", "typescript"]) do
-  {:ok, count} -> IO.puts("Downloaded #{count} new languages")
-  {:error, reason} -> IO.puts("Error: #{reason}")
-end
-```text
-
-### `TreeSitterLanguagePack.download_all()`
-
-Download all available languages (248).
-
-**Returns:** {:ok, count} | {:error, reason}
+This NIF runs on the DirtyIo scheduler.
 
 **Example:**
 
 ```elixir
-{:ok, count} = TreeSitterLanguagePack.download_all()
-IO.puts("Downloaded #{count} languages total")
-```text
+count = TreeSitterLanguagePack.download(["python", "rust", "typescript"])
+IO.puts("Downloaded #{count} new languages")
+```
 
-### `TreeSitterLanguagePack.manifest_languages()`
+### `download_all()`
 
-Get all available languages from remote manifest.
+Download all available languages from the remote manifest.
 
-**Returns:** {:ok, languages} | {:error, reason}
+**Returns:** non_neg_integer - Count of newly downloaded languages
+
+**Raises:** Erlang error if manifest fetch fails.
+
+This NIF runs on the DirtyIo scheduler.
 
 **Example:**
 
 ```elixir
-case TreeSitterLanguagePack.manifest_languages() do
-  {:ok, languages} ->
-    IO.puts("Available: #{length(languages)} languages")
-    IO.inspect(Enum.sort(languages))
+count = TreeSitterLanguagePack.download_all()
+IO.puts("Downloaded #{count} languages")
+```
 
-  {:error, reason} ->
-    IO.puts("Error: #{reason}")
-end
-```text
+### `manifest_languages()`
 
-### `TreeSitterLanguagePack.downloaded_languages()`
+Get all language names available in the remote manifest.
 
-Get languages already cached locally.
+Fetches and caches the remote manifest.
 
-Does not perform network requests.
+**Returns:** list of String - Sorted language names
 
-**Returns:** list[String]
+**Raises:** Erlang error if manifest fetch fails.
+
+This NIF runs on the DirtyIo scheduler.
+
+**Example:**
+
+```elixir
+languages = TreeSitterLanguagePack.manifest_languages()
+IO.puts("#{length(languages)} languages available for download")
+```
+
+### `downloaded_languages()`
+
+Get languages already cached locally. Does not perform network requests.
+
+**Returns:** list of String - Cached language names
 
 **Example:**
 
 ```elixir
 cached = TreeSitterLanguagePack.downloaded_languages()
 IO.inspect(cached)
-```text
+```
 
-### `TreeSitterLanguagePack.clean_cache()`
+### `clean_cache()`
 
 Delete all cached parser shared libraries.
 
-**Returns:** :ok | {:error, reason}
+**Returns:** `:ok`
+
+**Raises:** Erlang error if cache cannot be removed.
+
+This NIF runs on the DirtyIo scheduler.
 
 **Example:**
 
 ```elixir
 TreeSitterLanguagePack.clean_cache()
-IO.puts("Cache cleaned")
-```text
+```
 
-### `TreeSitterLanguagePack.cache_dir()`
+### `cache_dir()`
 
-Get the current cache directory path.
+Get the effective cache directory path.
 
 **Returns:** String
+
+**Raises:** Erlang error if cache directory cannot be determined.
+
+This NIF runs on the DirtyIo scheduler.
 
 **Example:**
 
 ```elixir
 dir = TreeSitterLanguagePack.cache_dir()
 IO.puts("Cache at: #{dir}")
-```text
+```
 
 ## Language Discovery
 
-### `TreeSitterLanguagePack.get_language(name)`
-
-Get a tree-sitter Language by name.
-
-Resolves aliases (e.g., `"shell"` → `"bash"`). Auto-downloads if needed.
-
-**Parameters:**
-
-- `name` (String): Language name or alias
-
-**Returns:** {:ok, language} | {:error, reason}
-
-**Example:**
-
-```elixir
-case TreeSitterLanguagePack.get_language("python") do
-  {:ok, language} ->
-    {:ok, parser} = TreeSitter.Parser.new()
-    TreeSitter.Parser.set_language(parser, language)
-    tree = TreeSitter.Parser.parse(parser, "x = 1")
-    IO.puts(tree.root_node.type)
-
-  {:error, reason} ->
-    IO.puts("Error: #{reason}")
-end
-```text
-
-### `TreeSitterLanguagePack.get_parser(name)`
-
-Get a pre-configured Parser for a language.
-
-**Parameters:**
-
-- `name` (String): Language name or alias
-
-**Returns:** {:ok, parser} | {:error, reason}
-
-**Example:**
-
-```elixir
-case TreeSitterLanguagePack.get_parser("rust") do
-  {:ok, parser} ->
-    tree = TreeSitter.Parser.parse(parser, "fn main() {}")
-    IO.puts(tree.root_node.has_error?)
-
-  {:error, reason} ->
-    IO.puts("Error: #{reason}")
-end
-```text
-
-### `TreeSitterLanguagePack.available_languages()`
+### `available_languages()`
 
 List all available language names.
 
-**Returns:** list[String]
+**Returns:** list of String - Sorted language names
 
 **Example:**
 
 ```elixir
 langs = TreeSitterLanguagePack.available_languages()
 Enum.each(langs, &IO.puts/1)
-```text
+```
 
-### `TreeSitterLanguagePack.has_language?(name)`
+### `has_language(name)`
 
 Check if a language is available.
 
 **Parameters:**
 
-- `name` (String): Language name or alias
+- `name` (String): Language name
 
 **Returns:** boolean
 
 **Example:**
 
 ```elixir
-if TreeSitterLanguagePack.has_language?("python") do
+if TreeSitterLanguagePack.has_language("python") do
   IO.puts("Python available")
 end
+```
 
-unless TreeSitterLanguagePack.has_language?("shell") do
-  raise "Shell not available"
-end
-```text
-
-### `TreeSitterLanguagePack.language_count()`
+### `language_count()`
 
 Get total number of available languages.
 
-**Returns:** integer
+**Returns:** non_neg_integer
 
 **Example:**
 
 ```elixir
 count = TreeSitterLanguagePack.language_count()
 IO.puts("#{count} languages available")
-```text
+```
 
-## Parsing
+### `detect_language(path)`
 
-### `TreeSitterLanguagePack.parse_string(source, language)`
-
-Parse source code into a syntax tree.
+Detect language name from a file path based on its extension.
 
 **Parameters:**
 
-- `source` (String | binary): Source code
-- `language` (String): Language name
+- `path` (String): File path or extension
 
-**Returns:** {:ok, tree} | {:error, reason}
+**Returns:** String or nil
 
 **Example:**
 
 ```elixir
-case TreeSitterLanguagePack.parse_string("def foo(): pass", "python") do
-  {:ok, tree} ->
-    IO.puts(TreeSitter.Tree.sexp(tree))
+TreeSitterLanguagePack.detect_language("script.py")
+#=> "python"
 
-  {:error, reason} ->
-    IO.puts("Error: #{reason}")
+TreeSitterLanguagePack.detect_language("unknown.xyz")
+#=> nil
+```
+
+### `detect_language_from_content(content)`
+
+Detect language name from source code content (e.g. shebang lines).
+
+**Parameters:**
+
+- `content` (String): File content
+
+**Returns:** String or nil
+
+**Example:**
+
+```elixir
+TreeSitterLanguagePack.detect_language_from_content("#!/usr/bin/env python3\nprint('hello')")
+#=> "python"
+```
+
+### `extension_ambiguity(ext)`
+
+Returns extension ambiguity information as a JSON string, or nil.
+
+When non-nil, the JSON decodes to a map with `"assigned"` (string) and `"alternatives"` (list of strings) fields.
+
+**Parameters:**
+
+- `ext` (String): File extension (without dot)
+
+**Returns:** String (JSON) or nil
+
+**Example:**
+
+```elixir
+case TreeSitterLanguagePack.extension_ambiguity("h") do
+  nil -> IO.puts("Not ambiguous")
+  json -> IO.inspect(Jason.decode!(json))
 end
-```text
+```
+
+### `get_language_ptr(name)`
+
+Returns the raw `TSLanguage` pointer as a non-negative integer. Useful for interop with Elixir tree-sitter bindings that accept a language pointer.
+
+**Parameters:**
+
+- `name` (String): Language name
+
+**Returns:** non_neg_integer
+
+**Raises:** `{:error, {:language_not_found, name}}` if the language is not found.
+
+**Example:**
+
+```elixir
+ptr = TreeSitterLanguagePack.get_language_ptr("python")
+# => 140234567890
+```
+
+## Queries
+
+### `get_highlights_query(language)`
+
+Returns the bundled highlights query for the given language, or nil.
+
+**Parameters:**
+
+- `language` (String): Language name
+
+**Returns:** String or nil
+
+### `get_injections_query(language)`
+
+Returns the bundled injections query for the given language, or nil.
+
+**Parameters:**
+
+- `language` (String): Language name
+
+**Returns:** String or nil
+
+### `get_locals_query(language)`
+
+Returns the bundled locals query for the given language, or nil.
+
+**Parameters:**
+
+- `language` (String): Language name
+
+**Returns:** String or nil
+
+## Parsing
+
+### `parse_string(language, source)`
+
+Parse source code and return an opaque tree reference. The reference can be passed to the `tree_*` inspection functions below.
+
+**Parameters:**
+
+- `language` (String): Language name
+- `source` (String): Source code to parse
+
+**Returns:** reference (opaque NIF resource)
+
+**Raises:** `{:error, {:language_not_found, name}}` or `{:error, {:parse_error, reason}}`.
+
+**Example:**
+
+```elixir
+tree = TreeSitterLanguagePack.parse_string("python", "def foo(): pass")
+TreeSitterLanguagePack.tree_root_node_type(tree)
+#=> "module"
+```
+
+## Tree Inspection Functions
+
+These functions accept the opaque tree reference returned by `parse_string/2`.
+
+### `tree_root_node_type(tree)`
+
+Returns the type name of the root node.
+
+**Parameters:**
+
+- `tree` (reference): Tree reference from `parse_string/2`
+
+**Returns:** String
+
+**Example:**
+
+```elixir
+tree = TreeSitterLanguagePack.parse_string("python", "x = 1")
+TreeSitterLanguagePack.tree_root_node_type(tree)
+#=> "module"
+```
+
+### `tree_root_child_count(tree)`
+
+Returns the number of named children of the root node.
+
+**Parameters:**
+
+- `tree` (reference): Tree reference from `parse_string/2`
+
+**Returns:** non_neg_integer
+
+**Example:**
+
+```elixir
+tree = TreeSitterLanguagePack.parse_string("python", "x = 1\ny = 2")
+TreeSitterLanguagePack.tree_root_child_count(tree)
+#=> 2
+```
+
+### `tree_contains_node_type(tree, node_type)`
+
+Checks whether any node in the tree has the given type name (depth-first traversal).
+
+**Parameters:**
+
+- `tree` (reference): Tree reference from `parse_string/2`
+- `node_type` (String): The node type to search for
+
+**Returns:** boolean
+
+**Example:**
+
+```elixir
+tree = TreeSitterLanguagePack.parse_string("python", "def hello(): pass")
+TreeSitterLanguagePack.tree_contains_node_type(tree, "function_definition")
+#=> true
+```
+
+### `tree_has_error_nodes(tree)`
+
+Checks whether the tree contains any ERROR or MISSING nodes.
+
+**Parameters:**
+
+- `tree` (reference): Tree reference from `parse_string/2`
+
+**Returns:** boolean
+
+**Example:**
+
+```elixir
+tree = TreeSitterLanguagePack.parse_string("python", "def (broken @@@ !!!")
+TreeSitterLanguagePack.tree_has_error_nodes(tree)
+#=> true
+```
 
 ## Code Intelligence
 
-### `TreeSitterLanguagePack.process(source, config)`
+### `process(source, config_json)`
 
-Extract code intelligence from source code.
+Process source code and extract metadata as an Elixir map. The result is converted from JSON to native Elixir types (maps, lists, strings, integers, booleans, nil).
 
 **Parameters:**
 
 - `source` (String): Source code
-- `config` (ProcessConfig): Configuration
+- `config_json` (String): JSON string with processing configuration. Must contain at least `"language"`. Optional fields:
+    - `structure` (bool, default true): Extract structural items
+    - `imports` (bool, default true): Extract import statements
+    - `exports` (bool, default true): Extract export statements
+    - `comments` (bool, default false): Extract comments
+    - `docstrings` (bool, default false): Extract docstrings
+    - `symbols` (bool, default false): Extract symbol definitions
+    - `diagnostics` (bool, default false): Include parse diagnostics
+    - `chunk_max_size` (int or null, default null): Maximum chunk size in bytes
 
-**Returns:** {:ok, result} | {:error, reason}
+**Returns:** map with string keys
 
-**Example:**
-
-```elixir
-config = TreeSitterLanguagePack.ProcessConfig.new("python")
-  |> TreeSitterLanguagePack.ProcessConfig.all()
-
-case TreeSitterLanguagePack.process("def hello(): pass", config) do
-  {:ok, result} ->
-    IO.puts("Functions: #{length(result["structure"])}")
-    IO.puts("Lines: #{result["metrics"]["total_lines"]}")
-
-  {:error, reason} ->
-    IO.puts("Error: #{reason}")
-end
-```text
-
-## Types
-
-### `TreeSitterLanguagePack.ProcessConfig`
-
-Configuration for code intelligence analysis.
-
-Use with pipe operators for fluent API.
-
-**Constructor:**
-
-```elixir
-config = TreeSitterLanguagePack.ProcessConfig.new("python")
-```text
-
-**Methods:**
-
-#### `structure() :: ProcessConfig`
-
-Enable structure extraction.
-
-#### `import_exports() :: ProcessConfig`
-
-Enable imports/exports extraction.
-
-#### `comments() :: ProcessConfig`
-
-Enable comment extraction.
-
-#### `docstrings() :: ProcessConfig`
-
-Enable docstring extraction.
-
-#### `symbols() :: ProcessConfig`
-
-Enable symbol extraction.
-
-#### `metrics() :: ProcessConfig`
-
-Enable metric extraction.
-
-#### `diagnostics() :: ProcessConfig`
-
-Enable diagnostic extraction.
-
-#### `with_chunks(max_size :: integer, overlap :: integer) :: ProcessConfig`
-
-Configure code chunking.
-
-#### `all() :: ProcessConfig`
-
-Enable all features.
+**Raises:** Erlang error on invalid config JSON, unknown language, or processing failure.
 
 **Example:**
 
 ```elixir
-config = TreeSitterLanguagePack.ProcessConfig.new("python")
-  |> TreeSitterLanguagePack.ProcessConfig.structure()
-  |> TreeSitterLanguagePack.ProcessConfig.import_exports()
-  |> TreeSitterLanguagePack.ProcessConfig.comments()
-  |> TreeSitterLanguagePack.ProcessConfig.with_chunks(2000, 400)
-```text
+config = Jason.encode!(%{"language" => "python", "structure" => true})
+result = TreeSitterLanguagePack.process("def hello(): pass", config)
 
-### Result Map
-
-Result from `process` function.
-
-**Keys:**
-
-- `"language"` (String) - Language name
-- `"metrics"` (Map) - File metrics
-    - `"total_lines"` (integer)
-    - `"code_lines"` (integer)
-    - `"comment_lines"` (integer)
-    - `"blank_lines"` (integer)
-- `"structure"` (list) - Code structure items
-    - Each item has `"kind"`, `"name"`, `"line"`, `"column"`, etc.
-- `"imports"` (list) - Import statements
-- `"exports"` (list) - Export statements
-- `"comments"` (list) - Comments
-- `"docstrings"` (list) - Docstrings
-- `"symbols"` (list) - Symbols
-- `"diagnostics"` (list) - Diagnostics
-- `"chunks"` (list) - Code chunks
-- `"parse_errors"` (integer) - Number of parse errors
-
-**Example:**
-
-```elixir
-{:ok, result} = TreeSitterLanguagePack.process(source, config)
-
-language = result["language"]
-structure = result["structure"]
-
-Enum.each(structure, fn item ->
+Enum.each(result["structure"], fn item ->
   IO.puts("#{item["kind"]}: #{item["name"]}")
 end)
-```text
+```
 
 ## Error Handling
 
-Use pattern matching with case/with for error handling:
+NIF functions raise Erlang errors with tagged tuples. Use `try`/`rescue` or pattern matching:
 
 ```elixir
-case TreeSitterLanguagePack.get_language("python") do
-  {:ok, language} ->
-    IO.puts("Got Python")
-
-  {:error, :language_not_found} ->
-    IO.puts("Language not available")
-
-  {:error, :download_failed} ->
-    IO.puts("Download failed")
-
-  {:error, reason} ->
-    IO.puts("Error: #{inspect(reason)}")
+try do
+  TreeSitterLanguagePack.get_language_ptr("nonexistent")
+rescue
+  ErlangError -> IO.puts("Language not found")
 end
-```text
+```
 
-Or with `with` for multi-step operations:
+For functions that return tagged tuples on error:
 
 ```elixir
-with {:ok, parser} <- TreeSitterLanguagePack.get_parser("python"),
-     {:ok, tree} <- TreeSitter.Parser.parse(parser, source),
-     {:ok, result} <- TreeSitterLanguagePack.process(source, config) do
-  IO.inspect(result)
-else
-  {:error, reason} -> IO.puts("Error: #{reason}")
+case TreeSitterLanguagePack.get_language_ptr("nonexistent") do
+  {:error, {:language_not_found, name}} ->
+    IO.puts("Language not found: #{name}")
+
+  ptr when is_integer(ptr) ->
+    IO.puts("Got pointer: #{ptr}")
 end
-```text
+```
 
 ## Usage Patterns
 
@@ -484,159 +519,41 @@ defmodule MyApp.Application do
   @impl true
   def start(_type, _args) do
     TreeSitterLanguagePack.init(
-      languages: ["python", "rust", "typescript", "javascript"]
+      ~s({"languages":["python","rust","typescript","javascript"]})
     )
 
-    children = [
-      # ... other children
-    ]
-
+    children = []
     opts = [strategy: :one_for_one, name: MyApp.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end
-```text
+```
 
-### Custom Cache Directory
-
-```elixir
-# lib/my_app/config.ex
-TreeSitterLanguagePack.configure(cache_dir: "/data/ts-pack-cache")
-```text
-
-### Process Batch Files
+### Batch Processing with Tasks
 
 ```elixir
-defmodule MyApp.Analyzer do
-  @spec analyze_files(String.t(), String.t()) :: :ok
-  def analyze_files(dir, language) do
-    config = TreeSitterLanguagePack.ProcessConfig.new(language)
-      |> TreeSitterLanguagePack.ProcessConfig.all()
+files = Path.wildcard("src/**/*.py")
+config = ~s({"language":"python"})
 
-    dir
-    |> File.ls!()
-    |> Enum.filter(&String.ends_with?(&1, ".py"))
-    |> Enum.each(fn file ->
-      path = Path.join(dir, file)
-      source = File.read!(path)
-
-      case TreeSitterLanguagePack.process(source, config) do
-        {:ok, result} ->
-          IO.puts("#{file}: #{length(result["structure"])} items")
-
-        {:error, reason} ->
-          IO.puts("Error: #{reason}")
-      end
-    end)
-
-    :ok
-  end
-end
-```text
-
-### Concurrent Processing with Tasks
-
-```elixir
-defmodule MyApp.ConcurrentAnalyzer do
-  @spec analyze_files_async(list(String.t()), String.t()) :: list(map)
-  def analyze_files_async(files, language) do
-    config = TreeSitterLanguagePack.ProcessConfig.new(language)
-      |> TreeSitterLanguagePack.ProcessConfig.all()
-
-    files
-    |> Task.async_stream(fn file ->
-      case File.read(file) do
-        {:ok, source} ->
-          case TreeSitterLanguagePack.process(source, config) do
-            {:ok, result} -> {:ok, result}
-            {:error, reason} -> {:error, {file, reason}}
-          end
-
-        {:error, reason} ->
-          {:error, {file, reason}}
-      end
-    end)
-    |> Enum.map(&elem(&1, 1))
-  end
-end
-```text
-
-### Parse and Walk Tree
-
-```elixir
-defmodule MyApp.TreeWalker do
-  @spec walk_tree(any(), non_neg_integer()) :: :ok
-  def walk_tree(node, depth \\ 0) do
-    indent = String.duplicate("  ", depth)
-    type = TreeSitter.Node.type(node)
-    IO.puts("#{indent}#{type}")
-
-    node
-    |> TreeSitter.Node.children()
-    |> Enum.each(&walk_tree(&1, depth + 1))
-  end
-end
-```text
-
-### Extract Specific Patterns
-
-```elixir
-defmodule MyApp.FunctionFinder do
-  @spec find_functions(String.t(), String.t()) :: list(map)
-  def find_functions(source, language) do
-    config = TreeSitterLanguagePack.ProcessConfig.new(language)
-      |> TreeSitterLanguagePack.ProcessConfig.structure()
-
-    case TreeSitterLanguagePack.process(source, config) do
-      {:ok, result} ->
-        result["structure"]
-        |> Enum.filter(&(&1["kind"] == "function"))
-
-      {:error, _reason} ->
-        []
-    end
-  end
-end
-```text
-
-### ExUnit Tests
-
-```elixir
-defmodule MyApp.AnalyzerTest do
-  use ExUnit.Case
-
-  setup do
-    TreeSitterLanguagePack.init(languages: ["python"])
-    :ok
-  end
-
-  test "analyzes python code" do
-    source = """
-    def hello():
-        pass
-    """
-
-    config = TreeSitterLanguagePack.ProcessConfig.new("python")
-      |> TreeSitterLanguagePack.ProcessConfig.all()
-
-    {:ok, result} = TreeSitterLanguagePack.process(source, config)
-
-    assert result["language"] == "python"
-    assert length(result["structure"]) > 0
-  end
-end
-```text
+files
+|> Task.async_stream(fn file ->
+  source = File.read!(file)
+  result = TreeSitterLanguagePack.process(source, config)
+  {file, length(result["structure"])}
+end)
+|> Enum.each(fn {:ok, {file, count}} ->
+  IO.puts("#{file}: #{count} items")
+end)
+```
 
 ## Type Specifications
 
-Define specs for type safety with Dialyzer:
+The module defines `@spec` annotations for all public functions. Use Dialyzer for static analysis:
 
 ```elixir
-@spec analyze(String.t(), String.t()) :: {:ok, map()} | {:error, String.t()}
+@spec analyze(String.t(), String.t()) :: map()
 def analyze(source, language) do
-  config = TreeSitterLanguagePack.ProcessConfig.new(language)
-    |> TreeSitterLanguagePack.ProcessConfig.all()
-
+  config = Jason.encode!(%{"language" => language})
   TreeSitterLanguagePack.process(source, config)
 end
 ```

@@ -1,8 +1,7 @@
 ---
+title: Architecture
 description: "How tree-sitter-language-pack is structured: Rust core, thin binding layer, and the download system."
 ---
-
-# Architecture
 
 ## Overview
 

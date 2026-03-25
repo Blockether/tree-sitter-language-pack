@@ -4,613 +4,457 @@ description: "Java API reference for tree-sitter-language-pack"
 
 # Java API Reference
 
+Package: `io.github.treesitter.languagepack`
+
+Requires JDK 25+ (Panama Foreign Function and Memory API). No JNI.
+
 ## Installation
 
-Add to `pom.xml`:
-
-```xml
-<dependency>
-    <groupId>dev.kreuzberg</groupId>
-    <artifactId>tree-sitter-language-pack</artifactId>
-    <version>1.0.0</version>
-</dependency>
-```text
+The native library must be available at runtime. Set the `TSPACK_LIB_PATH` environment variable to the path of the `libts_pack_ffi` shared library, or place it on the system library path.
 
 ## Quick Start
 
 ```java
-import dev.kreuzberg.treesitter.*;
+import io.github.treesitter.languagepack.*;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
-        // Pre-download languages
-        TsPackRegistry.download(new String[]{"python", "rust"});
+    public static void main(String[] args) {
+        try (var registry = new TsPackRegistry()) {
+            // List available languages
+            var languages = registry.availableLanguages();
+            System.out.printf("%d languages available%n", languages.size());
 
-        // Get a language
-        Language language = TsPackRegistry.getLanguage("python");
+            // Parse source code
+            try (var tree = registry.parseString("python", "def hello(): pass")) {
+                System.out.println(tree.rootNodeType());  // "module"
+                System.out.println(tree.rootChildCount()); // 1
+                System.out.println(tree.containsNodeType("function_definition")); // true
+            }
 
-        // Get a pre-configured parser
-        Parser parser = TsPackRegistry.getParser("python");
-        Tree tree = parser.parse("def hello(): pass".getBytes());
-        System.out.println(tree.getRootNode().sexp());
-
-        // Extract code intelligence
-        ProcessConfig config = new ProcessConfig("python").all();
-        ProcessResult result = TsPackRegistry.process("def hello(): pass", config);
-        System.out.printf("Functions: %d%n", result.getStructure().size());
+            // Extract code intelligence (returns JSON)
+            String configJson = """
+                {"language": "python", "structure": true, "imports": true}
+                """;
+            String resultJson = registry.process("def hello(): pass", configJson);
+            System.out.println(resultJson);
+        }
     }
 }
-```text
+```
 
-## Download Management
+## TsPackRegistry
 
-### `TsPackRegistry.download(String[] names): void`
+Implements `AutoCloseable`. Not thread-safe; callers must provide their own synchronization for concurrent access.
 
-Download specific languages to cache.
+### Constructor
+
+#### `new TsPackRegistry()`
+
+Create a new language registry by calling the native `ts_pack_registry_new()`.
+
+**Throws:**
+
+- `RuntimeException`: If the native registry could not be created
+
+**Example:**
+
+```java
+try (var registry = new TsPackRegistry()) {
+    // use registry
+}
+```
+
+### Instance Methods
+
+#### `close(): void`
+
+Free the underlying native registry. Safe to call multiple times. After closing, all other instance methods throw `IllegalStateException`.
+
+#### `getLanguage(String name): MemorySegment`
+
+Return the raw `TSLanguage*` pointer for the given language name. The returned `MemorySegment` remains valid for the lifetime of the registry.
 
 **Parameters:**
 
-- `names` (String[]): Language names to download
+- `name` (String): Language name (e.g., `"java"`, `"python"`)
+
+**Returns:** MemorySegment pointing to the native TSLanguage struct
 
 **Throws:**
 
-- `DownloadException`: If language not found or download fails
+- `LanguageNotFoundException`: If the language is not found
+- `IllegalStateException`: If the registry has been closed
 
 **Example:**
 
 ```java
-try {
-    TsPackRegistry.download(new String[]{"python", "rust", "typescript"});
-} catch (DownloadException e) {
-    System.err.println("Download failed: " + e.getMessage());
+try (var registry = new TsPackRegistry()) {
+    MemorySegment lang = registry.getLanguage("java");
+    // pass to a tree-sitter Java wrapper
 }
-```text
+```
 
-### `TsPackRegistry.downloadAll(): void`
+#### `languageCount(): int`
 
-Download all available languages (248).
+Return the number of available languages in the registry.
+
+**Returns:** int (non-negative)
 
 **Throws:**
 
-- `DownloadException`: If manifest fetch or download fails
+- `IllegalStateException`: If the registry has been closed
 
-**Example:**
+#### `languageNameAt(int index): String`
 
-```java
-try {
-    TsPackRegistry.downloadAll();
-    System.out.println("All languages downloaded");
-} catch (DownloadException e) {
-    e.printStackTrace();
-}
-```text
+Return the language name at the given index.
 
-### `TsPackRegistry.manifestLanguages(): List<String>`
+**Parameters:**
 
-Get all available languages from remote manifest.
+- `index` (int): Zero-based index, must be in `[0, languageCount())`
 
-**Returns:** List<String> - Available language names
+**Returns:** String (never null or empty)
 
 **Throws:**
 
-- `DownloadException`: If manifest fetch fails
+- `IndexOutOfBoundsException`: If index is out of range
+- `IllegalStateException`: If the registry has been closed
+
+#### `hasLanguage(String name): boolean`
+
+Check whether the registry contains a language with the given name.
+
+**Parameters:**
+
+- `name` (String): Language name
+
+**Returns:** boolean
+
+**Throws:**
+
+- `IllegalStateException`: If the registry has been closed
+
+#### `availableLanguages(): List<String>`
+
+Return an unmodifiable list of all available language names.
+
+**Returns:** List<String> (never null)
+
+**Throws:**
+
+- `IllegalStateException`: If the registry has been closed
 
 **Example:**
 
 ```java
-try {
-    List<String> languages = TsPackRegistry.manifestLanguages();
-    System.out.printf("Available: %d languages%n", languages.size());
-} catch (DownloadException e) {
-    e.printStackTrace();
+try (var registry = new TsPackRegistry()) {
+    List<String> languages = registry.availableLanguages();
+    for (String lang : languages) {
+        System.out.println(lang);
+    }
 }
-```text
+```
 
-### `TsPackRegistry.downloadedLanguages(): List<String>`
+#### `parseString(String language, String source): TsPackTree`
 
-Get languages already cached locally.
+Parse source code using the named language and return a tree handle. The returned `TsPackTree` must be closed when no longer needed.
 
-Does not perform network requests.
+**Parameters:**
 
-**Returns:** List<String> - Cached language names
+- `language` (String): Language name
+- `source` (String): Source code to parse
+
+**Returns:** TsPackTree
+
+**Throws:**
+
+- `LanguageNotFoundException`: If the language is not found
+- `IllegalStateException`: If the registry has been closed
+- `RuntimeException`: If parsing fails
 
 **Example:**
 
 ```java
-List<String> cached = TsPackRegistry.downloadedLanguages();
-for (String lang : cached) {
-    System.out.println(lang);
+try (var registry = new TsPackRegistry()) {
+    try (var tree = registry.parseString("python", "x = 1")) {
+        System.out.println(tree.rootNodeType()); // "module"
+    }
 }
-```text
+```
 
-### `TsPackRegistry.cleanCache(): void`
+#### `process(String source, String configJson): String`
+
+Process source code and extract file intelligence as a JSON string. The `configJson` parameter must contain at least a `"language"` field. Optional boolean fields: `"structure"`, `"imports"`, `"exports"`, `"comments"`, `"docstrings"`, `"symbols"`, `"diagnostics"`. Optional integer field: `"chunk_max_size"`.
+
+**Parameters:**
+
+- `source` (String): Source code to process
+- `configJson` (String): JSON configuration string
+
+**Returns:** String (JSON result)
+
+**Throws:**
+
+- `IllegalStateException`: If the registry has been closed
+- `RuntimeException`: If processing fails
+
+**Example:**
+
+```java
+try (var registry = new TsPackRegistry()) {
+    String json = registry.process(
+        "def hello(): pass",
+        "{\"language\": \"python\", \"structure\": true}"
+    );
+    System.out.println(json);
+}
+```
+
+### Static Methods
+
+#### `clearError(): void`
+
+Clear the last error on the current thread.
+
+#### `init(String configJson): void`
+
+Initialize the language pack with configuration. `configJson` is a JSON string with optional fields: `"cache_dir"` (string), `"languages"` (array), `"groups"` (array).
+
+**Parameters:**
+
+- `configJson` (String): JSON configuration (may be null or empty)
+
+**Throws:**
+
+- `RuntimeException`: If initialization fails
+
+**Example:**
+
+```java
+TsPackRegistry.init("{\"languages\": [\"python\", \"rust\"]}");
+```
+
+#### `configure(String configJson): void`
+
+Configure the language pack cache directory without downloading.
+
+**Parameters:**
+
+- `configJson` (String): JSON with optional `"cache_dir"` field (may be null or empty)
+
+**Throws:**
+
+- `RuntimeException`: If configuration fails
+
+#### `download(List<String> languages): int`
+
+Download specific languages to the cache. Returns the number of newly downloaded languages.
+
+**Parameters:**
+
+- `languages` (List<String>): Language names to download
+
+**Returns:** int
+
+**Throws:**
+
+- `RuntimeException`: If the download fails
+
+**Example:**
+
+```java
+int count = TsPackRegistry.download(List.of("python", "rust", "typescript"));
+System.out.printf("Downloaded %d new languages%n", count);
+```
+
+#### `downloadAll(): int`
+
+Download all available languages from the remote manifest. Returns the number of newly downloaded languages.
+
+**Returns:** int
+
+**Throws:**
+
+- `RuntimeException`: If the download fails
+
+#### `manifestLanguages(): List<String>`
+
+Get all language names available in the remote manifest. Returns an unmodifiable list.
+
+**Returns:** List<String>
+
+**Throws:**
+
+- `RuntimeException`: If the operation fails
+
+#### `downloadedLanguages(): List<String>`
+
+Get all languages that are already downloaded and cached locally. Returns an unmodifiable list, or an empty list if unavailable.
+
+**Returns:** List<String>
+
+#### `cleanCache(): void`
 
 Delete all cached parser shared libraries.
 
 **Throws:**
 
-- `DownloadException`: If cache cannot be removed
+- `RuntimeException`: If the operation fails
 
-**Example:**
+#### `cacheDir(): String`
 
-```java
-try {
-    TsPackRegistry.cleanCache();
-    System.out.println("Cache cleaned");
-} catch (DownloadException e) {
-    e.printStackTrace();
-}
-```text
+Get the effective cache directory path.
 
-### `TsPackRegistry.cacheDir(): String`
-
-Get the current cache directory path.
-
-**Returns:** String - Absolute cache directory path
-
-**Example:**
-
-```java
-String cacheDir = TsPackRegistry.cacheDir();
-System.out.printf("Cache at: %s%n", cacheDir);
-```text
-
-### `TsPackRegistry.init(String[] languages, String cacheDir): void`
-
-Initialize with optional pre-downloads and cache directory.
-
-**Parameters:**
-
-- `languages` (String[]): Languages to download (null = skip)
-- `cacheDir` (String): Custom cache directory (null = default)
+**Returns:** String
 
 **Throws:**
 
-- `DownloadException`: If configuration or download fails
+- `RuntimeException`: If the operation fails
 
-**Example:**
+## TsPackTree
 
-```java
-try {
-    TsPackRegistry.init(
-        new String[]{"python", "javascript"},
-        "/opt/ts-pack"
-    );
-} catch (DownloadException e) {
-    e.printStackTrace();
-}
-```text
+Implements `AutoCloseable`. Not thread-safe.
 
-### `TsPackRegistry.configure(String cacheDir): void`
+### Methods
 
-Apply configuration without downloading.
+#### `close(): void`
 
-**Parameters:**
+Free the underlying native tree. Safe to call multiple times.
 
-- `cacheDir` (String): Custom cache directory (null = default)
+#### `rootNodeType(): String`
+
+Return the type name of the root node (e.g., `"module"` for Python).
+
+**Returns:** String
 
 **Throws:**
 
-- `DownloadException`: If lock cannot be acquired
+- `IllegalStateException`: If the tree has been closed
 
-**Example:**
+#### `rootChildCount(): int`
 
-```java
-try {
-    TsPackRegistry.configure("/data/ts-pack");
-} catch (DownloadException e) {
-    e.printStackTrace();
-}
-```text
+Return the number of named children of the root node.
 
-## Language Discovery
-
-### `TsPackRegistry.getLanguage(String name): Language`
-
-Get a tree-sitter Language by name.
-
-Resolves aliases (e.g., `"shell"` → `"bash"`). Auto-downloads if needed.
-
-**Parameters:**
-
-- `name` (String): Language name or alias
-
-**Returns:** Language - tree-sitter Language object
+**Returns:** int (non-negative)
 
 **Throws:**
 
-- `LanguageNotFoundException`: If language not recognized
-- `DownloadException`: If auto-download fails
+- `IllegalStateException`: If the tree has been closed
 
-**Example:**
+#### `containsNodeType(String nodeType): boolean`
 
-```java
-try {
-    Language language = TsPackRegistry.getLanguage("python");
-    Parser parser = language.createParser();
-    Tree tree = parser.parse("x = 1".getBytes());
-    System.out.println(tree.getRootNode().getType()); // "module"
-} catch (LanguageNotFoundException e) {
-    System.err.println("Language not found: " + e.getMessage());
-}
-```text
-
-### `TsPackRegistry.getParser(String name): Parser`
-
-Get a pre-configured Parser for a language.
+Check whether any node in the tree has the given type name.
 
 **Parameters:**
 
-- `name` (String): Language name or alias
+- `nodeType` (String): Node type to search for
 
-**Returns:** Parser - Pre-configured tree-sitter Parser
+**Returns:** boolean
 
 **Throws:**
 
-- `LanguageNotFoundException`: If language not recognized
-- `DownloadException`: If auto-download fails
-- `ParserException`: If parser setup fails
+- `IllegalStateException`: If the tree has been closed
 
-**Example:**
+#### `hasErrorNodes(): boolean`
 
-```java
-try {
-    Parser parser = TsPackRegistry.getParser("rust");
-    Tree tree = parser.parse("fn main() {}".getBytes());
-    System.out.println(!tree.hasErrors()); // true
-} catch (Exception e) {
-    e.printStackTrace();
-}
-```text
+Check whether the tree contains any ERROR or MISSING nodes.
 
-### `TsPackRegistry.availableLanguages(): List<String>`
-
-List all available language names.
-
-**Returns:** List<String> - Sorted language names
-
-**Example:**
-
-```java
-List<String> languages = TsPackRegistry.availableLanguages();
-for (String lang : languages) {
-    System.out.println(lang);
-}
-```text
-
-### `TsPackRegistry.hasLanguage(String name): boolean`
-
-Check if a language is available.
-
-**Parameters:**
-
-- `name` (String): Language name or alias
-
-**Returns:** boolean - True if available
-
-**Example:**
-
-```java
-if (TsPackRegistry.hasLanguage("python")) {
-    System.out.println("Python available");
-}
-assert TsPackRegistry.hasLanguage("shell"); // alias for bash
-```text
-
-### `TsPackRegistry.languageCount(): int`
-
-Get total number of available languages.
-
-**Returns:** int - Language count
-
-**Example:**
-
-```java
-int count = TsPackRegistry.languageCount();
-System.out.printf("%d languages available%n", count);
-```text
-
-## Parsing
-
-### `TsPackRegistry.parse(byte[] source, String language): Tree`
-
-Parse source code into a syntax tree.
-
-**Parameters:**
-
-- `source` (byte[]): Source code bytes
-- `language` (String): Language name
-
-**Returns:** Tree - Parsed syntax tree
+**Returns:** boolean
 
 **Throws:**
 
-- `LanguageNotFoundException`: If language not found
-- `ParseException`: If parsing fails
+- `IllegalStateException`: If the tree has been closed
 
-**Example:**
+## Exceptions
 
-```java
-try {
-    Tree tree = TsPackRegistry.parse("def foo(): pass".getBytes(), "python");
-    System.out.println(tree.getRootNode().sexp());
-} catch (Exception e) {
-    e.printStackTrace();
-}
-```text
+### `LanguageNotFoundException`
 
-## Code Intelligence
-
-### `TsPackRegistry.process(String source, ProcessConfig config): ProcessResult`
-
-Extract code intelligence from source code.
-
-**Parameters:**
-
-- `source` (String): Source code
-- `config` (ProcessConfig): Configuration
-
-**Returns:** ProcessResult - Analysis result
-
-**Throws:**
-
-- `LanguageNotFoundException`: If language not found
-- `ParseException`: If parsing fails
-- `ProcessException`: If analysis fails
-
-**Example:**
-
-```java
-try {
-    ProcessConfig config = new ProcessConfig("python").all();
-    ProcessResult result = TsPackRegistry.process(
-        "def hello(): pass",
-        config
-    );
-
-    System.out.printf("Functions: %d%n", result.getStructure().size());
-    System.out.printf("Lines: %d%n", result.getMetrics().getTotalLines());
-} catch (Exception e) {
-    e.printStackTrace();
-}
-```text
-
-## Types
-
-### `ProcessConfig`
-
-Configuration for code intelligence analysis.
-
-**Constructor:**
-
-```java
-ProcessConfig config = new ProcessConfig("python");
-```text
+Thrown when a requested language is not available. Extends `IllegalArgumentException`.
 
 **Methods:**
 
-#### `structure(): ProcessConfig`
+- `getLanguageName(): String` - Return the name of the language that was not found
 
-Enable structure extraction.
+## Model Records
 
-#### `importExports(): ProcessConfig`
-
-Enable imports/exports extraction.
-
-#### `comments(): ProcessConfig`
-
-Enable comment extraction.
-
-#### `docstrings(): ProcessConfig`
-
-Enable docstring extraction.
-
-#### `symbols(): ProcessConfig`
-
-Enable symbol extraction.
-
-#### `metrics(): ProcessConfig`
-
-Enable metric extraction.
-
-#### `diagnostics(): ProcessConfig`
-
-Enable diagnostic extraction.
-
-#### `withChunks(int maxSize, int overlap): ProcessConfig`
-
-Configure code chunking.
-
-#### `all(): ProcessConfig`
-
-Enable all features.
-
-**Example:**
-
-```java
-ProcessConfig config = new ProcessConfig("python")
-    .structure()
-    .importExports()
-    .comments()
-    .withChunks(2000, 400);
-```text
+These record types are used to deserialize JSON results from `process()`.
 
 ### `ProcessResult`
 
-Result from code intelligence analysis.
-
-**Methods:**
-
-- `String getLanguage()` - Get language name
-- `FileMetrics getMetrics()` - Get file metrics
-- `List<StructureItem> getStructure()` - Get code structure
-- `List<ImportInfo> getImports()` - Get imports
-- `List<ExportInfo> getExports()` - Get exports
-- `List<CommentInfo> getComments()` - Get comments
-- `List<DocstringInfo> getDocstrings()` - Get docstrings
-- `List<SymbolInfo> getSymbols()` - Get symbols
-- `List<Diagnostic> getDiagnostics()` - Get diagnostics
-- `List<CodeChunk> getChunks()` - Get code chunks
-
-**Example:**
-
 ```java
-ProcessResult result = TsPackRegistry.process(source, config);
-
-System.out.println("Language: " + result.getLanguage());
-for (StructureItem item : result.getStructure()) {
-    System.out.printf("  %s: %s%n", item.getKind(), item.getName());
-}
-```text
-
-### `Language`
-
-tree-sitter Language object.
-
-**Methods:**
-
-- `Parser createParser()` - Create a new parser for this language
-- `String getName()` - Get language name
-
-### `Parser`
-
-tree-sitter Parser object.
-
-**Methods:**
-
-- `Tree parse(byte[] source)` - Parse source code
-- `Tree parse(byte[] source, Tree oldTree)` - Parse with incremental update
-- `void setTimeoutMicros(long micros)` - Set parse timeout
-
-### `Tree`
-
-Parsed syntax tree.
-
-**Methods:**
-
-- `Node getRootNode()` - Get root node
-- `Tree copy()` - Copy tree
-- `void close()` - Close tree
-
-### `Node`
-
-Syntax tree node.
-
-**Methods:**
-
-- `String getType()` - Get node type
-- `String getKind()` - Get node kind
-- `Point getStartPoint()` - Get start position
-- `Point getEndPoint()` - Get end position
-- `String getText(byte[] source)` - Get node text
-- `int getChildCount()` - Get number of children
-- `Node getChild(int index)` - Get child node
-- `String sexp()` - Get S-expression
-
-## Exception Handling
-
-```java
-import dev.kreuzberg.treesitter.*;
-
-try {
-    Language language = TsPackRegistry.getLanguage("python");
-    Parser parser = language.createParser();
-    Tree tree = parser.parse("x = 1".getBytes());
-} catch (LanguageNotFoundException e) {
-    System.err.println("Language not available");
-} catch (DownloadException e) {
-    System.err.println("Download failed");
-} catch (ParseException e) {
-    System.err.println("Parse error");
-} catch (Exception e) {
-    System.err.println("Unexpected error");
-}
-```text
-
-## Usage Patterns
-
-### Pre-download Languages
-
-```java
-public class App {
-    static {
-        try {
-            TsPackRegistry.download(new String[]{
-                "python", "rust", "typescript"
-            });
-        } catch (DownloadException e) {
-            throw new RuntimeException("Failed to download languages", e);
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        // Fast, no network required
-        Parser parser = TsPackRegistry.getParser("python");
-        // ...
-    }
-}
-```text
-
-### Custom Cache Directory
-
-```java
-public class App {
-    static {
-        try {
-            TsPackRegistry.configure("/opt/ts-pack-cache");
-        } catch (DownloadException e) {
-            throw new RuntimeException("Configuration failed", e);
-        }
-    }
-}
-```text
-
-### Batch Processing
-
-```java
-public class Analyzer {
-    private final Parser parser;
-
-    public Analyzer(String language) throws Exception {
-        this.parser = TsPackRegistry.getParser(language);
-    }
-
-    public void analyzeFiles(List<String> files) {
-        for (String file : files) {
-            try {
-                byte[] source = Files.readAllBytes(Path.of(file));
-                Tree tree = parser.parse(source);
-                System.out.printf("%s: %d nodes%n",
-                    file,
-                    tree.getRootNode().getChildCount());
-            } catch (Exception e) {
-                System.err.printf("Error: %s%n", e.getMessage());
-            }
-        }
-    }
-}
-```text
-
-### Multi-threaded Usage
-
-Each thread should get its own parser instance:
-
-```java
-ExecutorService executor = Executors.newFixedThreadPool(4);
-
-for (String file : files) {
-    executor.submit(() -> {
-        try {
-            Parser parser = TsPackRegistry.getParser("python");
-            byte[] source = Files.readAllBytes(Path.of(file));
-            Tree tree = parser.parse(source);
-            // Process tree
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    });
-}
-
-executor.shutdown();
-executor.awaitTermination(1, TimeUnit.MINUTES);
+public record ProcessResult(
+    FileMetadata metadata,
+    List<CodeChunk> chunks
+) {}
 ```
+
+### `FileMetadata`
+
+```java
+public record FileMetadata(
+    String language,
+    FileMetrics metrics,
+    List<StructureItem> structure,
+    List<ImportInfo> imports,
+    List<ExportInfo> exports,
+    List<CommentInfo> comments,
+    List<DocstringInfo> docstrings,
+    List<SymbolInfo> symbols,
+    List<Diagnostic> diagnostics
+) {}
+```
+
+### `FileMetrics`
+
+Fields: `totalLines`, `codeLines`, `commentLines`, `blankLines`, `totalBytes`, `nodeCount`, `errorCount`, `maxDepth` (all int).
+
+### `StructureItem`
+
+Fields: `kind` (String), `name` (String), `visibility` (String), `span` (Span), `children` (List<StructureItem>), `decorators` (List<String>), `docComment` (String), `signature` (String), `bodySpan` (Span).
+
+### `ImportInfo`
+
+Fields: `source` (String), `items` (List<String>), `alias` (String), `isWildcard` (boolean), `span` (Span).
+
+### `ExportInfo`
+
+Fields: `name` (String), `kind` (String), `span` (Span).
+
+### `CommentInfo`
+
+Fields: `text` (String), `kind` (String), `span` (Span), `associatedNode` (String).
+
+### `DocstringInfo`
+
+Fields: `text` (String), `format` (String), `span` (Span), `associatedItem` (String), `parsedSections` (List<DocSection>).
+
+### `DocSection`
+
+Fields: `kind` (String), `name` (String), `description` (String).
+
+### `SymbolInfo`
+
+Fields: `name` (String), `kind` (String), `span` (Span), `typeAnnotation` (String), `doc` (String).
+
+### `Diagnostic`
+
+Fields: `message` (String), `severity` (String), `span` (Span).
+
+### `CodeChunk`
+
+Fields: `content` (String), `startByte` (int), `endByte` (int), `startLine` (int), `endLine` (int), `metadata` (ChunkInfo).
+
+### `ChunkInfo`
+
+Fields: `language` (String), `chunkIndex` (int), `totalChunks` (int), `nodeTypes` (List<String>), `contextPath` (List<String>), `symbolsDefined` (List<String>), `comments` (List<CommentInfo>), `docstrings` (List<DocstringInfo>), `hasErrorNodes` (boolean).
+
+### `Span`
+
+Fields: `startByte` (int), `endByte` (int), `startLine` (int), `startColumn` (int), `endLine` (int), `endColumn` (int).
+
+### `NodeInfo`
+
+Fields: `kind` (String), `isNamed` (boolean), `startByte` (int), `endByte` (int), `startRow` (int), `startColumn` (int), `endRow` (int), `endColumn` (int), `namedChildCount` (int), `isError` (boolean), `isMissing` (boolean).
+
+## Thread Safety
+
+`TsPackRegistry` instances are **not** thread-safe. If concurrent access is required, callers must provide their own synchronization. Static methods (download, init, configure, etc.) do not require a registry instance.

@@ -11,14 +11,14 @@ Add to `Cargo.toml`:
 ```toml
 [dependencies]
 tree-sitter-language-pack = "1.0"
-```text
+```
 
-With default features (includes download API):
+With download feature (default):
 
 ```toml
 [dependencies]
 tree-sitter-language-pack = { version = "1.0", features = ["download"] }
-```text
+```
 
 ## Quick Start
 
@@ -37,38 +37,32 @@ let language = get_language("python").unwrap();
 // Get a pre-configured parser
 let mut parser = get_parser("python").unwrap();
 let tree = parser.parse("def hello(): pass", None).unwrap();
-println!("{}", tree.root_node().sexp());
+println!("{}", tree.root_node().to_sexp());
 
 // Extract code intelligence
 let config = ProcessConfig::new("python").all();
 let result = process("def hello(): pass", &config).unwrap();
 println!("Functions: {}", result.structure.len());
-```text
+```
 
 ## Download Management
 
+These functions require the `download` feature (enabled by default).
+
 ### `init(config: &PackConfig) -> Result<(), Error>`
 
-Initialize the language pack with configuration.
-
-Downloads all languages and groups specified in the config.
+Initialize the language pack with configuration. Downloads all languages and groups specified in the config.
 
 **Parameters:**
 
-- `config` (&PackConfig): Configuration with languages and cache dir
+- `config` (&PackConfig): Configuration with cache directory, languages, and groups
 
 **Returns:** Result<(), Error>
-
-**Errors:**
-
-- Error::Download: If downloads fail or network unavailable
-- Error::LockPoisoned: If mutex lock fails
 
 **Example:**
 
 ```rust
 use tree_sitter_language_pack::{PackConfig, init};
-use std::path::PathBuf;
 
 let config = PackConfig {
     cache_dir: None,
@@ -76,23 +70,17 @@ let config = PackConfig {
     groups: None,
 };
 init(&config)?;
-```text
+```
 
 ### `configure(config: &PackConfig) -> Result<(), Error>`
 
-Apply configuration without downloading.
-
-Use to set a custom cache directory before first `get_language` call.
+Apply configuration without downloading. Use to set a custom cache directory before the first `get_language` call.
 
 **Parameters:**
 
 - `config` (&PackConfig): Configuration
 
 **Returns:** Result<(), Error>
-
-**Errors:**
-
-- Error::LockPoisoned: If mutex lock fails
 
 **Example:**
 
@@ -106,24 +94,17 @@ let config = PackConfig {
     groups: None,
 };
 configure(&config)?;
-```text
+```
 
 ### `download(names: &[&str]) -> Result<usize, Error>`
 
-Download specific languages to cache.
-
-Returns number of newly downloaded languages.
+Download specific languages to cache. Returns the number of newly downloaded languages.
 
 **Parameters:**
 
 - `names` (&[&str]): Language names to download
 
-**Returns:** Result<usize, Error> - Count of newly downloaded
-
-**Errors:**
-
-- Error::Download: If language not in manifest or download fails
-- Error::LanguageNotFound: If language not recognized
+**Returns:** Result<usize, Error>
 
 **Example:**
 
@@ -132,19 +113,13 @@ use tree_sitter_language_pack::download;
 
 let count = download(&["python", "rust", "typescript"])?;
 println!("Downloaded {} new languages", count);
-```text
+```
 
 ### `download_all() -> Result<usize, Error>`
 
-Download all available languages (248).
+Download all available languages from the remote manifest. Returns the number of newly downloaded languages.
 
-Returns number of newly downloaded languages.
-
-**Returns:** Result<usize, Error> - Count of newly downloaded
-
-**Errors:**
-
-- Error::Download: If manifest fetch fails
+**Returns:** Result<usize, Error>
 
 **Example:**
 
@@ -153,19 +128,13 @@ use tree_sitter_language_pack::download_all;
 
 let count = download_all()?;
 println!("Downloaded {} languages total", count);
-```text
+```
 
 ### `manifest_languages() -> Result<Vec<String>, Error>`
 
-Get all available languages from remote manifest.
-
-Fetches and caches the manifest.
+Get all available languages from the remote manifest. Fetches and caches the manifest.
 
 **Returns:** Result<Vec<String>, Error> - Sorted language names
-
-**Errors:**
-
-- Error::Download: If manifest fetch fails
 
 **Example:**
 
@@ -174,15 +143,13 @@ use tree_sitter_language_pack::manifest_languages;
 
 let languages = manifest_languages()?;
 println!("Available: {}", languages.len());
-```text
+```
 
 ### `downloaded_languages() -> Vec<String>`
 
-Get languages already cached locally.
+Get languages already cached locally. No network requests. Returns empty if cache unavailable.
 
-No network requests. Returns empty if cache unavailable.
-
-**Returns:** Vec<String> - Cached language names
+**Returns:** Vec<String>
 
 **Example:**
 
@@ -193,17 +160,13 @@ let cached = downloaded_languages();
 for lang in cached {
     println!("{}", lang);
 }
-```text
+```
 
 ### `clean_cache() -> Result<(), Error>`
 
-Delete all cached parser libraries.
+Delete all cached parser shared libraries.
 
 **Returns:** Result<(), Error>
-
-**Errors:**
-
-- Error::Download: If cache cannot be removed
 
 **Example:**
 
@@ -211,12 +174,11 @@ Delete all cached parser libraries.
 use tree_sitter_language_pack::clean_cache;
 
 clean_cache()?;
-println!("Cache cleaned");
-```text
+```
 
 ### `cache_dir() -> Result<PathBuf, Error>`
 
-Get the current cache directory path.
+Get the effective cache directory path. Either the custom path set via `configure`/`init` or the default `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
 
 **Returns:** Result<PathBuf, Error>
 
@@ -227,55 +189,41 @@ use tree_sitter_language_pack::cache_dir;
 
 let dir = cache_dir()?;
 println!("Cache: {}", dir.display());
-```text
+```
 
 ## Language Discovery
 
 ### `get_language(name: &str) -> Result<Language, Error>`
 
-Get a tree-sitter Language by name.
-
-Resolves aliases (e.g., `"shell"` → `"bash"`). Auto-downloads if needed.
+Get a tree-sitter `Language` by name. Resolves aliases (e.g., `"shell"` maps to `"bash"`). With the `download` feature, auto-downloads the parser if not found locally.
 
 **Parameters:**
 
 - `name` (&str): Language name or alias
 
-**Returns:** Result<Language, Error> - tree-sitter Language
-
-**Errors:**
-
-- Error::LanguageNotFound: If language not recognized
-- Error::Download: If auto-download fails
+**Returns:** Result<Language, Error>
 
 **Example:**
 
 ```rust
 use tree_sitter_language_pack::get_language;
-use tree_sitter::Parser;
 
 let language = get_language("python")?;
-
-let mut parser = Parser::new();
+let mut parser = tree_sitter::Parser::new();
 parser.set_language(&language)?;
 let tree = parser.parse("x = 1", None).unwrap();
 assert_eq!(tree.root_node().kind(), "module");
-```text
+```
 
 ### `get_parser(name: &str) -> Result<Parser, Error>`
 
-Get a pre-configured Parser for a language.
+Get a pre-configured `Parser` for a language. Convenience wrapper that calls `get_language` and sets up a new parser.
 
 **Parameters:**
 
 - `name` (&str): Language name or alias
 
-**Returns:** Result<Parser, Error> - Pre-configured Parser
-
-**Errors:**
-
-- Error::LanguageNotFound: If language not recognized
-- Error::ParserSetup: If parser setup fails
+**Returns:** Result<Parser, Error>
 
 **Example:**
 
@@ -283,15 +231,15 @@ Get a pre-configured Parser for a language.
 use tree_sitter_language_pack::get_parser;
 
 let mut parser = get_parser("rust")?;
-let tree = parser.parse("fn main() {}", None)?;
+let tree = parser.parse("fn main() {}", None).unwrap();
 assert!(!tree.root_node().has_error());
-```text
+```
 
 ### `available_languages() -> Vec<String>`
 
-List all available language names.
+List all available language names (sorted, deduplicated, includes aliases).
 
-**Returns:** Vec<String> - Sorted, deduplicated names
+**Returns:** Vec<String>
 
 **Example:**
 
@@ -302,34 +250,33 @@ let langs = available_languages();
 for lang in &langs {
     println!("{}", lang);
 }
-```text
+```
 
 ### `has_language(name: &str) -> bool`
 
-Check if a language is available.
+Check if a language is available by name or alias.
 
 **Parameters:**
 
 - `name` (&str): Language name or alias
 
-**Returns:** bool - True if available
+**Returns:** bool
 
 **Example:**
 
 ```rust
 use tree_sitter_language_pack::has_language;
 
-if has_language("python") {
-    println!("Python available");
-}
+assert!(has_language("python"));
 assert!(has_language("shell")); // alias for bash
-```text
+assert!(!has_language("nonexistent_language"));
+```
 
 ### `language_count() -> usize`
 
-Get total number of available languages.
+Return the number of available languages.
 
-**Returns:** usize - Language count
+**Returns:** usize
 
 **Example:**
 
@@ -338,89 +285,307 @@ use tree_sitter_language_pack::language_count;
 
 let count = language_count();
 println!("{} languages", count);
-```text
+```
 
-## Parsing
+## Language Detection
 
-### `parse_string(source: &str, language: &Language) -> Result<Tree, Error>`
+### `detect_language_from_extension(ext: &str) -> Option<&'static str>`
 
-Parse source code into a syntax tree.
+Detect language name from a file extension (without leading dot). Case-insensitive.
 
 **Parameters:**
 
-- `source` (&str): Source code
-- `language` (&Language): tree-sitter Language
+- `ext` (&str): File extension without dot
 
-**Returns:** Result<Tree, Error> - Parsed tree
+**Returns:** Option<&'static str>
 
 **Example:**
 
 ```rust
-use tree_sitter_language_pack::{get_language, parse_string};
+use tree_sitter_language_pack::detect_language_from_extension;
 
-let language = get_language("python")?;
-let tree = parse_string("x = 1", &language)?;
-println!("{}", tree.root_node().sexp());
-```text
+assert_eq!(detect_language_from_extension("py"), Some("python"));
+assert_eq!(detect_language_from_extension("RS"), Some("rust"));
+assert_eq!(detect_language_from_extension("xyz"), None);
+```
+
+### `detect_language_from_path(path: &str) -> Option<&'static str>`
+
+Detect language name from a file path by extracting and looking up the extension.
+
+**Parameters:**
+
+- `path` (&str): File path
+
+**Returns:** Option<&'static str>
+
+**Example:**
+
+```rust
+use tree_sitter_language_pack::detect_language_from_path;
+
+assert_eq!(detect_language_from_path("src/main.rs"), Some("rust"));
+assert_eq!(detect_language_from_path("README.md"), Some("markdown"));
+assert_eq!(detect_language_from_path("Makefile"), None);
+```
+
+### `detect_language_from_content(content: &str) -> Option<&'static str>`
+
+Detect language from file content using the shebang line (`#!`). Inspects only the first line.
+
+**Parameters:**
+
+- `content` (&str): File content
+
+**Returns:** Option<&'static str>
+
+**Example:**
+
+```rust
+use tree_sitter_language_pack::detect_language_from_content;
+
+assert_eq!(detect_language_from_content("#!/usr/bin/env python3\npass"), Some("python"));
+assert_eq!(detect_language_from_content("#!/bin/bash\necho hi"), Some("bash"));
+assert_eq!(detect_language_from_content("no shebang here"), None);
+```
+
+### `extension_ambiguity(ext: &str) -> Option<(&'static str, &'static [&'static str])>`
+
+Check if a file extension is ambiguous. Returns the assigned language and alternatives if ambiguous, or `None` if unambiguous or unrecognized.
+
+**Parameters:**
+
+- `ext` (&str): File extension without dot
+
+**Returns:** Option<(&'static str, &'static [&'static str])>
+
+**Example:**
+
+```rust
+use tree_sitter_language_pack::extension_ambiguity;
+
+if let Some((assigned, alternatives)) = extension_ambiguity("m") {
+    assert_eq!(assigned, "objc");
+    assert!(alternatives.contains(&"matlab"));
+}
+assert!(extension_ambiguity("py").is_none());
+```
+
+## Parsing
+
+### `parse_string(language: &str, source: &[u8]) -> Result<Tree, Error>`
+
+Parse source code with the named language, returning the syntax tree. Uses the global registry to look up the language.
+
+**Parameters:**
+
+- `language` (&str): Language name
+- `source` (&[u8]): Source code as bytes
+
+**Returns:** Result<Tree, Error>
+
+**Example:**
+
+```rust
+use tree_sitter_language_pack::parse_string;
+
+let tree = parse_string("python", b"x = 1")?;
+assert_eq!(tree.root_node().kind(), "module");
+```
 
 ### `tree_contains_node_type(tree: &Tree, node_type: &str) -> bool`
 
-Check if tree contains a specific node type.
+Check if any node in the tree matches the given type name. Performs a depth-first traversal.
 
 **Parameters:**
 
 - `tree` (&Tree): Syntax tree
 - `node_type` (&str): Node type name
 
-**Returns:** bool - True if type exists
+**Returns:** bool
 
 **Example:**
 
 ```rust
-use tree_sitter_language_pack::{get_parser, tree_contains_node_type};
+use tree_sitter_language_pack::{parse_string, tree_contains_node_type};
 
-let mut parser = get_parser("python")?;
-let tree = parser.parse("def foo(): pass", None)?;
+let tree = parse_string("python", b"def foo(): pass")?;
 assert!(tree_contains_node_type(&tree, "function_definition"));
-```text
+```
 
-### `tree_to_sexp(tree: &Tree) -> String`
+### `tree_has_error_nodes(tree: &Tree) -> bool`
 
-Get S-expression representation of tree.
+Check whether the tree contains any ERROR or MISSING nodes.
 
 **Parameters:**
 
 - `tree` (&Tree): Syntax tree
 
-**Returns:** String - S-expression
+**Returns:** bool
+
+### `tree_to_sexp(tree: &Tree) -> String`
+
+Return the S-expression representation of the tree.
+
+**Parameters:**
+
+- `tree` (&Tree): Syntax tree
+
+**Returns:** String
 
 **Example:**
 
 ```rust
-use tree_sitter_language_pack::{get_parser, tree_to_sexp};
+use tree_sitter_language_pack::{parse_string, tree_to_sexp};
 
-let mut parser = get_parser("python")?;
-let tree = parser.parse("x = 1", None)?;
+let tree = parse_string("python", b"x = 1")?;
 println!("{}", tree_to_sexp(&tree));
-```text
+```
+
+### `tree_error_count(tree: &Tree) -> usize`
+
+Count the number of ERROR and MISSING nodes in the tree. Returns 0 for a clean parse.
+
+**Parameters:**
+
+- `tree` (&Tree): Syntax tree
+
+**Returns:** usize
+
+## Node Inspection
+
+### `NodeInfo`
+
+Lightweight owned snapshot of a tree-sitter node's properties.
+
+**Fields:**
+
+```rust
+pub struct NodeInfo {
+    pub kind: Cow<'static, str>,
+    pub is_named: bool,
+    pub start_byte: usize,
+    pub end_byte: usize,
+    pub start_row: usize,
+    pub start_col: usize,
+    pub end_row: usize,
+    pub end_col: usize,
+    pub named_child_count: usize,
+    pub is_error: bool,
+    pub is_missing: bool,
+}
+```
+
+### `node_info_from_node(node: Node) -> NodeInfo`
+
+Extract a `NodeInfo` snapshot from a tree-sitter `Node`.
+
+### `root_node_info(tree: &Tree) -> NodeInfo`
+
+Get a `NodeInfo` snapshot of the root node.
+
+### `find_nodes_by_type(tree: &Tree, node_type: &str) -> Vec<NodeInfo>`
+
+Find all nodes matching the given type name. Returns their `NodeInfo` via depth-first traversal.
+
+### `named_children_info(tree: &Tree) -> Vec<NodeInfo>`
+
+Get `NodeInfo` for all named children of the root node.
+
+### `extract_text<'a>(source: &'a [u8], node_info: &NodeInfo) -> Result<&'a str, Error>`
+
+Extract the source text corresponding to a node's byte range.
+
+**Parameters:**
+
+- `source` (&[u8]): Source code bytes
+- `node_info` (&NodeInfo): Node with byte range
+
+**Returns:** Result<&str, Error>
+
+## Query Execution
+
+### `run_query(tree: &Tree, language: &str, query_source: &str, source: &[u8]) -> Result<Vec<QueryMatch>, Error>`
+
+Execute a tree-sitter query pattern against a parsed tree. Returns all matches with their captured nodes.
+
+**Parameters:**
+
+- `tree` (&Tree): Parsed syntax tree
+- `language` (&str): Language name (used to compile the query)
+- `query_source` (&str): Tree-sitter query pattern string
+- `source` (&[u8]): Original source code bytes
+
+**Returns:** Result<Vec<QueryMatch>, Error>
+
+**Example:**
+
+```rust
+use tree_sitter_language_pack::{parse_string, run_query};
+
+let tree = parse_string("python", b"def hello(): pass")?;
+let matches = run_query(
+    &tree,
+    "python",
+    "(function_definition name: (identifier) @fn_name)",
+    b"def hello(): pass",
+)?;
+assert!(!matches.is_empty());
+```
+
+### `QueryMatch`
+
+A single match from a tree-sitter query.
+
+**Fields:**
+
+```rust
+pub struct QueryMatch {
+    pub pattern_index: usize,
+    pub captures: Vec<(Cow<'static, str>, NodeInfo)>,
+}
+```
+
+## Bundled Queries
+
+### `get_highlights_query(language: &str) -> Option<&'static str>`
+
+Get the bundled highlights query (`highlights.scm`) for a language, if available.
+
+### `get_injections_query(language: &str) -> Option<&'static str>`
+
+Get the bundled injections query (`injections.scm`) for a language, if available.
+
+### `get_locals_query(language: &str) -> Option<&'static str>`
+
+Get the bundled locals query (`locals.scm`) for a language, if available.
+
+## Code Chunking
+
+### `split_code(source: &str, tree: &Tree, max_chunk_size: usize) -> Vec<(usize, usize)>`
+
+Split source code into chunks using tree-sitter AST structure for intelligent boundaries. Returns `(start_byte, end_byte)` ranges.
+
+**Parameters:**
+
+- `source` (&str): Full source code
+- `tree` (&Tree): Parsed tree-sitter tree
+- `max_chunk_size` (usize): Maximum chunk size in bytes
+
+**Returns:** Vec<(usize, usize)>
 
 ## Code Intelligence
 
 ### `process(source: &str, config: &ProcessConfig) -> Result<ProcessResult, Error>`
 
-Extract code intelligence from source code.
+Parse source code and extract file intelligence using the global registry. Extracts metrics, structure, imports, exports, comments, docstrings, symbols, diagnostics, and/or chunks based on config flags.
 
 **Parameters:**
 
 - `source` (&str): Source code
 - `config` (&ProcessConfig): Configuration
 
-**Returns:** Result<ProcessResult, Error> - Analysis result
-
-**Errors:**
-
-- Error::LanguageNotFound: If language not found
-- Error::Parse: If parsing fails
+**Returns:** Result<ProcessResult, Error>
 
 **Example:**
 
@@ -431,69 +596,47 @@ let config = ProcessConfig::new("python").all();
 let result = process("def hello(): pass", &config)?;
 println!("Functions: {}", result.structure.len());
 println!("Total lines: {}", result.metrics.total_lines);
-```text
+```
 
 ## Types
 
 ### `ProcessConfig`
 
-Configuration for code intelligence analysis.
+Configuration for the `process()` function. Controls which analysis features are enabled.
 
-**Builder Pattern:**
+**Fields:**
 
 ```rust
-let config = ProcessConfig::new("python")
-    .with_structure(true)
-    .with_imports(true)
-    .with_exports(true)
-    .with_chunks(2000, 400);
-```text
+pub struct ProcessConfig {
+    pub language: Cow<'static, str>,
+    pub structure: bool,       // default: true
+    pub imports: bool,         // default: true
+    pub exports: bool,         // default: true
+    pub comments: bool,        // default: false
+    pub docstrings: bool,      // default: false
+    pub symbols: bool,         // default: false
+    pub diagnostics: bool,     // default: false
+    pub chunk_max_size: Option<usize>,  // default: None
+}
+```
 
 **Methods:**
 
-#### `new(language: &str) -> Self`
+#### `new(language: impl Into<String>) -> Self`
 
-Create config for a language.
+Create a config with defaults (structure, imports, exports enabled).
 
-#### `with_structure(mut self, enabled: bool) -> Self`
+#### `with_chunking(mut self, max_size: usize) -> Self`
 
-Enable/disable structure extraction.
+Enable chunking with the given maximum chunk size in bytes.
 
-#### `with_imports(mut self, enabled: bool) -> Self`
+#### `all(mut self) -> Self`
 
-Enable/disable import extraction.
+Enable all analysis features (structure, imports, exports, comments, docstrings, symbols, diagnostics).
 
-#### `with_exports(mut self, enabled: bool) -> Self`
+#### `minimal(mut self) -> Self`
 
-Enable/disable export extraction.
-
-#### `with_comments(mut self, enabled: bool) -> Self`
-
-Enable/disable comment extraction.
-
-#### `with_docstrings(mut self, enabled: bool) -> Self`
-
-Enable/disable docstring extraction.
-
-#### `with_symbols(mut self, enabled: bool) -> Self`
-
-Enable/disable symbol extraction.
-
-#### `with_metrics(mut self, enabled: bool) -> Self`
-
-Enable/disable metric extraction.
-
-#### `with_diagnostics(mut self, enabled: bool) -> Self`
-
-Enable/disable diagnostic extraction.
-
-#### `with_chunks(mut self, max_size: usize, overlap: usize) -> Self`
-
-Configure code chunking.
-
-#### `all() -> Self`
-
-Enable all features.
+Disable all analysis features (only metrics computed).
 
 **Example:**
 
@@ -501,11 +644,9 @@ Enable all features.
 use tree_sitter_language_pack::ProcessConfig;
 
 let config = ProcessConfig::new("python")
-    .with_structure(true)
-    .with_imports(true)
-    .with_chunks(1024, 200)
-    .all();
-```text
+    .all()
+    .with_chunking(2000);
+```
 
 ### `ProcessResult`
 
@@ -527,16 +668,7 @@ pub struct ProcessResult {
     pub chunks: Vec<CodeChunk>,
     pub parse_errors: usize,
 }
-```text
-
-**Example:**
-
-```rust
-let result = process(source, &config)?;
-println!("Language: {}", result.language);
-println!("Structures: {}", result.structure.len());
-println!("Imports: {}", result.imports.len());
-```text
+```
 
 ### `PackConfig`
 
@@ -550,20 +682,7 @@ pub struct PackConfig {
     pub languages: Option<Vec<String>>,
     pub groups: Option<Vec<String>>,
 }
-```text
-
-**Example:**
-
-```rust
-use std::path::PathBuf;
-use tree_sitter_language_pack::PackConfig;
-
-let config = PackConfig {
-    cache_dir: Some(PathBuf::from("/opt/ts-pack")),
-    languages: Some(vec!["python".to_string(), "rust".to_string()]),
-    groups: Some(vec!["web".to_string()]),
-};
-```text
+```
 
 ### `Error`
 
@@ -574,14 +693,21 @@ Error type for all operations.
 ```rust
 pub enum Error {
     LanguageNotFound(String),
+    DynamicLoad(String),
+    NullLanguagePointer(String),
     ParserSetup(String),
-    Parse(String),
-    Download(String),
     LockPoisoned(String),
-    Io(String),
-    // ... other variants
+    Config(String),
+    ParseFailed,
+    QueryError(String),
+    InvalidRange(String),
+    Io(std::io::Error),
+    Json(serde_json::Error),           // requires "config" or "download" feature
+    Toml(toml::de::Error),            // requires "config" feature
+    Download(String),                   // requires "download" feature
+    ChecksumMismatch { file, expected, actual },  // requires "download" feature
 }
-```text
+```
 
 **Example:**
 
@@ -593,96 +719,29 @@ match get_language("python") {
     Err(Error::LanguageNotFound(name)) => println!("Not found: {}", name),
     Err(e) => println!("Error: {:?}", e),
 }
-```text
+```
 
 ## Feature Flags
 
 ### `download` (default)
 
-Enable download API and automatic language retrieval.
+Enables download API and automatic language retrieval: `init`, `configure`, `download`, `download_all`, `manifest_languages`, `downloaded_languages`, `clean_cache`, `cache_dir`.
 
-```toml
-[dependencies]
-tree-sitter-language-pack = { version = "1.0", features = ["download"] }
-```text
+### `serde`
+
+Enables JSON serialization for `ProcessConfig`, `ProcessResult`, and related types. Also enables `extension_ambiguity_json`.
+
+### `config`
+
+Enables `PackConfig::from_toml_file` and `PackConfig::discover`.
 
 ### Minimal Installation (no download)
 
 ```toml
 [dependencies]
 tree-sitter-language-pack = { version = "1.0", default-features = false }
-```text
-
-## Usage Patterns
-
-### Pre-warming Cache
-
-```rust
-use tree_sitter_language_pack::{PackConfig, init};
-
-let config = PackConfig {
-    cache_dir: None,
-    languages: Some(vec![
-        "python".to_string(),
-        "rust".to_string(),
-        "typescript".to_string(),
-    ]),
-    groups: None,
-};
-
-init(&config)?;
-```text
-
-### Custom Cache Directory
-
-```rust
-use std::path::PathBuf;
-use tree_sitter_language_pack::{PackConfig, configure};
-
-let config = PackConfig {
-    cache_dir: Some(PathBuf::from("/data/ts-pack")),
-    languages: None,
-    groups: None,
-};
-
-configure(&config)?;
-```text
-
-### Batch Processing
-
-```rust
-use tree_sitter_language_pack::{ProcessConfig, process};
-use std::fs;
-
-let config = ProcessConfig::new("python").all();
-
-for entry in fs::read_dir("./src")? {
-    let path = entry?.path();
-    if path.extension().map_or(false, |ext| ext == "py") {
-        let source = fs::read_to_string(&path)?;
-        let result = process(&source, &config)?;
-        println!("{}: {} items", path.display(), result.structure.len());
-    }
-}
-```text
-
-### Error Handling
-
-```rust
-use tree_sitter_language_pack::{get_language, Error};
-
-match get_language("python") {
-    Ok(lang) => {
-        // Use language
-    }
-    Err(Error::LanguageNotFound(name)) => {
-        eprintln!("Language not available: {}", name);
-    }
-    Err(Error::Download(msg)) => {
-        eprintln!("Download failed: {}", msg);
-    }
-    Err(e) => {
-        eprintln!("Error: {:?}", e);
-    }
-}
 ```
+
+## Re-exports
+
+The crate re-exports `tree_sitter::{Language, Parser, Tree}` for convenience.

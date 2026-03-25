@@ -1,10 +1,9 @@
 ---
-description: "Pre-compiled tree-sitter parsers for 248 languages with code intelligence, chunking, and polyglot bindings."
+title: tree-sitter-language-pack
+description: "Comprehensive tree-sitter grammar compilation with bindings for Python, TypeScript, Rust, Go, Java, C#, Ruby, Elixir, PHP, and WebAssembly — 248 languages."
 ---
 
-# tree-sitter-language-pack
-
-**Universal code parser for 248 languages** — parse, analyze, and intelligently chunk source code across every major programming language.
+**Universal code parser for 248 languages** — parse, analyze, and chunk source code across every major programming language.
 
 <div class="hero-badges" markdown>
 [:material-lightning-bolt: Quick Start](getting-started/quickstart.md){ .md-button .md-button--primary }
@@ -20,7 +19,7 @@ description: "Pre-compiled tree-sitter parsers for 248 languages with code intel
 
     ---
 
-    Parse Python, JavaScript, Rust, Go, Java, C, TypeScript, Ruby, and 165+ more with a single unified API. One dependency, every language.
+    Parse Python, JavaScript, Rust, Go, Java, C, TypeScript, Ruby, and 240+ more with a single unified API. One dependency, every language.
 
     [:material-arrow-right: See all languages](languages.md)
 
@@ -152,7 +151,7 @@ description: "Pre-compiled tree-sitter parsers for 248 languages with code intel
     <dependency>
       <groupId>dev.kreuzberg</groupId>
       <artifactId>tree-sitter-language-pack</artifactId>
-      <version>1.0.0</version>
+      <version>1.2.0</version>
     </dependency>
     ```
 
@@ -183,3 +182,7 @@ description: "Pre-compiled tree-sitter parsers for 248 languages with code intel
 | :material-elephant: PHP | [`kreuzberg/tree-sitter-language-pack`](https://packagist.org/packages/kreuzberg/tree-sitter-language-pack) | 8.2+ |
 | :material-web: WebAssembly | [`@kreuzberg/tree-sitter-language-pack-wasm`](https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm) | Browser / Deno |
 | :material-console: CLI | [`ts-pack`](https://github.com/kreuzberg-dev/homebrew-tap) | — |
+
+---
+
+tree-sitter-language-pack is part of the [kreuzberg.dev](https://kreuzberg.dev) open-source ecosystem.

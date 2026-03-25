@@ -7,8 +7,14 @@ description: "Go API reference for tree-sitter-language-pack"
 ## Installation
 
 ```bash
-go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v2
-```text
+go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
+```
+
+Import path:
+
+```go
+import tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
+```
 
 ## Quick Start
 
@@ -19,613 +25,518 @@ import (
     "fmt"
     "log"
 
-    tsp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v2"
+    tspack "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
 func main() {
-    // Pre-download languages
-    if err := tsp.Download([]string{"python", "rust"}); err != nil {
-        log.Fatal(err)
-    }
-
-    // Get a language
-    lang, err := tsp.GetLanguage("python")
+    reg, err := tspack.NewRegistry()
     if err != nil {
         log.Fatal(err)
     }
+    defer reg.Close()
 
-    // Get a pre-configured parser
-    parser, err := tsp.GetParser("python")
-    if err != nil {
-        log.Fatal(err)
-    }
+    // Check available languages
+    langs := reg.AvailableLanguages()
+    fmt.Printf("%d languages available\n", len(langs))
 
     // Parse source code
-    tree := parser.Parse([]byte("def hello(): pass"), nil)
-    fmt.Println(tree.RootNode().String())
-
-    // Extract code intelligence
-    config := tsp.NewProcessConfig("python").All()
-    result, err := tsp.Process("def hello(): pass", config)
+    tree, err := reg.ParseString("python", "def hello(): pass")
     if err != nil {
         log.Fatal(err)
     }
-    fmt.Printf("Functions: %d\n", len(result.Structure))
+    defer tree.Close()
+
+    rootType, _ := tree.RootNodeType()
+    fmt.Println(rootType) // "module"
+
+    // Extract code intelligence
+    config := tspack.NewProcessConfig("python")
+    result, err := reg.Process("def hello(): pass", config)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("Functions: %d\n", len(result.Metadata.Structure))
 }
-```text
+```
 
-## Download Management
+## Registry
 
-### `Download(names []string) error`
+### `NewRegistry() (*Registry, error)`
 
-Download specific languages to cache.
+Create a new language registry containing all available tree-sitter grammars. The registry is safe for concurrent use from multiple goroutines. Must be closed with `Close()` when no longer needed.
 
-**Parameters:**
-
-- `names` ([]string): Language names to download
-
-**Returns:** error - nil on success
+**Returns:** *Registry, error
 
 **Example:**
 
 ```go
-err := tsp.Download([]string{"python", "rust", "typescript"})
-if err != nil {
-    log.Printf("Download failed: %v", err)
-}
-```text
-
-### `DownloadAll() error`
-
-Download all available languages (248).
-
-**Returns:** error - nil on success
-
-**Example:**
-
-```go
-err := tsp.DownloadAll()
+reg, err := tspack.NewRegistry()
 if err != nil {
     log.Fatal(err)
 }
-```text
+defer reg.Close()
+```
 
-### `ManifestLanguages() ([]string, error)`
+### `Registry.Close()`
 
-Get all available languages from remote manifest.
+Explicitly free the underlying C registry. Safe to call multiple times. After closing, all other methods return errors or zero values.
 
-**Returns:** []string - Language names, error
+### `Registry.GetLanguage(name string) (unsafe.Pointer, error)`
+
+Return a pointer to the TSLanguage for the given language name. The returned `unsafe.Pointer` can be cast to the appropriate type by consumers (e.g., go-tree-sitter's Language type). The pointer remains valid for the lifetime of the Registry.
+
+**Parameters:**
+
+- `name` (string): Language name
+
+**Returns:** unsafe.Pointer, error
 
 **Example:**
 
 ```go
-langs, err := tsp.ManifestLanguages()
+langPtr, err := reg.GetLanguage("python")
 if err != nil {
     log.Fatal(err)
 }
-fmt.Printf("Available: %d languages\n", len(langs))
-```text
+// Pass langPtr to a tree-sitter Go wrapper
+```
 
-### `DownloadedLanguages() []string`
+### `Registry.LanguageCount() int`
 
-Get languages already cached locally.
+Return the number of available languages. Returns 0 if the registry is closed.
 
-No error return. Returns empty slice if unavailable.
+### `Registry.LanguageNameAt(index int) (string, error)`
 
-**Returns:** []string - Cached language names
+Return the language name at the given index. Valid indices are `[0, LanguageCount())`.
 
-**Example:**
+### `Registry.HasLanguage(name string) bool`
 
-```go
-cached := tsp.DownloadedLanguages()
-for _, lang := range cached {
-    fmt.Println(lang)
-}
-```text
-
-### `CleanCache() error`
-
-Delete all cached parser shared libraries.
-
-**Returns:** error - nil on success
-
-**Example:**
-
-```go
-if err := tsp.CleanCache(); err != nil {
-    log.Fatal(err)
-}
-```text
-
-### `CacheDir() string`
-
-Get the current cache directory path.
-
-**Returns:** string - Absolute cache directory path
-
-**Example:**
-
-```go
-dir := tsp.CacheDir()
-fmt.Printf("Cache at: %s\n", dir)
-```text
-
-### `Init(languages []string, cacheDir string) error`
-
-Initialize with optional pre-downloads and cache directory.
+Check whether the registry contains a grammar for the named language. Returns false if the registry is closed.
 
 **Parameters:**
 
-- `languages` ([]string): Languages to download
-- `cacheDir` (string): Custom cache directory (empty = default)
+- `name` (string): Language name
 
-**Returns:** error - nil on success
+**Returns:** bool
 
-**Example:**
+### `Registry.AvailableLanguages() []string`
 
-```go
-err := tsp.Init([]string{"python", "javascript"}, "/opt/ts-pack")
-if err != nil {
-    log.Fatal(err)
-}
-```text
+Return a slice of all language names in the registry. Returns nil if the registry is closed.
 
-### `Configure(cacheDir string) error`
+**Returns:** []string
 
-Apply configuration without downloading.
+### `Registry.ParseString(language, source string) (*Tree, error)`
+
+Parse the given source code using the named language and return a Tree handle. The caller must call `Tree.Close()` when done.
 
 **Parameters:**
 
-- `cacheDir` (string): Custom cache directory (empty = default)
-
-**Returns:** error - nil on success
-
-**Example:**
-
-```go
-if err := tsp.Configure("/data/ts-pack"); err != nil {
-    log.Fatal(err)
-}
-```text
-
-## Language Discovery
-
-### `GetLanguage(name string) (*Language, error)`
-
-Get a tree-sitter Language by name.
-
-Resolves aliases (e.g., `"shell"` → `"bash"`). Auto-downloads if needed.
-
-**Parameters:**
-
-- `name` (string): Language name or alias
-
-**Returns:** *Language, error
-
-**Example:**
-
-```go
-lang, err := tsp.GetLanguage("python")
-if err != nil {
-    log.Fatal(err)
-}
-defer lang.Close()
-
-parser := language.NewParser()
-tree := parser.Parse([]byte("x = 1"), nil)
-```text
-
-### `GetParser(name string) (*Parser, error)`
-
-Get a pre-configured Parser for a language.
-
-**Parameters:**
-
-- `name` (string): Language name or alias
-
-**Returns:** *Parser, error
-
-**Example:**
-
-```go
-parser, err := tsp.GetParser("rust")
-if err != nil {
-    log.Fatal(err)
-}
-defer parser.Close()
-
-tree := parser.Parse([]byte("fn main() {}"), nil)
-```text
-
-### `AvailableLanguages() []string`
-
-List all available language names.
-
-**Returns:** []string - Sorted language names
-
-**Example:**
-
-```go
-langs := tsp.AvailableLanguages()
-for _, lang := range langs {
-    fmt.Println(lang)
-}
-```text
-
-### `HasLanguage(name string) bool`
-
-Check if a language is available.
-
-**Parameters:**
-
-- `name` (string): Language name or alias
-
-**Returns:** bool - True if available
-
-**Example:**
-
-```go
-if tsp.HasLanguage("python") {
-    fmt.Println("Python available")
-}
-if tsp.HasLanguage("shell") {
-    fmt.Println("Shell (alias for bash) available")
-}
-```text
-
-### `LanguageCount() int`
-
-Get total number of available languages.
-
-**Returns:** int - Language count
-
-**Example:**
-
-```go
-count := tsp.LanguageCount()
-fmt.Printf("%d languages available\n", count)
-```text
-
-## Parsing
-
-### `Parse(source []byte, language *Language) (*Tree, error)`
-
-Parse source code into a syntax tree.
-
-**Parameters:**
-
-- `source` ([]byte): Source code
-- `language` (*Language): tree-sitter Language
-
-**Returns:** *Tree, error
-
-**Example:**
-
-```go
-lang, _ := tsp.GetLanguage("python")
-defer lang.Close()
-
-tree, err := tsp.Parse([]byte("x = 1"), lang)
-if err != nil {
-    log.Fatal(err)
-}
-defer tree.Close()
-
-fmt.Println(tree.RootNode().String())
-```text
-
-### `ParseString(source, language string) (*Tree, error)`
-
-Parse source code string with language name.
-
-**Parameters:**
-
-- `source` (string): Source code
 - `language` (string): Language name
+- `source` (string): Source code
 
 **Returns:** *Tree, error
 
 **Example:**
 
 ```go
-tree, err := tsp.ParseString("def foo(): pass", "python")
+tree, err := reg.ParseString("python", "def foo(): pass")
 if err != nil {
     log.Fatal(err)
 }
 defer tree.Close()
-```text
+```
 
-## Code Intelligence
+### `Registry.Process(source string, config ProcessConfig) (*ProcessResult, error)`
 
-### `Process(source string, config *ProcessConfig) (*ProcessResult, error)`
-
-Extract code intelligence from source code.
+Extract file intelligence from source code using a `ProcessConfig`. Returns a typed `ProcessResult` with deserialized metadata and chunks.
 
 **Parameters:**
 
 - `source` (string): Source code
-- `config` (*ProcessConfig): Configuration
+- `config` (ProcessConfig): Configuration specifying language and extraction features
 
 **Returns:** *ProcessResult, error
 
 **Example:**
 
 ```go
-config := tsp.NewProcessConfig("python").All()
-result, err := tsp.Process("def hello(): pass", config)
+config := tspack.NewProcessConfig("python")
+result, err := reg.Process("def hello(): pass", config)
 if err != nil {
     log.Fatal(err)
 }
+fmt.Printf("Functions: %d\n", len(result.Metadata.Structure))
+```
 
-fmt.Printf("Functions: %d\n", len(result.Structure))
-fmt.Printf("Imports: %d\n", len(result.Imports))
-fmt.Printf("Lines: %d\n", result.Metrics.TotalLines)
-```text
+## Tree
+
+### `Tree.Close()`
+
+Free the underlying C tree. Safe to call multiple times.
+
+### `Tree.RootNodeType() (string, error)`
+
+Return the type name of the root node.
+
+### `Tree.RootChildCount() (int, error)`
+
+Return the number of named children of the root node.
+
+### `Tree.ContainsNodeType(nodeType string) (bool, error)`
+
+Check whether any node in the tree has the given type name.
+
+### `Tree.HasErrorNodes() (bool, error)`
+
+Check whether the tree contains any ERROR or MISSING nodes.
+
+## Language Detection
+
+### `DetectLanguage(path string) string`
+
+Detect a language name from a file path or extension. Returns an empty string if not recognized.
+
+**Parameters:**
+
+- `path` (string): File path or extension
+
+**Returns:** string
+
+### `DetectLanguageFromContent(content string) string`
+
+Detect a language name from file content using shebang-based detection. Returns an empty string if no shebang is recognized.
+
+**Parameters:**
+
+- `content` (string): File content
+
+**Returns:** string
+
+### `ExtensionAmbiguity(ext string) (*ExtensionAmbiguityResult, error)`
+
+Return ambiguity information for the given file extension. Returns nil if the extension is not ambiguous.
+
+**Returns:** *ExtensionAmbiguityResult, error
+
+```go
+type ExtensionAmbiguityResult struct {
+    Assigned     string   `json:"assigned"`
+    Alternatives []string `json:"alternatives"`
+}
+```
+
+## Bundled Queries
+
+### `GetHighlightsQuery(language string) string`
+
+Return the bundled highlights query for the given language. Returns an empty string if not available.
+
+### `GetInjectionsQuery(language string) string`
+
+Return the bundled injections query for the given language. Returns an empty string if not available.
+
+### `GetLocalsQuery(language string) string`
+
+Return the bundled locals query for the given language. Returns an empty string if not available.
+
+## Download Management
+
+### `Init(configJSON string) error`
+
+Initialize the language pack with configuration. `configJSON` is a JSON string with optional fields: `"cache_dir"` (string), `"languages"` (array), `"groups"` (array).
+
+**Parameters:**
+
+- `configJSON` (string): JSON configuration string
+
+**Returns:** error
+
+**Example:**
+
+```go
+err := tspack.Init(`{"languages": ["python", "rust"], "cache_dir": "/opt/ts-pack"}`)
+if err != nil {
+    log.Fatal(err)
+}
+```
+
+### `Configure(configJSON string) error`
+
+Configure the language pack cache directory without downloading. `configJSON` is a JSON string with an optional `"cache_dir"` field.
+
+**Parameters:**
+
+- `configJSON` (string): JSON configuration string
+
+**Returns:** error
+
+**Example:**
+
+```go
+err := tspack.Configure(`{"cache_dir": "/data/ts-pack"}`)
+if err != nil {
+    log.Fatal(err)
+}
+```
+
+### `Download(languages []string) (int, error)`
+
+Download specific languages to the cache. Returns the number of newly downloaded languages.
+
+**Parameters:**
+
+- `languages` ([]string): Language names to download
+
+**Returns:** int, error
+
+**Example:**
+
+```go
+count, err := tspack.Download([]string{"python", "rust", "typescript"})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Printf("Downloaded %d new languages\n", count)
+```
+
+### `DownloadAll() (int, error)`
+
+Download all available languages from the remote manifest. Returns the number of newly downloaded languages.
+
+**Returns:** int, error
+
+### `ManifestLanguages() ([]string, error)`
+
+Return all language names available in the remote manifest.
+
+**Returns:** []string, error
+
+### `DownloadedLanguages() ([]string, error)`
+
+Return all languages that are already downloaded and cached locally.
+
+**Returns:** []string, error
+
+### `CleanCache() error`
+
+Delete all cached parser shared libraries.
+
+**Returns:** error
+
+### `CacheDir() (string, error)`
+
+Return the effective cache directory path.
+
+**Returns:** string, error
 
 ## Types
 
 ### `ProcessConfig`
 
-Configuration for code intelligence analysis.
-
-**Constructor:**
+Configuration specifying what to extract from source code.
 
 ```go
-config := tsp.NewProcessConfig("python")
-```text
+type ProcessConfig struct {
+    Language     string `json:"language"`
+    Structure    bool   `json:"structure"`
+    Imports      bool   `json:"imports"`
+    Exports      bool   `json:"exports"`
+    Comments     bool   `json:"comments"`
+    Docstrings   bool   `json:"docstrings"`
+    Symbols      bool   `json:"symbols"`
+    Diagnostics  bool   `json:"diagnostics"`
+    ChunkMaxSize *int   `json:"chunk_max_size,omitempty"`
+}
+```
 
-**Methods:**
+### `NewProcessConfig(language string) ProcessConfig`
 
-#### `Structure() *ProcessConfig`
-
-Enable structure extraction.
-
-#### `ImportExports() *ProcessConfig`
-
-Enable imports/exports extraction.
-
-#### `Comments() *ProcessConfig`
-
-Enable comment extraction.
-
-#### `Docstrings() *ProcessConfig`
-
-Enable docstring extraction.
-
-#### `Symbols() *ProcessConfig`
-
-Enable symbol extraction.
-
-#### `Metrics() *ProcessConfig`
-
-Enable metric extraction.
-
-#### `Diagnostics() *ProcessConfig`
-
-Enable diagnostic extraction.
-
-#### `WithChunks(maxSize, overlap int) *ProcessConfig`
-
-Configure code chunking.
-
-#### `All() *ProcessConfig`
-
-Enable all features.
-
-**Example:**
-
-```go
-config := tsp.NewProcessConfig("python").
-    Structure().
-    ImportExports().
-    Comments().
-    WithChunks(2000, 400)
-```text
+Create a ProcessConfig with all extraction options enabled (structure, imports, exports, comments, docstrings, symbols, diagnostics) and no chunking.
 
 ### `ProcessResult`
 
-Result from code intelligence analysis.
-
-**Fields:**
-
 ```go
 type ProcessResult struct {
-    Language    string
-    Metrics     FileMetrics
-    Structure   []StructureItem
-    Imports     []ImportInfo
-    Exports     []ExportInfo
-    Comments    []CommentInfo
-    Docstrings  []DocstringInfo
-    Symbols     []SymbolInfo
-    Diagnostics []Diagnostic
-    Chunks      []CodeChunk
-    ParseErrors int
+    Metadata FileMetadata `json:"metadata"`
+    Chunks   []CodeChunk  `json:"chunks"`
 }
-```text
+```
 
-**Example:**
+### `FileMetadata`
 
 ```go
-result, _ := tsp.Process(source, config)
-fmt.Printf("Language: %s\n", result.Language)
-for _, item := range result.Structure {
-    fmt.Printf("  %s: %s\n", item.Kind, item.Name)
+type FileMetadata struct {
+    Language    string          `json:"language"`
+    Metrics     FileMetrics     `json:"metrics"`
+    Structure   []StructureItem `json:"structure,omitempty"`
+    Imports     []ImportInfo    `json:"imports,omitempty"`
+    Exports     []ExportInfo    `json:"exports,omitempty"`
+    Comments    []CommentInfo   `json:"comments,omitempty"`
+    Docstrings  []DocstringInfo `json:"docstrings,omitempty"`
+    Symbols     []SymbolInfo    `json:"symbols,omitempty"`
+    Diagnostics []Diagnostic    `json:"diagnostics,omitempty"`
 }
-```text
+```
 
-### `Language`
-
-tree-sitter Language object.
-
-**Methods:**
-
-- `Close()` - Release language resources
-- `Name() string` - Get language name
-
-### `Parser`
-
-tree-sitter Parser object.
-
-**Methods:**
-
-- `Close()` - Release parser resources
-- `Parse(source []byte, oldTree *Tree) *Tree` - Parse source code
-- `SetTimeoutMicros(micros uint64)` - Set parse timeout
-
-### `Tree`
-
-Parsed syntax tree.
-
-**Methods:**
-
-- `Close()` - Release tree resources
-- `RootNode() *Node` - Get root node
-- `Copy() *Tree` - Copy tree
-
-### `Node`
-
-Syntax tree node.
-
-**Methods:**
-
-- `Type() string` - Node type name
-- `Kind() string` - Node kind
-- `StartPoint() Point` - Start position
-- `EndPoint() Point` - End position
-- `Text(source []byte) string` - Get node text
-- `ChildCount() int` - Number of children
-- `Child(i int) *Node` - Get child node
-- `String() string` - S-expression representation
-
-## Error Handling
-
-Always check and handle errors:
+### `FileMetrics`
 
 ```go
-lang, err := tsp.GetLanguage("python")
-if err != nil {
-    switch err {
-    case tsp.ErrLanguageNotFound:
-        log.Printf("Language not available")
-    case tsp.ErrDownloadFailed:
-        log.Printf("Download failed (network error?)")
-    default:
-        log.Printf("Error: %v", err)
-    }
-    return
+type FileMetrics struct {
+    TotalLines   int `json:"total_lines"`
+    CodeLines    int `json:"code_lines"`
+    CommentLines int `json:"comment_lines"`
+    BlankLines   int `json:"blank_lines"`
+    TotalBytes   int `json:"total_bytes"`
+    NodeCount    int `json:"node_count"`
+    ErrorCount   int `json:"error_count"`
+    MaxDepth     int `json:"max_depth"`
 }
-defer lang.Close()
-```text
+```
 
-## Usage Patterns
-
-### Pre-download Languages
+### `StructureItem`
 
 ```go
-package main
-
-import (
-    "log"
-    tsp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v2"
-)
-
-func init() {
-    if err := tsp.Download([]string{
-        "python", "rust", "typescript",
-    }); err != nil {
-        log.Fatal(err)
-    }
+type StructureItem struct {
+    Kind       string          `json:"kind"`
+    Name       *string         `json:"name,omitempty"`
+    Visibility *string         `json:"visibility,omitempty"`
+    Span       Span            `json:"span"`
+    Children   []StructureItem `json:"children,omitempty"`
+    Decorators []string        `json:"decorators,omitempty"`
+    DocComment *string         `json:"doc_comment,omitempty"`
+    Signature  *string         `json:"signature,omitempty"`
+    BodySpan   *Span           `json:"body_span,omitempty"`
 }
+```
 
-func main() {
-    // Fast, no network required
-    parser, _ := tsp.GetParser("python")
-    defer parser.Close()
-}
-```text
-
-### Custom Cache Directory
+### `ImportInfo`
 
 ```go
-import tsp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v2"
-
-func init() {
-    if err := tsp.Configure("/opt/ts-pack-cache"); err != nil {
-        log.Fatal(err)
-    }
+type ImportInfo struct {
+    Source     string   `json:"source"`
+    Items      []string `json:"items,omitempty"`
+    Alias      *string  `json:"alias,omitempty"`
+    IsWildcard bool     `json:"is_wildcard"`
+    Span       Span     `json:"span"`
 }
-```text
+```
 
-### Process Multiple Files
+### `ExportInfo`
 
 ```go
-func analyzeFiles(dir string, lang string) error {
-    entries, err := os.ReadDir(dir)
-    if err != nil {
-        return err
-    }
-
-    config := tsp.NewProcessConfig(lang).All()
-
-    for _, entry := range entries {
-        if !entry.IsDir() {
-            path := filepath.Join(dir, entry.Name())
-            data, _ := os.ReadFile(path)
-            source := string(data)
-
-            result, err := tsp.Process(source, config)
-            if err != nil {
-                log.Printf("Error processing %s: %v", path, err)
-                continue
-            }
-
-            fmt.Printf("%s: %d items\n", path, len(result.Structure))
-        }
-    }
-
-    return nil
+type ExportInfo struct {
+    Name string `json:"name"`
+    Kind string `json:"kind"`
+    Span Span   `json:"span"`
 }
-```text
+```
 
-### Concurrent Parsing
+### `CommentInfo`
 
 ```go
-import (
-    "sync"
-    tsp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v2"
-)
-
-func parseFiles(files []string, lang string) {
-    parser, _ := tsp.GetParser(lang)
-    defer parser.Close()
-
-    var wg sync.WaitGroup
-    for _, file := range files {
-        wg.Add(1)
-        go func(f string) {
-            defer wg.Done()
-            data, _ := os.ReadFile(f)
-            tree := parser.Parse(data, nil)
-            defer tree.Close()
-            // Process tree
-        }(file)
-    }
-    wg.Wait()
+type CommentInfo struct {
+    Text           string  `json:"text"`
+    Kind           string  `json:"kind"`
+    Span           Span    `json:"span"`
+    AssociatedNode *string `json:"associated_node,omitempty"`
 }
-```text
+```
 
-## Thread Safety
-
-All public functions are thread-safe. Create separate Parser instances for concurrent use:
+### `DocstringInfo`
 
 ```go
-// Safe: each goroutine gets its own parser
+type DocstringInfo struct {
+    Text           string       `json:"text"`
+    Format         string       `json:"format"`
+    Span           Span         `json:"span"`
+    AssociatedItem *string      `json:"associated_item,omitempty"`
+    ParsedSections []DocSection `json:"parsed_sections,omitempty"`
+}
+```
+
+### `SymbolInfo`
+
+```go
+type SymbolInfo struct {
+    Name           string  `json:"name"`
+    Kind           string  `json:"kind"`
+    Span           Span    `json:"span"`
+    TypeAnnotation *string `json:"type_annotation,omitempty"`
+    Doc            *string `json:"doc,omitempty"`
+}
+```
+
+### `Diagnostic`
+
+```go
+type Diagnostic struct {
+    Message  string `json:"message"`
+    Severity string `json:"severity"`
+    Span     Span   `json:"span"`
+}
+```
+
+### `CodeChunk`
+
+```go
+type CodeChunk struct {
+    Content   string    `json:"content"`
+    StartByte int       `json:"start_byte"`
+    EndByte   int       `json:"end_byte"`
+    StartLine int       `json:"start_line"`
+    EndLine   int       `json:"end_line"`
+    Metadata  ChunkInfo `json:"metadata"`
+}
+```
+
+### `Span`
+
+```go
+type Span struct {
+    StartByte   int `json:"start_byte"`
+    EndByte     int `json:"end_byte"`
+    StartLine   int `json:"start_line"`
+    StartColumn int `json:"start_column"`
+    EndLine     int `json:"end_line"`
+    EndColumn   int `json:"end_column"`
+}
+```
+
+### `NodeInfo`
+
+```go
+type NodeInfo struct {
+    Kind            string `json:"kind"`
+    IsNamed         bool   `json:"is_named"`
+    StartByte       int    `json:"start_byte"`
+    EndByte         int    `json:"end_byte"`
+    StartRow        int    `json:"start_row"`
+    StartColumn     int    `json:"start_column"`
+    EndRow          int    `json:"end_row"`
+    EndColumn       int    `json:"end_column"`
+    NamedChildCount int    `json:"named_child_count"`
+    IsError         bool   `json:"is_error"`
+    IsMissing       bool   `json:"is_missing"`
+}
+```
+
+## Concurrency
+
+The `Registry` type is safe for concurrent use from multiple goroutines. All exported methods acquire the appropriate lock before accessing the underlying C registry. Create separate Registry instances if you need independent registries:
+
+```go
+// Safe: methods on the same registry are synchronized
+reg, _ := tspack.NewRegistry()
+defer reg.Close()
+
+var wg sync.WaitGroup
 for i := 0; i < 10; i++ {
+    wg.Add(1)
     go func() {
-        parser, _ := tsp.GetParser("python")
-        defer parser.Close()
-        // Use parser
+        defer wg.Done()
+        tree, _ := reg.ParseString("python", "x = 1")
+        defer tree.Close()
     }()
 }
+wg.Wait()
 ```

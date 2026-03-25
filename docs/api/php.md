@@ -10,228 +10,59 @@ Install via Composer:
 
 ```bash
 composer require kreuzberg/tree-sitter-language-pack
-```text
+```
+
+The package requires the `tree_sitter_language_pack` PHP extension (a native Rust extension built with ext-php-rs). The Composer package provides a PHP wrapper class around the procedural extension functions.
 
 ## Quick Start
 
 ```php
 <?php
+declare(strict_types=1);
+
 require_once 'vendor/autoload.php';
 
-use Kreuzberg\TreeSitterLanguagePack\LanguagePack;
-use Kreuzberg\TreeSitterLanguagePack\ProcessConfig;
+use TreeSitterLanguagePack\TreeSitterLanguagePack;
+use TreeSitterLanguagePack\ProcessConfig;
 
-// Pre-download languages
-LanguagePack::init(['python', 'rust']);
+// List available languages
+$langs = TreeSitterLanguagePack::availableLanguages();
+echo count($langs) . " languages available\n";
 
-// Get a language
-$language = LanguagePack::getLanguage('python');
-
-// Get a pre-configured parser
-$parser = LanguagePack::getParser('python');
-$tree = $parser->parse('def hello(): pass');
-echo $tree->rootNode()->sexp();
+// Parse source code (returns S-expression string)
+$sexp = TreeSitterLanguagePack::parseString("python", "def hello(): pass");
+echo "Tree: $sexp\n";
 
 // Extract code intelligence
-$config = (new ProcessConfig('python'))->all();
-$result = LanguagePack::process('def hello(): pass', $config);
-echo count($result['structure']) . ' functions';
-```text
+$config = new ProcessConfig("python");
+$result = TreeSitterLanguagePack::process("def hello(): pass", $config);
+echo count($result['structure']) . " structure items\n";
+```
 
-## Download Management
+## Architecture
 
-### `LanguagePack::download(string[] $names): int`
+The PHP binding has two layers:
 
-Download specific languages to cache.
+1. **Extension functions** (`ts_pack_*`): Procedural functions exposed directly by the Rust native extension via ext-php-rs.
+2. **PHP wrapper class** (`TreeSitterLanguagePack\TreeSitterLanguagePack`): A thin OOP wrapper in `packages/php/src/` that calls the extension functions.
 
-**Parameters:**
+You can use either layer. The wrapper class is the recommended interface.
 
-- `$names` (string[]): Language names to download
+## Wrapper Class API
 
-**Returns:** int - Count of newly downloaded languages
+### `TreeSitterLanguagePack::version(): string`
 
-**Throws:**
+Get the library version.
 
-- `DownloadException`: If language not found or download fails
-- `LanguageNotFoundError`: If language not in manifest
-
-**Example:**
-
-```php
-try {
-    $count = LanguagePack::download(['python', 'rust', 'typescript']);
-    echo "Downloaded $count new languages";
-} catch (DownloadException $e) {
-    echo "Download failed: " . $e->getMessage();
-}
-```text
-
-### `LanguagePack::downloadAll(): int`
-
-Download all available languages (248).
-
-**Returns:** int - Count of newly downloaded languages
-
-**Throws:**
-
-- `DownloadException`: If manifest fetch fails
+**Returns:** string - Version in semver format (e.g., "1.2.0")
 
 **Example:**
 
 ```php
-$count = LanguagePack::downloadAll();
-echo "Downloaded $count languages total";
-```text
+echo TreeSitterLanguagePack::version();
+```
 
-### `LanguagePack::manifestLanguages(): string[]`
-
-Get all available languages from remote manifest.
-
-**Returns:** string[] - Sorted language names
-
-**Throws:**
-
-- `DownloadException`: If manifest fetch fails
-
-**Example:**
-
-```php
-$languages = LanguagePack::manifestLanguages();
-echo 'Available: ' . count($languages) . ' languages';
-```text
-
-### `LanguagePack::downloadedLanguages(): string[]`
-
-Get languages already cached locally.
-
-**Returns:** string[] - Cached language names
-
-**Example:**
-
-```php
-$cached = LanguagePack::downloadedLanguages();
-foreach ($cached as $lang) {
-    echo $lang . PHP_EOL;
-}
-```text
-
-### `LanguagePack::cleanCache(): void`
-
-Delete all cached parser shared libraries.
-
-**Throws:**
-
-- `DownloadException`: If cache cannot be removed
-
-**Example:**
-
-```php
-LanguagePack::cleanCache();
-echo 'Cache cleaned';
-```text
-
-### `LanguagePack::cacheDir(): string`
-
-Get the current cache directory path.
-
-**Returns:** string - Absolute cache directory path
-
-**Example:**
-
-```php
-$dir = LanguagePack::cacheDir();
-echo "Cache at: $dir";
-```text
-
-### `LanguagePack::init(?string[] $languages = null, ?string $cacheDir = null): void`
-
-Initialize with optional pre-downloads and cache directory.
-
-**Parameters:**
-
-- `$languages` (string[] | null): Languages to download
-- `$cacheDir` (string | null): Custom cache directory
-
-**Throws:**
-
-- `DownloadException`: If configuration or download fails
-
-**Example:**
-
-```php
-LanguagePack::init(
-    languages: ['python', 'javascript'],
-    cacheDir: '/opt/ts-pack'
-);
-```text
-
-### `LanguagePack::configure(?string $cacheDir = null): void`
-
-Apply configuration without downloading.
-
-**Parameters:**
-
-- `$cacheDir` (string | null): Custom cache directory
-
-**Example:**
-
-```php
-LanguagePack::configure(cacheDir: '/data/ts-pack');
-$language = LanguagePack::getLanguage('python');
-```text
-
-## Language Discovery
-
-### `LanguagePack::getLanguage(string $name): Language`
-
-Get a tree-sitter Language by name.
-
-Resolves aliases. Auto-downloads if needed.
-
-**Parameters:**
-
-- `$name` (string): Language name or alias
-
-**Returns:** Language - tree-sitter Language object
-
-**Throws:**
-
-- `LanguageNotFoundError`: If language not recognized
-- `DownloadException`: If auto-download fails
-
-**Example:**
-
-```php
-try {
-    $language = LanguagePack::getLanguage('python');
-    $parser = new TreeSitter\Parser();
-    $parser->setLanguage($language);
-    $tree = $parser->parse('x = 1');
-    echo $tree->rootNode()->type(); // 'module'
-} catch (LanguageNotFoundError $e) {
-    echo "Language not found: " . $e->getMessage();
-}
-```text
-
-### `LanguagePack::getParser(string $name): Parser`
-
-Get a pre-configured Parser for a language.
-
-**Parameters:**
-
-- `$name` (string): Language name or alias
-
-**Returns:** Parser - Pre-configured tree-sitter Parser
-
-**Example:**
-
-```php
-$parser = LanguagePack::getParser('rust');
-$tree = $parser->parse('fn main() {}');
-echo !$tree->rootNode()->hasError(); // true
-```text
-
-### `LanguagePack::availableLanguages(): string[]`
+### `TreeSitterLanguagePack::availableLanguages(): array`
 
 List all available language names.
 
@@ -240,286 +71,266 @@ List all available language names.
 **Example:**
 
 ```php
-$langs = LanguagePack::availableLanguages();
+$langs = TreeSitterLanguagePack::availableLanguages();
 foreach ($langs as $lang) {
-    echo $lang . PHP_EOL;
+    echo "$lang\n";
 }
-```text
+```
 
-### `LanguagePack::hasLanguage(string $name): bool`
+### `TreeSitterLanguagePack::hasLanguage(string $name): bool`
 
 Check if a language is available.
 
 **Parameters:**
 
-- `$name` (string): Language name or alias
+- `$name` (string): Language name
 
-**Returns:** bool - True if available
+**Returns:** bool
 
 **Example:**
 
 ```php
-if (LanguagePack::hasLanguage('python')) {
-    echo 'Python available';
+if (TreeSitterLanguagePack::hasLanguage('python')) {
+    echo "Python available\n";
 }
-assert(LanguagePack::hasLanguage('shell')); // alias for bash
-```text
+```
 
-### `LanguagePack::languageCount(): int`
+### `TreeSitterLanguagePack::languageCount(): int`
 
 Get total number of available languages.
 
-**Returns:** int - Language count
+**Returns:** int
 
 **Example:**
 
 ```php
-$count = LanguagePack::languageCount();
-echo "$count languages available";
-```text
+echo TreeSitterLanguagePack::languageCount() . " languages\n";
+```
 
-## Parsing
+### `TreeSitterLanguagePack::getLanguage(string $name): int`
 
-### `LanguagePack::parseString(string $source, string $language): Tree`
-
-Parse source code into a syntax tree.
+Get the raw `TSLanguage` pointer as an integer handle. Useful for interop with PHP tree-sitter bindings that accept a language pointer.
 
 **Parameters:**
 
-- `$source` (string): Source code
+- `$name` (string): Language name
+
+**Returns:** int - Raw language pointer
+
+**Throws:** `\Exception` if the language is not available.
+
+**Example:**
+
+```php
+$ptr = TreeSitterLanguagePack::getLanguage('python');
+echo "Language pointer: $ptr\n";
+```
+
+### `TreeSitterLanguagePack::parseString(string $language, string $source): string`
+
+Parse source code and return an S-expression representation of the syntax tree.
+
+**Parameters:**
+
 - `$language` (string): Language name
+- `$source` (string): Source code to parse
 
-**Returns:** Tree - Parsed syntax tree
+**Returns:** string - S-expression of the parsed tree
+
+**Throws:** `\Exception` if the language is not available or parsing fails.
 
 **Example:**
 
 ```php
-$tree = LanguagePack::parseString('def foo(): pass', 'python');
-echo $tree->rootNode()->sexp();
-```text
+$sexp = TreeSitterLanguagePack::parseString('python', 'def foo(): pass');
+echo "Tree: $sexp\n";
+```
 
-## Code Intelligence
+### `TreeSitterLanguagePack::process(string $source, ProcessConfig|array $config): array`
 
-### `LanguagePack::process(string $source, ProcessConfig $config): array`
-
-Extract code intelligence from source code.
+Process source code and extract metadata and chunks.
 
 **Parameters:**
 
 - `$source` (string): Source code
-- `$config` (ProcessConfig): Configuration
+- `$config` (ProcessConfig or array): Configuration. Must contain at least `language`. Can be a `ProcessConfig` object or an associative array.
 
-**Returns:** array - Result with structure, imports, exports, etc.
+**Returns:** array - Extraction results with string keys
+
+**Throws:** `\RuntimeException` on invalid config, unknown language, or processing failure.
 
 **Example:**
 
 ```php
-$config = (new ProcessConfig('python'))
-    ->structure()
-    ->importExports()
-    ->withChunks(2000, 400);
+$config = new ProcessConfig('python', structure: true, comments: true);
+$result = TreeSitterLanguagePack::process('def hello(): pass', $config);
 
-$result = LanguagePack::process('def hello(): pass', $config);
-echo count($result['structure']) . ' functions';
-echo $result['metrics']['total_lines'] . ' lines';
-```text
+foreach ($result['structure'] as $item) {
+    echo "{$item['kind']}: {$item['name']}\n";
+}
+```
 
-## Types
+## ProcessConfig
 
-### `ProcessConfig`
-
-Configuration for code intelligence analysis.
+Configuration for source code processing. Uses PHP 8.2 readonly constructor promotion.
 
 **Constructor:**
 
 ```php
-$config = new ProcessConfig('python');
-```text
+new ProcessConfig(
+    string $language,        // Required: language name
+    bool $structure = true,  // Extract structural items (functions, classes, etc.)
+    bool $imports = true,    // Extract import statements
+    bool $exports = true,    // Extract export statements
+    bool $comments = false,  // Extract comments
+    bool $docstrings = false, // Extract docstrings
+    bool $symbols = false,   // Extract symbol definitions
+    bool $diagnostics = false, // Include parse diagnostics
+    ?int $chunkMaxSize = null, // Maximum chunk size in bytes (null disables chunking)
+)
+```
+
+All properties are `public readonly`.
 
 **Methods:**
 
-- `structure(): self` - Enable structure extraction
-- `importExports(): self` - Enable imports/exports extraction
-- `comments(): self` - Enable comment extraction
-- `docstrings(): self` - Enable docstring extraction
-- `symbols(): self` - Enable symbol extraction
-- `metrics(): self` - Enable metric extraction
-- `diagnostics(): self` - Enable diagnostic extraction
-- `withChunks(int $maxSize, int $overlap): self` - Configure chunking
-- `all(): self` - Enable all features
+- `toArray(): array` - Convert to associative array for JSON encoding
 
-**Example:**
+**Examples:**
 
 ```php
-$config = (new ProcessConfig('python'))
-    ->structure()
-    ->importExports()
-    ->comments()
-    ->withChunks(2000, 400);
-```text
+// Defaults: structure + imports + exports enabled
+$config = new ProcessConfig('python');
 
-### Result Array
+// Enable everything
+$config = new ProcessConfig(
+    'python',
+    structure: true,
+    imports: true,
+    exports: true,
+    comments: true,
+    docstrings: true,
+    symbols: true,
+    diagnostics: true,
+    chunkMaxSize: 2000,
+);
 
-**Keys:**
+// Using an array directly
+$result = TreeSitterLanguagePack::process($source, [
+    'language' => 'python',
+    'structure' => true,
+    'comments' => true,
+]);
+```
 
-- `'language'` (string) - Language name
-- `'metrics'` (array) - File metrics
-    - `'total_lines'` (int)
-    - `'code_lines'` (int)
-    - `'comment_lines'` (int)
-    - `'blank_lines'` (int)
-- `'structure'` (array) - Code structure items
-- `'imports'` (array) - Import statements
-- `'exports'` (array) - Export statements
-- `'comments'` (array) - Comments
-- `'docstrings'` (array) - Docstrings
-- `'symbols'` (array) - Symbols
-- `'diagnostics'` (array) - Diagnostics
-- `'chunks'` (array) - Code chunks
-- `'parse_errors'` (int) - Parse error count
+## Extension Functions (Procedural API)
 
-## Exception Handling
+These are the raw functions exposed by the native extension. The wrapper class calls these internally.
+
+### Registry and Parsing
+
+| Function | Parameters | Returns |
+|----------|-----------|---------|
+| `ts_pack_version()` | none | string |
+| `ts_pack_available_languages()` | none | string[] |
+| `ts_pack_has_language(string $name)` | language name | bool |
+| `ts_pack_language_count()` | none | int |
+| `ts_pack_detect_language(string $path)` | file path | string or null |
+| `ts_pack_detect_language_from_content(string $content)` | file content | string or null |
+| `ts_pack_extension_ambiguity(string $ext)` | extension | string (JSON) or null |
+| `ts_pack_get_highlights_query(string $language)` | language name | string or null |
+| `ts_pack_get_injections_query(string $language)` | language name | string or null |
+| `ts_pack_get_locals_query(string $language)` | language name | string or null |
+| `ts_pack_get_language(string $name)` | language name | int (pointer) |
+| `ts_pack_parse_string(string $language, string $source)` | language, source | string (S-expression) |
+| `ts_pack_process(string $source, string $config_json)` | source, JSON config | string (JSON result) |
+
+### Download Management
+
+| Function | Parameters | Returns |
+|----------|-----------|---------|
+| `ts_pack_init(string $config_json)` | JSON config | void |
+| `ts_pack_configure(string $config_json)` | JSON config | void |
+| `ts_pack_download(string[] $names)` | language names | int |
+| `ts_pack_download_all()` | none | int |
+| `ts_pack_manifest_languages()` | none | string[] |
+| `ts_pack_downloaded_languages()` | none | string[] |
+| `ts_pack_clean_cache()` | none | void |
+| `ts_pack_cache_dir()` | none | string |
+
+### Extension Function Examples
 
 ```php
-use Kreuzberg\TreeSitterLanguagePack\LanguagePack;
-use Kreuzberg\TreeSitterLanguagePack\Exception\LanguageNotFoundError;
-use Kreuzberg\TreeSitterLanguagePack\Exception\DownloadException;
+// Using procedural functions directly
+$langs = ts_pack_available_languages();
+$sexp = ts_pack_parse_string('python', 'x = 1');
+$result_json = ts_pack_process('def hello(): pass', '{"language":"python"}');
+$result = json_decode($result_json, true);
 
-try {
-    $parser = LanguagePack::getParser('python');
-    $tree = $parser->parse('x = 1');
-} catch (LanguageNotFoundError $e) {
-    echo 'Language not found';
-} catch (DownloadException $e) {
-    echo 'Download failed';
-} catch (Exception $e) {
-    echo 'Unexpected error';
+// Download management
+ts_pack_init('{"languages":["python","rust"]}');
+ts_pack_configure('{"cache_dir":"/tmp/parsers"}');
+$count = ts_pack_download(['python', 'rust']);
+$cached = ts_pack_downloaded_languages();
+$dir = ts_pack_cache_dir();
+ts_pack_clean_cache();
+```
+
+### Detection Functions
+
+```php
+$lang = ts_pack_detect_language('script.py');     // "python"
+$lang = ts_pack_detect_language_from_content("#!/usr/bin/env python3\n");  // "python"
+
+$info = ts_pack_extension_ambiguity('h');
+if ($info !== null) {
+    $data = json_decode($info, true);
+    echo "Assigned: " . $data['assigned'] . "\n";
 }
-```text
+```
+
+## Error Handling
+
+The native extension throws `\Exception` on errors. The wrapper class may throw `\RuntimeException` for JSON encoding/decoding failures.
+
+```php
+try {
+    $sexp = TreeSitterLanguagePack::parseString('nonexistent', 'code');
+} catch (\Exception $e) {
+    echo "Error: " . $e->getMessage() . "\n";
+}
+```
 
 ## Usage Patterns
 
 ### Pre-download Languages
 
 ```php
-// config/bootstrap.php
-use Kreuzberg\TreeSitterLanguagePack\LanguagePack;
-
-LanguagePack::init(['python', 'rust', 'typescript', 'javascript']);
-```text
-
-Then use in your application:
-
-```php
-require_once 'config/bootstrap.php';
-
-// Fast, no network required
-$parser = LanguagePack::getParser('python');
-```text
+// bootstrap.php
+ts_pack_init('{"languages":["python","rust","typescript","javascript"]}');
+```
 
 ### Custom Cache Directory
 
 ```php
-LanguagePack::configure(cacheDir: '/data/ts-pack-cache');
-$language = LanguagePack::getLanguage('python');
-```text
+ts_pack_configure('{"cache_dir":"/data/ts-pack-cache"}');
+```
 
 ### Batch Processing
 
 ```php
-function analyzeFiles(string $dir, string $language): void {
-    $config = (new ProcessConfig($language))->all();
+use TreeSitterLanguagePack\TreeSitterLanguagePack;
+use TreeSitterLanguagePack\ProcessConfig;
 
-    $files = glob("$dir/**/*." . (
-        $language === 'python' ? 'py' : $language
-    ));
+$config = new ProcessConfig('python');
 
-    foreach ($files as $file) {
-        try {
-            $source = file_get_contents($file);
-            $result = LanguagePack::process($source, $config);
-            echo "$file: " . count($result['structure']) . " items\n";
-        } catch (Exception $e) {
-            echo "Error: {$e->getMessage()}\n";
-        }
+foreach (glob('src/**/*.py') as $file) {
+    try {
+        $source = file_get_contents($file);
+        $result = TreeSitterLanguagePack::process($source, $config);
+        echo "$file: " . count($result['structure']) . " items\n";
+    } catch (\Exception $e) {
+        echo "Error: {$e->getMessage()}\n";
     }
-}
-
-analyzeFiles('./src', 'python');
-```text
-
-### Laravel Integration
-
-```php
-// app/Services/CodeAnalyzer.php
-namespace App\Services;
-
-use Kreuzberg\TreeSitterLanguagePack\LanguagePack;
-use Kreuzberg\TreeSitterLanguagePack\ProcessConfig;
-
-class CodeAnalyzer {
-    public function analyze(string $source, string $language): array {
-        $config = (new ProcessConfig($language))->all();
-        return LanguagePack::process($source, $config);
-    }
-}
-
-// In controller
-$analyzer = new \App\Services\CodeAnalyzer();
-$result = $analyzer->analyze($source, 'python');
-```text
-
-### Streaming Large Files
-
-```php
-function analyzeStreamedFile(string $path, string $language): void {
-    $config = (new ProcessConfig($language))->all();
-
-    $chunks = str_split(file_get_contents($path), 1024 * 100);
-    $accumulated = '';
-
-    foreach ($chunks as $chunk) {
-        $accumulated .= $chunk;
-
-        try {
-            $result = LanguagePack::process($accumulated, $config);
-            echo "Chunk: " . count($result['structure']) . " items\n";
-        } catch (Exception $e) {
-            echo "Error: {$e->getMessage()}\n";
-        }
-    }
-}
-```text
-
-### Extract Specific Patterns
-
-```php
-function findFunctions(string $source, string $language): array {
-    $config = (new ProcessConfig($language))->structure();
-    $result = LanguagePack::process($source, $config);
-
-    return array_filter(
-        $result['structure'],
-        fn($item) => $item['kind'] === 'function'
-    );
-}
-
-$functions = findFunctions(file_get_contents('code.py'), 'python');
-foreach ($functions as $func) {
-    echo $func['name'] . PHP_EOL;
-}
-```text
-
-### Type Hints
-
-```php
-/**
- * @param string $source Source code to analyze
- * @param string $language Language name
- * @return array Analysis result with structure, imports, etc.
- */
-function analyzeCode(string $source, string $language): array {
-    $config = (new ProcessConfig($language))->all();
-    return LanguagePack::process($source, $config);
 }
 ```

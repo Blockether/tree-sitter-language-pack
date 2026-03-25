@@ -1,8 +1,7 @@
 ---
+title: Quick Start
 description: "Parse your first file with tree-sitter-language-pack in under 5 minutes."
 ---
-
-# Quick Start
 
 This guide walks from install to parsing code in 5 minutes.
 
@@ -51,13 +50,13 @@ Parsers are downloaded automatically on first use. You can also pre-download for
 === "Node.js"
 
     ```typescript
-    import { getParser, download } from "@kreuzberg/tree-sitter-language-pack";
+    import { parseString, download } from "@kreuzberg/tree-sitter-language-pack";
 
     // Auto-downloads on first call
-    const parser = await getParser("python");
+    const tree = parseString("python", "print('hello')");
 
     // Or pre-download explicitly
-    await download(["python", "javascript", "rust"]);
+    download(["python", "javascript", "rust"]);
     ```
 
 === "Rust"
@@ -110,9 +109,7 @@ With a parser in hand, build a concrete syntax tree from source code.
 === "Node.js"
 
     ```typescript
-    import { getParser } from "@kreuzberg/tree-sitter-language-pack";
-
-    const parser = await getParser("javascript");
+    import { parseString, treeRootNodeType, treeRootChildCount } from "@kreuzberg/tree-sitter-language-pack";
 
     const source = `
     function greet(name) {
@@ -121,12 +118,10 @@ With a parser in hand, build a concrete syntax tree from source code.
     greet("world");
     `;
 
-    const tree = parser.parse(source);
-    const root = tree.rootNode;
+    const tree = parseString("javascript", source);
 
-    console.log(root.type);        // program
-    console.log(root.childCount);  // 2
-    console.log(root.toString().slice(0, 120));
+    console.log(treeRootNodeType(tree));       // program
+    console.log(treeRootChildCount(tree));     // 2
     ```
 
 === "Rust"

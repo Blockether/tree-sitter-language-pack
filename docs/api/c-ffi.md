@@ -6,470 +6,526 @@ description: "C FFI API reference for tree-sitter-language-pack"
 
 ## Overview
 
-The C FFI layer provides a stable C API for tree-sitter-language-pack, enabling integration with languages like Go, Java (Panama FFM), and C#.
+The C FFI layer provides a stable C API for tree-sitter-language-pack, enabling integration with languages like Go (cgo), Java (Panama FFM), and C# (P/Invoke).
 
-Headers are automatically generated from Rust source using `cbindgen` and are located in `crates/ffi/include/html_to_markdown.h`.
+The header file is located at `crates/ts-pack-ffi/include/ts_pack.h`.
 
 ## Installation
 
 ### C Header
 
 ```c
-#include "html_to_markdown.h"
-```text
+#include "ts_pack.h"
+```
 
 Link against the compiled FFI library:
 
 ```bash
 gcc -o program program.c -L. -lts_pack_ffi
-```text
+```
 
-## Version Query
+## Opaque Handles
 
-### `const char* ts_pack_version(void)`
+The API uses two opaque pointer types. Callers must never dereference or inspect the internals of these handles.
 
-Get the version string of the library.
+- `TsPackRegistry*` -- language registry created with `ts_pack_registry_new`, freed with `ts_pack_registry_free`.
+- `TsPackTree*` -- parsed syntax tree created with `ts_pack_parse_string`, freed with `ts_pack_tree_free`.
 
-**Returns:** const char* - Version string (e.g., "1.0.0")
+## Error Handling
 
-**Note:** Do NOT free the returned pointer; it points to static data.
+Errors are reported through a thread-local string. After any function returns a failure indicator (null pointer, 0 count, false, or -1), call `ts_pack_last_error()` to retrieve a human-readable message.
+
+### `const char* ts_pack_last_error(void)`
+
+Get the last error message for the current thread, or null if no error occurred.
+
+**Returns:** `const char*` -- error message string, valid until the next FFI call on the same thread. Do NOT free this pointer.
+
+### `void ts_pack_clear_error(void)`
+
+Clear the thread-local error state.
 
 **Example:**
 
 ```c
-#include <stdio.h>
-#include "html_to_markdown.h"
-
-int main() {
-    const char* version = ts_pack_version();
-    printf("Version: %s\n", version);
-    return 0;
+TsPackRegistry* reg = ts_pack_registry_new();
+if (!reg) {
+    const char* err = ts_pack_last_error();
+    fprintf(stderr, "Error: %s\n", err ? err : "unknown");
+    return 1;
 }
-```text
+```
+
+## Registry
+
+### `TsPackRegistry* ts_pack_registry_new(void)`
+
+Create a new language registry containing all compiled-in grammars.
+
+**Returns:** `TsPackRegistry*` -- opaque handle, or null on failure.
+
+**Note:** The caller must free the registry with `ts_pack_registry_free`.
+
+### `void ts_pack_registry_free(TsPackRegistry* registry)`
+
+Free a registry previously created with `ts_pack_registry_new`. Passing null is a safe no-op.
+
+**Parameters:**
+
+- `registry` (`TsPackRegistry*`): registry to free, or null.
+
+**Example:**
+
+```c
+TsPackRegistry* reg = ts_pack_registry_new();
+// ... use registry ...
+ts_pack_registry_free(reg);
+```
 
 ## Language Discovery
 
-### `const char** ts_pack_available_languages(size_t* out_count)`
+### `size_t ts_pack_language_count(const TsPackRegistry* registry)`
 
-Get all available language names.
+Get the number of available languages in the registry.
 
 **Parameters:**
 
-- `out_count` (size_t*): Pointer to store count of languages
+- `registry` (`const TsPackRegistry*`): registry handle.
 
-**Returns:** const char** - Array of language name strings
+**Returns:** `size_t` -- language count, or 0 if registry is null.
 
-**Note:** Free the returned array with `ts_pack_free_strings()`. Strings themselves must NOT be freed.
+### `const char* ts_pack_language_name_at(const TsPackRegistry* registry, size_t index)`
+
+Get the language name at the given index.
+
+**Parameters:**
+
+- `registry` (`const TsPackRegistry*`): registry handle.
+- `index` (`size_t`): zero-based index into the sorted language list.
+
+**Returns:** `const char*` -- newly-allocated C string, or null if out of bounds. The caller must free the returned string with `ts_pack_free_string`.
 
 **Example:**
 
 ```c
-size_t count;
-const char** languages = ts_pack_available_languages(&count);
+TsPackRegistry* reg = ts_pack_registry_new();
+size_t count = ts_pack_language_count(reg);
 for (size_t i = 0; i < count; i++) {
-    printf("%s\n", languages[i]);
+    char* name = (char*)ts_pack_language_name_at(reg, i);
+    if (name) {
+        printf("%s\n", name);
+        ts_pack_free_string(name);
+    }
 }
-ts_pack_free_strings(languages);
-```text
+ts_pack_registry_free(reg);
+```
 
-### `bool ts_pack_has_language(const char* name)`
+### `bool ts_pack_has_language(const TsPackRegistry* registry, const char* name)`
 
-Check if a language is available.
+Check whether the registry contains a language with the given name.
 
 **Parameters:**
 
-- `name` (const char*): Language name or alias
+- `registry` (`const TsPackRegistry*`): registry handle.
+- `name` (`const char*`): null-terminated language name.
 
-**Returns:** bool - True if available
+**Returns:** `bool` -- true if available, false otherwise (or if either pointer is null).
 
 **Example:**
 
 ```c
-if (ts_pack_has_language("python")) {
-    printf("Python available\n");
+if (ts_pack_has_language(reg, "python")) {
+    printf("Python is available\n");
 }
-```text
+```
 
-### `size_t ts_pack_language_count(void)`
+## Language Detection
 
-Get total number of available languages.
+### `char* ts_pack_detect_language(const char* path)`
 
-**Returns:** size_t - Language count
+Detect language name from a file path based on its extension.
+
+**Parameters:**
+
+- `path` (`const char*`): null-terminated file path.
+
+**Returns:** `char*` -- newly-allocated language name string, or null if the extension is not recognized. The caller must free the returned string with `ts_pack_free_string`.
+
+### `char* ts_pack_detect_language_from_content(const char* content)`
+
+Detect language name from file content using shebang-based detection.
+
+**Parameters:**
+
+- `content` (`const char*`): null-terminated file content.
+
+**Returns:** `char*` -- newly-allocated language name string, or null if no shebang is recognized. The caller must free the returned string with `ts_pack_free_string`.
+
+### `char* ts_pack_extension_ambiguity(const char* ext)`
+
+Get extension ambiguity information as a JSON string.
+
+**Parameters:**
+
+- `ext` (`const char*`): null-terminated file extension (without dot).
+
+**Returns:** `char*` -- newly-allocated JSON string with `"assigned"` (string) and `"alternatives"` (string array) fields, or null if the extension is not ambiguous. The caller must free the returned string with `ts_pack_free_string`.
+
+## Language Pointers
+
+### `const TSLanguage* ts_pack_get_language(const TsPackRegistry* registry, const char* name)`
+
+Get a raw tree-sitter `TSLanguage` pointer for the given language name.
+
+**Parameters:**
+
+- `registry` (`const TsPackRegistry*`): registry handle.
+- `name` (`const char*`): null-terminated language name.
+
+**Returns:** `const TSLanguage*` -- language pointer valid for the lifetime of the registry, or null on error. Check `ts_pack_last_error()` on null.
 
 **Example:**
 
 ```c
-size_t count = ts_pack_language_count();
-printf("%zu languages available\n", count);
-```text
+const TSLanguage* lang = ts_pack_get_language(reg, "python");
+if (!lang) {
+    fprintf(stderr, "Error: %s\n", ts_pack_last_error());
+    return;
+}
+// Use with tree-sitter's ts_parser_set_language()
+```
+
+## Queries
+
+### `char* ts_pack_get_highlights_query(const char* language)`
+
+Get the bundled highlights query for a language.
+
+**Parameters:**
+
+- `language` (`const char*`): null-terminated language name.
+
+**Returns:** `char*` -- newly-allocated query string, or null if no highlights query is bundled. Free with `ts_pack_free_string`.
+
+### `char* ts_pack_get_injections_query(const char* language)`
+
+Get the bundled injections query for a language.
+
+**Parameters:**
+
+- `language` (`const char*`): null-terminated language name.
+
+**Returns:** `char*` -- newly-allocated query string, or null if unavailable. Free with `ts_pack_free_string`.
+
+### `char* ts_pack_get_locals_query(const char* language)`
+
+Get the bundled locals query for a language.
+
+**Parameters:**
+
+- `language` (`const char*`): null-terminated language name.
+
+**Returns:** `char*` -- newly-allocated query string, or null if unavailable. Free with `ts_pack_free_string`.
 
 ## Parsing
 
-### `TSLanguage* ts_pack_get_language(const char* name, TSPackError* out_error)`
+### `TsPackTree* ts_pack_parse_string(const TsPackRegistry* registry, const char* name, const char* source, size_t source_len)`
 
-Get a tree-sitter Language by name.
-
-**Parameters:**
-
-- `name` (const char*): Language name or alias
-- `out_error` (TSPackError*): Error output (NULL-safe)
-
-**Returns:** TSLanguage* - Language object, NULL on error
-
-**Example:**
-
-```c
-TSPackError error = {0};
-TSLanguage* language = ts_pack_get_language("python", &error);
-if (!language) {
-    fprintf(stderr, "Error: %s\n", error.message);
-    return;
-}
-// Use language
-```text
-
-### `TSParser* ts_pack_get_parser(const char* name, TSPackError* out_error)`
-
-Get a pre-configured Parser for a language.
+Parse source code into an opaque syntax tree.
 
 **Parameters:**
 
-- `name` (const char*): Language name
-- `out_error` (TSPackError*): Error output
+- `registry` (`const TsPackRegistry*`): registry handle.
+- `name` (`const char*`): null-terminated language name.
+- `source` (`const char*`): source code buffer (does not need to be null-terminated).
+- `source_len` (`size_t`): length of the source buffer in bytes.
 
-**Returns:** TSParser* - Parser object, NULL on error
-
-**Note:** Caller must free with `ts_parser_delete()`.
-
-**Example:**
-
-```c
-TSPackError error = {0};
-TSParser* parser = ts_pack_get_parser("python", &error);
-if (!parser) {
-    fprintf(stderr, "Error: %s\n", error.message);
-    return;
-}
-
-TSTree* tree = ts_parser_parse(parser, "x = 1", 5);
-// ... use tree ...
-ts_tree_delete(tree);
-ts_parser_delete(parser);
-```text
-
-### `TSTree* ts_pack_parse(const char* source, size_t source_len, const char* language, TSPackError* out_error)`
-
-Parse source code into a syntax tree.
-
-**Parameters:**
-
-- `source` (const char*): Source code bytes
-- `source_len` (size_t): Length of source
-- `language` (const char*): Language name
-- `out_error` (TSPackError*): Error output
-
-**Returns:** TSTree* - Parsed tree, NULL on error
-
-**Note:** Caller must free with `ts_tree_delete()`.
+**Returns:** `TsPackTree*` -- opaque tree handle, or null on error. Check `ts_pack_last_error()` on null. The caller must free the tree with `ts_pack_tree_free`.
 
 **Example:**
 
 ```c
 const char* code = "def hello(): pass";
-TSPackError error = {0};
-TSTree* tree = ts_pack_parse(code, strlen(code), "python", &error);
+TsPackTree* tree = ts_pack_parse_string(reg, "python", code, strlen(code));
 if (!tree) {
-    fprintf(stderr, "Parse error: %s\n", error.message);
+    fprintf(stderr, "Parse error: %s\n", ts_pack_last_error());
     return;
 }
-
-TSNode root = ts_tree_root_node(tree);
 // ... use tree ...
-ts_tree_delete(tree);
-```text
+ts_pack_tree_free(tree);
+```
 
-## Tree Navigation
+### `void ts_pack_tree_free(TsPackTree* tree)`
 
-### `TSNode ts_tree_root_node(TSTree* tree)`
+Free a tree previously created with `ts_pack_parse_string`. Passing null is a safe no-op.
 
-Get the root node of a tree.
+## Tree Inspection
+
+### `char* ts_pack_tree_root_node_type(const TsPackTree* tree)`
+
+Get the type name of the root node.
 
 **Parameters:**
 
-- `tree` (TSTree*): Syntax tree
+- `tree` (`const TsPackTree*`): tree handle.
 
-**Returns:** TSNode - Root node
+**Returns:** `char*` -- newly-allocated type name string, or null if tree is null. Free with `ts_pack_free_string`.
+
+### `uint32_t ts_pack_tree_root_child_count(const TsPackTree* tree)`
+
+Get the number of named children of the root node.
+
+**Parameters:**
+
+- `tree` (`const TsPackTree*`): tree handle.
+
+**Returns:** `uint32_t` -- child count, or 0 if tree is null.
+
+### `bool ts_pack_tree_contains_node_type(const TsPackTree* tree, const char* node_type)`
+
+Check whether any node in the tree has the given type name. Uses depth-first traversal.
+
+**Parameters:**
+
+- `tree` (`const TsPackTree*`): tree handle.
+- `node_type` (`const char*`): null-terminated node type name to search for.
+
+**Returns:** `bool` -- true if a node with the given type exists.
+
+### `bool ts_pack_tree_has_error_nodes(const TsPackTree* tree)`
+
+Check whether the tree contains any ERROR or MISSING nodes.
+
+**Parameters:**
+
+- `tree` (`const TsPackTree*`): tree handle.
+
+**Returns:** `bool` -- true if the tree has error nodes.
+
+### `size_t ts_pack_tree_error_count(const TsPackTree* tree)`
+
+Return the count of ERROR and MISSING nodes in the tree.
+
+**Parameters:**
+
+- `tree` (`const TsPackTree*`): tree handle.
+
+**Returns:** `size_t` -- error node count, or 0 if tree is null.
+
+### `char* ts_pack_tree_to_sexp(const TsPackTree* tree)`
+
+Get the S-expression representation of the tree.
+
+**Parameters:**
+
+- `tree` (`const TsPackTree*`): tree handle.
+
+**Returns:** `char*` -- newly-allocated S-expression string, or null if tree is null. Free with `ts_pack_free_string`.
 
 **Example:**
 
 ```c
-TSNode root = ts_tree_root_node(tree);
-printf("Root type: %s\n", ts_node_type(root));
-```text
-
-### `const char* ts_node_type(TSNode node)`
-
-Get the type name of a node.
-
-**Parameters:**
-
-- `node` (TSNode): Syntax tree node
-
-**Returns:** const char* - Type name string
-
-**Example:**
-
-```c
-TSNode node = ts_tree_root_node(tree);
-printf("Type: %s\n", ts_node_type(node));
-```text
-
-### `uint32_t ts_node_child_count(TSNode node)`
-
-Get number of child nodes.
-
-**Parameters:**
-
-- `node` (TSNode): Syntax tree node
-
-**Returns:** uint32_t - Child count
-
-**Example:**
-
-```c
-uint32_t count = ts_node_child_count(node);
-for (uint32_t i = 0; i < count; i++) {
-    TSNode child = ts_node_child(node, i);
-    printf("Child %u: %s\n", i, ts_node_type(child));
+char* sexp = ts_pack_tree_to_sexp(tree);
+if (sexp) {
+    printf("%s\n", sexp);
+    ts_pack_free_string(sexp);
 }
-```text
+```
 
-### `TSNode ts_node_child(TSNode node, uint32_t index)`
+## Code Intelligence (Process)
 
-Get a child node by index.
+### `char* ts_pack_process(const TsPackRegistry* registry, const char* source, size_t source_len, const char* config_json)`
+
+Process source code and extract metadata and chunks as a JSON string.
 
 **Parameters:**
 
-- `node` (TSNode): Parent node
-- `index` (uint32_t): Child index
+- `registry` (`const TsPackRegistry*`): registry handle.
+- `source` (`const char*`): source code buffer.
+- `source_len` (`size_t`): length of the source buffer in bytes.
+- `config_json` (`const char*`): null-terminated JSON configuration string.
 
-**Returns:** TSNode - Child node
+**Config JSON fields:**
+
+- `language` (string, required): the language name.
+- `structure` (bool): extract functions, classes, etc.
+- `imports` (bool): extract imports.
+- `exports` (bool): extract exports.
+- `comments` (bool): extract comments.
+- `symbols` (bool): extract symbols.
+- `docstrings` (bool): extract docstrings.
+- `diagnostics` (bool): include diagnostics.
+- `chunk_max_size` (number): maximum chunk size in bytes.
+
+**Returns:** `char*` -- newly-allocated JSON string containing the process result, or null on error. Check `ts_pack_last_error()` on null. Free with `ts_pack_free_string`.
 
 **Example:**
 
 ```c
-TSNode first_child = ts_node_child(node, 0);
-```text
-
-## Code Intelligence
-
-### `TSPackProcessConfig* ts_pack_process_config_new(const char* language)`
-
-Create a new process configuration.
-
-**Parameters:**
-
-- `language` (const char*): Language name
-
-**Returns:** TSPackProcessConfig* - Configuration object
-
-**Note:** Free with `ts_pack_process_config_delete()`.
-
-**Example:**
-
-```c
-TSPackProcessConfig* config = ts_pack_process_config_new("python");
-ts_pack_process_config_set_structure(config, true);
-ts_pack_process_config_set_imports(config, true);
-// ... configure options ...
-TSPackProcessResult* result = ts_pack_process(code, config, NULL);
-ts_pack_process_config_delete(config);
-```text
-
-### Configuration Methods
-
-- `void ts_pack_process_config_set_structure(TSPackProcessConfig* config, bool enabled)`
-- `void ts_pack_process_config_set_imports(TSPackProcessConfig* config, bool enabled)`
-- `void ts_pack_process_config_set_exports(TSPackProcessConfig* config, bool enabled)`
-- `void ts_pack_process_config_set_comments(TSPackProcessConfig* config, bool enabled)`
-- `void ts_pack_process_config_set_docstrings(TSPackProcessConfig* config, bool enabled)`
-- `void ts_pack_process_config_set_symbols(TSPackProcessConfig* config, bool enabled)`
-- `void ts_pack_process_config_set_diagnostics(TSPackProcessConfig* config, bool enabled)`
-- `void ts_pack_process_config_set_metrics(TSPackProcessConfig* config, bool enabled)`
-- `void ts_pack_process_config_set_chunks(TSPackProcessConfig* config, size_t max_size, size_t overlap)`
-- `void ts_pack_process_config_set_all(TSPackProcessConfig* config, bool enabled)`
-
-### `TSPackProcessResult* ts_pack_process(const char* source, TSPackProcessConfig* config, TSPackError* out_error)`
-
-Extract code intelligence from source code.
-
-**Parameters:**
-
-- `source` (const char*): Source code
-- `config` (TSPackProcessConfig*): Configuration
-- `out_error` (TSPackError*): Error output
-
-**Returns:** TSPackProcessResult* - Analysis result, NULL on error
-
-**Note:** Free with `ts_pack_process_result_delete()`.
-
-**Example:**
-
-```c
-TSPackProcessConfig* config = ts_pack_process_config_new("python");
-ts_pack_process_config_set_all(config, true);
-
-TSPackError error = {0};
-TSPackProcessResult* result = ts_pack_process("def foo(): pass", config, &error);
-
+const char* config = "{\"language\":\"python\",\"structure\":true,\"imports\":true}";
+const char* code = "import os\ndef hello(): pass";
+char* result = ts_pack_process(reg, code, strlen(code), config);
 if (!result) {
-    fprintf(stderr, "Process error: %s\n", error.message);
-    ts_pack_process_config_delete(config);
-    return;
+    fprintf(stderr, "Process error: %s\n", ts_pack_last_error());
+} else {
+    printf("%s\n", result);
+    ts_pack_free_string(result);
 }
+```
 
-// Access result data
-printf("Functions: %zu\n", result->structure_count);
+## Download API
 
-ts_pack_process_result_delete(result);
-ts_pack_process_config_delete(config);
-```text
+These functions require the `download` feature to be enabled at compile time.
+
+### `int32_t ts_pack_init(const char* config_json)`
+
+Initialize the language pack with configuration, downloading parsers as needed.
+
+**Parameters:**
+
+- `config_json` (`const char*`): null-terminated JSON string, or null for defaults.
+
+**Config JSON fields:**
+
+- `cache_dir` (string): override default cache directory.
+- `languages` (array of strings): languages to pre-download.
+- `groups` (array of strings): language groups to pre-download.
+
+**Returns:** `0` on success, `-1` on error.
+
+### `int32_t ts_pack_configure(const char* config_json)`
+
+Configure the language pack without downloading. Accepts the same JSON fields as `ts_pack_init` (only `cache_dir` is meaningful here).
+
+**Returns:** `0` on success, `-1` on error.
+
+### `int32_t ts_pack_download(const char** names, size_t count)`
+
+Download specific languages to the cache.
+
+**Parameters:**
+
+- `names` (`const char**`): array of null-terminated language name strings.
+- `count` (`size_t`): number of strings in the array.
+
+**Returns:** number of newly downloaded languages on success, or `-1` on error.
+
+### `int32_t ts_pack_download_all(void)`
+
+Download all available languages from the remote manifest.
+
+**Returns:** number of newly downloaded languages on success, or `-1` on error.
+
+### `const char** ts_pack_manifest_languages(size_t* out_count)`
+
+Get all language names available in the remote manifest.
+
+**Parameters:**
+
+- `out_count` (`size_t*`): receives the number of languages in the returned array.
+
+**Returns:** newly-allocated array of language name strings, or null on error. Free each string with `ts_pack_free_string`, then free the array with `ts_pack_free_string_array`.
+
+### `const char** ts_pack_downloaded_languages(size_t* out_count)`
+
+Get all languages that are already downloaded and cached locally.
+
+**Parameters:**
+
+- `out_count` (`size_t*`): receives the number of languages in the returned array.
+
+**Returns:** newly-allocated array of language name strings. Free each string with `ts_pack_free_string`, then free the array with `ts_pack_free_string_array`.
+
+### `int32_t ts_pack_clean_cache(void)`
+
+Delete all cached parser shared libraries.
+
+**Returns:** `0` on success, `-1` on error.
+
+### `char* ts_pack_cache_dir(void)`
+
+Get the effective cache directory path.
+
+**Returns:** `char*` -- newly-allocated path string, or null on error. Free with `ts_pack_free_string`.
 
 ## Memory Management
 
-### `void ts_pack_free_strings(const char** strings)`
+### `void ts_pack_free_string(char* s)`
 
-Free a string array returned by C API.
+Free a string returned by the FFI (e.g., from `ts_pack_language_name_at`, `ts_pack_tree_to_sexp`, `ts_pack_process`). Passing null is a safe no-op.
 
-**Parameters:**
+### `void ts_pack_free_string_array(const char** arr)`
 
-- `strings` (const char**): String array to free
-
-**Example:**
-
-```c
-const char** languages = ts_pack_available_languages(&count);
-// ... use languages ...
-ts_pack_free_strings(languages);
-```text
-
-### `void ts_pack_process_config_delete(TSPackProcessConfig* config)`
-
-Free a process configuration.
-
-**Parameters:**
-
-- `config` (TSPackProcessConfig*): Configuration to free
-
-### `void ts_pack_process_result_delete(TSPackProcessResult* result)`
-
-Free a process result.
-
-**Parameters:**
-
-- `result` (TSPackProcessResult*): Result to free
-
-## Error Handling
-
-### `TSPackError`
-
-Error information structure.
-
-**Fields:**
-
-```c
-typedef struct {
-    int code;              // Error code (1000+)
-    const char* message;   // Error message string
-    const char* context;   // Additional context (nullable)
-} TSPackError;
-```text
-
-**Example:**
-
-```c
-TSPackError error = {0};
-TSLanguage* lang = ts_pack_get_language("python", &error);
-
-if (!lang) {
-    switch (error.code) {
-        case 1001:
-            printf("Language not found\n");
-            break;
-        case 1002:
-            printf("Download failed\n");
-            break;
-        default:
-            printf("Error %d: %s\n", error.code, error.message);
-    }
-    if (error.context) {
-        printf("Context: %s\n", error.context);
-    }
-}
-```text
+Free a string array wrapper returned by the FFI (e.g., from `ts_pack_manifest_languages`). This frees only the array itself, not the individual strings. Free each string with `ts_pack_free_string` before calling this. Passing null is a safe no-op. Requires the `download` feature.
 
 ## Complete Example
 
 ```c
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include "html_to_markdown.h"
+#include "ts_pack.h"
 
-int main(int argc, char** argv) {
-    if (argc < 2) {
-        fprintf(stderr, "Usage: %s <language>\n", argv[0]);
+int main(void) {
+    /* Create registry */
+    TsPackRegistry* reg = ts_pack_registry_new();
+    if (!reg) {
+        fprintf(stderr, "Failed to create registry: %s\n", ts_pack_last_error());
         return 1;
     }
 
-    const char* language = argv[1];
+    /* List languages */
+    size_t count = ts_pack_language_count(reg);
+    printf("%zu languages available\n", count);
+
+    /* Check for Python */
+    if (!ts_pack_has_language(reg, "python")) {
+        fprintf(stderr, "Python not available\n");
+        ts_pack_registry_free(reg);
+        return 1;
+    }
+
+    /* Parse source code */
     const char* code = "def hello(name):\n    print(f'Hello {name}')";
-
-    // Get parser
-    TSPackError error = {0};
-    TSParser* parser = ts_pack_get_parser(language, &error);
-    if (!parser) {
-        fprintf(stderr, "Error: %s\n", error.message);
-        return 1;
-    }
-
-    // Parse code
-    TSTree* tree = ts_parser_parse(parser, code, strlen(code));
+    TsPackTree* tree = ts_pack_parse_string(reg, "python", code, strlen(code));
     if (!tree) {
-        fprintf(stderr, "Parse failed\n");
-        ts_parser_delete(parser);
+        fprintf(stderr, "Parse failed: %s\n", ts_pack_last_error());
+        ts_pack_registry_free(reg);
         return 1;
     }
 
-    // Navigate tree
-    TSNode root = ts_tree_root_node(tree);
-    printf("Root: %s\n", ts_node_type(root));
-    printf("Children: %u\n", ts_node_child_count(root));
-
-    for (uint32_t i = 0; i < ts_node_child_count(root); i++) {
-        TSNode child = ts_node_child(root, i);
-        printf("  %u: %s\n", i, ts_node_type(child));
+    /* Inspect tree */
+    char* root_type = ts_pack_tree_root_node_type(tree);
+    if (root_type) {
+        printf("Root node type: %s\n", root_type);
+        ts_pack_free_string(root_type);
     }
 
-    // Process for intelligence
-    TSPackProcessConfig* config = ts_pack_process_config_new(language);
-    ts_pack_process_config_set_all(config, true);
+    printf("Root children: %u\n", ts_pack_tree_root_child_count(tree));
+    printf("Has errors: %s\n", ts_pack_tree_has_error_nodes(tree) ? "yes" : "no");
+    printf("Contains function_definition: %s\n",
+           ts_pack_tree_contains_node_type(tree, "function_definition") ? "yes" : "no");
 
-    TSPackProcessResult* result = ts_pack_process(code, config, &error);
-    if (!result) {
-        fprintf(stderr, "Process error: %s\n", error.message);
-    } else {
-        printf("Structure items: %zu\n", result->structure_count);
-        ts_pack_process_result_delete(result);
+    /* S-expression */
+    char* sexp = ts_pack_tree_to_sexp(tree);
+    if (sexp) {
+        printf("S-expression:\n%s\n", sexp);
+        ts_pack_free_string(sexp);
     }
 
-    ts_pack_process_config_delete(config);
-    ts_tree_delete(tree);
-    ts_parser_delete(parser);
+    /* Process for code intelligence */
+    const char* config = "{\"language\":\"python\",\"structure\":true,\"imports\":true}";
+    char* result = ts_pack_process(reg, code, strlen(code), config);
+    if (result) {
+        printf("Process result:\n%s\n", result);
+        ts_pack_free_string(result);
+    }
 
+    /* Cleanup */
+    ts_pack_tree_free(tree);
+    ts_pack_registry_free(reg);
     return 0;
 }
-```text
+```
 
 ## Linking
 
@@ -477,7 +533,7 @@ int main(int argc, char** argv) {
 
 ```bash
 gcc -o program program.c -L. -l:libts_pack_ffi.a
-```text
+```
 
 ### Dynamic Library
 
@@ -485,7 +541,7 @@ gcc -o program program.c -L. -l:libts_pack_ffi.a
 gcc -o program program.c -L. -lts_pack_ffi
 export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
 ./program
-```text
+```
 
 ### CMake Integration
 
@@ -493,15 +549,5 @@ export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
 find_library(TS_PACK_FFI ts_pack_ffi REQUIRED)
 add_executable(program program.c)
 target_link_libraries(program ${TS_PACK_FFI})
-target_include_directories(program PRIVATE /path/to/crates/ffi/include)
-```text
-
-## ABI Stability
-
-The C FFI is governed by semantic versioning:
-
-- **MAJOR**: Breaking ABI changes (function signature, struct layout changes)
-- **MINOR**: New functions or optional fields at struct end
-- **PATCH**: Bug fixes, internal optimizations
-
-Current ABI version: See `HTML_TO_MARKDOWN_VERSION_MAJOR` and `_MINOR` constants in header.
+target_include_directories(program PRIVATE /path/to/crates/ts-pack-ffi/include)
+```
