@@ -1,6 +1,6 @@
 use crate::fixtures::{
     Fixture, escape_go_string, group_by_category, has_ambiguity_assertions, has_chunk_assertions,
-    has_detect_assertions, has_highlights_assertions, has_intel_assertions, sanitize_name,
+    has_detect_assertions, has_highlights_assertions, has_process_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -87,7 +87,12 @@ func skipIfLanguageUnavailable(t *testing.T, reg *tspack.Registry, lang string) 
 }
 
 fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
-    let needs_json = fixtures.iter().any(|f| has_intel_assertions(f));
+    let needs_json = fixtures.iter().any(|f| has_process_assertions(f));
+    let needs_strings = fixtures.iter().any(|f| {
+        f.assertions
+            .as_ref()
+            .is_some_and(|a| a.process_structure_name_contains.is_some() || a.process_imports_contains_source.is_some())
+    });
 
     let mut out = String::new();
 
@@ -98,6 +103,9 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
     if needs_json {
         writeln!(out, "import (").unwrap();
         writeln!(out, "\t\"encoding/json\"").unwrap();
+        if needs_strings {
+            writeln!(out, "\t\"strings\"").unwrap();
+        }
         writeln!(out, "\t\"testing\"").unwrap();
         writeln!(out).unwrap();
         writeln!(
@@ -284,13 +292,13 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t\tt.Fatal(\"Highlights query should not be empty\")").unwrap();
                 writeln!(out, "\t}}").unwrap();
             }
-        } else if has_intel_assertions(fixture) {
+        } else if has_process_assertions(fixture) {
             let lang = fixture.language.as_deref().unwrap_or("unknown");
             let source = fixture.source_code.as_deref().unwrap_or("");
             let assertions = assertions.unwrap();
 
             if has_chunk_assertions(fixture) {
-                let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
+                let max_chunk_size = assertions.process_chunk_max_size.unwrap_or(512);
                 writeln!(out, "\tchunkSize := uint32({})", max_chunk_size).unwrap();
                 writeln!(
                     out,
@@ -322,7 +330,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             writeln!(out, "\t}}").unwrap();
 
             if has_chunk_assertions(fixture)
-                && let Some(min_chunks) = assertions.intel_chunk_count_min
+                && let Some(min_chunks) = assertions.process_chunk_count_min
             {
                 writeln!(out).unwrap();
                 writeln!(out, "\tchunks, _ := intel[\"chunks\"].([]interface{{}})").unwrap();
@@ -336,7 +344,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t}}").unwrap();
             }
 
-            if let Some(expected_lang) = &assertions.intel_language {
+            if let Some(expected_lang) = &assertions.process_language {
                 writeln!(out).unwrap();
                 writeln!(
                     out,
@@ -353,7 +361,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t}}").unwrap();
             }
 
-            if let Some(min_structures) = assertions.intel_structure_count_min {
+            if let Some(min_structures) = assertions.process_structure_count_min {
                 writeln!(out).unwrap();
                 writeln!(out, "\tstructure, _ := intel[\"structure\"].([]interface{{}})").unwrap();
                 writeln!(out, "\tif len(structure) < {} {{", min_structures).unwrap();
@@ -366,7 +374,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t}}").unwrap();
             }
 
-            if let Some(expected_kind) = &assertions.intel_structure_contains_kind {
+            if let Some(expected_kind) = &assertions.process_structure_contains_kind {
                 writeln!(out).unwrap();
                 writeln!(out, "\tstructureList, _ := intel[\"structure\"].([]interface{{}})").unwrap();
                 writeln!(out, "\tfoundKind := false").unwrap();
@@ -393,7 +401,34 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t}}").unwrap();
             }
 
-            if let Some(min_imports) = assertions.intel_imports_count_min {
+            if let Some(name_fragment) = &assertions.process_structure_name_contains {
+                writeln!(out).unwrap();
+                writeln!(out, "\tstructureListN, _ := intel[\"structure\"].([]interface{{}})").unwrap();
+                writeln!(out, "\tfoundName := false").unwrap();
+                writeln!(out, "\tfor _, s := range structureListN {{").unwrap();
+                writeln!(out, "\t\tif m, ok := s.(map[string]interface{{}}); ok {{").unwrap();
+                writeln!(
+                    out,
+                    "\t\t\tif n, _ := m[\"name\"].(string); strings.Contains(n, \"{}\") {{",
+                    escape_go_string(name_fragment)
+                )
+                .unwrap();
+                writeln!(out, "\t\t\t\tfoundName = true").unwrap();
+                writeln!(out, "\t\t\t\tbreak").unwrap();
+                writeln!(out, "\t\t\t}}").unwrap();
+                writeln!(out, "\t\t}}").unwrap();
+                writeln!(out, "\t}}").unwrap();
+                writeln!(out, "\tif !foundName {{").unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatal(\"structure should contain an item with name containing '{}'\")",
+                    escape_go_string(name_fragment)
+                )
+                .unwrap();
+                writeln!(out, "\t}}").unwrap();
+            }
+
+            if let Some(min_imports) = assertions.process_imports_count_min {
                 writeln!(out).unwrap();
                 writeln!(out, "\timports, _ := intel[\"imports\"].([]interface{{}})").unwrap();
                 writeln!(out, "\tif len(imports) < {} {{", min_imports).unwrap();
@@ -406,15 +441,71 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t}}").unwrap();
             }
 
-            // Emit metrics variable once if either metrics assertion is present
-            let needs_metrics =
-                assertions.intel_metrics_total_lines_min.is_some() || assertions.intel_metrics_error_count.is_some();
+            if let Some(import_source) = &assertions.process_imports_contains_source {
+                writeln!(out).unwrap();
+                writeln!(out, "\timportsList, _ := intel[\"imports\"].([]interface{{}})").unwrap();
+                writeln!(out, "\tfoundImport := false").unwrap();
+                writeln!(out, "\tfor _, imp := range importsList {{").unwrap();
+                writeln!(out, "\t\tif m, ok := imp.(map[string]interface{{}}); ok {{").unwrap();
+                writeln!(
+                    out,
+                    "\t\t\tif src, _ := m[\"source\"].(string); src == \"{}\" {{",
+                    escape_go_string(import_source)
+                )
+                .unwrap();
+                writeln!(out, "\t\t\t\tfoundImport = true").unwrap();
+                writeln!(out, "\t\t\t\tbreak").unwrap();
+                writeln!(out, "\t\t\t}}").unwrap();
+                writeln!(out, "\t\t}}").unwrap();
+                writeln!(out, "\t}}").unwrap();
+                writeln!(out, "\tif !foundImport {{").unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatal(\"imports should contain source '{}'\")",
+                    escape_go_string(import_source)
+                )
+                .unwrap();
+                writeln!(out, "\t}}").unwrap();
+            }
+
+            if let Some(min_exports) = assertions.process_exports_count_min {
+                writeln!(out).unwrap();
+                writeln!(out, "\texports, _ := intel[\"exports\"].([]interface{{}})").unwrap();
+                writeln!(out, "\tif len(exports) < {} {{", min_exports).unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatalf(\"expected at least {} export(s), got %d\", len(exports))",
+                    min_exports
+                )
+                .unwrap();
+                writeln!(out, "\t}}").unwrap();
+            }
+
+            if let Some(min_comments) = assertions.process_comments_count_min {
+                writeln!(out).unwrap();
+                writeln!(out, "\tcomments, _ := intel[\"comments\"].([]interface{{}})").unwrap();
+                writeln!(out, "\tif len(comments) < {} {{", min_comments).unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatalf(\"expected at least {} comment(s), got %d\", len(comments))",
+                    min_comments
+                )
+                .unwrap();
+                writeln!(out, "\t}}").unwrap();
+            }
+
+            // Emit metrics variable once if any metrics assertion is present
+            let needs_metrics = assertions.process_metrics_total_lines_min.is_some()
+                || assertions.process_metrics_error_count.is_some()
+                || assertions.process_metrics_code_lines_min.is_some()
+                || assertions.process_metrics_comment_lines_min.is_some()
+                || assertions.process_metrics_max_depth_min.is_some();
             if needs_metrics {
                 writeln!(out).unwrap();
                 writeln!(out, "\tmetrics, _ := intel[\"metrics\"].(map[string]interface{{}})").unwrap();
             }
 
-            if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+            if let Some(min_lines) = assertions.process_metrics_total_lines_min {
                 writeln!(out, "\ttotalLines, _ := metrics[\"total_lines\"].(float64)").unwrap();
                 writeln!(out, "\tif int(totalLines) < {} {{", min_lines).unwrap();
                 writeln!(
@@ -426,7 +517,43 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t}}").unwrap();
             }
 
-            if let Some(expected_error_count) = assertions.intel_metrics_error_count {
+            if let Some(min_code_lines) = assertions.process_metrics_code_lines_min {
+                writeln!(out, "\tcodeLines, _ := metrics[\"code_lines\"].(float64)").unwrap();
+                writeln!(out, "\tif int(codeLines) < {} {{", min_code_lines).unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatalf(\"expected at least {} code line(s), got %v\", codeLines)",
+                    min_code_lines
+                )
+                .unwrap();
+                writeln!(out, "\t}}").unwrap();
+            }
+
+            if let Some(min_comment_lines) = assertions.process_metrics_comment_lines_min {
+                writeln!(out, "\tcommentLines, _ := metrics[\"comment_lines\"].(float64)").unwrap();
+                writeln!(out, "\tif int(commentLines) < {} {{", min_comment_lines).unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatalf(\"expected at least {} comment line(s), got %v\", commentLines)",
+                    min_comment_lines
+                )
+                .unwrap();
+                writeln!(out, "\t}}").unwrap();
+            }
+
+            if let Some(min_depth) = assertions.process_metrics_max_depth_min {
+                writeln!(out, "\tmaxDepth, _ := metrics[\"max_depth\"].(float64)").unwrap();
+                writeln!(out, "\tif int(maxDepth) < {} {{", min_depth).unwrap();
+                writeln!(
+                    out,
+                    "\t\tt.Fatalf(\"expected max_depth >= {}, got %v\", maxDepth)",
+                    min_depth
+                )
+                .unwrap();
+                writeln!(out, "\t}}").unwrap();
+            }
+
+            if let Some(expected_error_count) = assertions.process_metrics_error_count {
                 writeln!(out, "\terrorCount, _ := metrics[\"error_count\"].(float64)").unwrap();
                 writeln!(out, "\tif int(errorCount) != {} {{", expected_error_count).unwrap();
                 writeln!(
@@ -438,7 +565,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t}}").unwrap();
             }
 
-            if assertions.intel_diagnostics_not_empty == Some(true) {
+            if assertions.process_diagnostics_not_empty == Some(true) {
                 writeln!(out).unwrap();
                 writeln!(out, "\tdiagnostics, _ := intel[\"diagnostics\"].([]interface{{}})").unwrap();
                 writeln!(out, "\tif len(diagnostics) == 0 {{").unwrap();

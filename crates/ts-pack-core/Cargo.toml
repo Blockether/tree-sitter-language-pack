@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Core library for tree-sitter language pack - provides compiled parsers for 197 languages"
+description = "Core library for tree-sitter language pack - provides compiled parsers for 248 languages"
 
 [features]
 default = ["dynamic-loading", "download"]
@@ -34,6 +34,7 @@ all = [
     "lang-beancount",
     "lang-bibtex",
     "lang-bicep",
+    "lang-batch",
     "lang-bitbake",
     "lang-bsl",
     "lang-c",
@@ -54,6 +55,7 @@ all = [
     "lang-cuda",
     "lang-d",
     "lang-dart",
+    "lang-diff",
     "lang-dockerfile",
     "lang-doxygen",
     "lang-dtd",
@@ -132,6 +134,7 @@ all = [
     "lang-perl",
     "lang-pgn",
     "lang-php",
+    "lang-pkl",
     "lang-po",
     "lang-pony",
     "lang-powershell",
@@ -217,6 +220,56 @@ all = [
     "lang-tlaplus",
     "lang-vb",
     "lang-wit",
+    "lang-angular",
+    "lang-bass",
+    "lang-blade",
+    "lang-brightscript",
+    "lang-circom",
+    "lang-cooklang",
+    "lang-corn",
+    "lang-crystal",
+    "lang-cue",
+    "lang-cylc",
+    "lang-desktop",
+    "lang-djot",
+    "lang-earthfile",
+    "lang-ebnf",
+    "lang-editorconfig",
+    "lang-eds",
+    "lang-eex",
+    "lang-elsa",
+    "lang-enforce",
+    "lang-facility",
+    "lang-faust",
+    "lang-fidl",
+    "lang-foam",
+    "lang-forth",
+    "lang-git_config",
+    "lang-git_rebase",
+    "lang-godot_resource",
+    "lang-http",
+    "lang-hurl",
+    "lang-just",
+    "lang-ledger",
+    "lang-less",
+    "lang-liquid",
+    "lang-mojo",
+    "lang-move",
+    "lang-nickel",
+    "lang-nginx",
+    "lang-norg",
+    "lang-nushell",
+    "lang-promql",
+    "lang-pug",
+    "lang-ql",
+    "lang-robot",
+    "lang-teal",
+    "lang-templ",
+    "lang-tmux",
+    "lang-todotxt",
+    "lang-turtle",
+    "lang-vimdoc",
+    "lang-wolfram",
 ]
 web = [
     "lang-html",
@@ -302,7 +355,7 @@ functional = [
     "lang-janet",
     "lang-agda",
 ]
-# Curated subset for WASM builds (~30 languages). Compiling all 197 languages
+# Curated subset for WASM builds (~30 languages). Compiling all 248 languages
 # to wasm32-unknown-unknown exceeds GitHub Actions runner memory (7GB).
 # Native bindings (Python, Node.js, Ruby, etc.) use "all" and support every language.
 wasm = [
@@ -355,6 +408,7 @@ lang-bash = []
 lang-beancount = []
 lang-bibtex = []
 lang-bicep = []
+lang-batch = []
 lang-bitbake = []
 lang-bsl = []
 lang-c = []
@@ -375,6 +429,7 @@ lang-csv = []
 lang-cuda = []
 lang-d = []
 lang-dart = []
+lang-diff = []
 lang-dockerfile = []
 lang-doxygen = []
 lang-dtd = []
@@ -453,6 +508,7 @@ lang-pem = []
 lang-perl = []
 lang-pgn = []
 lang-php = []
+lang-pkl = []
 lang-po = []
 lang-pony = []
 lang-powershell = []
@@ -538,6 +594,56 @@ lang-textproto = []
 lang-tlaplus = []
 lang-vb = []
 lang-wit = []
+lang-angular = []
+lang-bass = []
+lang-blade = []
+lang-brightscript = []
+lang-circom = []
+lang-cooklang = []
+lang-corn = []
+lang-crystal = []
+lang-cue = []
+lang-cylc = []
+lang-desktop = []
+lang-djot = []
+lang-earthfile = []
+lang-ebnf = []
+lang-editorconfig = []
+lang-eds = []
+lang-eex = []
+lang-elsa = []
+lang-enforce = []
+lang-facility = []
+lang-faust = []
+lang-fidl = []
+lang-foam = []
+lang-forth = []
+lang-git_config = []
+lang-git_rebase = []
+lang-godot_resource = []
+lang-http = []
+lang-hurl = []
+lang-just = []
+lang-ledger = []
+lang-less = []
+lang-liquid = []
+lang-mojo = []
+lang-move = []
+lang-nickel = []
+lang-nginx = []
+lang-norg = []
+lang-nushell = []
+lang-promql = []
+lang-pug = []
+lang-ql = []
+lang-robot = []
+lang-teal = []
+lang-templ = []
+lang-tmux = []
+lang-todotxt = []
+lang-turtle = []
+lang-vimdoc = []
+lang-wolfram = []
 
 [dependencies]
 ahash = { workspace = true }

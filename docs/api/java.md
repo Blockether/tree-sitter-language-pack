@@ -68,7 +68,7 @@ try {
 
 ### `TsPackRegistry.downloadAll(): void`
 
-Download all available languages (170+).
+Download all available languages (248).
 
 **Throws:**
 

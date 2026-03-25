@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-03-25
+
+### Added
+
+- 49 new permissively-licensed grammars — 248 languages total
+    - angular, bass, blade, brightscript, circom, cooklang, corn, crystal, cue, cylc, desktop, djot, earthfile, ebnf, editorconfig, eds, eex, elsa, enforce, facility, faust, fidl, foam, forth, git_config, git_rebase, godot_resource, http, hurl, just, ledger, less, liquid, mojo, move, nickel, nginx, norg, nushell, promql, pug, ql, robot, teal, templ, tmux, todotxt, turtle, vimdoc, wolfram
+- Grammar updater automation (`scripts/check_grammar_updates.py`) with weekly CI workflow
+- Generated supported languages table (`docs/supported-languages.md`) integrated into docs CI
+- Node.js NAPI exports: `detectLanguageFromExtension`, `detectLanguageFromPath`, `getHighlightsQuery`, `extensionAmbiguity`
+- E2E `process` test category with `process()` API coverage across all 11 language bindings
+
+### Fixed
+
+- Download/load filename mismatch for languages with c_symbol overrides (csharp, embeddedtemplate, vb) — fixes [#80](https://github.com/kreuzberg-dev/tree-sitter-language-pack/issues/80)
+- E2E fixture system: merged stale `intel/` and `metadata/` directories into unified `process/` category
+- TypeScript and WASM e2e generators now use camelCase for metrics keys
+- Docker CI grammar fixture updated to include all languages
+- Elixir publish workflow: checksum file verification, increased retry timeout
+- Missing Node.js `index.js` exports for detection and query functions
+
+### Changed
+
+- Renamed e2e fixture assertions from `intel_*`/`meta_*` to `process_*`
+- All documentation and package descriptions updated to reflect 248 languages
+
 ## [1.1.4] - 2026-03-24
 
 ### Added

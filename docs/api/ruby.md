@@ -130,7 +130,7 @@ puts "Downloaded #{count} new languages"
 
 ### `TreeSitterLanguagePack.download_all`
 
-Download all available languages (170+).
+Download all available languages (248).
 
 **Returns:** Integer - Count of newly downloaded languages
 

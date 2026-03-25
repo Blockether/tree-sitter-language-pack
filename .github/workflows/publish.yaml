@@ -2076,8 +2076,22 @@ jobs:
         working-directory: crates/ts-pack-elixir
         run: mix deps.get
 
+      - name: Verify checksum file exists before compile
+        run: |
+          CHECKSUM_FILE="crates/ts-pack-elixir/checksum-Elixir.TreeSitterLanguagePack.exs"
+          if [[ ! -f "$CHECKSUM_FILE" ]]; then
+            echo "ERROR: Checksum file not found: $CHECKSUM_FILE"
+            echo "The generate_checksums.sh step must have failed silently."
+            exit 1
+          fi
+          echo "Checksum file present: $CHECKSUM_FILE"
+          echo "Contents:"
+          cat "$CHECKSUM_FILE"
+
       - name: Compile project
         working-directory: crates/ts-pack-elixir
+        env:
+          TSLP_BUILD: "1"
         run: mix compile
 
       - name: Re-check Hex.pm before publish

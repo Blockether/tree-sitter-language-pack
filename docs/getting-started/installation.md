@@ -32,8 +32,8 @@ Verify the installation:
 
 ```python
 import tree_sitter_language_pack as tslp
-print(tslp.language_count())  # 173
-```text
+print(tslp.language_count())  # 248
+```
 
 ## Node.js
 
@@ -61,8 +61,8 @@ Verify:
 
 ```javascript
 const tslp = require("@kreuzberg/tree-sitter-language-pack");
-console.log(tslp.languageCount()); // 173
-```text
+console.log(tslp.languageCount()); // 248
+```
 
 The package ships pre-built native binaries for Linux (x64, arm64), macOS (x64, arm64), and Windows (x64).
 
@@ -72,22 +72,22 @@ Requires Rust 1.75+.
 
 ```bash
 cargo add ts-pack-core
-```text
+```
 
 Or add to `Cargo.toml` manually:
 
 ```toml
 [dependencies]
 ts-pack-core = "1"
-```text
+```
 
 Verify:
 
 ```rust
 fn main() {
-    println!("{}", ts_pack_core::language_count()); // 173
+    println!("{}", ts_pack_core::language_count()); // 248
 }
-```text
+```
 
 ## Go
 
@@ -95,15 +95,15 @@ Requires Go 1.26+.
 
 ```bash
 go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1
-```text
+```
 
 ```go
 import tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/v1"
 
 func main() {
-    fmt.Println(tslp.LanguageCount()) // 173
+    fmt.Println(tslp.LanguageCount()) // 248
 }
-```text
+```
 
 The Go binding uses cgo and links against the pre-compiled C FFI library.
 
@@ -117,7 +117,7 @@ Requires Java 21+ (uses Panama FFM API).
     <dependency>
         <groupId>dev.kreuzberg</groupId>
         <artifactId>tree-sitter-language-pack</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.4</version>
     </dependency>
     ```
 
@@ -125,7 +125,7 @@ Requires Java 21+ (uses Panama FFM API).
 
     ```kotlin
     dependencies {
-        implementation("dev.kreuzberg:tree-sitter-language-pack:1.0.0")
+        implementation("dev.kreuzberg:tree-sitter-language-pack:1.1.4")
     }
     ```
 
@@ -133,7 +133,7 @@ Requires Java 21+ (uses Panama FFM API).
 
     ```groovy
     dependencies {
-        implementation 'dev.kreuzberg:tree-sitter-language-pack:1.0.0'
+        implementation 'dev.kreuzberg:tree-sitter-language-pack:1.1.4'
     }
     ```
 
@@ -142,10 +142,10 @@ import dev.kreuzberg.TreeSitterLanguagePack;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println(TreeSitterLanguagePack.languageCount()); // 173
+        System.out.println(TreeSitterLanguagePack.languageCount()); // 248
     }
 }
-```text
+```
 
 ## C# / .NET
 
@@ -166,14 +166,14 @@ Requires .NET 10+.
 === ".csproj"
 
     ```xml
-    <PackageReference Include="TreeSitterLanguagePack" Version="1.0.0" />
+    <PackageReference Include="TreeSitterLanguagePack" Version="1.1.4" />
     ```
 
 ```csharp
 using TreeSitterLanguagePack;
 
-Console.WriteLine(Pack.LanguageCount()); // 173
-```text
+Console.WriteLine(Pack.LanguageCount()); // 248
+```
 
 ## Ruby
 
@@ -198,8 +198,8 @@ Requires Ruby 3.4+.
 ```ruby
 require "tree_sitter_language_pack"
 
-puts TreeSitterLanguagePack.language_count # 173
-```text
+puts TreeSitterLanguagePack.language_count # 248
+```
 
 ## Elixir
 
@@ -220,8 +220,8 @@ Requires Elixir 1.14+ and OTP 25+.
     ```
 
 ```elixir
-IO.puts TreeSitterLanguagePack.language_count() # 173
-```text
+IO.puts TreeSitterLanguagePack.language_count() # 248
+```
 
 ## PHP
 
@@ -247,8 +247,8 @@ Requires PHP 8.2+.
 <?php
 use Kreuzberg\TreeSitterLanguagePack;
 
-echo TreeSitterLanguagePack::languageCount(); // 173
-```text
+echo TreeSitterLanguagePack::languageCount(); // 248
+```
 
 ## WebAssembly
 
@@ -302,11 +302,11 @@ Verify:
 
 ```bash
 ts-pack --version
-ts-pack list | wc -l  # 173
-```text
+ts-pack list | wc -l  # 248
+```
 
 ## Next Steps
 
 - [Quick Start guide](quickstart.md) — parse your first file in 5 minutes
 - [Download model](../concepts/download-model.md) — understand how parser caching works
-- [Languages](../languages.md) — full list of 170+ supported languages
+- [Languages](../languages.md) — full list of 248 supported languages

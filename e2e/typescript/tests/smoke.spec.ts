@@ -54,16 +54,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_asciidoc", () => {
-    // Smoke test: load asciidoc and parse a simple snippet
-    if (!hasLanguage("asciidoc")) {
-      console.log("Skipping: language 'asciidoc' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("asciidoc");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_asm", () => {
     // Smoke test: load asm and parse a simple snippet
     if (!hasLanguage("asm")) {
@@ -84,16 +74,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_awk", () => {
-    // Smoke test: load awk and parse a simple snippet
-    if (!hasLanguage("awk")) {
-      console.log("Skipping: language 'awk' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("awk");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_bash", () => {
     // Smoke test: load bash and parse a simple snippet
     if (!hasLanguage("bash")) {
@@ -101,16 +81,6 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("bash");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_batch", () => {
-    // Smoke test: load batch and parse a simple snippet
-    if (!hasLanguage("batch")) {
-      console.log("Skipping: language 'batch' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("batch");
     expect(ptr).toBeTruthy();
   });
 
@@ -174,16 +144,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_caddy", () => {
-    // Smoke test: load caddy and parse a simple snippet
-    if (!hasLanguage("caddy")) {
-      console.log("Skipping: language 'caddy' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("caddy");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_cairo", () => {
     // Smoke test: load cairo and parse a simple snippet
     if (!hasLanguage("cairo")) {
@@ -201,26 +161,6 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("capnp");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_cedar", () => {
-    // Smoke test: load cedar and parse a simple snippet
-    if (!hasLanguage("cedar")) {
-      console.log("Skipping: language 'cedar' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("cedar");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_cedarschema", () => {
-    // Smoke test: load cedarschema and parse a simple snippet
-    if (!hasLanguage("cedarschema")) {
-      console.log("Skipping: language 'cedarschema' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("cedarschema");
     expect(ptr).toBeTruthy();
   });
 
@@ -314,16 +254,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_csharp", () => {
-    // Smoke test: load csharp and parse a simple snippet
-    if (!hasLanguage("csharp")) {
-      console.log("Skipping: language 'csharp' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("csharp");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_css", () => {
     // Smoke test: load css and parse a simple snippet
     if (!hasLanguage("css")) {
@@ -374,26 +304,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_devicetree", () => {
-    // Smoke test: load devicetree and parse a simple snippet
-    if (!hasLanguage("devicetree")) {
-      console.log("Skipping: language 'devicetree' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("devicetree");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_diff", () => {
-    // Smoke test: load diff and parse a simple snippet
-    if (!hasLanguage("diff")) {
-      console.log("Skipping: language 'diff' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("diff");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_dockerfile", () => {
     // Smoke test: load dockerfile and parse a simple snippet
     if (!hasLanguage("dockerfile")) {
@@ -401,16 +311,6 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("dockerfile");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_dot", () => {
-    // Smoke test: load dot and parse a simple snippet
-    if (!hasLanguage("dot")) {
-      console.log("Skipping: language 'dot' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("dot");
     expect(ptr).toBeTruthy();
   });
 
@@ -461,16 +361,6 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("elm");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_embeddedtemplate", () => {
-    // Smoke test: load embeddedtemplate and parse a simple snippet
-    if (!hasLanguage("embeddedtemplate")) {
-      console.log("Skipping: language 'embeddedtemplate' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("embeddedtemplate");
     expect(ptr).toBeTruthy();
   });
 
@@ -774,16 +664,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_idris", () => {
-    // Smoke test: load idris and parse a simple snippet
-    if (!hasLanguage("idris")) {
-      console.log("Skipping: language 'idris' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("idris");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_ini", () => {
     // Smoke test: load ini and parse a simple snippet
     if (!hasLanguage("ini")) {
@@ -831,26 +711,6 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("javascript");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_jinja2", () => {
-    // Smoke test: load jinja2 and parse a simple snippet
-    if (!hasLanguage("jinja2")) {
-      console.log("Skipping: language 'jinja2' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("jinja2");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_jq", () => {
-    // Smoke test: load jq and parse a simple snippet
-    if (!hasLanguage("jq")) {
-      console.log("Skipping: language 'jq' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("jq");
     expect(ptr).toBeTruthy();
   });
 
@@ -931,16 +791,6 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("latex");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_lean", () => {
-    // Smoke test: load lean and parse a simple snippet
-    if (!hasLanguage("lean")) {
-      console.log("Skipping: language 'lean' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("lean");
     expect(ptr).toBeTruthy();
   });
 
@@ -1224,16 +1074,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_pkl", () => {
-    // Smoke test: load pkl and parse a simple snippet
-    if (!hasLanguage("pkl")) {
-      console.log("Skipping: language 'pkl' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("pkl");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_po", () => {
     // Smoke test: load po and parse a simple snippet
     if (!hasLanguage("po")) {
@@ -1251,16 +1091,6 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("pony");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_postscript", () => {
-    // Smoke test: load postscript and parse a simple snippet
-    if (!hasLanguage("postscript")) {
-      console.log("Skipping: language 'postscript' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("postscript");
     expect(ptr).toBeTruthy();
   });
 
@@ -1291,16 +1121,6 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("prisma");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_prolog", () => {
-    // Smoke test: load prolog and parse a simple snippet
-    if (!hasLanguage("prolog")) {
-      console.log("Skipping: language 'prolog' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("prolog");
     expect(ptr).toBeTruthy();
   });
 
@@ -1444,16 +1264,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_regex", () => {
-    // Smoke test: load regex and parse a simple snippet
-    if (!hasLanguage("regex")) {
-      console.log("Skipping: language 'regex' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("regex");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_rego", () => {
     // Smoke test: load rego and parse a simple snippet
     if (!hasLanguage("rego")) {
@@ -1471,16 +1281,6 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("requirements");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_rescript", () => {
-    // Smoke test: load rescript and parse a simple snippet
-    if (!hasLanguage("rescript")) {
-      console.log("Skipping: language 'rescript' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("rescript");
     expect(ptr).toBeTruthy();
   });
 
@@ -1614,16 +1414,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_ssh_config", () => {
-    // Smoke test: load ssh_config and parse a simple snippet
-    if (!hasLanguage("ssh_config")) {
-      console.log("Skipping: language 'ssh_config' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("ssh_config");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_starlark", () => {
     // Smoke test: load starlark and parse a simple snippet
     if (!hasLanguage("starlark")) {
@@ -1694,16 +1484,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_textproto", () => {
-    // Smoke test: load textproto and parse a simple snippet
-    if (!hasLanguage("textproto")) {
-      console.log("Skipping: language 'textproto' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("textproto");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_thrift", () => {
     // Smoke test: load thrift and parse a simple snippet
     if (!hasLanguage("thrift")) {
@@ -1711,16 +1491,6 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("thrift");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_tlaplus", () => {
-    // Smoke test: load tlaplus and parse a simple snippet
-    if (!hasLanguage("tlaplus")) {
-      console.log("Skipping: language 'tlaplus' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("tlaplus");
     expect(ptr).toBeTruthy();
   });
 
@@ -1824,16 +1594,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_vb", () => {
-    // Smoke test: load vb and parse a simple snippet
-    if (!hasLanguage("vb")) {
-      console.log("Skipping: language 'vb' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("vb");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_verilog", () => {
     // Smoke test: load verilog and parse a simple snippet
     if (!hasLanguage("verilog")) {
@@ -1904,16 +1664,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_wit", () => {
-    // Smoke test: load wit and parse a simple snippet
-    if (!hasLanguage("wit")) {
-      console.log("Skipping: language 'wit' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("wit");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_xcompose", () => {
     // Smoke test: load xcompose and parse a simple snippet
     if (!hasLanguage("xcompose")) {
@@ -1934,16 +1684,6 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
-  it("smoke_yaml", () => {
-    // Smoke test: load yaml and parse a simple snippet
-    if (!hasLanguage("yaml")) {
-      console.log("Skipping: language 'yaml' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("yaml");
-    expect(ptr).toBeTruthy();
-  });
-
   it("smoke_yuck", () => {
     // Smoke test: load yuck and parse a simple snippet
     if (!hasLanguage("yuck")) {
@@ -1961,16 +1701,6 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("zig");
-    expect(ptr).toBeTruthy();
-  });
-
-  it("smoke_zsh", () => {
-    // Smoke test: load zsh and parse a simple snippet
-    if (!hasLanguage("zsh")) {
-      console.log("Skipping: language 'zsh' not available");
-      return;
-    }
-    const ptr = getLanguagePtr("zsh");
     expect(ptr).toBeTruthy();
   });
 

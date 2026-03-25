@@ -1,6 +1,6 @@
 use crate::fixtures::{
     Fixture, escape_csharp_string, group_by_category, has_chunk_assertions, has_detect_assertions,
-    has_intel_assertions, sanitize_name,
+    has_process_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -133,13 +133,13 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 escape_csharp_string(lang)
             )
             .unwrap();
-        } else if has_intel_assertions(fixture) {
+        } else if has_process_assertions(fixture) {
             let lang = fixture.language.as_deref().unwrap_or("unknown");
             let source = fixture.source_code.as_deref().unwrap_or("");
             let assertions = assertions.unwrap();
 
             if has_chunk_assertions(fixture) {
-                let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
+                let max_chunk_size = assertions.process_chunk_max_size.unwrap_or(512);
                 writeln!(
                     out,
                     "        var config = new ProcessConfig {{ Language = \"{}\", ChunkMaxSize = {} }};",
@@ -162,7 +162,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             )
             .unwrap();
 
-            if let Some(expected_lang) = &assertions.intel_language {
+            if let Some(expected_lang) = &assertions.process_language {
                 writeln!(
                     out,
                     "        Assert.Equal(\"{}\", result.Language);",
@@ -171,7 +171,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(min_structures) = assertions.intel_structure_count_min {
+            if let Some(min_structures) = assertions.process_structure_count_min {
                 writeln!(
                     out,
                     "        Assert.True(result.Structure.Count >= {}, \"Should have at least {} structure(s)\");",
@@ -180,7 +180,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(expected_kind) = &assertions.intel_structure_contains_kind {
+            if let Some(expected_kind) = &assertions.process_structure_contains_kind {
                 writeln!(
                     out,
                     "        Assert.Contains(result.Structure, s => s.Kind.ToString() == \"{}\");",
@@ -189,7 +189,16 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(min_imports) = assertions.intel_imports_count_min {
+            if let Some(name_fragment) = &assertions.process_structure_name_contains {
+                writeln!(
+                    out,
+                    "        Assert.Contains(result.Structure, s => s.Name != null && s.Name.Contains(\"{}\"));",
+                    escape_csharp_string(name_fragment)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_imports) = assertions.process_imports_count_min {
                 writeln!(
                     out,
                     "        Assert.True(result.Imports.Count >= {}, \"Should have at least {} import(s)\");",
@@ -198,7 +207,34 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+            if let Some(import_source) = &assertions.process_imports_contains_source {
+                writeln!(
+                    out,
+                    "        Assert.Contains(result.Imports, i => i.Source == \"{}\");",
+                    escape_csharp_string(import_source)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_exports) = assertions.process_exports_count_min {
+                writeln!(
+                    out,
+                    "        Assert.True(result.Exports.Count >= {}, \"Should have at least {} export(s)\");",
+                    min_exports, min_exports
+                )
+                .unwrap();
+            }
+
+            if let Some(min_comments) = assertions.process_comments_count_min {
+                writeln!(
+                    out,
+                    "        Assert.True(result.Comments.Count >= {}, \"Should have at least {} comment(s)\");",
+                    min_comments, min_comments
+                )
+                .unwrap();
+            }
+
+            if let Some(min_lines) = assertions.process_metrics_total_lines_min {
                 writeln!(
                     out,
                     "        Assert.True(result.Metrics.TotalLines >= {}, \"Should have at least {} total line(s)\");",
@@ -207,7 +243,34 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(expected_error_count) = assertions.intel_metrics_error_count {
+            if let Some(min_code_lines) = assertions.process_metrics_code_lines_min {
+                writeln!(
+                    out,
+                    "        Assert.True(result.Metrics.CodeLines >= {}, \"Should have at least {} code line(s)\");",
+                    min_code_lines, min_code_lines
+                )
+                .unwrap();
+            }
+
+            if let Some(min_comment_lines) = assertions.process_metrics_comment_lines_min {
+                writeln!(
+                    out,
+                    "        Assert.True(result.Metrics.CommentLines >= {}, \"Should have at least {} comment line(s)\");",
+                    min_comment_lines, min_comment_lines
+                )
+                .unwrap();
+            }
+
+            if let Some(min_depth) = assertions.process_metrics_max_depth_min {
+                writeln!(
+                    out,
+                    "        Assert.True(result.Metrics.MaxDepth >= {}, \"Should have max_depth >= {}\");",
+                    min_depth, min_depth
+                )
+                .unwrap();
+            }
+
+            if let Some(expected_error_count) = assertions.process_metrics_error_count {
                 writeln!(
                     out,
                     "        Assert.Equal({}, result.Metrics.ErrorCount);",
@@ -216,12 +279,12 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if assertions.intel_diagnostics_not_empty == Some(true) {
+            if assertions.process_diagnostics_not_empty == Some(true) {
                 writeln!(out, "        Assert.NotEmpty(result.Diagnostics);").unwrap();
             }
 
             if has_chunk_assertions(fixture)
-                && let Some(min_chunks) = assertions.intel_chunk_count_min
+                && let Some(min_chunks) = assertions.process_chunk_count_min
             {
                 writeln!(
                     out,

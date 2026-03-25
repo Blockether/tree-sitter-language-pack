@@ -77,7 +77,7 @@ if err != nil {
 
 ### `DownloadAll() error`
 
-Download all available languages (170+).
+Download all available languages (248).
 
 **Returns:** error - nil on success
 

@@ -57,7 +57,7 @@ A comprehensive collection of tree-sitter language parsers with polyglot binding
 
 ## Overview
 
-**tree-sitter-language-pack** bundles 197+ tree-sitter language parsers into a single package with native bindings for multiple programming languages. Ship syntax analysis in your application without managing individual parser dependencies.
+**tree-sitter-language-pack** bundles 248 tree-sitter language parsers into a single package with native bindings for multiple programming languages. Ship syntax analysis in your application without managing individual parser dependencies.
 
 ## Architecture
 
@@ -223,7 +223,7 @@ The `process()` function returns structured analysis including functions, classe
 
 | Feature | Description |
 | --- | --- |
-| **197+ Languages** | Pre-compiled parsers for 197+ programming languages |
+| **248 Languages** | Pre-compiled parsers for 248 programming languages |
 | **On-Demand Downloads** | Parsers are downloaded on-demand and cached locally for fast reuse |
 | **Selective Installation** | Download only the languages you need; unused parsers never downloaded |
 | **Polyglot Bindings** | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++ |
@@ -232,18 +232,18 @@ The `process()` function returns structured analysis including functions, classe
 
 ## Supported Languages
 
-This pack includes 197+ languages. See the [Rust core Cargo.toml](crates/ts-pack-core/Cargo.toml) for the full list of available language features.
+This pack includes 248 languages. See the [Rust core Cargo.toml](crates/ts-pack-core/Cargo.toml) for the full list of available language features.
 
 ## Package READMEs
 
-- [Rust](crates/ts-pack-core/README.md) -- Rust core library providing access to 170+ tree-sitter parsers with on-demand download and caching support.
-- [Python](crates/ts-pack-python/README.md) -- Python bindings for tree-sitter-language-pack, providing access to 170+ pre-compiled tree-sitter parsers with on-demand downloads.
+- [Rust](crates/ts-pack-core/README.md) -- Rust core library providing access to 248 tree-sitter parsers with on-demand download and caching support.
+- [Python](crates/ts-pack-python/README.md) -- Python bindings for tree-sitter-language-pack, providing access to 248 pre-compiled tree-sitter parsers with on-demand downloads.
 - [Node.js](crates/ts-pack-node/README.md) -- Node.js NAPI bindings for tree-sitter-language-pack with on-demand parser downloads.
 - [Go](packages/go/v1/README.md) -- Go bindings for tree-sitter-language-pack with on-demand parser caching.
 - [Java](crates/ts-pack-java/README.md) -- Java bindings for tree-sitter-language-pack with on-demand parser downloads (JDK 22+).
 - [Elixir](crates/ts-pack-elixir/README.md) -- Elixir bindings for tree-sitter-language-pack with on-demand parser downloads.
 - [Ruby](crates/ts-pack-ruby/README.md) -- Ruby bindings for tree-sitter-language-pack with on-demand parser downloads.
-- [WebAssembly](crates/ts-pack-wasm/README.md) -- WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 30 languages optimized for browser and edge runtimes. For all 173 languages, use native bindings (Python, Node.js, etc.).
+- [WebAssembly](crates/ts-pack-wasm/README.md) -- WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 30 languages optimized for browser and edge runtimes. For all 248 languages, use native bindings (Python, Node.js, etc.).
 - [PHP](crates/ts-pack-php/README.md) -- PHP extension via ext-php-rs with on-demand parser downloads.
 - [.NET (C#)](packages/csharp/TreeSitterLanguagePack/README.md) -- .NET P/Invoke bindings with on-demand parser downloads.
 - [C/C++ (FFI)](crates/ts-pack-ffi/README.md) -- C-compatible FFI bindings for tree-sitter-language-pack. Use from any language with C interop.

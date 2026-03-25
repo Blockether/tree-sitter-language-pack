@@ -55,7 +55,7 @@ ts-pack download [OPTIONS] <LANGUAGES>...
 
 **Options:**
 
-- `--all` - Download all 170+ languages
+- `--all` - Download all 248 languages
 - `--groups <GROUPS>...` - Download language groups instead
 - `--force` - Re-download even if cached
 - `--verbose` - Show download progress
@@ -122,7 +122,7 @@ Available languages:
   typescript
   ...
 
-Cached: 15 of 170 languages
+Cached: 15 of 248 languages
 ```text
 
 ### `ts-pack parse`
@@ -474,7 +474,7 @@ Breakdown:
   typescript: 32 MB (12%)
   ... (17 more languages)
 
-Cached languages: 20/170
+Cached languages: 20/248
 ```text
 
 ### `ts-pack version`
@@ -510,7 +510,7 @@ ts-pack version --json
 ```text
 ts-pack version 1.0.0 (tree-sitter-language-pack)
   Built: 2026-03-18
-  Grammars: 170+
+  Grammars: 248
 ```text
 
 ### `ts-pack help`

@@ -1,6 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_ruby_string, group_by_category, has_chunk_assertions, has_detect_assertions, has_intel_assertions,
-    sanitize_name,
+    Fixture, escape_ruby_string, group_by_category, has_chunk_assertions, has_detect_assertions,
+    has_process_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -121,12 +121,12 @@ fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 expected
             )
             .unwrap();
-        } else if has_intel_assertions(fixture) {
+        } else if has_process_assertions(fixture) {
             let lang = fixture.language.as_deref().unwrap_or("unknown");
             let source = fixture.source_code.as_deref().unwrap_or("");
 
             if has_chunk_assertions(fixture) {
-                let chunk_size = assertions.and_then(|a| a.intel_chunk_max_size).unwrap_or(1024);
+                let chunk_size = assertions.and_then(|a| a.process_chunk_max_size).unwrap_or(1024);
                 writeln!(
                     out,
                     "    intel = TreeSitterLanguagePack.process(\"{}\", '{{\"language\":\"{}\",\"chunk_max_size\":{}}}')",
@@ -146,7 +146,7 @@ fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(expected_lang) = assertions.and_then(|a| a.intel_language.as_deref()) {
+            if let Some(expected_lang) = assertions.and_then(|a| a.process_language.as_deref()) {
                 writeln!(
                     out,
                     "    expect(intel[\"language\"]).to eq(\"{}\")",
@@ -155,11 +155,11 @@ fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(min_count) = assertions.and_then(|a| a.intel_structure_count_min) {
+            if let Some(min_count) = assertions.and_then(|a| a.process_structure_count_min) {
                 writeln!(out, "    expect(intel[\"structure\"].length).to be >= {}", min_count).unwrap();
             }
 
-            if let Some(kind) = assertions.and_then(|a| a.intel_structure_contains_kind.as_deref()) {
+            if let Some(kind) = assertions.and_then(|a| a.process_structure_contains_kind.as_deref()) {
                 writeln!(
                     out,
                     "    expect(intel[\"structure\"].any? {{ |s| s[\"kind\"] == \"{}\" }}).to be true",
@@ -168,11 +168,37 @@ fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(min_count) = assertions.and_then(|a| a.intel_imports_count_min) {
+            if let Some(name_fragment) = assertions.and_then(|a| a.process_structure_name_contains.as_deref()) {
+                writeln!(
+                    out,
+                    "    expect(intel[\"structure\"].any? {{ |s| (s[\"name\"] || \"\").include?(\"{}\" ) }}).to be true",
+                    escape_ruby_string(name_fragment)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_count) = assertions.and_then(|a| a.process_imports_count_min) {
                 writeln!(out, "    expect(intel[\"imports\"].length).to be >= {}", min_count).unwrap();
             }
 
-            if let Some(min_lines) = assertions.and_then(|a| a.intel_metrics_total_lines_min) {
+            if let Some(import_source) = assertions.and_then(|a| a.process_imports_contains_source.as_deref()) {
+                writeln!(
+                    out,
+                    "    expect(intel[\"imports\"].any? {{ |i| i[\"source\"] == \"{}\" }}).to be true",
+                    escape_ruby_string(import_source)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_exports) = assertions.and_then(|a| a.process_exports_count_min) {
+                writeln!(out, "    expect(intel[\"exports\"].length).to be >= {}", min_exports).unwrap();
+            }
+
+            if let Some(min_comments) = assertions.and_then(|a| a.process_comments_count_min) {
+                writeln!(out, "    expect(intel[\"comments\"].length).to be >= {}", min_comments).unwrap();
+            }
+
+            if let Some(min_lines) = assertions.and_then(|a| a.process_metrics_total_lines_min) {
                 writeln!(
                     out,
                     "    expect(intel[\"metrics\"][\"total_lines\"]).to be >= {}",
@@ -181,7 +207,34 @@ fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(error_count) = assertions.and_then(|a| a.intel_metrics_error_count) {
+            if let Some(min_code_lines) = assertions.and_then(|a| a.process_metrics_code_lines_min) {
+                writeln!(
+                    out,
+                    "    expect(intel[\"metrics\"][\"code_lines\"]).to be >= {}",
+                    min_code_lines
+                )
+                .unwrap();
+            }
+
+            if let Some(min_comment_lines) = assertions.and_then(|a| a.process_metrics_comment_lines_min) {
+                writeln!(
+                    out,
+                    "    expect(intel[\"metrics\"][\"comment_lines\"]).to be >= {}",
+                    min_comment_lines
+                )
+                .unwrap();
+            }
+
+            if let Some(min_depth) = assertions.and_then(|a| a.process_metrics_max_depth_min) {
+                writeln!(
+                    out,
+                    "    expect(intel[\"metrics\"][\"max_depth\"]).to be >= {}",
+                    min_depth
+                )
+                .unwrap();
+            }
+
+            if let Some(error_count) = assertions.and_then(|a| a.process_metrics_error_count) {
                 writeln!(
                     out,
                     "    expect(intel[\"metrics\"][\"error_count\"]).to eq({})",
@@ -190,12 +243,12 @@ fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if assertions.is_some_and(|a| a.intel_diagnostics_not_empty == Some(true)) {
+            if assertions.is_some_and(|a| a.process_diagnostics_not_empty == Some(true)) {
                 writeln!(out, "    expect(intel[\"diagnostics\"]).not_to be_empty").unwrap();
             }
 
             if has_chunk_assertions(fixture)
-                && let Some(min_chunks) = assertions.and_then(|a| a.intel_chunk_count_min)
+                && let Some(min_chunks) = assertions.and_then(|a| a.process_chunk_count_min)
             {
                 writeln!(out, "    expect(chunks.length).to be >= {}", min_chunks).unwrap();
             }

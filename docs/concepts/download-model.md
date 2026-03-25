@@ -122,7 +122,7 @@ For production deployments, CI environments, or offline use, download parsers ex
     # Download specific languages
     download(["python", "javascript", "typescript", "rust"])
 
-    # Download everything (173 parsers, ~150 MB)
+    # Download everything (248 parsers, ~150 MB)
     download_all()
 
     # Configure + download in one call

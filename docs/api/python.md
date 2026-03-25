@@ -142,7 +142,7 @@ print(f"Downloaded {count} new languages")
 
 ### `download_all() -> int`
 
-Download all available languages from the remote manifest (170+).
+Download all available languages from the remote manifest (248).
 
 Returns the number of newly downloaded languages.
 
@@ -157,7 +157,7 @@ Returns the number of newly downloaded languages.
 ```python
 from tree_sitter_language_pack import download_all
 
-# Download all 170+ languages
+# Download all 248 languages
 count = download_all()
 print(f"Downloaded {count} languages total")
 ```text

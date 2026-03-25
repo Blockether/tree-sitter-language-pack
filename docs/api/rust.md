@@ -136,7 +136,7 @@ println!("Downloaded {} new languages", count);
 
 ### `download_all() -> Result<usize, Error>`
 
-Download all available languages (170+).
+Download all available languages (248).
 
 Returns number of newly downloaded languages.
 

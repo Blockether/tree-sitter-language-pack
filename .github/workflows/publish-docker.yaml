@@ -238,7 +238,7 @@ jobs:
             type=raw,value=latest,enable=${{ !contains(needs.prepare.outputs.tag, '-') }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-            org.opencontainers.image.description=tree-sitter-language-pack CLI — 170+ parsers statically linked
+            org.opencontainers.image.description=tree-sitter-language-pack CLI — 248 parsers statically linked
             org.opencontainers.image.licenses=MIT
 
       - name: Build and push multiplatform

@@ -197,7 +197,7 @@ task c:e2e:test        # Run C E2E tests
 
 ## Parser Caching
 
-Cloning 170+ tree-sitter grammar repositories is slow. The build system includes a multi-layer caching strategy to avoid redundant work.
+Cloning 248 tree-sitter grammar repositories is slow. The build system includes a multi-layer caching strategy to avoid redundant work.
 
 ### How It Works
 

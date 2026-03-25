@@ -1,4 +1,4 @@
-# tree-sitter-language-pack CLI — static musl binary with all 173 parsers
+# tree-sitter-language-pack CLI — static musl binary with all 248 parsers
 # Build: docker build -f docker/Dockerfile -t ts-pack .
 # Run:   docker run --rm ts-pack parse --language python -
 #

@@ -1,5 +1,5 @@
 use crate::fixtures::{
-    Fixture, escape_c_string, has_chunk_assertions, has_detect_assertions, has_intel_assertions, sanitize_name,
+    Fixture, escape_c_string, has_chunk_assertions, has_detect_assertions, has_process_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -350,14 +350,14 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
         )
         .unwrap();
         writeln!(out, "    ASSERT_EQ_BOOL(result, {}, \"has_language check\");", expected).unwrap();
-    } else if has_intel_assertions(fixture) {
+    } else if has_process_assertions(fixture) {
         let lang = fixture.language.as_deref().unwrap_or("unknown");
         let source = fixture.source_code.as_deref().unwrap_or("");
         let source_escaped = escape_c_string(source);
         let assertions = assertions.unwrap();
 
         if has_chunk_assertions(fixture) {
-            let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
+            let max_chunk_size = assertions.process_chunk_max_size.unwrap_or(512);
             writeln!(
                 out,
                 "    char *result = ts_pack_process(reg, \"{}\", {}, \"{{\\\"language\\\":\\\"{}\\\",\\\"chunk_max_size\\\":{}}}\");",
@@ -384,7 +384,7 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
         )
         .unwrap();
 
-        if let Some(expected_lang) = &assertions.intel_language {
+        if let Some(expected_lang) = &assertions.process_language {
             writeln!(
                 out,
                 "    ASSERT_TRUE(json_has_string_field_spaced(result, \"language\", \"{}\"), \"Expected language '{}'\");",
@@ -394,7 +394,7 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
             .unwrap();
         }
 
-        if let Some(min_structures) = assertions.intel_structure_count_min {
+        if let Some(min_structures) = assertions.process_structure_count_min {
             writeln!(
                 out,
                 "    ASSERT_GTE(json_count_array(result, \"structure\"), (size_t){min_structures}, \"Should have at least {min_structures} structure(s)\");"
@@ -402,7 +402,7 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
             .unwrap();
         }
 
-        if let Some(expected_kind) = &assertions.intel_structure_contains_kind {
+        if let Some(expected_kind) = &assertions.process_structure_contains_kind {
             writeln!(
                 out,
                 "    ASSERT_TRUE(json_array_contains_kind(result, \"structure\", \"{}\"), \"Structure should contain a '{}' kind node\");",
@@ -412,7 +412,7 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
             .unwrap();
         }
 
-        if let Some(min_imports) = assertions.intel_imports_count_min {
+        if let Some(min_imports) = assertions.process_imports_count_min {
             writeln!(
                 out,
                 "    ASSERT_GTE(json_count_array(result, \"imports\"), (size_t){min_imports}, \"Should have at least {min_imports} import(s)\");"
@@ -420,7 +420,23 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
             .unwrap();
         }
 
-        if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+        if let Some(min_exports) = assertions.process_exports_count_min {
+            writeln!(
+                out,
+                "    ASSERT_GTE(json_count_array(result, \"exports\"), (size_t){min_exports}, \"Should have at least {min_exports} export(s)\");"
+            )
+            .unwrap();
+        }
+
+        if let Some(min_comments) = assertions.process_comments_count_min {
+            writeln!(
+                out,
+                "    ASSERT_GTE(json_count_array(result, \"comments\"), (size_t){min_comments}, \"Should have at least {min_comments} comment(s)\");"
+            )
+            .unwrap();
+        }
+
+        if let Some(min_lines) = assertions.process_metrics_total_lines_min {
             writeln!(
                 out,
                 "    ASSERT_GTE((size_t)json_get_int_field(result, \"total_lines\"), (size_t){min_lines}, \"Should have at least {min_lines} total line(s)\");"
@@ -428,7 +444,31 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
             .unwrap();
         }
 
-        if let Some(expected_error_count) = assertions.intel_metrics_error_count {
+        if let Some(min_code_lines) = assertions.process_metrics_code_lines_min {
+            writeln!(
+                out,
+                "    ASSERT_GTE((size_t)json_get_int_field(result, \"code_lines\"), (size_t){min_code_lines}, \"Should have at least {min_code_lines} code line(s)\");"
+            )
+            .unwrap();
+        }
+
+        if let Some(min_comment_lines) = assertions.process_metrics_comment_lines_min {
+            writeln!(
+                out,
+                "    ASSERT_GTE((size_t)json_get_int_field(result, \"comment_lines\"), (size_t){min_comment_lines}, \"Should have at least {min_comment_lines} comment line(s)\");"
+            )
+            .unwrap();
+        }
+
+        if let Some(min_depth) = assertions.process_metrics_max_depth_min {
+            writeln!(
+                out,
+                "    ASSERT_GTE((size_t)json_get_int_field(result, \"max_depth\"), (size_t){min_depth}, \"Should have max_depth >= {min_depth}\");"
+            )
+            .unwrap();
+        }
+
+        if let Some(expected_error_count) = assertions.process_metrics_error_count {
             writeln!(
                 out,
                 "    ASSERT_EQ_INT(json_get_int_field(result, \"error_count\"), {expected_error_count}, \"Expected error_count == {expected_error_count}\");"
@@ -436,7 +476,7 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
             .unwrap();
         }
 
-        if assertions.intel_diagnostics_not_empty == Some(true) {
+        if assertions.process_diagnostics_not_empty == Some(true) {
             writeln!(
                 out,
                 "    ASSERT_GT(json_count_array(result, \"diagnostics\"), (size_t)0, \"Diagnostics should not be empty\");"
@@ -445,7 +485,7 @@ fn write_test_file(dir: &Path, fixture: &Fixture) -> Result<(), String> {
         }
 
         if has_chunk_assertions(fixture)
-            && let Some(min_chunks) = assertions.intel_chunk_count_min
+            && let Some(min_chunks) = assertions.process_chunk_count_min
         {
             writeln!(
                 out,

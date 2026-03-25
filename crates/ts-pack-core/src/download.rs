@@ -185,7 +185,7 @@ impl DownloadManager {
 
     /// Get the expected path for a language's shared library in the cache.
     pub fn lib_path(&self, name: &str) -> PathBuf {
-        let lib_name = format!("tree_sitter_{name}");
+        let lib_name = format!("tree_sitter_{}", crate::registry::c_symbol_for(name));
         let (prefix, ext) = if cfg!(target_os = "macos") {
             ("lib", "dylib")
         } else if cfg!(target_os = "windows") {

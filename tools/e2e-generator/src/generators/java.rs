@@ -1,6 +1,6 @@
 use crate::fixtures::{
-    Fixture, escape_java_string, group_by_category, has_chunk_assertions, has_detect_assertions, has_intel_assertions,
-    sanitize_name,
+    Fixture, escape_java_string, group_by_category, has_chunk_assertions, has_detect_assertions,
+    has_process_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -141,7 +141,7 @@ final class Helpers {
 }
 
 fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<(), String> {
-    let needs_json = fixtures.iter().any(|f| has_intel_assertions(f));
+    let needs_json = fixtures.iter().any(|f| has_process_assertions(f));
 
     let mut out = String::new();
     let class_name = to_java_class_name(category);
@@ -251,7 +251,7 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                 .unwrap();
                 writeln!(out, "        }}").unwrap();
             }
-        } else if has_intel_assertions(fixture) {
+        } else if has_process_assertions(fixture) {
             let lang = fixture.language.as_deref().unwrap_or("unknown");
             let source = fixture.source_code.as_deref().unwrap_or("");
             let assertions = assertions.unwrap();
@@ -259,7 +259,7 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
             writeln!(out, "        try (var registry = Helpers.createRegistry()) {{").unwrap();
 
             if has_chunk_assertions(fixture) {
-                let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
+                let max_chunk_size = assertions.process_chunk_max_size.unwrap_or(512);
                 writeln!(
                     out,
                     "            String configJson = \"{{\\\"language\\\":\\\"{}\\\",\\\"chunk_max_size\\\":{}}}\";",
@@ -289,7 +289,7 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
             .unwrap();
 
             if has_chunk_assertions(fixture)
-                && let Some(min_chunks) = assertions.intel_chunk_count_min
+                && let Some(min_chunks) = assertions.process_chunk_count_min
             {
                 writeln!(out, "            JsonArray chunks = intel.getAsJsonArray(\"chunks\");").unwrap();
                 writeln!(
@@ -301,7 +301,7 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                     .unwrap();
             }
 
-            if let Some(expected_lang) = &assertions.intel_language {
+            if let Some(expected_lang) = &assertions.process_language {
                 writeln!(
                     out,
                     "            assertEquals(\"{}\", intel.get(\"language\").getAsString());",
@@ -310,7 +310,7 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                 .unwrap();
             }
 
-            if let Some(min_structures) = assertions.intel_structure_count_min {
+            if let Some(min_structures) = assertions.process_structure_count_min {
                 writeln!(
                     out,
                     "            assertTrue(intel.getAsJsonArray(\"structure\").size() >= {}, \"Should have at least {} structure(s)\");",
@@ -320,7 +320,7 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                 .unwrap();
             }
 
-            if let Some(expected_kind) = &assertions.intel_structure_contains_kind {
+            if let Some(expected_kind) = &assertions.process_structure_contains_kind {
                 writeln!(out, "            boolean foundKind = false;").unwrap();
                 writeln!(
                     out,
@@ -345,7 +345,37 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                 .unwrap();
             }
 
-            if let Some(min_imports) = assertions.intel_imports_count_min {
+            if let Some(name_fragment) = &assertions.process_structure_name_contains {
+                writeln!(out, "            boolean foundName = false;").unwrap();
+                writeln!(
+                    out,
+                    "            for (var elem : intel.getAsJsonArray(\"structure\")) {{"
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "                var nameElem = elem.getAsJsonObject().get(\"name\");"
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "                if (nameElem != null && nameElem.getAsString().contains(\"{}\")) {{",
+                    escape_java_string(name_fragment)
+                )
+                .unwrap();
+                writeln!(out, "                    foundName = true;").unwrap();
+                writeln!(out, "                    break;").unwrap();
+                writeln!(out, "                }}").unwrap();
+                writeln!(out, "            }}").unwrap();
+                writeln!(
+                    out,
+                    "            assertTrue(foundName, \"Structure should contain an item with name containing '{}'\");",
+                    escape_java_string(name_fragment)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_imports) = assertions.process_imports_count_min {
                 writeln!(
                     out,
                     "            assertTrue(intel.getAsJsonArray(\"imports\").size() >= {}, \"Should have at least {} import(s)\");",
@@ -355,14 +385,65 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                 .unwrap();
             }
 
-            if assertions.intel_metrics_total_lines_min.is_some() || assertions.intel_metrics_error_count.is_some() {
+            if let Some(import_source) = &assertions.process_imports_contains_source {
+                writeln!(out, "            boolean foundImport = false;").unwrap();
+                writeln!(out, "            for (var elem : intel.getAsJsonArray(\"imports\")) {{").unwrap();
+                writeln!(
+                    out,
+                    "                var srcElem = elem.getAsJsonObject().get(\"source\");"
+                )
+                .unwrap();
+                writeln!(
+                    out,
+                    "                if (srcElem != null && srcElem.getAsString().equals(\"{}\")) {{",
+                    escape_java_string(import_source)
+                )
+                .unwrap();
+                writeln!(out, "                    foundImport = true;").unwrap();
+                writeln!(out, "                    break;").unwrap();
+                writeln!(out, "                }}").unwrap();
+                writeln!(out, "            }}").unwrap();
+                writeln!(
+                    out,
+                    "            assertTrue(foundImport, \"Imports should contain source '{}'\");",
+                    escape_java_string(import_source)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_exports) = assertions.process_exports_count_min {
+                writeln!(
+                    out,
+                    "            assertTrue(intel.getAsJsonArray(\"exports\").size() >= {}, \"Should have at least {} export(s)\");",
+                    min_exports,
+                    min_exports
+                )
+                .unwrap();
+            }
+
+            if let Some(min_comments) = assertions.process_comments_count_min {
+                writeln!(
+                    out,
+                    "            assertTrue(intel.getAsJsonArray(\"comments\").size() >= {}, \"Should have at least {} comment(s)\");",
+                    min_comments,
+                    min_comments
+                )
+                .unwrap();
+            }
+
+            let needs_metrics = assertions.process_metrics_total_lines_min.is_some()
+                || assertions.process_metrics_error_count.is_some()
+                || assertions.process_metrics_code_lines_min.is_some()
+                || assertions.process_metrics_comment_lines_min.is_some()
+                || assertions.process_metrics_max_depth_min.is_some();
+            if needs_metrics {
                 writeln!(
                     out,
                     "            JsonObject metrics = intel.getAsJsonObject(\"metrics\");"
                 )
                 .unwrap();
 
-                if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+                if let Some(min_lines) = assertions.process_metrics_total_lines_min {
                     writeln!(
                         out,
                         "            assertTrue(metrics.get(\"total_lines\").getAsInt() >= {}, \"Should have at least {} total line(s)\");",
@@ -372,7 +453,37 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                     .unwrap();
                 }
 
-                if let Some(expected_error_count) = assertions.intel_metrics_error_count {
+                if let Some(min_code_lines) = assertions.process_metrics_code_lines_min {
+                    writeln!(
+                        out,
+                        "            assertTrue(metrics.get(\"code_lines\").getAsInt() >= {}, \"Should have at least {} code line(s)\");",
+                        min_code_lines,
+                        min_code_lines
+                    )
+                    .unwrap();
+                }
+
+                if let Some(min_comment_lines) = assertions.process_metrics_comment_lines_min {
+                    writeln!(
+                        out,
+                        "            assertTrue(metrics.get(\"comment_lines\").getAsInt() >= {}, \"Should have at least {} comment line(s)\");",
+                        min_comment_lines,
+                        min_comment_lines
+                    )
+                    .unwrap();
+                }
+
+                if let Some(min_depth) = assertions.process_metrics_max_depth_min {
+                    writeln!(
+                        out,
+                        "            assertTrue(metrics.get(\"max_depth\").getAsInt() >= {}, \"Should have max_depth >= {}\");",
+                        min_depth,
+                        min_depth
+                    )
+                    .unwrap();
+                }
+
+                if let Some(expected_error_count) = assertions.process_metrics_error_count {
                     writeln!(
                         out,
                         "            assertEquals({}, metrics.get(\"error_count\").getAsInt(), \"Expected error_count {}\");",
@@ -383,7 +494,7 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                 }
             }
 
-            if assertions.intel_diagnostics_not_empty == Some(true) {
+            if assertions.process_diagnostics_not_empty == Some(true) {
                 writeln!(
                     out,
                     "            assertFalse(intel.getAsJsonArray(\"diagnostics\").isEmpty(), \"Diagnostics should not be empty\");"

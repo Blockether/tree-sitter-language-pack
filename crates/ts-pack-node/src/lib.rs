@@ -20,6 +20,20 @@ pub fn detect_language(path: String) -> Option<String> {
     tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
 }
 
+/// Detect language name from a file extension (without dot).
+/// Returns null if the extension is not recognized.
+#[napi(js_name = "detectLanguageFromExtension")]
+pub fn detect_language_from_extension(ext: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_extension(&ext).map(String::from)
+}
+
+/// Detect language name from a file path.
+/// Returns null if the extension is not recognized.
+#[napi(js_name = "detectLanguageFromPath")]
+pub fn detect_language_from_path(path: String) -> Option<String> {
+    tree_sitter_language_pack::detect_language_from_path(&path).map(String::from)
+}
+
 /// Returns the number of available languages.
 #[napi(js_name = "languageCount")]
 pub fn language_count() -> u32 {
@@ -218,7 +232,7 @@ pub fn js_download(names: Vec<String>) -> napi::Result<u32> {
         .map_err(|e| napi::Error::from_reason(format!("{e}")))
 }
 
-/// Download all 170+ available languages from the remote manifest.
+/// Download all 248 available languages from the remote manifest.
 ///
 /// Returns the number of languages successfully downloaded.
 /// Throws an error if download fails.

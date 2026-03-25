@@ -1,0 +1,19 @@
+{
+	"id": "javascript_multi_import_process",
+	"category": "process",
+	"description": "Intel: detect multiple imports and function in JavaScript",
+	"language": "javascript",
+	"source_code": "import fs from 'fs';\nimport path from 'path';\n\nfunction process(input) {\n    return input.trim();\n}\n",
+	"assertions": {
+		"process_language": "javascript",
+		"process_imports_count_min": 2,
+		"process_structure_count_min": 1,
+		"process_structure_contains_kind": "Function",
+		"process_metrics_total_lines_min": 6,
+		"process_metrics_error_count": 0
+	},
+	"skip": {
+		"requires_language": "javascript"
+	},
+	"tags": ["intel", "imports"]
+}

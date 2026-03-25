@@ -38,25 +38,39 @@ pub struct Assertions {
     pub language_available: Option<bool>,
     #[serde(default)]
     pub languages_not_empty: Option<bool>,
-    // Intel assertions (process / process with chunking)
+    // Process assertions (process / process with chunking)
     #[serde(default)]
-    pub intel_language: Option<String>,
+    pub process_language: Option<String>,
     #[serde(default)]
-    pub intel_structure_count_min: Option<usize>,
+    pub process_structure_count_min: Option<usize>,
     #[serde(default)]
-    pub intel_structure_contains_kind: Option<String>,
+    pub process_structure_contains_kind: Option<String>,
     #[serde(default)]
-    pub intel_imports_count_min: Option<usize>,
+    pub process_imports_count_min: Option<usize>,
     #[serde(default)]
-    pub intel_metrics_total_lines_min: Option<usize>,
+    pub process_metrics_total_lines_min: Option<usize>,
     #[serde(default)]
-    pub intel_metrics_error_count: Option<usize>,
+    pub process_metrics_error_count: Option<usize>,
     #[serde(default)]
-    pub intel_diagnostics_not_empty: Option<bool>,
+    pub process_diagnostics_not_empty: Option<bool>,
     #[serde(default)]
-    pub intel_chunk_count_min: Option<usize>,
+    pub process_chunk_count_min: Option<usize>,
     #[serde(default)]
-    pub intel_chunk_max_size: Option<usize>,
+    pub process_chunk_max_size: Option<usize>,
+    #[serde(default)]
+    pub process_comments_count_min: Option<usize>,
+    #[serde(default)]
+    pub process_exports_count_min: Option<usize>,
+    #[serde(default)]
+    pub process_imports_contains_source: Option<String>,
+    #[serde(default)]
+    pub process_structure_name_contains: Option<String>,
+    #[serde(default)]
+    pub process_metrics_code_lines_min: Option<usize>,
+    #[serde(default)]
+    pub process_metrics_comment_lines_min: Option<usize>,
+    #[serde(default)]
+    pub process_metrics_max_depth_min: Option<usize>,
     // Language detection
     #[serde(default)]
     pub detect_from_extension: Option<String>,
@@ -293,17 +307,24 @@ pub fn has_highlights_assertions(fixture: &Fixture) -> bool {
         .is_some_and(|a| a.highlights_query_not_empty.is_some() || a.highlights_query_is_none.is_some())
 }
 
-/// Check if a fixture has any intel-related assertions.
-pub fn has_intel_assertions(fixture: &Fixture) -> bool {
+/// Check if a fixture has any process-related assertions.
+pub fn has_process_assertions(fixture: &Fixture) -> bool {
     fixture.assertions.as_ref().is_some_and(|a| {
-        a.intel_language.is_some()
-            || a.intel_structure_count_min.is_some()
-            || a.intel_structure_contains_kind.is_some()
-            || a.intel_imports_count_min.is_some()
-            || a.intel_metrics_total_lines_min.is_some()
-            || a.intel_metrics_error_count.is_some()
-            || a.intel_diagnostics_not_empty.is_some()
-            || a.intel_chunk_count_min.is_some()
+        a.process_language.is_some()
+            || a.process_structure_count_min.is_some()
+            || a.process_structure_contains_kind.is_some()
+            || a.process_imports_count_min.is_some()
+            || a.process_metrics_total_lines_min.is_some()
+            || a.process_metrics_error_count.is_some()
+            || a.process_diagnostics_not_empty.is_some()
+            || a.process_chunk_count_min.is_some()
+            || a.process_comments_count_min.is_some()
+            || a.process_exports_count_min.is_some()
+            || a.process_imports_contains_source.is_some()
+            || a.process_structure_name_contains.is_some()
+            || a.process_metrics_code_lines_min.is_some()
+            || a.process_metrics_comment_lines_min.is_some()
+            || a.process_metrics_max_depth_min.is_some()
     })
 }
 
@@ -312,5 +333,5 @@ pub fn has_chunk_assertions(fixture: &Fixture) -> bool {
     fixture
         .assertions
         .as_ref()
-        .is_some_and(|a| a.intel_chunk_count_min.is_some())
+        .is_some_and(|a| a.process_chunk_count_min.is_some())
 }

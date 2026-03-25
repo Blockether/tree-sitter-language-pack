@@ -169,6 +169,11 @@ tasks:
     cmds:
       - uv run --no-sync scripts/pin_vendors.py --only-missing
 
+  update:grammars:check:
+    desc: Check for grammar updates against upstream (reports stale revisions without writing)
+    cmds:
+      - uv run --no-sync scripts/check_grammar_updates.py
+
   # E2E test generation
   e2e:generate:all:
     desc: Generate E2E tests for all languages from fixtures
@@ -274,6 +279,16 @@ tasks:
       - cargo run -p e2e-generator -- generate-smoke-fixtures --definitions sources/language_definitions.json --output fixtures/smoke
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+
+  # Documentation generation
+  docs:generate:languages:
+    desc: Generate supported languages documentation from language_definitions.json
+    cmds:
+      - python3 scripts/generate_grammar_table.py
+    sources:
+      - sources/language_definitions.json
+    generates:
+      - docs/supported-languages.md
 
   # README generation
   generate-readme:

@@ -48,13 +48,13 @@ for TARGET in "${TARGETS[@]}"; do
 
     # Retry with backoff -- assets may not be immediately available after upload
     DOWNLOADED=false
-    for ATTEMPT in 1 2 3 4 5; do
+    for ATTEMPT in 1 2 3 4 5 6 7 8 9 10; do
       if curl "${CURL_OPTS[@]}" -o "${TMPDIR}/${FILENAME}" "$URL"; then
         DOWNLOADED=true
         break
       fi
-      echo "  Attempt $ATTEMPT failed, waiting $((ATTEMPT * 10))s..."
-      sleep $((ATTEMPT * 10))
+      echo "  Attempt $ATTEMPT failed, waiting 15s..."
+      sleep 15
     done
 
     if $DOWNLOADED; then

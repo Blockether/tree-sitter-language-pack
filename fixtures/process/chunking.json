@@ -1,0 +1,18 @@
+{
+	"id": "python_chunking_process_detail",
+	"category": "process",
+	"description": "Intel: chunk multi-function Python source into multiple pieces",
+	"language": "python",
+	"source_code": "def alpha():\n    pass\n\ndef beta():\n    pass\n\ndef gamma():\n    pass\n\ndef delta():\n    pass\n",
+	"assertions": {
+		"tree_not_null": true,
+		"process_language": "python",
+		"process_chunk_count_min": 2,
+		"process_chunk_max_size": 30,
+		"process_metrics_total_lines_min": 8
+	},
+	"skip": {
+		"requires_language": "python"
+	},
+	"tags": ["metadata", "chunking"]
+}

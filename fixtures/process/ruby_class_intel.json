@@ -1,0 +1,18 @@
+{
+	"id": "ruby_class_process",
+	"category": "process",
+	"description": "Intel: Ruby class with method",
+	"language": "ruby",
+	"source_code": "require 'json'\n\nclass Greeter\n  def greet(name)\n    \"Hello #{name}\"\n  end\nend\n",
+	"assertions": {
+		"process_language": "ruby",
+		"process_structure_count_min": 1,
+		"process_structure_contains_kind": "Class",
+		"process_metrics_total_lines_min": 7,
+		"process_metrics_error_count": 0
+	},
+	"skip": {
+		"requires_language": "ruby"
+	},
+	"tags": ["intel"]
+}

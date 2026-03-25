@@ -145,7 +145,7 @@ console.log(`Downloaded ${count} new languages`);
 
 ### `downloadAll(): Promise<number>`
 
-Download all available languages (170+).
+Download all available languages (248).
 
 Returns the number of newly downloaded languages.
 

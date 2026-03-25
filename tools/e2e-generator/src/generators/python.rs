@@ -1,6 +1,6 @@
 use crate::fixtures::{
     Fixture, escape_python_string, group_by_category, has_ambiguity_assertions, has_chunk_assertions,
-    has_detect_assertions, has_highlights_assertions, has_intel_assertions, sanitize_name,
+    has_detect_assertions, has_highlights_assertions, has_process_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -117,7 +117,7 @@ fn fixture_needs_get_parser(f: &Fixture) -> bool {
     let is_error = a.is_some_and(|a| a.expect_error == Some(true));
     let is_registry = a.is_some_and(|a| a.languages_not_empty == Some(true));
     let is_lang_check = a.is_some_and(|a| a.language_available.is_some());
-    f.language.is_some() && !has_intel_assertions(f) && !is_error && !is_registry && !is_lang_check
+    f.language.is_some() && !has_process_assertions(f) && !is_error && !is_registry && !is_lang_check
 }
 
 fn fixture_needs_get_language(f: &Fixture) -> bool {
@@ -133,10 +133,6 @@ fn fixture_needs_available_languages(f: &Fixture) -> bool {
 fn fixture_needs_has_language(f: &Fixture) -> bool {
     f.skip.as_ref().is_some_and(|s| s.requires_language.is_some())
         || f.assertions.as_ref().is_some_and(|a| a.language_available.is_some())
-}
-
-fn fixture_needs_process(f: &Fixture) -> bool {
-    has_intel_assertions(f)
 }
 
 fn fixture_needs_detect_from_extension(f: &Fixture) -> bool {
@@ -191,7 +187,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             || has_ambiguity_assertions(f);
         fixture_needs_has_language(f) || (f.language.is_some() && !is_agnostic)
     });
-    let need_process = needs_import(fixtures, fixture_needs_process);
+    let need_process = needs_import(fixtures, has_process_assertions);
     let need_tree_contains = needs_import(fixtures, fixture_needs_tree_contains);
     let need_tree_has_error = needs_import(fixtures, fixture_needs_tree_has_error);
     let need_pytest = fixtures.iter().any(|f| {
@@ -434,13 +430,13 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
                 writeln!(out, "    assert len(q) > 0, \"Highlights query should not be empty\"").unwrap();
             }
-        } else if has_intel_assertions(fixture) {
+        } else if has_process_assertions(fixture) {
             let lang = fixture.language.as_deref().unwrap_or("unknown");
             let source = fixture.source_code.as_deref().unwrap_or("");
             let assertions = assertions.unwrap();
 
             if has_chunk_assertions(fixture) {
-                let max_chunk_size = assertions.intel_chunk_max_size.unwrap_or(512);
+                let max_chunk_size = assertions.process_chunk_max_size.unwrap_or(512);
                 writeln!(
                     out,
                     "    intel = process(\"{}\", ProcessConfig(language=\"{}\", chunk_max_size={}))",
@@ -449,7 +445,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                     max_chunk_size
                 )
                 .unwrap();
-                if let Some(min_chunks) = assertions.intel_chunk_count_min {
+                if let Some(min_chunks) = assertions.process_chunk_count_min {
                     writeln!(out, "    chunks = intel.get(\"chunks\", [])").unwrap();
                     writeln!(
                         out,
@@ -467,7 +463,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(expected_lang) = &assertions.intel_language {
+            if let Some(expected_lang) = &assertions.process_language {
                 writeln!(
                     out,
                     "    assert intel.get(\"language\") == \"{}\", f\"Expected language '{}', got {{intel.get('language')}}\"",
@@ -477,7 +473,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(min_structures) = assertions.intel_structure_count_min {
+            if let Some(min_structures) = assertions.process_structure_count_min {
                 writeln!(
                     out,
                     "    assert len(intel.get(\"structure\", [])) >= {min_structures}, \"Should have at least {min_structures} structure(s)\""
@@ -485,7 +481,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(expected_kind) = &assertions.intel_structure_contains_kind {
+            if let Some(expected_kind) = &assertions.process_structure_contains_kind {
                 writeln!(
                     out,
                     "    assert any(s.get(\"kind\") == \"{}\" for s in intel.get(\"structure\", [])), \"Structure should contain a '{}' kind node\"",
@@ -495,7 +491,17 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(min_imports) = assertions.intel_imports_count_min {
+            if let Some(name_fragment) = &assertions.process_structure_name_contains {
+                writeln!(
+                    out,
+                    "    assert any(\"{}\" in (s.get(\"name\") or \"\") for s in intel.get(\"structure\", [])), \"Structure should contain an item with name containing '{}'\"",
+                    escape_python_string(name_fragment),
+                    escape_python_string(name_fragment)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_imports) = assertions.process_imports_count_min {
                 writeln!(
                     out,
                     "    assert len(intel.get(\"imports\", [])) >= {min_imports}, \"Should have at least {min_imports} import(s)\""
@@ -503,11 +509,42 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if assertions.intel_metrics_total_lines_min.is_some() || assertions.intel_metrics_error_count.is_some() {
+            if let Some(import_source) = &assertions.process_imports_contains_source {
+                writeln!(
+                    out,
+                    "    assert any(i.get(\"source\") == \"{}\" for i in intel.get(\"imports\", [])), \"Imports should contain source '{}'\"",
+                    escape_python_string(import_source),
+                    escape_python_string(import_source)
+                )
+                .unwrap();
+            }
+
+            if let Some(min_exports) = assertions.process_exports_count_min {
+                writeln!(
+                    out,
+                    "    assert len(intel.get(\"exports\", [])) >= {min_exports}, \"Should have at least {min_exports} export(s)\""
+                )
+                .unwrap();
+            }
+
+            if let Some(min_comments) = assertions.process_comments_count_min {
+                writeln!(
+                    out,
+                    "    assert len(intel.get(\"comments\", [])) >= {min_comments}, \"Should have at least {min_comments} comment(s)\""
+                )
+                .unwrap();
+            }
+
+            let needs_metrics = assertions.process_metrics_total_lines_min.is_some()
+                || assertions.process_metrics_error_count.is_some()
+                || assertions.process_metrics_code_lines_min.is_some()
+                || assertions.process_metrics_comment_lines_min.is_some()
+                || assertions.process_metrics_max_depth_min.is_some();
+            if needs_metrics {
                 writeln!(out, "    metrics = intel.get(\"metrics\", {{}})").unwrap();
             }
 
-            if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+            if let Some(min_lines) = assertions.process_metrics_total_lines_min {
                 writeln!(
                     out,
                     "    assert metrics.get(\"total_lines\", 0) >= {min_lines}, \"Should have at least {min_lines} total line(s)\""
@@ -515,7 +552,31 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if let Some(expected_error_count) = assertions.intel_metrics_error_count {
+            if let Some(min_code_lines) = assertions.process_metrics_code_lines_min {
+                writeln!(
+                    out,
+                    "    assert metrics.get(\"code_lines\", 0) >= {min_code_lines}, \"Should have at least {min_code_lines} code line(s)\""
+                )
+                .unwrap();
+            }
+
+            if let Some(min_comment_lines) = assertions.process_metrics_comment_lines_min {
+                writeln!(
+                    out,
+                    "    assert metrics.get(\"comment_lines\", 0) >= {min_comment_lines}, \"Should have at least {min_comment_lines} comment line(s)\""
+                )
+                .unwrap();
+            }
+
+            if let Some(min_depth) = assertions.process_metrics_max_depth_min {
+                writeln!(
+                    out,
+                    "    assert metrics.get(\"max_depth\", 0) >= {min_depth}, \"Should have max_depth >= {min_depth}\""
+                )
+                .unwrap();
+            }
+
+            if let Some(expected_error_count) = assertions.process_metrics_error_count {
                 writeln!(
                     out,
                     "    assert metrics.get(\"error_count\", 0) == {expected_error_count}, f\"Expected error_count {expected_error_count}, got {{metrics.get('error_count', 0)}}\""
@@ -523,7 +584,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 .unwrap();
             }
 
-            if assertions.intel_diagnostics_not_empty == Some(true) {
+            if assertions.process_diagnostics_not_empty == Some(true) {
                 writeln!(
                     out,
                     "    assert len(intel.get(\"diagnostics\", [])) > 0, \"Diagnostics should not be empty\""

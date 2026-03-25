@@ -537,7 +537,7 @@ function analyze() {
 
 The WASM package includes a curated subset of **30 languages** optimized for browser and edge runtime use cases. This covers the most popular web, systems, scripting, and data format languages.
 
-Compiling all 173 supported languages into a single WASM binary exceeds the memory limits of standard build environments. Native bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP, CLI) include **all 173 languages**.
+Compiling all 248 supported languages into a single WASM binary exceeds the memory limits of standard build environments. Native bindings (Python, Node.js, Ruby, Go, Java, C#, Elixir, PHP, CLI) include **all 248 languages**.
 
 **Included languages:**
 
@@ -554,7 +554,7 @@ Use `availableLanguages()` at runtime to get the exact list of supported languag
 
 WASM builds have some limitations:
 
-1. **Language subset**: 30 of 173 languages are included (see above). For all languages, use native bindings.
+1. **Language subset**: 30 of 248 languages are included (see above). For all languages, use native bindings.
 2. **No download API**: Grammars are pre-bundled. For dynamic downloading, use platform-specific bindings (Python, Node.js, etc.)
 3. **Single-threaded**: Run CPU-intensive parsing in Web Workers
 4. **No file I/O**: Read files from memory or streams

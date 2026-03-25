@@ -1,6 +1,6 @@
 use crate::fixtures::{
     Fixture, escape_rust_string, group_by_category, has_ambiguity_assertions, has_chunk_assertions,
-    has_detect_assertions, has_highlights_assertions, has_intel_assertions, sanitize_name,
+    has_detect_assertions, has_highlights_assertions, has_process_assertions, sanitize_name,
 };
 use crate::generators::Generator;
 use std::fmt::Write as FmtWrite;
@@ -124,7 +124,7 @@ fn structure_kind_variant(kind: &str) -> String {
     }
 }
 
-/// Write intel assertion code for a fixture.
+/// Write process assertion code for a fixture.
 fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
     let assertions = fixture.assertions.as_ref().unwrap();
     let lang = fixture.language.as_deref().unwrap_or("unknown");
@@ -133,7 +133,7 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
     writeln!(out, "    // {}", fixture.description).unwrap();
 
     if has_chunk_assertions(fixture) {
-        let max_size = assertions.intel_chunk_max_size.unwrap_or(1000);
+        let max_size = assertions.process_chunk_max_size.unwrap_or(1000);
         writeln!(
             out,
             "    let config = tree_sitter_language_pack::ProcessConfig::new(\"{}\").with_chunking({});",
@@ -149,7 +149,7 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
         .unwrap();
 
         // Chunk assertions
-        if let Some(min_chunks) = assertions.intel_chunk_count_min {
+        if let Some(min_chunks) = assertions.process_chunk_count_min {
             writeln!(
                 out,
                 "    assert!(intel.chunks.len() >= {min_chunks}, \"Expected at least {min_chunks} chunk(s), got {{}}\", intel.chunks.len());"
@@ -171,8 +171,8 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
         .unwrap();
     }
 
-    // Intel field assertions
-    if let Some(expected_lang) = &assertions.intel_language {
+    // Process field assertions
+    if let Some(expected_lang) = &assertions.process_language {
         writeln!(
             out,
             "    assert_eq!(intel.language, \"{}\", \"intel.language mismatch\");",
@@ -181,7 +181,7 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
         .unwrap();
     }
 
-    if let Some(min_count) = assertions.intel_structure_count_min {
+    if let Some(min_count) = assertions.process_structure_count_min {
         writeln!(
             out,
             "    assert!(intel.structure.len() >= {min_count}, \"Expected at least {min_count} structure item(s), got {{}}\", intel.structure.len());"
@@ -189,7 +189,7 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
         .unwrap();
     }
 
-    if let Some(kind) = &assertions.intel_structure_contains_kind {
+    if let Some(kind) = &assertions.process_structure_contains_kind {
         let variant = structure_kind_variant(kind);
         writeln!(
             out,
@@ -199,7 +199,17 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
         .unwrap();
     }
 
-    if let Some(min_imports) = assertions.intel_imports_count_min {
+    if let Some(name_fragment) = &assertions.process_structure_name_contains {
+        writeln!(
+            out,
+            "    assert!(intel.structure.iter().any(|s| s.name.as_deref().unwrap_or(\"\").contains(\"{}\")), \"Structure should contain an item with name containing '{}'\");",
+            escape_rust_string(name_fragment),
+            escape_rust_string(name_fragment)
+        )
+        .unwrap();
+    }
+
+    if let Some(min_imports) = assertions.process_imports_count_min {
         writeln!(
             out,
             "    assert!(intel.imports.len() >= {min_imports}, \"Expected at least {min_imports} import(s), got {{}}\", intel.imports.len());"
@@ -207,7 +217,33 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
         .unwrap();
     }
 
-    if let Some(min_lines) = assertions.intel_metrics_total_lines_min {
+    if let Some(import_source) = &assertions.process_imports_contains_source {
+        writeln!(
+            out,
+            "    assert!(intel.imports.iter().any(|i| i.source.as_deref().unwrap_or(\"\") == \"{}\"), \"Imports should contain source '{}'\");",
+            escape_rust_string(import_source),
+            escape_rust_string(import_source)
+        )
+        .unwrap();
+    }
+
+    if let Some(min_exports) = assertions.process_exports_count_min {
+        writeln!(
+            out,
+            "    assert!(intel.exports.len() >= {min_exports}, \"Expected at least {min_exports} export(s), got {{}}\", intel.exports.len());"
+        )
+        .unwrap();
+    }
+
+    if let Some(min_comments) = assertions.process_comments_count_min {
+        writeln!(
+            out,
+            "    assert!(intel.comments.len() >= {min_comments}, \"Expected at least {min_comments} comment(s), got {{}}\", intel.comments.len());"
+        )
+        .unwrap();
+    }
+
+    if let Some(min_lines) = assertions.process_metrics_total_lines_min {
         writeln!(
             out,
             "    assert!(intel.metrics.total_lines >= {min_lines}, \"Expected at least {min_lines} total line(s), got {{}}\", intel.metrics.total_lines);"
@@ -215,7 +251,31 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
         .unwrap();
     }
 
-    if let Some(expected_errors) = assertions.intel_metrics_error_count {
+    if let Some(min_code_lines) = assertions.process_metrics_code_lines_min {
+        writeln!(
+            out,
+            "    assert!(intel.metrics.code_lines >= {min_code_lines}, \"Expected at least {min_code_lines} code line(s), got {{}}\", intel.metrics.code_lines);"
+        )
+        .unwrap();
+    }
+
+    if let Some(min_comment_lines) = assertions.process_metrics_comment_lines_min {
+        writeln!(
+            out,
+            "    assert!(intel.metrics.comment_lines >= {min_comment_lines}, \"Expected at least {min_comment_lines} comment line(s), got {{}}\", intel.metrics.comment_lines);"
+        )
+        .unwrap();
+    }
+
+    if let Some(min_depth) = assertions.process_metrics_max_depth_min {
+        writeln!(
+            out,
+            "    assert!(intel.metrics.max_depth >= {min_depth}, \"Expected max_depth >= {min_depth}, got {{}}\", intel.metrics.max_depth);"
+        )
+        .unwrap();
+    }
+
+    if let Some(expected_errors) = assertions.process_metrics_error_count {
         writeln!(
             out,
             "    assert_eq!(intel.metrics.error_count, {expected_errors}, \"Expected error_count == {expected_errors}, got {{}}\", intel.metrics.error_count);"
@@ -223,7 +283,7 @@ fn write_intel_assertions(out: &mut String, fixture: &Fixture) {
         .unwrap();
     }
 
-    if assertions.intel_diagnostics_not_empty == Some(true) {
+    if assertions.process_diagnostics_not_empty == Some(true) {
         writeln!(
             out,
             "    assert!(!intel.diagnostics.is_empty(), \"diagnostics should not be empty\");"
@@ -450,8 +510,8 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             write_ambiguity_assertions(&mut out, fixture);
         } else if has_highlights_assertions(fixture) {
             write_highlights_assertions(&mut out, fixture);
-        } else if has_intel_assertions(fixture) {
-            // Intel test: call process() with ProcessConfig
+        } else if has_process_assertions(fixture) {
+            // Process test: call process() with ProcessConfig
             write_intel_assertions(&mut out, fixture);
         } else {
             // Parsing test

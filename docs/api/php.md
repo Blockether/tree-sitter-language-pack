@@ -68,7 +68,7 @@ try {
 
 ### `LanguagePack::downloadAll(): int`
 
-Download all available languages (170+).
+Download all available languages (248).
 
 **Returns:** int - Count of newly downloaded languages
 

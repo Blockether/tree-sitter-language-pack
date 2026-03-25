@@ -117,7 +117,7 @@ end
 
 ### `TreeSitterLanguagePack.download_all()`
 
-Download all available languages (170+).
+Download all available languages (248).
 
 **Returns:** {:ok, count} | {:error, reason}
 

@@ -53,7 +53,7 @@
   </a>
 </div>
 
-Rust core library providing access to 170+ tree-sitter parsers with on-demand download and caching support.
+Rust core library providing access to 248 tree-sitter parsers with on-demand download and caching support.
 
 ## Installation
 
@@ -101,7 +101,7 @@ println!("Chunks: {}", result.chunks.len());
 
 | Feature | Description |
 | --- | --- |
-| **197+ Languages** | Pre-compiled parsers for 197+ programming languages |
+| **248 Languages** | Pre-compiled parsers for 248 programming languages |
 | **On-Demand Downloads** | Parsers are downloaded on-demand and cached locally for fast reuse |
 | **Selective Installation** | Download only the languages you need; unused parsers never downloaded |
 | **Polyglot Bindings** | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++ |

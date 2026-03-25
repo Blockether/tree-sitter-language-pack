@@ -1,0 +1,19 @@
+{
+	"id": "rust_function_process",
+	"category": "process",
+	"description": "Intel: extract structure from Rust function definition",
+	"language": "rust",
+	"source_code": "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n",
+	"assertions": {
+		"tree_not_null": true,
+		"process_language": "rust",
+		"process_structure_count_min": 1,
+		"process_structure_contains_kind": "Function",
+		"process_metrics_total_lines_min": 3,
+		"process_metrics_error_count": 0
+	},
+	"skip": {
+		"requires_language": "rust"
+	},
+	"tags": ["intel"]
+}

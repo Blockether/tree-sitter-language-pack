@@ -90,7 +90,7 @@ jobs:
           SIZE_MB=$((SIZE / 1024 / 1024))
           echo "Image size: ${SIZE_MB} MB"
 
-      - name: Test all grammars (173 languages)
+      - name: Test all grammars (198 languages)
         run: |
           docker run --rm \
             -v "${{ github.workspace }}/tests/test_apps:/tests" \
