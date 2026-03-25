@@ -22,6 +22,7 @@ const LANGUAGE_ALIASES: &[(&str, &str)] = &[
 
 /// Resolve a language name to its C symbol name (e.g. "csharp" -> "c_sharp").
 /// Falls back to the language name itself if no override exists.
+#[cfg(any(feature = "dynamic-loading", feature = "download"))]
 #[inline(always)]
 pub(crate) fn c_symbol_for(name: &str) -> &str {
     for &(lang, sym) in C_SYMBOL_OVERRIDES {
