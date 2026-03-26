@@ -108,8 +108,15 @@ jobs:
       - name: Install Task
         uses: kreuzberg-dev/actions/install-task@v1
 
-      - name: Run all-grammars E2E tests
+      - name: Run all-grammars E2E tests (static)
         run: task rust:e2e:all-grammars
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           TSLP_LINK_MODE: static
+
+      - name: Run c_symbol override E2E tests (dynamic)
+        run: task rust:e2e:test
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          TSLP_LINK_MODE: dynamic
+          TSLP_LANGUAGES: "csharp,vb,embeddedtemplate,nushell,python"

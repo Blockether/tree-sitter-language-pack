@@ -228,6 +228,14 @@ RSpec.describe 'smoke' do
     expect(tree.root_child_count).to be >= 1
   end
 
+  it 'smoke_csharp' do
+    # Smoke test: load csharp and parse a simple snippet
+    skip "Language 'csharp' not available" unless TreeSitterLanguagePack.has_language('csharp')
+    tree = TreeSitterLanguagePack.parse_string('csharp', "using System;\nclass Foo { }")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
+  end
+
   it 'smoke_css' do
     # Smoke test: load css and parse a simple snippet
     skip "Language 'css' not available" unless TreeSitterLanguagePack.has_language('css')
@@ -325,6 +333,14 @@ RSpec.describe 'smoke' do
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
     expect(tree.contains_node_type('module_declaration')).to be true
+  end
+
+  it 'smoke_embeddedtemplate' do
+    # Smoke test: load embeddedtemplate and parse a simple snippet
+    skip "Language 'embeddedtemplate' not available" unless TreeSitterLanguagePack.has_language('embeddedtemplate')
+    tree = TreeSitterLanguagePack.parse_string('embeddedtemplate', '<%= hello %>')
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
   end
 
   it 'smoke_erlang' do
@@ -871,6 +887,14 @@ RSpec.describe 'smoke' do
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
     expect(tree.contains_node_type('task_definition')).to be true
+  end
+
+  it 'smoke_nushell' do
+    # Smoke test: load nushell and parse a simple snippet
+    skip "Language 'nushell' not available" unless TreeSitterLanguagePack.has_language('nushell')
+    tree = TreeSitterLanguagePack.parse_string('nushell', 'let x = 42')
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
   end
 
   it 'smoke_objc' do
@@ -1424,6 +1448,14 @@ RSpec.describe 'smoke' do
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
     expect(tree.contains_node_type('function_declaration')).to be true
+  end
+
+  it 'smoke_vb' do
+    # Smoke test: load vb and parse a simple snippet
+    skip "Language 'vb' not available" unless TreeSitterLanguagePack.has_language('vb')
+    tree = TreeSitterLanguagePack.parse_string('vb', "Module Hello\n    Sub Main()\n    End Sub\nEnd Module")
+    expect(tree).not_to be_nil
+    expect(tree.root_child_count).to be >= 1
   end
 
   it 'smoke_verilog' do

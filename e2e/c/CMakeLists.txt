@@ -295,6 +295,10 @@ add_executable(test_smoke_cpp test_smoke_cpp.c)
 target_link_libraries(test_smoke_cpp ts_pack_ffi)
 add_test(NAME test_smoke_cpp COMMAND test_smoke_cpp)
 
+add_executable(test_smoke_csharp test_smoke_csharp.c)
+target_link_libraries(test_smoke_csharp ts_pack_ffi)
+add_test(NAME test_smoke_csharp COMMAND test_smoke_csharp)
+
 add_executable(test_smoke_css test_smoke_css.c)
 target_link_libraries(test_smoke_css ts_pack_ffi)
 add_test(NAME test_smoke_css COMMAND test_smoke_css)
@@ -338,6 +342,10 @@ add_test(NAME test_smoke_elixir COMMAND test_smoke_elixir)
 add_executable(test_smoke_elm test_smoke_elm.c)
 target_link_libraries(test_smoke_elm ts_pack_ffi)
 add_test(NAME test_smoke_elm COMMAND test_smoke_elm)
+
+add_executable(test_smoke_embeddedtemplate test_smoke_embeddedtemplate.c)
+target_link_libraries(test_smoke_embeddedtemplate ts_pack_ffi)
+add_test(NAME test_smoke_embeddedtemplate COMMAND test_smoke_embeddedtemplate)
 
 add_executable(test_smoke_erlang test_smoke_erlang.c)
 target_link_libraries(test_smoke_erlang ts_pack_ffi)
@@ -582,6 +590,10 @@ add_test(NAME test_smoke_nix COMMAND test_smoke_nix)
 add_executable(test_smoke_nqc test_smoke_nqc.c)
 target_link_libraries(test_smoke_nqc ts_pack_ffi)
 add_test(NAME test_smoke_nqc COMMAND test_smoke_nqc)
+
+add_executable(test_smoke_nushell test_smoke_nushell.c)
+target_link_libraries(test_smoke_nushell ts_pack_ffi)
+add_test(NAME test_smoke_nushell COMMAND test_smoke_nushell)
 
 add_executable(test_smoke_objc test_smoke_objc.c)
 target_link_libraries(test_smoke_objc ts_pack_ffi)
@@ -830,6 +842,10 @@ add_test(NAME test_smoke_uxntal COMMAND test_smoke_uxntal)
 add_executable(test_smoke_v test_smoke_v.c)
 target_link_libraries(test_smoke_v ts_pack_ffi)
 add_test(NAME test_smoke_v COMMAND test_smoke_v)
+
+add_executable(test_smoke_vb test_smoke_vb.c)
+target_link_libraries(test_smoke_vb ts_pack_ffi)
+add_test(NAME test_smoke_vb COMMAND test_smoke_vb)
 
 add_executable(test_smoke_verilog test_smoke_verilog.c)
 target_link_libraries(test_smoke_verilog ts_pack_ffi)

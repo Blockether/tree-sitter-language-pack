@@ -404,6 +404,19 @@ defmodule E2eTests.SmokeTest do
     end
   end
 
+  @tag :skip_unless_csharp
+  test "smoke_csharp" do
+    # Smoke test: load csharp and parse a simple snippet
+    unless TreeSitterLanguagePack.has_language("csharp") do
+      IO.puts("Skipping: language 'csharp' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("csharp", "using System;\nclass Foo { }")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
+    end
+  end
+
   @tag :skip_unless_css
   test "smoke_css" do
     # Smoke test: load css and parse a simple snippet
@@ -577,6 +590,19 @@ defmodule E2eTests.SmokeTest do
 
       assert TreeSitterLanguagePack.tree_contains_node_type(tree, "module_declaration"),
              "Tree should contain a 'module_declaration' node"
+    end
+  end
+
+  @tag :skip_unless_embeddedtemplate
+  test "smoke_embeddedtemplate" do
+    # Smoke test: load embeddedtemplate and parse a simple snippet
+    unless TreeSitterLanguagePack.has_language("embeddedtemplate") do
+      IO.puts("Skipping: language 'embeddedtemplate' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("embeddedtemplate", "<%= hello %>")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
     end
   end
 
@@ -1557,6 +1583,19 @@ defmodule E2eTests.SmokeTest do
 
       assert TreeSitterLanguagePack.tree_contains_node_type(tree, "task_definition"),
              "Tree should contain a 'task_definition' node"
+    end
+  end
+
+  @tag :skip_unless_nushell
+  test "smoke_nushell" do
+    # Smoke test: load nushell and parse a simple snippet
+    unless TreeSitterLanguagePack.has_language("nushell") do
+      IO.puts("Skipping: language 'nushell' not available")
+    else
+      tree = TreeSitterLanguagePack.parse_string("nushell", "let x = 42")
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
     end
   end
 
@@ -2550,6 +2589,24 @@ defmodule E2eTests.SmokeTest do
 
       assert TreeSitterLanguagePack.tree_contains_node_type(tree, "function_declaration"),
              "Tree should contain a 'function_declaration' node"
+    end
+  end
+
+  @tag :skip_unless_vb
+  test "smoke_vb" do
+    # Smoke test: load vb and parse a simple snippet
+    unless TreeSitterLanguagePack.has_language("vb") do
+      IO.puts("Skipping: language 'vb' not available")
+    else
+      tree =
+        TreeSitterLanguagePack.parse_string(
+          "vb",
+          "Module Hello\n    Sub Main()\n    End Sub\nEnd Module"
+        )
+
+      assert is_reference(tree), "Parse tree should be a reference"
+      child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
+      assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
     end
   end
 

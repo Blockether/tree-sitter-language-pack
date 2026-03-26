@@ -282,6 +282,16 @@ def test_smoke_cpp():
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
+@pytest.mark.skipif(not has_language("csharp"), reason="Language 'csharp' not available")
+def test_smoke_csharp():
+    """Smoke test: load csharp and parse a simple snippet"""
+    parser = get_parser("csharp")
+    tree = parser.parse(b"using System;\nclass Foo { }")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
+
+
 @pytest.mark.skipif(not has_language("css"), reason="Language 'css' not available")
 def test_smoke_css():
     """Smoke test: load css and parse a simple snippet"""
@@ -401,6 +411,16 @@ def test_smoke_elm():
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
     assert tree_contains_node_type(root, "module_declaration"), "Tree should contain a 'module_declaration' node"
+
+
+@pytest.mark.skipif(not has_language("embeddedtemplate"), reason="Language 'embeddedtemplate' not available")
+def test_smoke_embeddedtemplate():
+    """Smoke test: load embeddedtemplate and parse a simple snippet"""
+    parser = get_parser("embeddedtemplate")
+    tree = parser.parse(b"<%= hello %>")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("erlang"), reason="Language 'erlang' not available")
@@ -1070,6 +1090,16 @@ def test_smoke_nqc():
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
     assert tree_contains_node_type(root, "task_definition"), "Tree should contain a 'task_definition' node"
+
+
+@pytest.mark.skipif(not has_language("nushell"), reason="Language 'nushell' not available")
+def test_smoke_nushell():
+    """Smoke test: load nushell and parse a simple snippet"""
+    parser = get_parser("nushell")
+    tree = parser.parse(b"let x = 42")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("objc"), reason="Language 'objc' not available")
@@ -1747,6 +1777,16 @@ def test_smoke_v():
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
     assert tree_contains_node_type(root, "function_declaration"), "Tree should contain a 'function_declaration' node"
+
+
+@pytest.mark.skipif(not has_language("vb"), reason="Language 'vb' not available")
+def test_smoke_vb():
+    """Smoke test: load vb and parse a simple snippet"""
+    parser = get_parser("vb")
+    tree = parser.parse(b"Module Hello\n    Sub Main()\n    End Sub\nEnd Module")
+    assert tree is not None, "Parse tree should not be None"
+    root = tree.root_node
+    assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
 
 
 @pytest.mark.skipif(not has_language("verilog"), reason="Language 'verilog' not available")

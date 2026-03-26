@@ -254,6 +254,16 @@ describe("smoke", () => {
     expect(ptr).toBeTruthy();
   });
 
+  it("smoke_csharp", () => {
+    // Smoke test: load csharp and parse a simple snippet
+    if (!hasLanguage("csharp")) {
+      console.log("Skipping: language 'csharp' not available");
+      return;
+    }
+    const ptr = getLanguagePtr("csharp");
+    expect(ptr).toBeTruthy();
+  });
+
   it("smoke_css", () => {
     // Smoke test: load css and parse a simple snippet
     if (!hasLanguage("css")) {
@@ -361,6 +371,16 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("elm");
+    expect(ptr).toBeTruthy();
+  });
+
+  it("smoke_embeddedtemplate", () => {
+    // Smoke test: load embeddedtemplate and parse a simple snippet
+    if (!hasLanguage("embeddedtemplate")) {
+      console.log("Skipping: language 'embeddedtemplate' not available");
+      return;
+    }
+    const ptr = getLanguagePtr("embeddedtemplate");
     expect(ptr).toBeTruthy();
   });
 
@@ -971,6 +991,16 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("nqc");
+    expect(ptr).toBeTruthy();
+  });
+
+  it("smoke_nushell", () => {
+    // Smoke test: load nushell and parse a simple snippet
+    if (!hasLanguage("nushell")) {
+      console.log("Skipping: language 'nushell' not available");
+      return;
+    }
+    const ptr = getLanguagePtr("nushell");
     expect(ptr).toBeTruthy();
   });
 
@@ -1591,6 +1621,16 @@ describe("smoke", () => {
       return;
     }
     const ptr = getLanguagePtr("v");
+    expect(ptr).toBeTruthy();
+  });
+
+  it("smoke_vb", () => {
+    // Smoke test: load vb and parse a simple snippet
+    if (!hasLanguage("vb")) {
+      console.log("Skipping: language 'vb' not available");
+      return;
+    }
+    const ptr = getLanguagePtr("vb");
     expect(ptr).toBeTruthy();
   });
 

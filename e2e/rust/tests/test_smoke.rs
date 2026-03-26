@@ -571,6 +571,25 @@ fn smoke_cpp() {
 }
 
 #[test]
+fn smoke_csharp() {
+    if !tree_sitter_language_pack::has_language("csharp") {
+        eprintln!("Skipping: language 'csharp' not available");
+        return;
+    }
+    // Smoke test: load csharp and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("csharp").expect("Failed to get parser for 'csharp'");
+    let tree = parser.parse("using System;\nclass Foo { }", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
+    );
+}
+
+#[test]
 fn smoke_css() {
     if !tree_sitter_language_pack::has_language("css") {
         eprintln!("Skipping: language 'css' not available");
@@ -821,6 +840,26 @@ fn smoke_elm() {
     assert!(
         e2e_tests::tree_contains_node_type(root, "module_declaration"),
         "Tree should contain a 'module_declaration' node"
+    );
+}
+
+#[test]
+fn smoke_embeddedtemplate() {
+    if !tree_sitter_language_pack::has_language("embeddedtemplate") {
+        eprintln!("Skipping: language 'embeddedtemplate' not available");
+        return;
+    }
+    // Smoke test: load embeddedtemplate and parse a simple snippet
+    let mut parser =
+        tree_sitter_language_pack::get_parser("embeddedtemplate").expect("Failed to get parser for 'embeddedtemplate'");
+    let tree = parser.parse("<%= hello %>", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
     );
 }
 
@@ -2207,6 +2246,25 @@ fn smoke_nqc() {
     assert!(
         e2e_tests::tree_contains_node_type(root, "task_definition"),
         "Tree should contain a 'task_definition' node"
+    );
+}
+
+#[test]
+fn smoke_nushell() {
+    if !tree_sitter_language_pack::has_language("nushell") {
+        eprintln!("Skipping: language 'nushell' not available");
+        return;
+    }
+    // Smoke test: load nushell and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("nushell").expect("Failed to get parser for 'nushell'");
+    let tree = parser.parse("let x = 42", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
     );
 }
 
@@ -3610,6 +3668,25 @@ fn smoke_v() {
     assert!(
         e2e_tests::tree_contains_node_type(root, "function_declaration"),
         "Tree should contain a 'function_declaration' node"
+    );
+}
+
+#[test]
+fn smoke_vb() {
+    if !tree_sitter_language_pack::has_language("vb") {
+        eprintln!("Skipping: language 'vb' not available");
+        return;
+    }
+    // Smoke test: load vb and parse a simple snippet
+    let mut parser = tree_sitter_language_pack::get_parser("vb").expect("Failed to get parser for 'vb'");
+    let tree = parser.parse("Module Hello\n    Sub Main()\n    End Sub\nEnd Module", None);
+    assert!(tree.is_some(), "Parse tree should not be None");
+    let tree = tree.unwrap();
+    let root = tree.root_node();
+    assert!(
+        root.child_count() >= 1,
+        "Root should have at least 1 child(ren), got {}",
+        root.child_count()
     );
 }
 

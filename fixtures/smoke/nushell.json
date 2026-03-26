@@ -1,0 +1,12 @@
+{
+	"id": "smoke_nushell",
+	"category": "smoke",
+	"description": "Smoke test: load nushell and parse a simple snippet",
+	"language": "nushell",
+	"source_code": "let x = 42",
+	"assertions": {
+		"tree_not_null": true,
+		"root_child_count_min": 1
+	},
+	"tags": ["smoke"]
+}

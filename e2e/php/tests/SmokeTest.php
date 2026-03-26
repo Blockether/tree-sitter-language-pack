@@ -310,6 +310,18 @@ class SmokeTest extends TestCase
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
+    public function test_smoke_csharp(): void
+    {
+        // Smoke test: load csharp and parse a simple snippet
+        if (!\ts_pack_has_language('csharp')) {
+            $this->markTestSkipped('Language \'csharp\' not available');
+        }
+        $langPtr = \ts_pack_get_language('csharp');
+        $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
+        $sexp = \ts_pack_parse_string('csharp', "using System;\nclass Foo { }");
+        $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
+    }
+
     public function test_smoke_css(): void
     {
         // Smoke test: load css and parse a simple snippet
@@ -439,6 +451,18 @@ class SmokeTest extends TestCase
         $langPtr = \ts_pack_get_language('elm');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
         $sexp = \ts_pack_parse_string('elm', "module Main exposing (..)");
+        $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
+    }
+
+    public function test_smoke_embeddedtemplate(): void
+    {
+        // Smoke test: load embeddedtemplate and parse a simple snippet
+        if (!\ts_pack_has_language('embeddedtemplate')) {
+            $this->markTestSkipped('Language \'embeddedtemplate\' not available');
+        }
+        $langPtr = \ts_pack_get_language('embeddedtemplate');
+        $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
+        $sexp = \ts_pack_parse_string('embeddedtemplate', "<%= hello %>");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1171,6 +1195,18 @@ class SmokeTest extends TestCase
         $langPtr = \ts_pack_get_language('nqc');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
         $sexp = \ts_pack_parse_string('nqc', "task main() {}");
+        $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
+    }
+
+    public function test_smoke_nushell(): void
+    {
+        // Smoke test: load nushell and parse a simple snippet
+        if (!\ts_pack_has_language('nushell')) {
+            $this->markTestSkipped('Language \'nushell\' not available');
+        }
+        $langPtr = \ts_pack_get_language('nushell');
+        $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
+        $sexp = \ts_pack_parse_string('nushell', "let x = 42");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 
@@ -1915,6 +1951,18 @@ class SmokeTest extends TestCase
         $langPtr = \ts_pack_get_language('v');
         $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
         $sexp = \ts_pack_parse_string('v', "fn main() {}");
+        $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
+    }
+
+    public function test_smoke_vb(): void
+    {
+        // Smoke test: load vb and parse a simple snippet
+        if (!\ts_pack_has_language('vb')) {
+            $this->markTestSkipped('Language \'vb\' not available');
+        }
+        $langPtr = \ts_pack_get_language('vb');
+        $this->assertIsInt($langPtr, 'Language pointer should be a valid integer handle');
+        $sexp = \ts_pack_parse_string('vb', "Module Hello\n    Sub Main()\n    End Sub\nEnd Module");
         $this->assertNotEmpty($sexp, 'Parse tree S-expression should not be empty');
     }
 

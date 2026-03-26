@@ -329,6 +329,19 @@ func TestSmokeCpp(t *testing.T) {
 	}
 }
 
+func TestSmokeCsharp(t *testing.T) {
+	// Smoke test: load csharp and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "csharp")
+	ptr, err := reg.GetLanguage("csharp")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "csharp", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "csharp")
+	}
+}
+
 func TestSmokeCss(t *testing.T) {
 	// Smoke test: load css and parse a simple snippet
 	reg := newTestRegistry(t)
@@ -469,6 +482,19 @@ func TestSmokeElm(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "elm")
+	}
+}
+
+func TestSmokeEmbeddedtemplate(t *testing.T) {
+	// Smoke test: load embeddedtemplate and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "embeddedtemplate")
+	ptr, err := reg.GetLanguage("embeddedtemplate")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "embeddedtemplate", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "embeddedtemplate")
 	}
 }
 
@@ -1262,6 +1288,19 @@ func TestSmokeNqc(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "nqc")
+	}
+}
+
+func TestSmokeNushell(t *testing.T) {
+	// Smoke test: load nushell and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "nushell")
+	ptr, err := reg.GetLanguage("nushell")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "nushell", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "nushell")
 	}
 }
 
@@ -2068,6 +2107,19 @@ func TestSmokeV(t *testing.T) {
 	}
 	if ptr == nil {
 		t.Fatalf("Language pointer for %q is nil", "v")
+	}
+}
+
+func TestSmokeVb(t *testing.T) {
+	// Smoke test: load vb and parse a simple snippet
+	reg := newTestRegistry(t)
+	skipIfLanguageUnavailable(t, reg, "vb")
+	ptr, err := reg.GetLanguage("vb")
+	if err != nil {
+		t.Fatalf("Failed to get language %q: %v", "vb", err)
+	}
+	if ptr == nil {
+		t.Fatalf("Language pointer for %q is nil", "vb")
 	}
 }
 

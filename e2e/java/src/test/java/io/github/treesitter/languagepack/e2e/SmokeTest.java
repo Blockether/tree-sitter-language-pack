@@ -334,6 +334,19 @@ class SmokeTest {
   }
 
   @Test
+  void smoke_csharp() {
+    // Smoke test: load csharp and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("csharp"), "Language 'csharp' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("csharp");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
   void smoke_css() {
     // Smoke test: load css and parse a simple snippet
     try (var registry = Helpers.createRegistry()) {
@@ -472,6 +485,19 @@ class SmokeTest {
     }
     try (var registry = Helpers.createRegistry()) {
       var langPtr = registry.getLanguage("elm");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_embeddedtemplate() {
+    // Smoke test: load embeddedtemplate and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("embeddedtemplate"), "Language 'embeddedtemplate' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("embeddedtemplate");
       assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
@@ -1265,6 +1291,19 @@ class SmokeTest {
     }
     try (var registry = Helpers.createRegistry()) {
       var langPtr = registry.getLanguage("nqc");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_nushell() {
+    // Smoke test: load nushell and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("nushell"), "Language 'nushell' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("nushell");
       assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
@@ -2071,6 +2110,19 @@ class SmokeTest {
     }
     try (var registry = Helpers.createRegistry()) {
       var langPtr = registry.getLanguage("v");
+      assertNotNull(langPtr, "Language pointer should not be null");
+    }
+  }
+
+  @Test
+  void smoke_vb() {
+    // Smoke test: load vb and parse a simple snippet
+    try (var registry = Helpers.createRegistry()) {
+      org.junit.jupiter.api.Assumptions.assumeTrue(
+          registry.hasLanguage("vb"), "Language 'vb' not available");
+    }
+    try (var registry = Helpers.createRegistry()) {
+      var langPtr = registry.getLanguage("vb");
       assertNotNull(langPtr, "Language pointer should not be null");
     }
   }
