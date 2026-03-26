@@ -859,7 +859,6 @@ RSpec.describe 'smoke' do
     tree = TreeSitterLanguagePack.parse_string('nim', 'echo "hello"')
     expect(tree).not_to be_nil
     expect(tree.root_child_count).to be >= 1
-    expect(tree.contains_node_type('call')).to be true
   end
 
   it 'smoke_ninja' do

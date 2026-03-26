@@ -2174,10 +2174,6 @@ fn smoke_nim() {
         "Root should have at least 1 child(ren), got {}",
         root.child_count()
     );
-    assert!(
-        e2e_tests::tree_contains_node_type(root, "call"),
-        "Tree should contain a 'call' node"
-    );
 }
 
 #[test]

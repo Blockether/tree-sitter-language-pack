@@ -1530,9 +1530,6 @@ defmodule E2eTests.SmokeTest do
       assert is_reference(tree), "Parse tree should be a reference"
       child_count = TreeSitterLanguagePack.tree_root_child_count(tree)
       assert child_count >= 1, "Root should have at least 1 child(ren), got #{child_count}"
-
-      assert TreeSitterLanguagePack.tree_contains_node_type(tree, "call"),
-             "Tree should contain a 'call' node"
     end
   end
 

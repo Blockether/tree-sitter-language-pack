@@ -18,16 +18,16 @@ func TestCFunctionProcess(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "c" {
-		t.Fatalf("expected language %q, got %q", "c", result.Metadata.Language)
+	if result.Language != "c" {
+		t.Fatalf("expected language %q, got %q", "c", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -37,12 +37,12 @@ func TestCFunctionProcess(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if result.Metadata.Metrics.TotalLines < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -55,16 +55,16 @@ func TestConfigAllPython(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -74,16 +74,16 @@ func TestConfigAllPython(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if len(result.Metadata.Imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
+	if len(result.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Imports))
 	}
 
-	if result.Metadata.Metrics.TotalLines < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -96,12 +96,12 @@ func TestConfigMinimalPython(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if result.Metadata.Metrics.TotalLines < 2 {
-		t.Fatalf("expected at least 2 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 2 {
+		t.Fatalf("expected at least 2 total line(s), got %d", result.Metrics.TotalLines)
 	}
 }
 
@@ -114,16 +114,16 @@ func TestGoFunctionProcess(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "go" {
-		t.Fatalf("expected language %q, got %q", "go", result.Metadata.Language)
+	if result.Language != "go" {
+		t.Fatalf("expected language %q, got %q", "go", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -133,16 +133,16 @@ func TestGoFunctionProcess(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if len(result.Metadata.Imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
+	if len(result.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Imports))
 	}
 
-	if result.Metadata.Metrics.TotalLines < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -155,16 +155,16 @@ func TestGoFunctionProcessDetail(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "go" {
-		t.Fatalf("expected language %q, got %q", "go", result.Metadata.Language)
+	if result.Language != "go" {
+		t.Fatalf("expected language %q, got %q", "go", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -174,16 +174,16 @@ func TestGoFunctionProcessDetail(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if len(result.Metadata.Imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
+	if len(result.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Imports))
 	}
 
-	if result.Metadata.Metrics.TotalLines < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -196,16 +196,16 @@ func TestJavaClassProcess(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "java" {
-		t.Fatalf("expected language %q, got %q", "java", result.Metadata.Language)
+	if result.Language != "java" {
+		t.Fatalf("expected language %q, got %q", "java", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Class" {
 			foundKind = true
 			break
@@ -215,16 +215,16 @@ func TestJavaClassProcess(t *testing.T) {
 		t.Fatal("structure should contain a 'Class' kind node")
 	}
 
-	if len(result.Metadata.Imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
+	if len(result.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Imports))
 	}
 
-	if result.Metadata.Metrics.TotalLines < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -237,16 +237,16 @@ func TestJavascriptMultiImportProcess(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "javascript" {
-		t.Fatalf("expected language %q, got %q", "javascript", result.Metadata.Language)
+	if result.Language != "javascript" {
+		t.Fatalf("expected language %q, got %q", "javascript", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -256,16 +256,16 @@ func TestJavascriptMultiImportProcess(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if len(result.Metadata.Imports) < 2 {
-		t.Fatalf("expected at least 2 import(s), got %d", len(result.Metadata.Imports))
+	if len(result.Imports) < 2 {
+		t.Fatalf("expected at least 2 import(s), got %d", len(result.Imports))
 	}
 
-	if result.Metadata.Metrics.TotalLines < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -278,16 +278,16 @@ func TestJavascriptMultiImportProcessDetail(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "javascript" {
-		t.Fatalf("expected language %q, got %q", "javascript", result.Metadata.Language)
+	if result.Language != "javascript" {
+		t.Fatalf("expected language %q, got %q", "javascript", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -297,16 +297,16 @@ func TestJavascriptMultiImportProcessDetail(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if len(result.Metadata.Imports) < 2 {
-		t.Fatalf("expected at least 2 import(s), got %d", len(result.Metadata.Imports))
+	if len(result.Imports) < 2 {
+		t.Fatalf("expected at least 2 import(s), got %d", len(result.Imports))
 	}
 
-	if result.Metadata.Metrics.TotalLines < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -319,12 +319,12 @@ func TestProcessJavascriptExportsDetail(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "javascript" {
-		t.Fatalf("expected language %q, got %q", "javascript", result.Metadata.Language)
+	if result.Language != "javascript" {
+		t.Fatalf("expected language %q, got %q", "javascript", result.Language)
 	}
 
-	if len(result.Metadata.Exports) < 1 {
-		t.Fatalf("expected at least 1 export(s), got %d", len(result.Metadata.Exports))
+	if len(result.Exports) < 1 {
+		t.Fatalf("expected at least 1 export(s), got %d", len(result.Exports))
 	}
 }
 
@@ -337,12 +337,12 @@ func TestProcessPythonComments(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Comments) < 1 {
-		t.Fatalf("expected at least 1 comment(s), got %d", len(result.Metadata.Comments))
+	if len(result.Comments) < 1 {
+		t.Fatalf("expected at least 1 comment(s), got %d", len(result.Comments))
 	}
 }
 
@@ -355,16 +355,16 @@ func TestProcessPythonImportsDetail(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Imports) < 2 {
-		t.Fatalf("expected at least 2 import(s), got %d", len(result.Metadata.Imports))
+	if len(result.Imports) < 2 {
+		t.Fatalf("expected at least 2 import(s), got %d", len(result.Imports))
 	}
 
 	foundImport := false
-	for _, imp := range result.Metadata.Imports {
+	for _, imp := range result.Imports {
 		if strings.Contains(imp.Source, "os") {
 			foundImport = true
 			break
@@ -384,20 +384,20 @@ func TestProcessPythonMetricsDetail(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if result.Metadata.Metrics.CodeLines < 4 {
-		t.Fatalf("expected at least 4 code line(s), got %d", result.Metadata.Metrics.CodeLines)
+	if result.Metrics.CodeLines < 4 {
+		t.Fatalf("expected at least 4 code line(s), got %d", result.Metrics.CodeLines)
 	}
 
-	if result.Metadata.Metrics.CommentLines < 1 {
-		t.Fatalf("expected at least 1 comment line(s), got %d", result.Metadata.Metrics.CommentLines)
+	if result.Metrics.CommentLines < 1 {
+		t.Fatalf("expected at least 1 comment line(s), got %d", result.Metrics.CommentLines)
 	}
 
-	if result.Metadata.Metrics.MaxDepth < 1 {
-		t.Fatalf("expected max_depth >= 1, got %d", result.Metadata.Metrics.MaxDepth)
+	if result.Metrics.MaxDepth < 1 {
+		t.Fatalf("expected max_depth >= 1, got %d", result.Metrics.MaxDepth)
 	}
 }
 
@@ -410,16 +410,16 @@ func TestProcessRustStructureName(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", result.Metadata.Language)
+	if result.Language != "rust" {
+		t.Fatalf("expected language %q, got %q", "rust", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundName := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Name != nil && strings.Contains(*s.Name, "MyConfig") {
 			foundName = true
 			break
@@ -444,16 +444,16 @@ func TestPythonChunkingMedium(t *testing.T) {
 		t.Fatalf("expected at least 2 chunk(s), got %d", len(result.Chunks))
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 3 {
-		t.Fatalf("expected at least 3 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 3 {
+		t.Fatalf("expected at least 3 structure(s), got %d", len(result.Structure))
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -471,12 +471,12 @@ func TestPythonChunkingProcessDetail(t *testing.T) {
 		t.Fatalf("expected at least 2 chunk(s), got %d", len(result.Chunks))
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if result.Metadata.Metrics.TotalLines < 8 {
-		t.Fatalf("expected at least 8 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 8 {
+		t.Fatalf("expected at least 8 total line(s), got %d", result.Metrics.TotalLines)
 	}
 }
 
@@ -489,16 +489,16 @@ func TestPythonClassWithMethodsProcess(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Class" {
 			foundKind = true
 			break
@@ -508,12 +508,12 @@ func TestPythonClassWithMethodsProcess(t *testing.T) {
 		t.Fatal("structure should contain a 'Class' kind node")
 	}
 
-	if result.Metadata.Metrics.TotalLines < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -526,16 +526,16 @@ func TestPythonClassWithMethodsProcessDetail(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Class" {
 			foundKind = true
 			break
@@ -545,12 +545,12 @@ func TestPythonClassWithMethodsProcessDetail(t *testing.T) {
 		t.Fatal("structure should contain a 'Class' kind node")
 	}
 
-	if result.Metadata.Metrics.TotalLines < 6 {
-		t.Fatalf("expected at least 6 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 6 {
+		t.Fatalf("expected at least 6 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -563,15 +563,15 @@ func TestPythonErrorDiagnostics(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 1 {
-		t.Fatalf("expected error_count 1, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 1 {
+		t.Fatalf("expected error_count 1, got %d", result.Metrics.ErrorCount)
 	}
 
-	if len(result.Metadata.Diagnostics) == 0 {
+	if len(result.Diagnostics) == 0 {
 		t.Fatal("diagnostics should not be empty")
 	}
 }
@@ -585,16 +585,16 @@ func TestPythonFunctionProcess(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -604,12 +604,12 @@ func TestPythonFunctionProcess(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if result.Metadata.Metrics.TotalLines < 2 {
-		t.Fatalf("expected at least 2 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 2 {
+		t.Fatalf("expected at least 2 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -622,16 +622,16 @@ func TestPythonFunctionProcessDetail(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -641,12 +641,12 @@ func TestPythonFunctionProcessDetail(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if result.Metadata.Metrics.TotalLines < 2 {
-		t.Fatalf("expected at least 2 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 2 {
+		t.Fatalf("expected at least 2 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -659,11 +659,11 @@ func TestPythonMalformedCodeProcess(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Diagnostics) == 0 {
+	if len(result.Diagnostics) == 0 {
 		t.Fatal("diagnostics should not be empty")
 	}
 }
@@ -677,11 +677,11 @@ func TestPythonMalformedCodeProcessDetail(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Diagnostics) == 0 {
+	if len(result.Diagnostics) == 0 {
 		t.Fatal("diagnostics should not be empty")
 	}
 }
@@ -695,24 +695,24 @@ func TestPythonMultiImportProcess(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
-	if len(result.Metadata.Imports) < 3 {
-		t.Fatalf("expected at least 3 import(s), got %d", len(result.Metadata.Imports))
+	if len(result.Imports) < 3 {
+		t.Fatalf("expected at least 3 import(s), got %d", len(result.Imports))
 	}
 
-	if result.Metadata.Metrics.TotalLines < 5 {
-		t.Fatalf("expected at least 5 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 5 {
+		t.Fatalf("expected at least 5 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -725,24 +725,24 @@ func TestPythonMultiImportProcessDetail(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "python" {
-		t.Fatalf("expected language %q, got %q", "python", result.Metadata.Language)
+	if result.Language != "python" {
+		t.Fatalf("expected language %q, got %q", "python", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
-	if len(result.Metadata.Imports) < 3 {
-		t.Fatalf("expected at least 3 import(s), got %d", len(result.Metadata.Imports))
+	if len(result.Imports) < 3 {
+		t.Fatalf("expected at least 3 import(s), got %d", len(result.Imports))
 	}
 
-	if result.Metadata.Metrics.TotalLines < 5 {
-		t.Fatalf("expected at least 5 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 5 {
+		t.Fatalf("expected at least 5 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -755,16 +755,16 @@ func TestRubyClassProcess(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "ruby" {
-		t.Fatalf("expected language %q, got %q", "ruby", result.Metadata.Language)
+	if result.Language != "ruby" {
+		t.Fatalf("expected language %q, got %q", "ruby", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Class" {
 			foundKind = true
 			break
@@ -774,12 +774,12 @@ func TestRubyClassProcess(t *testing.T) {
 		t.Fatal("structure should contain a 'Class' kind node")
 	}
 
-	if result.Metadata.Metrics.TotalLines < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -797,12 +797,12 @@ func TestRustChunkingProcess(t *testing.T) {
 		t.Fatalf("expected at least 2 chunk(s), got %d", len(result.Chunks))
 	}
 
-	if result.Metadata.Language != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", result.Metadata.Language)
+	if result.Language != "rust" {
+		t.Fatalf("expected language %q, got %q", "rust", result.Language)
 	}
 
-	if result.Metadata.Metrics.TotalLines < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metrics.TotalLines)
 	}
 }
 
@@ -820,12 +820,12 @@ func TestRustChunkingProcessDetail(t *testing.T) {
 		t.Fatalf("expected at least 2 chunk(s), got %d", len(result.Chunks))
 	}
 
-	if result.Metadata.Language != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", result.Metadata.Language)
+	if result.Language != "rust" {
+		t.Fatalf("expected language %q, got %q", "rust", result.Language)
 	}
 
-	if result.Metadata.Metrics.TotalLines < 7 {
-		t.Fatalf("expected at least 7 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 7 {
+		t.Fatalf("expected at least 7 total line(s), got %d", result.Metrics.TotalLines)
 	}
 }
 
@@ -838,16 +838,16 @@ func TestRustFunctionProcess(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", result.Metadata.Language)
+	if result.Language != "rust" {
+		t.Fatalf("expected language %q, got %q", "rust", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -857,12 +857,12 @@ func TestRustFunctionProcess(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if result.Metadata.Metrics.TotalLines < 3 {
-		t.Fatalf("expected at least 3 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 3 {
+		t.Fatalf("expected at least 3 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -875,16 +875,16 @@ func TestRustFunctionProcessDetail(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "rust" {
-		t.Fatalf("expected language %q, got %q", "rust", result.Metadata.Language)
+	if result.Language != "rust" {
+		t.Fatalf("expected language %q, got %q", "rust", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -894,12 +894,12 @@ func TestRustFunctionProcessDetail(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if result.Metadata.Metrics.TotalLines < 3 {
-		t.Fatalf("expected at least 3 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 3 {
+		t.Fatalf("expected at least 3 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -912,16 +912,16 @@ func TestTypescriptFunctionProcess(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "typescript" {
-		t.Fatalf("expected language %q, got %q", "typescript", result.Metadata.Language)
+	if result.Language != "typescript" {
+		t.Fatalf("expected language %q, got %q", "typescript", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -931,16 +931,16 @@ func TestTypescriptFunctionProcess(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if len(result.Metadata.Imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
+	if len(result.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Imports))
 	}
 
-	if result.Metadata.Metrics.TotalLines < 5 {
-		t.Fatalf("expected at least 5 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 5 {
+		t.Fatalf("expected at least 5 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }
 
@@ -953,16 +953,16 @@ func TestTypescriptFunctionProcessDetail(t *testing.T) {
 		t.Fatalf("process failed: %v", err)
 	}
 
-	if result.Metadata.Language != "typescript" {
-		t.Fatalf("expected language %q, got %q", "typescript", result.Metadata.Language)
+	if result.Language != "typescript" {
+		t.Fatalf("expected language %q, got %q", "typescript", result.Language)
 	}
 
-	if len(result.Metadata.Structure) < 1 {
-		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Metadata.Structure))
+	if len(result.Structure) < 1 {
+		t.Fatalf("expected at least 1 structure(s), got %d", len(result.Structure))
 	}
 
 	foundKind := false
-	for _, s := range result.Metadata.Structure {
+	for _, s := range result.Structure {
 		if s.Kind == "Function" {
 			foundKind = true
 			break
@@ -972,15 +972,15 @@ func TestTypescriptFunctionProcessDetail(t *testing.T) {
 		t.Fatal("structure should contain a 'Function' kind node")
 	}
 
-	if len(result.Metadata.Imports) < 1 {
-		t.Fatalf("expected at least 1 import(s), got %d", len(result.Metadata.Imports))
+	if len(result.Imports) < 1 {
+		t.Fatalf("expected at least 1 import(s), got %d", len(result.Imports))
 	}
 
-	if result.Metadata.Metrics.TotalLines < 5 {
-		t.Fatalf("expected at least 5 total line(s), got %d", result.Metadata.Metrics.TotalLines)
+	if result.Metrics.TotalLines < 5 {
+		t.Fatalf("expected at least 5 total line(s), got %d", result.Metrics.TotalLines)
 	}
 
-	if result.Metadata.Metrics.ErrorCount != 0 {
-		t.Fatalf("expected error_count 0, got %d", result.Metadata.Metrics.ErrorCount)
+	if result.Metrics.ErrorCount != 0 {
+		t.Fatalf("expected error_count 0, got %d", result.Metrics.ErrorCount)
 	}
 }

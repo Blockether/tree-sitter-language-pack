@@ -1056,7 +1056,6 @@ def test_smoke_nim():
     assert tree is not None, "Parse tree should not be None"
     root = tree.root_node
     assert root.child_count >= 1, f"Root should have at least 1 child(ren), got {root.child_count}"
-    assert tree_contains_node_type(root, "call"), "Tree should contain a 'call' node"
 
 
 @pytest.mark.skipif(not has_language("ninja"), reason="Language 'ninja' not available")

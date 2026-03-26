@@ -155,9 +155,18 @@ type CodeChunk struct {
 }
 
 // ProcessResult holds the result of Process (analyze + chunk).
+// Fields are flat (not nested under "metadata") matching the Rust ProcessResult JSON.
 type ProcessResult struct {
-	Metadata FileMetadata `json:"metadata"`
-	Chunks   []CodeChunk  `json:"chunks"`
+	Language    string          `json:"language"`
+	Metrics     FileMetrics     `json:"metrics"`
+	Structure   []StructureItem `json:"structure,omitempty"`
+	Imports     []ImportInfo    `json:"imports,omitempty"`
+	Exports     []ExportInfo    `json:"exports,omitempty"`
+	Comments    []CommentInfo   `json:"comments,omitempty"`
+	Docstrings  []DocstringInfo `json:"docstrings,omitempty"`
+	Symbols     []SymbolInfo    `json:"symbols,omitempty"`
+	Diagnostics []Diagnostic    `json:"diagnostics,omitempty"`
+	Chunks      []CodeChunk     `json:"chunks,omitempty"`
 }
 
 // ProcessConfig specifies what to extract from source code.
