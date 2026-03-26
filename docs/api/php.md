@@ -223,6 +223,104 @@ $result = TreeSitterLanguagePack::process($source, [
 ]);
 ```
 
+## Pattern Extraction
+
+### `TreeSitterLanguagePack::extract(string $source, string $configJson): array`
+
+Run tree-sitter queries against source code and return structured extraction results. Unlike `process`, which uses predefined intelligence queries, `extract` lets you supply arbitrary tree-sitter query patterns.
+
+The wrapper class calls `ts_pack_extract` internally and JSON-decodes the result into an associative array.
+
+**Parameters:**
+
+- `$source` (string): Source code to extract from
+- `$configJson` (string): JSON string with extraction configuration. Fields:
+    - `language` (string, required): Language name
+    - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
+        - `query` (string, required): Tree-sitter query in S-expression syntax
+        - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
+        - `child_fields` (string[], default `[]`): Field names to extract from child nodes
+        - `max_results` (int|null, default null): Maximum number of matches to return
+        - `byte_range` ([int, int]|null, default null): Restrict matches to a byte range
+
+**Returns:** array - Associative array with extraction results. The top-level array contains:
+
+- `language` (string): The language used
+- `results` (array): Keyed by pattern name, each value contains:
+    - `matches` (array): Each match has `pattern_index` (int) and `captures` (array). Each capture has `name` (string), `text` (string|null), `node` (array|null), `child_fields` (array), and `start_byte` (int).
+    - `total_count` (int): Total matches before `max_results` truncation
+
+**Throws:** `\RuntimeException` on invalid config JSON, unknown language, or extraction failure.
+
+**Example:**
+
+```php
+$config = json_encode([
+    'language' => 'python',
+    'patterns' => [
+        'functions' => [
+            'query' => '(function_definition name: (identifier) @fn_name)',
+            'capture_output' => 'Text',
+        ],
+    ],
+]);
+
+$result = TreeSitterLanguagePack::extract('def hello(): pass', $config);
+
+foreach ($result['results']['functions']['matches'] as $match) {
+    foreach ($match['captures'] as $capture) {
+        echo $capture['text'] . "\n";
+    }
+}
+```
+
+### `TreeSitterLanguagePack::validateExtraction(string $configJson): array`
+
+Validate extraction patterns without running them against source code. Useful for checking query syntax before performing extraction.
+
+**Parameters:**
+
+- `$configJson` (string): JSON string with the same shape as the config for `extract` (must include `language` and `patterns`)
+
+**Returns:** array - Associative array with validation results. The top-level array contains:
+
+- `valid` (bool): Whether all patterns are valid
+- `patterns` (array): Per-pattern validation, each with:
+    - `valid` (bool): Whether this pattern compiled successfully
+    - `capture_names` (string[]): Capture names defined in the query
+    - `pattern_count` (int): Number of patterns in the query
+    - `warnings` (string[]): Non-fatal warnings
+    - `errors` (string[]): Fatal errors (e.g., query syntax errors)
+
+**Throws:** `\RuntimeException` on invalid config JSON or unknown language.
+
+**Example:**
+
+```php
+$config = json_encode([
+    'language' => 'python',
+    'patterns' => [
+        'functions' => [
+            'query' => '(function_definition name: (identifier) @fn_name)',
+        ],
+    ],
+]);
+
+$result = TreeSitterLanguagePack::validateExtraction($config);
+
+if ($result['valid']) {
+    echo "All patterns valid\n";
+} else {
+    foreach ($result['patterns'] as $name => $info) {
+        if (!$info['valid']) {
+            foreach ($info['errors'] as $error) {
+                echo "$name: $error\n";
+            }
+        }
+    }
+}
+```
+
 ## Extension Functions (Procedural API)
 
 These are the raw functions exposed by the native extension. The wrapper class calls these internally.
@@ -244,6 +342,8 @@ These are the raw functions exposed by the native extension. The wrapper class c
 | `ts_pack_get_language(string $name)` | language name | int (pointer) |
 | `ts_pack_parse_string(string $language, string $source)` | language, source | string (S-expression) |
 | `ts_pack_process(string $source, string $config_json)` | source, JSON config | string (JSON result) |
+| `ts_pack_extract(string $source, string $config_json)` | source, JSON config | string (JSON result) |
+| `ts_pack_validate_extraction(string $config_json)` | JSON config | string (JSON result) |
 
 ### Download Management
 

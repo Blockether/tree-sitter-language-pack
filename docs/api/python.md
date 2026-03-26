@@ -415,6 +415,7 @@ ProcessConfig(
 | `symbols` | `bool` | `True` | Extract symbols |
 | `diagnostics` | `bool` | `True` | Extract diagnostics |
 | `chunk_max_size` | `int \| None` | `None` | Maximum chunk size (None disables chunking) |
+| `extractions` | `dict \| None` | `None` | Custom extraction patterns (same shape as `extract` config `patterns`) |
 
 ### Static Methods
 
@@ -458,6 +459,103 @@ config = ProcessConfig(
     chunk_max_size=2000,
 )
 result = process("import os\ndef foo(): pass", config)
+```
+
+## Extraction Queries
+
+### `extract(source: str, config: dict) -> dict`
+
+Run user-defined tree-sitter queries against source code and return structured results. Parses the source, executes all named patterns, and returns matches with captured nodes, text, and child fields.
+
+**Parameters:**
+
+- `source` (str): Source code string to parse and query
+- `config` (dict): Extraction configuration with the following keys:
+    - `language` (str): Language name (e.g., `"python"`)
+    - `patterns` (dict): Mapping of pattern names to pattern config dicts
+
+**Pattern config fields:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `query` | `str` | (required) | Tree-sitter S-expression query string |
+| `capture_output` | `str` | `"Full"` | `"Text"` (text only), `"Node"` (node info only), or `"Full"` (both) |
+| `child_fields` | `list[str]` | `[]` | Child field names to extract from captured nodes |
+| `max_results` | `int \| None` | `None` | Maximum matches to return (None for unlimited) |
+| `byte_range` | `[int, int] \| None` | `None` | Restrict matches to a `[start, end]` byte range |
+
+**Returns:** dict with keys:
+
+- `language` (str): The language used
+- `results` (dict): Mapping of pattern names to result dicts, each containing:
+    - `matches` (list[dict]): List of match dicts, each with `pattern_index` (int) and `captures` (list of capture dicts)
+    - `total_count` (int): Total matches found (before `max_results` truncation)
+
+Each capture dict contains: `name` (str), `node` (dict or None), `text` (str or None), `child_fields` (dict), `start_byte` (int).
+
+**Raises:**
+
+- `ParseError`: If parsing fails, the config is invalid, or serialization fails
+
+```python
+from tree_sitter_language_pack import extract
+
+result = extract(
+    "def hello(): pass\ndef world(): pass",
+    {
+        "language": "python",
+        "patterns": {
+            "functions": {
+                "query": "(function_definition name: (identifier) @fn_name) @fn_def",
+                "capture_output": "Full",
+                "child_fields": ["name", "parameters"],
+            }
+        },
+    },
+)
+
+for match in result["results"]["functions"]["matches"]:
+    for capture in match["captures"]:
+        if capture["text"]:
+            print(f"{capture['name']}: {capture['text']}")
+```
+
+### `validate_extraction(config: dict) -> dict`
+
+Validate an extraction config without executing it. Checks that the language exists and all query patterns compile successfully.
+
+**Parameters:**
+
+- `config` (dict): Same shape as the `config` parameter of `extract`
+
+**Returns:** dict with keys:
+
+- `valid` (bool): Whether all patterns are valid
+- `patterns` (dict): Mapping of pattern names to validation dicts, each with:
+    - `valid` (bool): Whether this pattern compiled
+    - `capture_names` (list[str]): Capture names defined in the query
+    - `pattern_count` (int): Number of patterns in the query
+    - `warnings` (list[str]): Non-fatal warnings
+    - `errors` (list[str]): Fatal errors (e.g., syntax errors)
+
+**Raises:**
+
+- `ParseError`: If the language cannot be loaded or the config is malformed
+
+```python
+from tree_sitter_language_pack import validate_extraction
+
+result = validate_extraction({
+    "language": "python",
+    "patterns": {
+        "functions": {
+            "query": "(function_definition name: (identifier) @fn_name)",
+        }
+    },
+})
+
+assert result["valid"]
+assert "fn_name" in result["patterns"]["functions"]["capture_names"]
 ```
 
 ## Download Management

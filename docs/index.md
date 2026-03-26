@@ -59,9 +59,17 @@ description: "Comprehensive tree-sitter grammar compilation with bindings for Py
 
     ---
 
-    Rust core with zero-copy parsing. Tree-sitter is battle-tested in editors like Neovim and Helix for a reason.
+    Rust core with zero-copy parsing. Tree-sitter powers production editors including Neovim, Helix, and Zed.
 
     [:material-arrow-right: Architecture overview](concepts/architecture.md)
+
+- :material-magnify:{ .lg .middle } **Extraction Queries**
+
+    ---
+
+    Run custom tree-sitter queries and get structured results with text, metadata, and child fields.
+
+    [:material-arrow-right: Extraction guide](guides/extraction.md)
 
 </div>
 
@@ -151,7 +159,7 @@ description: "Comprehensive tree-sitter grammar compilation with bindings for Py
     <dependency>
       <groupId>dev.kreuzberg</groupId>
       <artifactId>tree-sitter-language-pack</artifactId>
-      <version>1.2.0</version>
+      <version>1.3.0</version>
     </dependency>
     ```
 
@@ -175,7 +183,7 @@ description: "Comprehensive tree-sitter grammar compilation with bindings for Py
 | :fontawesome-brands-js: Node.js | [`@kreuzberg/tree-sitter-language-pack`](https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack) | 18+ |
 | :fontawesome-brands-rust: Rust | [`ts-pack-core`](https://crates.io/crates/tree-sitter-language-pack) | 1.75+ |
 | :fontawesome-brands-golang: Go | [`packages/go/v1`](https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go/v1) | 1.26+ |
-| :fontawesome-brands-java: Java | [`dev.kreuzberg:tree-sitter-language-pack`](https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack) | 21+ |
+| :fontawesome-brands-java: Java | [`dev.kreuzberg:tree-sitter-language-pack`](https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack) | 25+ |
 | :material-language-csharp: C# / .NET | [`TreeSitterLanguagePack`](https://www.nuget.org/packages/TreeSitterLanguagePack) | .NET 10+ |
 | :material-language-ruby: Ruby | [`tree_sitter_language_pack`](https://rubygems.org/gems/tree_sitter_language_pack) | 3.4+ |
 | :simple-elixir: Elixir | [`tree_sitter_language_pack`](https://hex.pm/packages/tree_sitter_language_pack) | 1.14+ / OTP 25+ |

@@ -455,6 +455,10 @@ Fields: `startByte` (int), `endByte` (int), `startLine` (int), `startColumn` (in
 
 Fields: `kind` (String), `isNamed` (boolean), `startByte` (int), `endByte` (int), `startRow` (int), `startColumn` (int), `endRow` (int), `endColumn` (int), `namedChildCount` (int), `isError` (boolean), `isMissing` (boolean).
 
+## Extraction Queries
+
+Extraction queries are not yet available in the Java binding. See the [Extraction Queries guide](../guides/extraction.md) for usage in other languages.
+
 ## Thread Safety
 
 `TsPackRegistry` instances are **not** thread-safe. If concurrent access is required, callers must provide their own synchronization. Static methods (download, init, configure, etc.) do not require a registry instance.

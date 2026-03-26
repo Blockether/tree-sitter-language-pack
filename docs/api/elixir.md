@@ -483,6 +483,100 @@ Enum.each(result["structure"], fn item ->
 end)
 ```
 
+## Pattern Extraction
+
+### `extract(source, config_json)`
+
+Run tree-sitter queries against source code and return structured extraction results as an Elixir map. Unlike `process`, which uses predefined intelligence queries, `extract` lets you supply arbitrary tree-sitter query patterns.
+
+**Parameters:**
+
+- `source` (String): Source code to extract from
+- `config_json` (String): JSON string with extraction configuration. Fields:
+    - `language` (string, required): Language name
+    - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
+        - `query` (string, required): Tree-sitter query in S-expression syntax
+        - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
+        - `child_fields` (list of string, default `[]`): Field names to extract from child nodes
+        - `max_results` (int or nil, default nil): Maximum number of matches to return
+        - `byte_range` (list of two ints or nil, default nil): Restrict matches to a byte range `[start, end]`
+
+**Returns:** map with string keys. The top-level map contains:
+
+- `"language"` (string): The language used
+- `"results"` (map): Keyed by pattern name, each value contains:
+    - `"matches"` (list): Each match has `"pattern_index"` (integer) and `"captures"` (list). Each capture has `"name"` (string), `"text"` (string or nil), `"node"` (map or nil), `"child_fields"` (map), and `"start_byte"` (integer).
+    - `"total_count"` (integer): Total matches before `max_results` truncation
+
+**Raises:** Erlang error on invalid config JSON, unknown language, or extraction failure.
+
+**Example:**
+
+```elixir
+config = Jason.encode!(%{
+  "language" => "python",
+  "patterns" => %{
+    "functions" => %{
+      "query" => "(function_definition name: (identifier) @fn_name)",
+      "capture_output" => "Text"
+    }
+  }
+})
+
+result = TreeSitterLanguagePack.extract("def hello(): pass\ndef world(): pass", config)
+
+for match <- result["results"]["functions"]["matches"],
+    capture <- match["captures"] do
+  IO.puts(capture["text"])
+end
+# Output:
+# hello
+# world
+```
+
+### `validate_extraction(config_json)`
+
+Validate extraction patterns without running them against source code. Useful for checking query syntax before performing extraction.
+
+**Parameters:**
+
+- `config_json` (String): JSON string with the same shape as the config for `extract/2` (must include `language` and `patterns`)
+
+**Returns:** map with string keys. The top-level map contains:
+
+- `"valid"` (boolean): Whether all patterns are valid
+- `"patterns"` (map): Per-pattern validation, each with:
+    - `"valid"` (boolean): Whether this pattern compiled successfully
+    - `"capture_names"` (list of string): Capture names defined in the query
+    - `"pattern_count"` (integer): Number of patterns in the query
+    - `"warnings"` (list of string): Non-fatal warnings
+    - `"errors"` (list of string): Fatal errors (e.g., query syntax errors)
+
+**Raises:** Erlang error on invalid config JSON or unknown language.
+
+**Example:**
+
+```elixir
+config = Jason.encode!(%{
+  "language" => "python",
+  "patterns" => %{
+    "functions" => %{
+      "query" => "(function_definition name: (identifier) @fn_name)"
+    }
+  }
+})
+
+result = TreeSitterLanguagePack.validate_extraction(config)
+
+if result["valid"] do
+  IO.puts("All patterns valid")
+else
+  for {name, info} <- result["patterns"], not info["valid"] do
+    Enum.each(info["errors"], &IO.puts("#{name}: #{&1}"))
+  end
+end
+```
+
 ## Error Handling
 
 NIF functions raise Erlang errors with tagged tuples. Use `try`/`rescue` or pattern matching:

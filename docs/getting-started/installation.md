@@ -116,7 +116,7 @@ Requires JDK 25+ (uses Panama FFM API).
     <dependency>
         <groupId>dev.kreuzberg</groupId>
         <artifactId>tree-sitter-language-pack</artifactId>
-        <version>1.2.0</version>
+        <version>1.3.0</version>
     </dependency>
     ```
 
@@ -124,7 +124,7 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```kotlin
     dependencies {
-        implementation("dev.kreuzberg:tree-sitter-language-pack:1.2.0")
+        implementation("dev.kreuzberg:tree-sitter-language-pack:1.3.0")
     }
     ```
 
@@ -132,7 +132,7 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```groovy
     dependencies {
-        implementation 'dev.kreuzberg:tree-sitter-language-pack:1.2.0'
+        implementation 'dev.kreuzberg:tree-sitter-language-pack:1.3.0'
     }
     ```
 
@@ -165,7 +165,7 @@ Requires .NET 10+.
 === ".csproj"
 
     ```xml
-    <PackageReference Include="TreeSitterLanguagePack" Version="1.2.0" />
+    <PackageReference Include="TreeSitterLanguagePack" Version="1.3.0" />
     ```
 
 ```csharp

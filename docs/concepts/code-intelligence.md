@@ -285,3 +285,28 @@ print(f"\n{func['name']} docstring:\n{func['docstring']}")
 m = result["metrics"]
 print(f"\nLines: {m['total_lines']} total, {m['code_lines']} code, {m['comment_lines']} comments")
 ```
+
+## Custom Extraction Queries
+
+The built-in fields above cover common use cases, but many workflows require language-specific patterns that go beyond standard structure or import extraction. The `ProcessConfig.extractions` field lets you define custom tree-sitter query patterns that run alongside the standard analysis passes.
+
+Each extraction is a named pattern with a tree-sitter S-expression query. Results are returned in `ProcessResult.extractions`, keyed by the name you provide. You can control what data each match captures (text, node metadata, or both), limit the number of results, and restrict matches to a byte range.
+
+```python
+config = ProcessConfig(
+    language="python",
+    structure=True,
+    extractions={
+        "decorators": {
+            "query": "(decorator (identifier) @name)",
+            "capture_output": "text",
+        },
+    },
+)
+result = process(source, config)
+
+for match in result["extractions"]["decorators"]:
+    print(match)
+```
+
+For a full walkthrough of extraction queries, including `child_fields`, `max_results`, `byte_range`, and compiled extraction for repeated use, see the [Extraction Queries guide](../guides/extraction.md).

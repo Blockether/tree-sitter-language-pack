@@ -280,6 +280,7 @@ interface JsProcessConfig {
   symbols?: boolean;     // default: true
   diagnostics?: boolean; // default: true
   chunkMaxSize?: number; // optional, in bytes
+  extractions?: Record<string, PatternConfig>; // custom extraction patterns
 }
 ```
 
@@ -418,6 +419,124 @@ interface ChunkContext {
   hasErrorNodes: boolean;
   contextPath: string[];
 }
+```
+
+## Extraction Queries
+
+### `extract(source: string, config: object): ExtractionResult`
+
+Run user-defined tree-sitter queries against source code and return structured results. Parses the source, executes all named patterns, and returns matches with captured nodes, text, and child fields.
+
+Accepts both camelCase and snake_case config keys. Returns camelCase keys in the result.
+
+**Throws** if the language is not found, parsing fails, or a query pattern is invalid.
+
+**Config type:**
+
+```typescript
+interface ExtractionConfig {
+  language: string;
+  patterns: Record<string, PatternConfig>;
+}
+
+interface PatternConfig {
+  query: string;                       // tree-sitter S-expression query
+  captureOutput?: "Text" | "Node" | "Full";  // default: "Full"
+  childFields?: string[];              // child field names to extract (default: [])
+  maxResults?: number;                 // max matches to return (default: unlimited)
+  byteRange?: [number, number];        // restrict to byte range (default: entire file)
+}
+```
+
+**Result type:**
+
+```typescript
+interface ExtractionResult {
+  language: string;
+  results: Record<string, PatternResult>;
+}
+
+interface PatternResult {
+  matches: MatchResult[];
+  totalCount: number;
+}
+
+interface MatchResult {
+  patternIndex: number;
+  captures: CaptureResult[];
+}
+
+interface CaptureResult {
+  name: string;
+  node: NodeInfo | null;
+  text: string | null;
+  childFields: Record<string, string | null>;
+  startByte: number;
+}
+```
+
+```typescript
+import { extract } from "@kreuzberg/tree-sitter-language-pack";
+
+const result = extract("def hello(): pass\ndef world(): pass", {
+  language: "python",
+  patterns: {
+    functions: {
+      query: "(function_definition name: (identifier) @fn_name) @fn_def",
+      captureOutput: "Full",
+      childFields: ["name", "parameters"],
+    },
+  },
+});
+
+for (const match of result.results.functions.matches) {
+  for (const capture of match.captures) {
+    if (capture.text) {
+      console.log(`${capture.name}: ${capture.text}`);
+    }
+  }
+}
+```
+
+### `validateExtraction(config: object): ValidationResult`
+
+Validate extraction patterns without executing them. Checks that the language exists and all query patterns compile successfully.
+
+Accepts the same config shape as `extract`.
+
+**Throws** if the language cannot be loaded or the config is malformed.
+
+**Result type:**
+
+```typescript
+interface ValidationResult {
+  valid: boolean;
+  patterns: Record<string, PatternValidation>;
+}
+
+interface PatternValidation {
+  valid: boolean;
+  captureNames: string[];
+  patternCount: number;
+  warnings: string[];
+  errors: string[];
+}
+```
+
+```typescript
+import { validateExtraction } from "@kreuzberg/tree-sitter-language-pack";
+
+const result = validateExtraction({
+  language: "python",
+  patterns: {
+    functions: {
+      query: "(function_definition name: (identifier) @fn_name)",
+    },
+  },
+});
+
+console.log(result.valid); // true
+console.log(result.patterns.functions.captureNames); // ["fn_name"]
 ```
 
 ## Download Management

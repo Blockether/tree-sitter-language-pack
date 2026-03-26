@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-03-26
+
+### Added
+
+- Extraction query API: run user-defined tree-sitter queries and get structured results
+    - `extract_patterns()` / `extract()` across Python, Node.js, Rust, Ruby, Elixir, PHP, WASM, C FFI
+    - `validate_extraction()` for config validation without execution
+    - `CompiledExtraction` for pre-compiled query reuse (Rust)
+    - `ProcessConfig.extractions` for combining custom queries with standard analysis
+    - Types: ExtractionConfig, ExtractionPattern, CaptureOutput, CaptureResult, MatchResult, PatternResult, ExtractionResult
+- Criterion benchmarks: 9 groups, 23 benchmarks across Python, TypeScript, Rust, Go
+- Extraction queries guide and documentation across all API references
+
+### Fixed
+
+- E2E generator: `process_imports_contains_source` assertion uses contains instead of equality
+- WASM: language list matches actual compiled features (30 languages)
+- WASM: add missing `detectLanguageFromPath` and `detectLanguageFromExtension` exports
+- PHP generator: null array handling in `process()` result assertions
+- Elixir: RustlerPrecompiled `crate` field resolution with `load_from` override
+- Predicate evaluation: remove redundant re-evaluation (tree-sitter 0.26 handles internally)
+- Documentation: stale version numbers, incomplete API references, incorrect function signatures
+- Java version requirement standardized to JDK 25+
+
 ## [1.2.1] - 2026-03-25
 
 ### Fixed

@@ -13,7 +13,7 @@ Namespace: `TreeSitterLanguagePack`
 Add to `.csproj`:
 
 ```xml
-<PackageReference Include="TreeSitterLanguagePack" Version="1.0.0" />
+<PackageReference Include="TreeSitterLanguagePack" Version="1.3.0" />
 ```
 
 Or via dotnet CLI:
@@ -473,6 +473,10 @@ public sealed class TsPackException : Exception
     public TsPackException(string message, Exception innerException);
 }
 ```
+
+## Extraction Queries
+
+Extraction queries are not yet available in the C# binding. See the [Extraction Queries guide](../guides/extraction.md) for usage in other languages.
 
 ## Thread Safety
 

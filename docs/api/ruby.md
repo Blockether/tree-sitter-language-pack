@@ -456,6 +456,105 @@ result["structure"].each do |item|
 end
 ```
 
+## Pattern Extraction
+
+### `TreeSitterLanguagePack.extract(source, config_json)`
+
+Run tree-sitter queries against source code and return structured extraction results as a JSON string. Unlike `process`, which uses predefined intelligence queries, `extract` lets you supply arbitrary tree-sitter query patterns.
+
+**Parameters:**
+
+- `source` (String): Source code to extract from
+- `config_json` (String): JSON string with extraction configuration. Fields:
+    - `language` (string, required): Language name
+    - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
+        - `query` (string, required): Tree-sitter query in S-expression syntax
+        - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
+        - `child_fields` (array of string, default `[]`): Field names to extract from child nodes
+        - `max_results` (int or null, default null): Maximum number of matches to return
+        - `byte_range` (array of two ints or null, default null): Restrict matches to a byte range `[start, end]`
+
+**Returns:** String - JSON string with extraction results. The top-level object contains:
+
+- `language` (string): The language used
+- `results` (object): Keyed by pattern name, each value contains:
+    - `matches` (array): Each match has `pattern_index` (int) and `captures` (array). Each capture has `name` (string), `text` (string or null), `node` (object or null), `child_fields` (object), and `start_byte` (int).
+    - `total_count` (int): Total matches before `max_results` truncation
+
+**Raises:** `RuntimeError` on invalid config JSON, unknown language, or extraction failure.
+
+**Example:**
+
+```ruby
+require "json"
+
+config = {
+  language: "python",
+  patterns: {
+    functions: {
+      query: "(function_definition name: (identifier) @fn_name)",
+      capture_output: "Text"
+    }
+  }
+}.to_json
+
+result_json = TreeSitterLanguagePack.extract("def hello(): pass\ndef world(): pass", config)
+result = JSON.parse(result_json)
+
+result["results"]["functions"]["matches"].each do |m|
+  m["captures"].each { |c| puts c["text"] }
+end
+# Output:
+# hello
+# world
+```
+
+### `TreeSitterLanguagePack.validate_extraction(config_json)`
+
+Validate extraction patterns without running them against source code. Useful for checking query syntax before performing extraction.
+
+**Parameters:**
+
+- `config_json` (String): JSON string with the same shape as the config for `extract` (must include `language` and `patterns`)
+
+**Returns:** String - JSON string with validation results. The top-level object contains:
+
+- `valid` (bool): Whether all patterns are valid
+- `patterns` (object): Per-pattern validation, each with:
+    - `valid` (bool): Whether this pattern compiled successfully
+    - `capture_names` (array of string): Capture names defined in the query
+    - `pattern_count` (int): Number of patterns in the query
+    - `warnings` (array of string): Non-fatal warnings
+    - `errors` (array of string): Fatal errors (e.g., query syntax errors)
+
+**Raises:** `RuntimeError` on invalid config JSON or unknown language.
+
+**Example:**
+
+```ruby
+require "json"
+
+config = {
+  language: "python",
+  patterns: {
+    functions: {
+      query: "(function_definition name: (identifier) @fn_name)"
+    }
+  }
+}.to_json
+
+result_json = TreeSitterLanguagePack.validate_extraction(config)
+result = JSON.parse(result_json)
+
+if result["valid"]
+  puts "All patterns valid"
+else
+  result["patterns"].each do |name, info|
+    info["errors"].each { |err| puts "#{name}: #{err}" } unless info["valid"]
+  end
+end
+```
+
 ## Error Handling
 
 All errors from the native extension are raised as `RuntimeError`. There are no custom exception classes.

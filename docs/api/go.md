@@ -520,6 +520,10 @@ type NodeInfo struct {
 }
 ```
 
+## Extraction Queries
+
+Extraction queries are not yet available in the Go binding. See the [Extraction Queries guide](../guides/extraction.md) for usage in other languages.
+
 ## Concurrency
 
 The `Registry` type is safe for concurrent use from multiple goroutines. All exported methods acquire the appropriate lock before accessing the underlying C registry. Create separate Registry instances if you need independent registries:

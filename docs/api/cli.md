@@ -332,6 +332,10 @@ ts-pack completions fish > ~/.config/fish/completions/ts-pack.fish
 
 All error messages are printed to stderr.
 
+## Extraction Queries
+
+Extraction queries are available through the library API but are not yet exposed as a CLI subcommand. See the [Extraction Queries guide](../guides/extraction.md) for usage via the Rust, Python, TypeScript, and C FFI APIs.
+
 ## Common Workflows
 
 ### Download and Parse

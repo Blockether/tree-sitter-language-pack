@@ -279,7 +279,39 @@ Go beyond the raw syntax tree. Extract functions, classes, imports, and more wit
     ts-pack process src/main.py --all --format json | jq '.structure[].name'
     ```
 
-## Step 5 — Chunk for LLMs
+## Step 5 — Run Extraction Queries
+
+Use `extract` to run custom tree-sitter queries and get structured results with captured text and metadata.
+
+=== "Python"
+
+    ```python
+    import tree_sitter_language_pack as tslp
+
+    source = """
+    def greet(name: str) -> str:
+        return f"Hello, {name}!"
+
+    def farewell(name: str) -> str:
+        return f"Goodbye, {name}!"
+    """
+
+    result = tslp.extract(source, {
+        "language": "python",
+        "patterns": {
+            "functions": {
+                "query": "(function_definition name: (identifier) @name)",
+                "capture_output": "Text",
+            }
+        }
+    })
+    for match in result["results"]["functions"]["matches"]:
+        print(match["captures"][0]["text"])
+    # greet
+    # farewell
+    ```
+
+## Step 6 — Chunk for LLMs
 
 Split code at natural boundaries so language models receive coherent, complete units.
 

@@ -373,6 +373,67 @@ if (!result) {
 }
 ```
 
+## Extraction Queries
+
+### `char* ts_pack_extract(const char* source, size_t source_len, const char* config_json)`
+
+Run extraction queries against source code using tree-sitter query patterns.
+
+**Parameters:**
+
+- `source` (`const char*`): source code buffer (does not need to be null-terminated).
+- `source_len` (`size_t`): length of the source buffer in bytes.
+- `config_json` (`const char*`): null-terminated JSON configuration string.
+
+**Config JSON fields:**
+
+- `language` (string, required): the language name.
+- `patterns` (object, required): a map of pattern names to pattern definitions. Each pattern definition contains:
+    - `query` (string): a tree-sitter query string.
+    - `capture_output` (object): output format configuration.
+    - `child_fields` (array): child field names to extract.
+    - `max_results` (number or null): optional limit on matches.
+    - `byte_range` (array or null): optional `[start, end]` byte range to restrict matching.
+
+**Returns:** `char*` -- newly-allocated JSON string containing the extraction results, or null on error. Check `ts_pack_last_error()` on null. Free with `ts_pack_free_string`.
+
+**Example:**
+
+```c
+const char* code = "def hello(): pass\ndef world(): pass";
+const char* config = "{\"language\":\"python\",\"patterns\":{\"fns\":{\"query\":\"(function_definition name: (identifier) @fn_name)\",\"capture_output\":{},\"child_fields\":[],\"max_results\":null,\"byte_range\":null}}}";
+char* result = ts_pack_extract(code, strlen(code), config);
+if (!result) {
+    fprintf(stderr, "Extract error: %s\n", ts_pack_last_error());
+} else {
+    printf("%s\n", result);
+    ts_pack_free_string(result);
+}
+```
+
+### `char* ts_pack_validate_extraction(const char* config_json)`
+
+Validate extraction patterns without running them against source code. Useful for checking query syntax before executing.
+
+**Parameters:**
+
+- `config_json` (`const char*`): null-terminated JSON configuration string with the same shape as for `ts_pack_extract` (language + patterns).
+
+**Returns:** `char*` -- newly-allocated JSON string containing validation results, or null on error. Check `ts_pack_last_error()` on null. Free with `ts_pack_free_string`.
+
+**Example:**
+
+```c
+const char* config = "{\"language\":\"python\",\"patterns\":{\"fns\":{\"query\":\"(function_definition name: (identifier) @fn_name)\",\"capture_output\":{},\"child_fields\":[],\"max_results\":null,\"byte_range\":null}}}";
+char* result = ts_pack_validate_extraction(config);
+if (!result) {
+    fprintf(stderr, "Validation error: %s\n", ts_pack_last_error());
+} else {
+    printf("Validation result: %s\n", result);
+    ts_pack_free_string(result);
+}
+```
+
 ## Download API
 
 These functions require the `download` feature to be enabled at compile time.

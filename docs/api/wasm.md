@@ -309,6 +309,103 @@ for (const item of result.structure) {
 }
 ```
 
+## Pattern Extraction
+
+### `extract(source: string, config: object): object`
+
+Run tree-sitter queries against source code and return structured extraction results as a JavaScript object. Unlike `process`, which uses predefined intelligence queries, `extract` lets you supply arbitrary tree-sitter query patterns.
+
+The config is a plain JS object (not a JSON string). It is converted internally via `JSON.stringify`.
+
+**Parameters:**
+
+- `source` (string): Source code to extract from
+- `config` (object): Configuration object. Fields:
+    - `language` (string, required): Language name
+    - `patterns` (object, required): Named patterns to run. Each key maps to an object with:
+        - `query` (string, required): Tree-sitter query in S-expression syntax
+        - `capture_output` (string, default `"Full"`): What to capture -- `"Text"`, `"Node"`, or `"Full"`
+        - `child_fields` (string[], default `[]`): Field names to extract from child nodes
+        - `max_results` (number | null, default null): Maximum number of matches to return
+        - `byte_range` ([number, number] | null, default null): Restrict matches to a byte range
+
+**Returns:** object - Extraction results. The top-level object contains:
+
+- `language` (string): The language used
+- `results` (object): Keyed by pattern name, each value contains:
+    - `matches` (array): Each match has `pattern_index` (number) and `captures` (array). Each capture has `name` (string), `text` (string | null), `node` (object | null), `child_fields` (object), and `start_byte` (number).
+    - `total_count` (number): Total matches before `max_results` truncation
+
+**Throws:** Error on invalid config, unknown language, or extraction failure.
+
+**Example:**
+
+```javascript
+const result = tsp.extract("def hello(): pass\ndef world(): pass", {
+  language: "python",
+  patterns: {
+    functions: {
+      query: "(function_definition name: (identifier) @fn_name)",
+      capture_output: "Text",
+    },
+  },
+});
+
+for (const match of result.results.functions.matches) {
+  for (const capture of match.captures) {
+    console.log(capture.text);
+  }
+}
+// Output:
+// hello
+// world
+```
+
+### `validateExtraction(config: object): object`
+
+Validate extraction patterns without running them against source code. Useful for checking query syntax before performing extraction.
+
+The config is a plain JS object with the same shape as the config for `extract`.
+
+**Parameters:**
+
+- `config` (object): Configuration object (must include `language` and `patterns`)
+
+**Returns:** object - Validation results. The top-level object contains:
+
+- `valid` (boolean): Whether all patterns are valid
+- `patterns` (object): Per-pattern validation, each with:
+    - `valid` (boolean): Whether this pattern compiled successfully
+    - `capture_names` (string[]): Capture names defined in the query
+    - `pattern_count` (number): Number of patterns in the query
+    - `warnings` (string[]): Non-fatal warnings
+    - `errors` (string[]): Fatal errors (e.g., query syntax errors)
+
+**Throws:** Error on invalid config or unknown language.
+
+**Example:**
+
+```javascript
+const result = tsp.validateExtraction({
+  language: "python",
+  patterns: {
+    functions: {
+      query: "(function_definition name: (identifier) @fn_name)",
+    },
+  },
+});
+
+if (result.valid) {
+  console.log("All patterns valid");
+} else {
+  for (const [name, info] of Object.entries(result.patterns)) {
+    if (!info.valid) {
+      info.errors.forEach((err) => console.error(`${name}: ${err}`));
+    }
+  }
+}
+```
+
 ## Download/Configure API (Not Supported in WASM)
 
 The following functions exist for API parity but are stubs. WASM cannot perform network I/O or maintain a persistent cache. All grammars are pre-bundled at compile time.

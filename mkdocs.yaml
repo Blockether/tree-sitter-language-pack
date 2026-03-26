@@ -156,6 +156,7 @@ nav:
       - Chunking for LLMs: guides/chunking.md
       - Configuration: guides/configuration.md
       - CLI Usage: guides/cli.md
+      - Extraction Queries: guides/extraction.md
   - API Reference:
       - Python: api/python.md
       - TypeScript / Node.js: api/typescript.md

@@ -10,14 +10,14 @@ Add to `Cargo.toml`:
 
 ```toml
 [dependencies]
-tree-sitter-language-pack = "1.0"
+tree-sitter-language-pack = "1.2"
 ```
 
 With download feature (default):
 
 ```toml
 [dependencies]
-tree-sitter-language-pack = { version = "1.0", features = ["download"] }
+tree-sitter-language-pack = { version = "1.3", features = ["download"] }
 ```
 
 ## Quick Start
@@ -617,6 +617,7 @@ pub struct ProcessConfig {
     pub symbols: bool,         // default: false
     pub diagnostics: bool,     // default: false
     pub chunk_max_size: Option<usize>,  // default: None
+    pub extractions: Option<AHashMap<String, ExtractionPattern>>,  // default: None
 }
 ```
 
@@ -739,7 +740,242 @@ Enables `PackConfig::from_toml_file` and `PackConfig::discover`.
 
 ```toml
 [dependencies]
-tree-sitter-language-pack = { version = "1.0", default-features = false }
+tree-sitter-language-pack = { version = "1.3", default-features = false }
+```
+
+## Extraction Queries
+
+### `extract_patterns(source: &str, config: &ExtractionConfig) -> Result<ExtractionResult, Error>`
+
+Run extraction patterns against source code. Parses the source, executes all named patterns, and returns structured results with captured nodes, text, and child fields.
+
+This is a convenience wrapper around `CompiledExtraction::compile` followed by `CompiledExtraction::extract`. For repeated extractions with the same config, prefer compiling once and reusing.
+
+**Parameters:**
+
+- `source` (&str): Source code to parse and query
+- `config` (&ExtractionConfig): Extraction configuration
+
+**Returns:** Result<ExtractionResult, Error>
+
+**Example:**
+
+```rust
+use ahash::AHashMap;
+use tree_sitter_language_pack::{
+    ExtractionConfig, ExtractionPattern, CaptureOutput, extract_patterns,
+};
+
+let mut patterns = AHashMap::new();
+patterns.insert("functions".to_string(), ExtractionPattern {
+    query: "(function_definition name: (identifier) @fn_name)".to_string(),
+    capture_output: CaptureOutput::Full,
+    child_fields: vec!["name".to_string(), "parameters".to_string()],
+    max_results: None,
+    byte_range: None,
+});
+
+let config = ExtractionConfig {
+    language: "python".to_string(),
+    patterns,
+};
+
+let result = extract_patterns("def hello(): pass", &config)?;
+let fns = &result.results["functions"];
+assert_eq!(fns.total_count, 1);
+```
+
+### `validate_extraction(config: &ExtractionConfig) -> Result<ValidationResult, Error>`
+
+Validate extraction patterns without executing them. Checks that the language exists and all query patterns compile. Returns detailed diagnostics per pattern.
+
+**Parameters:**
+
+- `config` (&ExtractionConfig): Extraction configuration to validate
+
+**Returns:** Result<ValidationResult, Error>
+
+**Example:**
+
+```rust
+use ahash::AHashMap;
+use tree_sitter_language_pack::{
+    ExtractionConfig, ExtractionPattern, CaptureOutput, validate_extraction,
+};
+
+let mut patterns = AHashMap::new();
+patterns.insert("fns".to_string(), ExtractionPattern {
+    query: "(function_definition name: (identifier) @fn_name)".to_string(),
+    capture_output: CaptureOutput::default(),
+    child_fields: Vec::new(),
+    max_results: None,
+    byte_range: None,
+});
+
+let config = ExtractionConfig {
+    language: "python".to_string(),
+    patterns,
+};
+
+let result = validate_extraction(&config)?;
+assert!(result.valid);
+assert!(result.patterns["fns"].capture_names.contains(&"fn_name".to_string()));
+```
+
+### `CompiledExtraction`
+
+A pre-compiled extraction that caches compiled `tree_sitter::Query` objects for reuse across multiple source inputs. This avoids recompiling queries on every call and is the recommended approach for repeated extractions.
+
+`CompiledExtraction` is `Send + Sync` and can be shared across threads.
+
+#### `CompiledExtraction::compile(config: &ExtractionConfig) -> Result<Self, Error>`
+
+Compile an extraction config. Loads the language and compiles all query patterns.
+
+**Example:**
+
+```rust
+use ahash::AHashMap;
+use tree_sitter_language_pack::{
+    ExtractionConfig, ExtractionPattern, CaptureOutput, CompiledExtraction,
+};
+
+let mut patterns = AHashMap::new();
+patterns.insert("fns".to_string(), ExtractionPattern {
+    query: "(function_definition name: (identifier) @fn_name)".to_string(),
+    capture_output: CaptureOutput::Text,
+    child_fields: Vec::new(),
+    max_results: None,
+    byte_range: None,
+});
+
+let config = ExtractionConfig {
+    language: "python".to_string(),
+    patterns,
+};
+
+let compiled = CompiledExtraction::compile(&config)?;
+```
+
+#### `CompiledExtraction::compile_with_language(language: Language, language_name: &str, patterns: &AHashMap<String, ExtractionPattern>) -> Result<Self, Error>`
+
+Compile extraction patterns using a pre-loaded `tree_sitter::Language`. Avoids a redundant language registry lookup when the caller already has the language.
+
+#### `CompiledExtraction::extract(&self, source: &str) -> Result<ExtractionResult, Error>`
+
+Parse the source code and run all compiled patterns against it. Returns an `ExtractionResult`.
+
+```rust
+let r1 = compiled.extract("def a(): pass")?;
+let r2 = compiled.extract("def x(): pass\ndef y(): pass")?;
+assert_eq!(r1.results["fns"].total_count, 1);
+assert_eq!(r2.results["fns"].total_count, 2);
+```
+
+#### `CompiledExtraction::extract_from_tree(&self, tree: &Tree, source: &[u8]) -> Result<ExtractionResult, Error>`
+
+Run compiled patterns against an already-parsed tree. Use this when you have parsed the source separately and want to avoid re-parsing.
+
+```rust
+use tree_sitter_language_pack::parse_string;
+
+let source = "def hello(): pass";
+let tree = parse_string("python", source.as_bytes())?;
+let result = compiled.extract_from_tree(&tree, source.as_bytes())?;
+assert_eq!(result.results["fns"].total_count, 1);
+```
+
+### Extraction Types
+
+#### `ExtractionConfig`
+
+```rust
+pub struct ExtractionConfig {
+    pub language: String,
+    pub patterns: AHashMap<String, ExtractionPattern>,
+}
+```
+
+#### `ExtractionPattern`
+
+```rust
+pub struct ExtractionPattern {
+    pub query: String,                    // tree-sitter S-expression query
+    pub capture_output: CaptureOutput,    // Text, Node, or Full (default: Full)
+    pub child_fields: Vec<String>,        // child field names to extract (default: [])
+    pub max_results: Option<usize>,       // max matches (default: None / unlimited)
+    pub byte_range: Option<(usize, usize)>,  // restrict to byte range (default: None)
+}
+```
+
+#### `CaptureOutput`
+
+```rust
+pub enum CaptureOutput {
+    Text,  // capture only matched text
+    Node,  // capture only NodeInfo
+    Full,  // capture both text and NodeInfo (default)
+}
+```
+
+#### `ExtractionResult`
+
+```rust
+pub struct ExtractionResult {
+    pub language: String,
+    pub results: AHashMap<String, PatternResult>,
+}
+```
+
+#### `PatternResult`
+
+```rust
+pub struct PatternResult {
+    pub matches: Vec<MatchResult>,
+    pub total_count: usize,  // total matches before max_results truncation
+}
+```
+
+#### `MatchResult`
+
+```rust
+pub struct MatchResult {
+    pub pattern_index: usize,
+    pub captures: Vec<CaptureResult>,
+}
+```
+
+#### `CaptureResult`
+
+```rust
+pub struct CaptureResult {
+    pub name: String,
+    pub node: Option<NodeInfo>,
+    pub text: Option<String>,
+    pub child_fields: AHashMap<String, Option<String>>,
+    pub start_byte: usize,
+}
+```
+
+#### `ValidationResult`
+
+```rust
+pub struct ValidationResult {
+    pub valid: bool,
+    pub patterns: AHashMap<String, PatternValidation>,
+}
+```
+
+#### `PatternValidation`
+
+```rust
+pub struct PatternValidation {
+    pub valid: bool,
+    pub capture_names: Vec<String>,
+    pub pattern_count: usize,
+    pub warnings: Vec<String>,
+    pub errors: Vec<String>,
+}
 ```
 
 ## Re-exports
