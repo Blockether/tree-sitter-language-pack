@@ -298,12 +298,37 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
 
             if has_chunk_assertions(fixture) {
                 let max_chunk_size = assertions.process_chunk_max_size.unwrap_or(512);
+                let needs_structure = assertions.process_structure_count_min.is_some()
+                    || assertions.process_structure_contains_kind.is_some()
+                    || assertions.process_structure_name_contains.is_some();
+                let needs_imports = assertions.process_imports_count_min.is_some()
+                    || assertions.process_imports_contains_source.is_some();
+                let needs_exports = assertions.process_exports_count_min.is_some();
+                let needs_comments = assertions.process_comments_count_min.is_some();
+                let needs_diagnostics = assertions.process_diagnostics_not_empty == Some(true);
+                let mut extras = String::new();
+                if needs_structure {
+                    extras.push_str(", Structure: true");
+                }
+                if needs_imports {
+                    extras.push_str(", Imports: true");
+                }
+                if needs_exports {
+                    extras.push_str(", Exports: true");
+                }
+                if needs_comments {
+                    extras.push_str(", Comments: true");
+                }
+                if needs_diagnostics {
+                    extras.push_str(", Diagnostics: true");
+                }
                 writeln!(out, "\tchunkSize := {}", max_chunk_size).unwrap();
                 writeln!(
                     out,
-                    "\tresult, err := reg.Process(\"{}\", tspack.ProcessConfig{{Language: \"{}\", ChunkMaxSize: &chunkSize}})",
+                    "\tresult, err := reg.Process(\"{}\", tspack.ProcessConfig{{Language: \"{}\", ChunkMaxSize: &chunkSize{}}})",
                     escape_go_string(source),
                     escape_go_string(lang),
+                    extras,
                 )
                 .unwrap();
             } else {

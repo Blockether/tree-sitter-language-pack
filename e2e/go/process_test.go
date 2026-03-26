@@ -435,7 +435,7 @@ func TestPythonChunkingMedium(t *testing.T) {
 	reg := newTestRegistry(t)
 	skipIfLanguageUnavailable(t, reg, "python")
 	chunkSize := 50
-	result, err := reg.Process("def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n", tspack.ProcessConfig{Language: "python", ChunkMaxSize: &chunkSize})
+	result, err := reg.Process("def first():\n    x = 1\n    return x\n\ndef second():\n    y = 2\n    return y\n\ndef third():\n    z = 3\n    return z\n", tspack.ProcessConfig{Language: "python", ChunkMaxSize: &chunkSize, Structure: true})
 	if err != nil {
 		t.Fatalf("process failed: %v", err)
 	}
