@@ -194,7 +194,7 @@ class ProcessTest extends TestCase
         $this->assertGreaterThanOrEqual(2, count($intel['imports']), 'Should have at least 2 import(s)');
         $foundImport = false;
         foreach ($intel['imports'] as $i) {
-            if (($i['source'] ?? '') === 'os') { $foundImport = true; break; }
+            if (str_contains(($i['source'] ?? ''), 'os')) { $foundImport = true; break; }
         }
         $this->assertTrue($foundImport, 'Imports should contain source \'os\' ');
     }

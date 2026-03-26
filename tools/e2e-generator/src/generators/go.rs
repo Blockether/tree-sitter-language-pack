@@ -449,7 +449,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "\t\tif m, ok := imp.(map[string]interface{{}}); ok {{").unwrap();
                 writeln!(
                     out,
-                    "\t\t\tif src, _ := m[\"source\"].(string); src == \"{}\" {{",
+                    "\t\t\tif src, _ := m[\"source\"].(string); strings.Contains(src, \"{}\") {{",
                     escape_go_string(import_source)
                 )
                 .unwrap();

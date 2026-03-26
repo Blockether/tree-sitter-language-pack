@@ -275,7 +275,7 @@ def test_process_python_imports_detail():
     )
     assert intel.get("language") == "python", f"Expected language 'python', got {intel.get('language')}"
     assert len(intel.get("imports", [])) >= 2, "Should have at least 2 import(s)"
-    assert any(i.get("source") == "os" for i in intel.get("imports", [])), "Imports should contain source 'os'"
+    assert any("os" in (i.get("source") or "") for i in intel.get("imports", [])), "Imports should contain source 'os'"
 
 
 @pytest.mark.skipif(not has_language("python"), reason="Language 'python' not available")

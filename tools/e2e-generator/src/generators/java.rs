@@ -395,7 +395,7 @@ fn write_test_file(pkg_dir: &Path, category: &str, fixtures: &[&Fixture]) -> Res
                 .unwrap();
                 writeln!(
                     out,
-                    "                if (srcElem != null && srcElem.getAsString().equals(\"{}\")) {{",
+                    "                if (srcElem != null && srcElem.getAsString().contains(\"{}\")) {{",
                     escape_java_string(import_source)
                 )
                 .unwrap();

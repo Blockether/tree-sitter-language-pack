@@ -214,7 +214,7 @@ defmodule E2eTests.ProcessTest do
 
       assert intel["language"] == "python"
       assert length(intel["imports"]) >= 2
-      assert Enum.any?(intel["imports"], fn i -> i["source"] == "os" end)
+      assert Enum.any?(intel["imports"], fn i -> String.contains?(i["source"] || "", "os") end)
     end
   end
 

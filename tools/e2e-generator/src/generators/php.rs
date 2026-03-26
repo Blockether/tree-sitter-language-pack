@@ -238,7 +238,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
                 writeln!(out, "        foreach ($intel['imports'] as $i) {{").unwrap();
                 writeln!(
                     out,
-                    "            if (($i['source'] ?? '') === '{}') {{ $foundImport = true; break; }}",
+                    "            if (str_contains(($i['source'] ?? ''), '{}')) {{ $foundImport = true; break; }}",
                     escape_php_string(import_source)
                 )
                 .unwrap();

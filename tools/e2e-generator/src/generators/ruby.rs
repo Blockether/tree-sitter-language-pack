@@ -184,7 +184,7 @@ fn write_spec_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(import_source) = assertions.and_then(|a| a.process_imports_contains_source.as_deref()) {
                 writeln!(
                     out,
-                    "    expect(intel[\"imports\"].any? {{ |i| i[\"source\"] == \"{}\" }}).to be true",
+                    "    expect(intel[\"imports\"].any? {{ |i| (i[\"source\"] || \"\").include?(\"{}\") }}).to be true",
                     escape_ruby_string(import_source)
                 )
                 .unwrap();

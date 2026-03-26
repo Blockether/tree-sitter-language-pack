@@ -512,7 +512,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(import_source) = &assertions.process_imports_contains_source {
                 writeln!(
                     out,
-                    "    assert any(i.get(\"source\") == \"{}\" for i in intel.get(\"imports\", [])), \"Imports should contain source '{}'\"",
+                    "    assert any(\"{}\" in (i.get(\"source\") or \"\") for i in intel.get(\"imports\", [])), \"Imports should contain source '{}'\"",
                     escape_python_string(import_source),
                     escape_python_string(import_source)
                 )

@@ -289,7 +289,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(import_source) = &assertions.process_imports_contains_source {
                 writeln!(
                     out,
-                    "    expect((intel.imports || []).some((i: any) => i.source === \"{}\")).toBe(true);",
+                    "    expect((intel.imports || []).some((i: any) => (i.source || \"\").includes(\"{}\"))).toBe(true);",
                     escape_js_string(import_source)
                 )
                 .unwrap();

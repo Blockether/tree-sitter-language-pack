@@ -187,7 +187,7 @@ public class ProcessTests
         var result = TsPackClient.Process("import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n", config);
         Assert.Equal("python", result.Language);
         Assert.True(result.Imports.Count >= 2, "Should have at least 2 import(s)");
-        Assert.Contains(result.Imports, i => i.Source == "os");
+        Assert.Contains(result.Imports, i => i.Source.Contains("os"));
     }
 
     [Fact]

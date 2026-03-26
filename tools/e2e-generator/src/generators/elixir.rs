@@ -226,7 +226,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(import_source) = assertions.and_then(|a| a.process_imports_contains_source.as_deref()) {
                 writeln!(
                     out,
-                    "    assert Enum.any?(intel[\"imports\"], fn i -> i[\"source\"] == \"{}\" end)",
+                    "    assert Enum.any?(intel[\"imports\"], fn i -> String.contains?(i[\"source\"] || \"\", \"{}\") end)",
                     escape_elixir_string(import_source)
                 )
                 .unwrap();

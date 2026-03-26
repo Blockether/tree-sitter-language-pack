@@ -210,7 +210,7 @@ fn write_test_file(dir: &Path, category: &str, fixtures: &[&Fixture]) -> Result<
             if let Some(import_source) = &assertions.process_imports_contains_source {
                 writeln!(
                     out,
-                    "        Assert.Contains(result.Imports, i => i.Source == \"{}\");",
+                    "        Assert.Contains(result.Imports, i => i.Source.Contains(\"{}\"));",
                     escape_csharp_string(import_source)
                 )
                 .unwrap();

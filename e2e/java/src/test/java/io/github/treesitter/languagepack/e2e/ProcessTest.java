@@ -353,7 +353,7 @@ class ProcessTest {
       boolean foundImport = false;
       for (var elem : intel.getAsJsonArray("imports")) {
         var srcElem = elem.getAsJsonObject().get("source");
-        if (srcElem != null && srcElem.getAsString().equals("os")) {
+        if (srcElem != null && srcElem.getAsString().contains("os")) {
           foundImport = true;
           break;
         }

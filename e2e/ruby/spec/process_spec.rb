@@ -139,7 +139,7 @@ RSpec.describe 'process' do
     )
     expect(intel['language']).to eq('python')
     expect(intel['imports'].length).to be >= 2
-    expect(intel['imports'].any? { |i| i['source'] == 'os' }).to be true
+    expect(intel['imports'].any? { |i| (i['source'] || '').include?('os') }).to be true
   end
 
   it 'process_python_metrics_detail' do

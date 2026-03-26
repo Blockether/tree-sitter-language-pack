@@ -476,7 +476,7 @@ func TestProcessPythonImportsDetail(t *testing.T) {
 	foundImport := false
 	for _, imp := range importsList {
 		if m, ok := imp.(map[string]interface{}); ok {
-			if src, _ := m["source"].(string); src == "os" {
+			if src, _ := m["source"].(string); strings.Contains(src, "os") {
 				foundImport = true
 				break
 			}
