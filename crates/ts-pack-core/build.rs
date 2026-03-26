@@ -109,7 +109,10 @@ fn shared_lib_components(target_os: &str) -> (&'static str, &'static str) {
 }
 
 /// Compile a single language parser into a shared library (.so/.dylib/.dll).
-fn compile_parser_dynamic(name: &str, parser_dir: &Path, output_dir: &Path) -> bool {
+///
+/// When a language has a `c_symbol` override (e.g. "csharp" → "c_sharp"),
+/// the library is named using the c_symbol so the runtime loader can find it.
+fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path, output_dir: &Path) -> bool {
     let src_dir = parser_dir.join("src");
     let parser_c = src_dir.join("parser.c");
 
@@ -136,7 +139,8 @@ fn compile_parser_dynamic(name: &str, parser_dir: &Path, output_dir: &Path) -> b
         includes.push(common_dir);
     }
 
-    let lib_name = format!("tree_sitter_{name}");
+    let sym = c_symbol.unwrap_or(name);
+    let lib_name = format!("tree_sitter_{sym}");
     let os = target_os();
     let (prefix, ext) = shared_lib_components(&os);
     let output_path = output_dir.join(format!("{prefix}{lib_name}.{ext}"));
@@ -761,7 +765,8 @@ fn main() {
                 }
             }
             "dynamic" => {
-                if compile_parser_dynamic(name, &parser_dir, &libs_dir) {
+                let c_sym = definitions.get(name.as_str()).and_then(|d| d.c_symbol.as_deref());
+                if compile_parser_dynamic(name, c_sym, &parser_dir, &libs_dir) {
                     dynamic_compiled.push(name.clone());
                 }
             }
@@ -769,7 +774,8 @@ fn main() {
                 if compile_parser_static(name, &parser_dir) {
                     static_compiled.push(name.clone());
                 }
-                if compile_parser_dynamic(name, &parser_dir, &libs_dir) {
+                let c_sym = definitions.get(name.as_str()).and_then(|d| d.c_symbol.as_deref());
+                if compile_parser_dynamic(name, c_sym, &parser_dir, &libs_dir) {
                     dynamic_compiled.push(name.clone());
                 }
             }
@@ -778,7 +784,8 @@ fn main() {
                     "cargo:warning=Unknown TSLP_LINK_MODE '{}', defaulting to dynamic",
                     link_mode
                 );
-                if compile_parser_dynamic(name, &parser_dir, &libs_dir) {
+                let c_sym = definitions.get(name.as_str()).and_then(|d| d.c_symbol.as_deref());
+                if compile_parser_dynamic(name, c_sym, &parser_dir, &libs_dir) {
                     dynamic_compiled.push(name.clone());
                 }
             }
