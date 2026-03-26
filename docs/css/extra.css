@@ -57,6 +57,32 @@ html {
 	background-color: #23232c;
 }
 
+/* Modern theme header: solid dark background with white text */
+.md-header {
+	background-color: #323040;
+	color: #ffffff;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+}
+
+.md-header .md-ellipsis,
+.md-header__title,
+.md-header__title *,
+.md-header__topic,
+.md-header__topic *,
+.md-header__button,
+.md-header a {
+	color: #ffffff !important;
+}
+
+.md-header__button svg {
+	fill: #ffffff;
+}
+
+.md-header .md-search__input {
+	color: #ffffff;
+}
+
 [data-md-color-scheme="slate"] .md-main {
 	background-color: #23232c;
 }
