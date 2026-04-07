@@ -19,7 +19,7 @@
 	"al": {
 		"extensions": ["al"],
 		"repo": "https://github.com/SShadowS/tree-sitter-al",
-		"rev": "4d9602fa78835fa66a21c8fc7d4b293b407033a0"
+		"rev": "3e4ccb672f27d1ad673a8a995b1f5c770bb0f738"
 	},
 	"angular": {
 		"extensions": [],
@@ -43,7 +43,7 @@
 		"directory": "tree-sitter-asciidoc",
 		"extensions": ["adoc", "asciidoc"],
 		"repo": "https://github.com/cathaysia/tree-sitter-asciidoc",
-		"rev": "8b7488e4a92133c9adacc49e97652007e1b6621a"
+		"rev": "27685d3d1fcec9ea658681d2c997f109a2c2f080"
 	},
 	"asm": {
 		"extensions": ["s", "asm"],
@@ -273,7 +273,7 @@
 	"desktop": {
 		"extensions": ["desktop"],
 		"repo": "https://github.com/ValdezFOmar/tree-sitter-desktop",
-		"rev": "58e2ae16828d20889a36e657d728d901b4de47ec"
+		"rev": "954da7259e0f6c3bb4f811fddce11eb5ac94d9f6"
 	},
 	"devicetree": {
 		"extensions": ["dts", "dtsi"],
@@ -329,7 +329,7 @@
 	"editorconfig": {
 		"extensions": [],
 		"repo": "https://github.com/ValdezFOmar/tree-sitter-editorconfig",
-		"rev": "63f104dab268a25237f773323c172a4a380a00e1"
+		"rev": "bfd74395e393f56ba58db953458b346f02d6f7b2"
 	},
 	"eds": {
 		"extensions": ["eds"],
@@ -481,7 +481,7 @@
 	"gleam": {
 		"extensions": ["gleam"],
 		"repo": "https://github.com/gleam-lang/tree-sitter-gleam",
-		"rev": "0bb1b0ae1a3555180ae7b0004851da747fc230d1"
+		"rev": "0153f8b875cd02034b553f3a84a2f5ee67a80364"
 	},
 	"glsl": {
 		"branch": "master",
@@ -712,7 +712,7 @@
 	"liquid": {
 		"extensions": ["liquid"],
 		"repo": "https://github.com/hankthetank27/tree-sitter-liquid",
-		"rev": "9566ca79911052919fce09d26f1f655b5e093857"
+		"rev": "e45dbac8c5fa95b1f0e00e7e0c04bc8855823391"
 	},
 	"llvm": {
 		"extensions": ["ll"],
@@ -743,7 +743,7 @@
 		"extensions": ["magik"],
 		"generate": true,
 		"repo": "https://github.com/krn-robin/tree-sitter-magik",
-		"rev": "f288161c5f64f0582386e54d90cf1a720520b55d"
+		"rev": "7f821c17c1b109ecd4f7559bb5ebb7eff5315cbc"
 	},
 	"make": {
 		"extensions": ["mk", "makefile"],
@@ -888,7 +888,7 @@
 		"branch": "release",
 		"extensions": ["pl", "pm"],
 		"repo": "https://github.com/tree-sitter-perl/tree-sitter-perl",
-		"rev": "4a0f3435a1a01aa5854e01592ae7734eeb7c35c2"
+		"rev": "67887d64e479493888dba5a4daae4be5a84e8218"
 	},
 	"pgn": {
 		"branch": "master",
@@ -1058,7 +1058,7 @@
 	"robot": {
 		"extensions": ["robot"],
 		"repo": "https://github.com/Hubro/tree-sitter-robot",
-		"rev": "0f010f439e7873db42d3aabae8a48a8f61a89910"
+		"rev": "b317756ae0fb90ca945f900c77cdd3513d0c0eb4"
 	},
 	"ron": {
 		"extensions": ["ron"],
@@ -1150,7 +1150,7 @@
 		"extensions": ["swift"],
 		"generate": true,
 		"repo": "https://github.com/alex-pinkus/tree-sitter-swift",
-		"rev": "50f2735c48adbbf06c01c37d151f73c9d9dadc6a"
+		"rev": "da7f9370b70ba31357122c211734db98eb6f6a35"
 	},
 	"tablegen": {
 		"branch": "master",
@@ -1354,7 +1354,7 @@
 	"yuck": {
 		"extensions": ["yuck"],
 		"repo": "https://github.com/tree-sitter-grammars/tree-sitter-yuck",
-		"rev": "e877f6ade4b77d5ef8787075141053631ba12318"
+		"rev": "6c60112b3b3e739fb1ca4a8ea4bea2b6ffe11318"
 	},
 	"zig": {
 		"extensions": ["zig"],
