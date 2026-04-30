@@ -57,6 +57,9 @@ doc = [
   "zensical",
 ]
 
+[tool.hatch]
+build.targets.wheel.packages = [ "scripts" ]
+
 [tool.uv]
 sources.uv-bump = { git = "https://github.com/Goldziher/uv-bump" }
 

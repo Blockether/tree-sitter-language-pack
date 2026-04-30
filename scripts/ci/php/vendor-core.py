@@ -17,10 +17,10 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
-try:
+if sys.version_info >= (3, 11):
     import tomllib
-except ImportError:
-    import tomli as tomllib
+else:
+    import tomli as tomllib  # type: ignore[import-not-found]
 
 
 def get_repo_root() -> Path:
