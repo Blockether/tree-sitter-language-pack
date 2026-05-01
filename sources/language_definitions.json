@@ -123,7 +123,7 @@
       "beancount"
     ],
     "repo": "https://github.com/polarmutex/tree-sitter-beancount",
-    "rev": "9db1ad0d5047e5e7f12db50741aba1c32716779a"
+    "rev": "81769709e26c3469d827f1b1c6c34120bb4966b1"
   },
   "bibtex": {
     "branch": "master",
@@ -154,7 +154,7 @@
       "blade"
     ],
     "repo": "https://github.com/EmranMR/tree-sitter-blade",
-    "rev": "b9436b7b936907aff730de0dac1b99d7c632cc86"
+    "rev": "5dbdcb0ccbe91e64b038b41545d3acc26c74907a"
   },
   "brightscript": {
     "extensions": [
@@ -246,7 +246,7 @@
       "cfc"
     ],
     "repo": "https://github.com/cfmleditor/tree-sitter-cfml",
-    "rev": "66bb2ba2bda0c1c006d75221824a338550222e2c"
+    "rev": "afb8d70917830d37b8c549cac41a8377b3c19593"
   },
   "chatito": {
     "extensions": [
@@ -466,7 +466,7 @@
       "dj"
     ],
     "repo": "https://github.com/treeman/tree-sitter-djot",
-    "rev": "74fac1f53c6d52aeac104b6874e5506be6d0cfe6"
+    "rev": "759a61896ccb2200a4becec4443e768638a21d58"
   },
   "dockerfile": {
     "extensions": [
@@ -723,7 +723,7 @@
   "git_rebase": {
     "extensions": [],
     "repo": "https://github.com/the-mikedavis/tree-sitter-git-rebase",
-    "rev": "3db1f61fb928433381253bc5159c40f7d10c57b1"
+    "rev": "39bf3b7566c86ccffd70aaa5105c7c8b76788975"
   },
   "gitattributes": {
     "branch": "master",
@@ -750,7 +750,7 @@
       "gleam"
     ],
     "repo": "https://github.com/gleam-lang/tree-sitter-gleam",
-    "rev": "1627dc5101e63bf19717c540a56df5ef20b1fc7a"
+    "rev": "4e4643c2215c2b2343d9ec179c798818c132c9cc"
   },
   "glimmer": {
     "extensions": [
@@ -1118,7 +1118,7 @@
       "kts"
     ],
     "repo": "https://github.com/fwcd/tree-sitter-kotlin",
-    "rev": "85e46e9e148f2016d098397ce3b78e1f1e58e515"
+    "rev": "f66d2908542e93c0204c6c241f794afe4e9cd5d1"
   },
   "latex": {
     "branch": "master",
@@ -1475,7 +1475,7 @@
     ],
     "generate": true,
     "repo": "https://github.com/apple/tree-sitter-pkl",
-    "rev": "e800f06f06d461c4207867b44e76b0da1687a250"
+    "rev": "4b0c34dde3fa8a6bb3c3e6118e5cec745f452c9a"
   },
   "po": {
     "extensions": [
@@ -1619,7 +1619,7 @@
   "qmldir": {
     "extensions": [],
     "repo": "https://github.com/tree-sitter-grammars/tree-sitter-qmldir",
-    "rev": "6b2b5e41734bd6f07ea4c36ac20fb6f14061c841"
+    "rev": "408bd08ef5ada87a45e9cf58795fb95b2654e862"
   },
   "qmljs": {
     "branch": "master",
@@ -1699,7 +1699,7 @@
   "requirements": {
     "extensions": [],
     "repo": "https://github.com/tree-sitter-grammars/tree-sitter-requirements",
-    "rev": "caeb2ba854dea55931f76034978de1fd79362939"
+    "rev": "2c3bb291f497258ba417d052faa14a2dfee6d401"
   },
   "rescript": {
     "extensions": [
@@ -1930,7 +1930,7 @@
     ],
     "generate": true,
     "repo": "https://github.com/alex-pinkus/tree-sitter-swift",
-    "rev": "e2b381615811f0dc5b6fb3fbc1a1b5046c1348b3"
+    "rev": "c354345348cf8079e6794fa1b1324d8d44b6807b"
   },
   "systemverilog": {
     "ambiguous": {
@@ -1946,7 +1946,7 @@
       "svh"
     ],
     "repo": "https://github.com/gmlarumbe/tree-sitter-systemverilog",
-    "rev": "293928578cb27fbd0005fcc5f09c09a1e8628c89"
+    "rev": "cb5050f6575df47b7492d4b8858f8c4caa04c375"
   },
   "tablegen": {
     "branch": "master",
