@@ -2,11 +2,11 @@
 title: "PHP API Reference"
 ---
 
-## PHP API Reference <span class="version-badge">v1.8.0-rc.24</span>
+## PHP API Reference <span class="version-badge">v1.8.0-rc.26</span>
 
 ### Functions
 
-#### DetectLanguageFromExtension()
+#### detectLanguageFromExtension()
 
 Detect language name from a file extension (without leading dot).
 
@@ -29,7 +29,7 @@ public static function detectLanguageFromExtension(string $ext): ?string
 
 ---
 
-#### DetectLanguageFromPath()
+#### detectLanguageFromPath()
 
 Detect language name from a file path.
 
@@ -53,7 +53,7 @@ public static function detectLanguageFromPath(string $path): ?string
 
 ---
 
-#### DetectLanguageFromContent()
+#### detectLanguageFromContent()
 
 Detect language name from file content using the shebang line (`#!`).
 
@@ -89,7 +89,7 @@ public static function detectLanguageFromContent(string $content): ?string
 
 ---
 
-#### RootNodeInfo()
+#### rootNodeInfo()
 
 Get a `NodeInfo` snapshot of the root node.
 
@@ -110,7 +110,7 @@ public static function rootNodeInfo(Tree $tree): NodeInfo
 
 ---
 
-#### FindNodesByType()
+#### findNodesByType()
 
 Find all nodes matching the given type name, returning their `NodeInfo`.
 
@@ -134,7 +134,7 @@ public static function findNodesByType(Tree $tree, string $nodeType): array<Node
 
 ---
 
-#### NamedChildrenInfo()
+#### namedChildrenInfo()
 
 Get `NodeInfo` for all named children of the root node.
 
@@ -158,7 +158,7 @@ public static function namedChildrenInfo(Tree $tree): array<NodeInfo>
 
 ---
 
-#### ParseString()
+#### parseString()
 
 Parse source code with the named language, returning the syntax tree.
 
@@ -186,7 +186,7 @@ public static function parseString(string $language, string $source): Tree
 
 ---
 
-#### TreeContainsNodeType()
+#### treeContainsNodeType()
 
 Check whether any node in the tree matches the given type name.
 
@@ -210,7 +210,7 @@ public static function treeContainsNodeType(Tree $tree, string $nodeType): bool
 
 ---
 
-#### TreeHasErrorNodes()
+#### treeHasErrorNodes()
 
 Check whether the tree contains any ERROR or MISSING nodes.
 
@@ -233,7 +233,7 @@ public static function treeHasErrorNodes(Tree $tree): bool
 
 ---
 
-#### TreeToSexp()
+#### treeToSexp()
 
 Return the S-expression representation of the entire tree.
 
@@ -257,7 +257,7 @@ public static function treeToSexp(Tree $tree): string
 
 ---
 
-#### TreeErrorCount()
+#### treeErrorCount()
 
 Count the number of ERROR and MISSING nodes in the tree.
 
@@ -280,7 +280,7 @@ public static function treeErrorCount(Tree $tree): int
 
 ---
 
-#### GetHighlightsQuery()
+#### getHighlightsQuery()
 
 Get the highlights query for a language, if bundled.
 
@@ -304,7 +304,7 @@ public static function getHighlightsQuery(string $language): ?string
 
 ---
 
-#### GetInjectionsQuery()
+#### getInjectionsQuery()
 
 Get the injections query for a language, if bundled.
 
@@ -328,7 +328,7 @@ public static function getInjectionsQuery(string $language): ?string
 
 ---
 
-#### GetLocalsQuery()
+#### getLocalsQuery()
 
 Get the locals query for a language, if bundled.
 
@@ -352,7 +352,7 @@ public static function getLocalsQuery(string $language): ?string
 
 ---
 
-#### RunQuery()
+#### runQuery()
 
 Execute a tree-sitter query pattern against a parsed tree.
 
@@ -386,7 +386,7 @@ public static function runQuery(Tree $tree, string $language, string $querySourc
 
 ---
 
-#### GetLanguage()
+#### getLanguage()
 
 Get a tree-sitter `Language` by name using the global registry.
 
@@ -418,7 +418,7 @@ public static function getLanguage(string $name): Language
 
 ---
 
-#### GetParser()
+#### getParser()
 
 Get a tree-sitter `Parser` pre-configured for the given language.
 
@@ -449,7 +449,7 @@ public static function getParser(string $name): Parser
 
 ---
 
-#### AvailableLanguages()
+#### availableLanguages()
 
 List all available language names (sorted, deduplicated, includes aliases).
 
@@ -467,7 +467,7 @@ public static function availableLanguages(): array<string>
 
 ---
 
-#### HasLanguage()
+#### hasLanguage()
 
 Check if a language is available by name or alias.
 
@@ -491,7 +491,7 @@ public static function hasLanguage(string $name): bool
 
 ---
 
-#### LanguageCount()
+#### languageCount()
 
 Return the number of available languages.
 
@@ -509,7 +509,7 @@ public static function languageCount(): int
 
 ---
 
-#### Process()
+#### process()
 
 Process source code and extract file intelligence using the global registry.
 
@@ -541,7 +541,7 @@ public static function process(string $source, ProcessConfig $config): ProcessRe
 
 ---
 
-#### ExtractPatterns()
+#### extractPatterns()
 
 Run extraction patterns against source code.
 
@@ -572,7 +572,7 @@ public static function extractPatterns(string $source, ExtractionConfig $config)
 
 ---
 
-#### ValidateExtraction()
+#### validateExtraction()
 
 Validate extraction patterns without running them.
 
@@ -601,7 +601,7 @@ public static function validateExtraction(ExtractionConfig $config): ValidationR
 
 ---
 
-#### Init()
+#### init()
 
 Initialize the language pack with the given configuration.
 
@@ -632,7 +632,7 @@ public static function init(PackConfig $config): void
 
 ---
 
-#### Configure()
+#### configure()
 
 Apply download configuration without downloading anything.
 
@@ -664,7 +664,7 @@ public static function configure(PackConfig $config): void
 
 ---
 
-#### Download()
+#### download()
 
 Download specific languages to the local cache.
 
@@ -695,7 +695,7 @@ public static function download(array<string> $names): int
 
 ---
 
-#### DownloadAll()
+#### downloadAll()
 
 Download all available languages from the remote manifest.
 
@@ -718,7 +718,7 @@ public static function downloadAll(): int
 
 ---
 
-#### ManifestLanguages()
+#### manifestLanguages()
 
 Return all language names available in the remote manifest (305).
 
@@ -743,7 +743,7 @@ public static function manifestLanguages(): array<string>
 
 ---
 
-#### DownloadedLanguages()
+#### downloadedLanguages()
 
 Return languages that are already downloaded and cached locally.
 
@@ -761,7 +761,7 @@ public static function downloadedLanguages(): array<string>
 
 ---
 
-#### CleanCache()
+#### cleanCache()
 
 Delete all cached parser shared libraries.
 
@@ -785,7 +785,7 @@ public static function cleanCache(): void
 
 ---
 
-#### CacheDir()
+#### cacheDir()
 
 Return the effective cache directory path.
 
@@ -820,7 +820,7 @@ A single captured node within a match.
 | `name` | `string` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `?NodeInfo` | `null` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `?string` | `null` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `childFields` | `string` | — | Values of requested child fields, keyed by field name. |
+| `childFields` | `array<string, ?string>` | `{}` | Values of requested child fields, keyed by field name. |
 | `startByte` | `int` | — | Byte offset where this capture starts in the source. |
 
 
@@ -922,7 +922,7 @@ Manages downloading and caching of pre-built parser shared libraries.
 
 ##### Methods
 
-###### New()
+###### new()
 
 Create a new download manager for the given version.
 
@@ -932,7 +932,7 @@ Create a new download manager for the given version.
 public static function new(string $version): DownloadManager
 ```
 
-###### WithCacheDir()
+###### withCacheDir()
 
 Create a download manager with a custom cache directory.
 
@@ -942,7 +942,7 @@ Create a download manager with a custom cache directory.
 public static function withCacheDir(string $version, string $cacheDir): DownloadManager
 ```
 
-###### DefaultCacheDir()
+###### defaultCacheDir()
 
 Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
 
@@ -952,7 +952,7 @@ Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
 public static function defaultCacheDir(string $version): string
 ```
 
-###### CacheDir()
+###### cacheDir()
 
 Return the path to the libs cache directory.
 
@@ -962,7 +962,7 @@ Return the path to the libs cache directory.
 public function cacheDir(): string
 ```
 
-###### InstalledLanguages()
+###### installedLanguages()
 
 List languages that are already downloaded and cached.
 
@@ -972,7 +972,7 @@ List languages that are already downloaded and cached.
 public function installedLanguages(): array<string>
 ```
 
-###### EnsureLanguages()
+###### ensureLanguages()
 
 Ensure the specified languages are available in the cache.
 Downloads the platform bundle if any requested languages are missing.
@@ -983,7 +983,7 @@ Downloads the platform bundle if any requested languages are missing.
 public function ensureLanguages(array<string> $names): void
 ```
 
-###### EnsureGroup()
+###### ensureGroup()
 
 Ensure all languages in a named group are available.
 
@@ -993,7 +993,7 @@ Ensure all languages in a named group are available.
 public function ensureGroup(string $group): void
 ```
 
-###### LibPath()
+###### libPath()
 
 Get the expected path for a language's shared library in the cache.
 
@@ -1003,7 +1003,7 @@ Get the expected path for a language's shared library in the cache.
 public function libPath(string $name): string
 ```
 
-###### FetchManifest()
+###### fetchManifest()
 
 Fetch the parser manifest from GitHub Releases.
 
@@ -1013,7 +1013,7 @@ Fetch the parser manifest from GitHub Releases.
 public function fetchManifest(): ParserManifest
 ```
 
-###### CleanCache()
+###### cleanCache()
 
 Remove all cached parser libraries.
 
@@ -1046,7 +1046,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `string` | — | The language name (e.g., `"python"`). |
-| `patterns` | `string` | — | Named patterns to run. Keys become the keys in `ExtractionResult::results`. |
+| `patterns` | `array<string, ExtractionPattern>` | `{}` | Named patterns to run. Keys become the keys in `ExtractionResult::results`. |
 
 
 ---
@@ -1073,7 +1073,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `string` | — | The language that was used. |
-| `results` | `string` | — | Results keyed by pattern name. |
+| `results` | `array<string, PatternResult>` | `{}` | Results keyed by pattern name. |
 
 
 ---
@@ -1137,7 +1137,7 @@ global instance via the module-level convenience functions
 
 ##### Methods
 
-###### WithLibsDir()
+###### withLibsDir()
 
 Create a registry with a custom directory for dynamic libraries.
 
@@ -1150,7 +1150,7 @@ dynamic grammar shared libraries are stored in a non-standard location.
 public static function withLibsDir(string $libsDir): LanguageRegistry
 ```
 
-###### AddExtraLibsDir()
+###### addExtraLibsDir()
 
 Add an additional directory to search for dynamic libraries.
 
@@ -1168,7 +1168,7 @@ immutable while the directory list is updated.
 public function addExtraLibsDir(string $dir): void
 ```
 
-###### GetLanguage()
+###### getLanguage()
 
 Get a tree-sitter `Language` by name.
 
@@ -1187,7 +1187,7 @@ does not match any known grammar.
 public function getLanguage(string $name): Language
 ```
 
-###### AvailableLanguages()
+###### availableLanguages()
 
 List all available language names, sorted and deduplicated.
 
@@ -1200,7 +1200,7 @@ Includes statically compiled languages, dynamically loadable languages
 public function availableLanguages(): array<string>
 ```
 
-###### HasLanguage()
+###### hasLanguage()
 
 Check whether a language is available by name or alias.
 
@@ -1213,7 +1213,7 @@ table or from a dynamic library on disk.
 public function hasLanguage(string $name): bool
 ```
 
-###### LanguageCount()
+###### languageCount()
 
 Return the total number of available languages (including aliases).
 
@@ -1223,7 +1223,7 @@ Return the total number of available languages (including aliases).
 public function languageCount(): int
 ```
 
-###### Process()
+###### process()
 
 Parse source code and extract file intelligence based on config in a single pass.
 
@@ -1233,7 +1233,7 @@ Parse source code and extract file intelligence based on config in a single pass
 public function process(string $source, ProcessConfig $config): ProcessResult
 ```
 
-###### Default()
+###### default()
 
 **Signature:**
 
@@ -1297,7 +1297,7 @@ or passed as a dict/object from language bindings.
 
 ##### Methods
 
-###### FromTomlFile()
+###### fromTomlFile()
 
 Load configuration from a TOML file.
 
@@ -1311,7 +1311,7 @@ Returns an error if the file cannot be read or the TOML is invalid.
 public static function fromTomlFile(string $path): PackConfig
 ```
 
-###### Discover()
+###### discover()
 
 Discover configuration by searching for `language-pack.toml` in:
 
@@ -1404,11 +1404,11 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
 | `chunkMaxSize` | `?int` | `null` | Maximum chunk size in bytes. `null` disables chunking. |
-| `extractions` | `?string` | `null` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult::extractions`. |
+| `extractions` | `?array<string, ExtractionPattern>` | `null` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult::extractions`. |
 
 ##### Methods
 
-###### Default()
+###### default()
 
 **Signature:**
 
@@ -1416,7 +1416,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 public static function default(): ProcessConfig
 ```
 
-###### WithChunking()
+###### withChunking()
 
 Enable chunking with the given maximum chunk size in bytes.
 
@@ -1426,7 +1426,7 @@ Enable chunking with the given maximum chunk size in bytes.
 public function withChunking(int $maxSize): ProcessConfig
 ```
 
-###### All()
+###### all()
 
 Enable all analysis features.
 
@@ -1436,7 +1436,7 @@ Enable all analysis features.
 public function all(): ProcessConfig
 ```
 
-###### Minimal()
+###### minimal()
 
 Disable all analysis features (only metrics computed).
 
@@ -1469,7 +1469,7 @@ Fields are populated based on the `crate::ProcessConfig` flags.
 | `symbols` | `array<SymbolInfo>` | `[]` | Symbols |
 | `diagnostics` | `array<Diagnostic>` | `[]` | Diagnostics |
 | `chunks` | `array<CodeChunk>` | `[]` | Text chunks for chunking/embedding |
-| `extractions` | `string` | — | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `array<string, PatternResult>` | `{}` | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1551,7 +1551,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `bool` | — | Whether all patterns are valid. |
-| `patterns` | `string` | — | Per-pattern validation details. |
+| `patterns` | `array<string, PatternValidation>` | `{}` | Per-pattern validation details. |
 
 
 ---

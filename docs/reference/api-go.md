@@ -2,7 +2,7 @@
 title: "Go API Reference"
 ---
 
-## Go API Reference <span class="version-badge">v1.8.0-rc.24</span>
+## Go API Reference <span class="version-badge">v1.8.0-rc.26</span>
 
 ### Functions
 
@@ -820,7 +820,7 @@ A single captured node within a match.
 | `Name` | `string` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `Node` | `*NodeInfo` | `nil` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `Text` | `*string` | `nil` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `ChildFields` | `string` | — | Values of requested child fields, keyed by field name. |
+| `ChildFields` | `map[string]*string` | `nil` | Values of requested child fields, keyed by field name. |
 | `StartByte` | `int` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1046,7 +1046,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Language` | `string` | — | The language name (e.g., `"python"`). |
-| `Patterns` | `string` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `Patterns` | `map[string]ExtractionPattern` | `nil` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1073,7 +1073,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Language` | `string` | — | The language that was used. |
-| `Results` | `string` | — | Results keyed by pattern name. |
+| `Results` | `map[string]PatternResult` | `nil` | Results keyed by pattern name. |
 
 
 ---
@@ -1404,7 +1404,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `Symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `Diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
 | `ChunkMaxSize` | `*int` | `nil` | Maximum chunk size in bytes. `nil` disables chunking. |
-| `Extractions` | `*string` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `Extractions` | `*map[string]ExtractionPattern` | `nil` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1469,7 +1469,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `Symbols` | `[]SymbolInfo` | `nil` | Symbols |
 | `Diagnostics` | `[]Diagnostic` | `nil` | Diagnostics |
 | `Chunks` | `[]CodeChunk` | `nil` | Text chunks for chunking/embedding |
-| `Extractions` | `string` | — | Results of custom extraction patterns (when `config.extractions` is set). |
+| `Extractions` | `map[string]PatternResult` | `nil` | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1551,7 +1551,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Valid` | `bool` | — | Whether all patterns are valid. |
-| `Patterns` | `string` | — | Per-pattern validation details. |
+| `Patterns` | `map[string]PatternValidation` | `nil` | Per-pattern validation details. |
 
 
 ---
