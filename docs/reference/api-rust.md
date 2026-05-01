@@ -2,11 +2,11 @@
 title: "Rust API Reference"
 ---
 
-## Rust API Reference <span class="version-badge">v1.8.0-rc.24</span>
+## Rust API Reference <span class="version-badge">v1.8.0-rc.26</span>
 
 ### Functions
 
-#### Detect_language_from_extension()
+#### detect_language_from_extension()
 
 Detect language name from a file extension (without leading dot).
 
@@ -29,7 +29,7 @@ pub fn detect_language_from_extension(ext: &str) -> Option<String>
 
 ---
 
-#### Detect_language_from_path()
+#### detect_language_from_path()
 
 Detect language name from a file path.
 
@@ -53,7 +53,7 @@ pub fn detect_language_from_path(path: &str) -> Option<String>
 
 ---
 
-#### Detect_language_from_content()
+#### detect_language_from_content()
 
 Detect language name from file content using the shebang line (`#!`).
 
@@ -89,7 +89,7 @@ pub fn detect_language_from_content(content: &str) -> Option<String>
 
 ---
 
-#### Root_node_info()
+#### root_node_info()
 
 Get a `NodeInfo` snapshot of the root node.
 
@@ -110,7 +110,7 @@ pub fn root_node_info(tree: Tree) -> NodeInfo
 
 ---
 
-#### Find_nodes_by_type()
+#### find_nodes_by_type()
 
 Find all nodes matching the given type name, returning their `NodeInfo`.
 
@@ -134,7 +134,7 @@ pub fn find_nodes_by_type(tree: Tree, node_type: &str) -> Vec<NodeInfo>
 
 ---
 
-#### Named_children_info()
+#### named_children_info()
 
 Get `NodeInfo` for all named children of the root node.
 
@@ -158,7 +158,7 @@ pub fn named_children_info(tree: Tree) -> Vec<NodeInfo>
 
 ---
 
-#### Parse_string()
+#### parse_string()
 
 Parse source code with the named language, returning the syntax tree.
 
@@ -186,7 +186,7 @@ pub fn parse_string(language: &str, source: &[u8]) -> Result<Tree, Error>
 
 ---
 
-#### Tree_contains_node_type()
+#### tree_contains_node_type()
 
 Check whether any node in the tree matches the given type name.
 
@@ -210,7 +210,7 @@ pub fn tree_contains_node_type(tree: Tree, node_type: &str) -> bool
 
 ---
 
-#### Tree_has_error_nodes()
+#### tree_has_error_nodes()
 
 Check whether the tree contains any ERROR or MISSING nodes.
 
@@ -233,7 +233,7 @@ pub fn tree_has_error_nodes(tree: Tree) -> bool
 
 ---
 
-#### Tree_to_sexp()
+#### tree_to_sexp()
 
 Return the S-expression representation of the entire tree.
 
@@ -257,7 +257,7 @@ pub fn tree_to_sexp(tree: Tree) -> String
 
 ---
 
-#### Tree_error_count()
+#### tree_error_count()
 
 Count the number of ERROR and MISSING nodes in the tree.
 
@@ -280,7 +280,7 @@ pub fn tree_error_count(tree: Tree) -> usize
 
 ---
 
-#### Get_highlights_query()
+#### get_highlights_query()
 
 Get the highlights query for a language, if bundled.
 
@@ -304,7 +304,7 @@ pub fn get_highlights_query(language: &str) -> Option<String>
 
 ---
 
-#### Get_injections_query()
+#### get_injections_query()
 
 Get the injections query for a language, if bundled.
 
@@ -328,7 +328,7 @@ pub fn get_injections_query(language: &str) -> Option<String>
 
 ---
 
-#### Get_locals_query()
+#### get_locals_query()
 
 Get the locals query for a language, if bundled.
 
@@ -352,7 +352,7 @@ pub fn get_locals_query(language: &str) -> Option<String>
 
 ---
 
-#### Run_query()
+#### run_query()
 
 Execute a tree-sitter query pattern against a parsed tree.
 
@@ -386,7 +386,7 @@ pub fn run_query(tree: Tree, language: &str, query_source: &str, source: &[u8]) 
 
 ---
 
-#### Get_language()
+#### get_language()
 
 Get a tree-sitter `Language` by name using the global registry.
 
@@ -418,7 +418,7 @@ pub fn get_language(name: &str) -> Result<Language, Error>
 
 ---
 
-#### Get_parser()
+#### get_parser()
 
 Get a tree-sitter `Parser` pre-configured for the given language.
 
@@ -449,7 +449,7 @@ pub fn get_parser(name: &str) -> Result<Parser, Error>
 
 ---
 
-#### Available_languages()
+#### available_languages()
 
 List all available language names (sorted, deduplicated, includes aliases).
 
@@ -467,7 +467,7 @@ pub fn available_languages() -> Vec<String>
 
 ---
 
-#### Has_language()
+#### has_language()
 
 Check if a language is available by name or alias.
 
@@ -491,7 +491,7 @@ pub fn has_language(name: &str) -> bool
 
 ---
 
-#### Language_count()
+#### language_count()
 
 Return the number of available languages.
 
@@ -509,7 +509,7 @@ pub fn language_count() -> usize
 
 ---
 
-#### Process()
+#### process()
 
 Process source code and extract file intelligence using the global registry.
 
@@ -541,7 +541,7 @@ pub fn process(source: &str, config: ProcessConfig) -> Result<ProcessResult, Err
 
 ---
 
-#### Extract_patterns()
+#### extract_patterns()
 
 Run extraction patterns against source code.
 
@@ -572,7 +572,7 @@ pub fn extract_patterns(source: &str, config: ExtractionConfig) -> Result<Extrac
 
 ---
 
-#### Validate_extraction()
+#### validate_extraction()
 
 Validate extraction patterns without running them.
 
@@ -601,7 +601,7 @@ pub fn validate_extraction(config: ExtractionConfig) -> Result<ValidationResult,
 
 ---
 
-#### Init()
+#### init()
 
 Initialize the language pack with the given configuration.
 
@@ -632,7 +632,7 @@ pub fn init(config: PackConfig) -> Result<(), Error>
 
 ---
 
-#### Configure()
+#### configure()
 
 Apply download configuration without downloading anything.
 
@@ -664,7 +664,7 @@ pub fn configure(config: PackConfig) -> Result<(), Error>
 
 ---
 
-#### Download()
+#### download()
 
 Download specific languages to the local cache.
 
@@ -695,7 +695,7 @@ pub fn download(names: Vec<String>) -> Result<usize, Error>
 
 ---
 
-#### Download_all()
+#### download_all()
 
 Download all available languages from the remote manifest.
 
@@ -718,7 +718,7 @@ pub fn download_all() -> Result<usize, Error>
 
 ---
 
-#### Manifest_languages()
+#### manifest_languages()
 
 Return all language names available in the remote manifest (305).
 
@@ -743,7 +743,7 @@ pub fn manifest_languages() -> Result<Vec<String>, Error>
 
 ---
 
-#### Downloaded_languages()
+#### downloaded_languages()
 
 Return languages that are already downloaded and cached locally.
 
@@ -761,7 +761,7 @@ pub fn downloaded_languages() -> Vec<String>
 
 ---
 
-#### Clean_cache()
+#### clean_cache()
 
 Delete all cached parser shared libraries.
 
@@ -785,7 +785,7 @@ pub fn clean_cache() -> Result<(), Error>
 
 ---
 
-#### Cache_dir()
+#### cache_dir()
 
 Return the effective cache directory path.
 
@@ -820,7 +820,7 @@ A single captured node within a match.
 | `name` | `String` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `Option<NodeInfo>` | `Default::default()` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `Option<String>` | `Default::default()` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `child_fields` | `String` | — | Values of requested child fields, keyed by field name. |
+| `child_fields` | `HashMap<String, Option<String>>` | `HashMap::new()` | Values of requested child fields, keyed by field name. |
 | `start_byte` | `usize` | — | Byte offset where this capture starts in the source. |
 
 
@@ -922,7 +922,7 @@ Manages downloading and caching of pre-built parser shared libraries.
 
 ##### Methods
 
-###### New()
+###### new()
 
 Create a new download manager for the given version.
 
@@ -932,7 +932,7 @@ Create a new download manager for the given version.
 pub fn new(version: &str) -> DownloadManager
 ```
 
-###### With_cache_dir()
+###### with_cache_dir()
 
 Create a download manager with a custom cache directory.
 
@@ -942,7 +942,7 @@ Create a download manager with a custom cache directory.
 pub fn with_cache_dir(version: &str, cache_dir: PathBuf) -> DownloadManager
 ```
 
-###### Default_cache_dir()
+###### default_cache_dir()
 
 Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
 
@@ -952,7 +952,7 @@ Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
 pub fn default_cache_dir(version: &str) -> PathBuf
 ```
 
-###### Cache_dir()
+###### cache_dir()
 
 Return the path to the libs cache directory.
 
@@ -962,7 +962,7 @@ Return the path to the libs cache directory.
 pub fn cache_dir(&self) -> PathBuf
 ```
 
-###### Installed_languages()
+###### installed_languages()
 
 List languages that are already downloaded and cached.
 
@@ -972,7 +972,7 @@ List languages that are already downloaded and cached.
 pub fn installed_languages(&self) -> Vec<String>
 ```
 
-###### Ensure_languages()
+###### ensure_languages()
 
 Ensure the specified languages are available in the cache.
 Downloads the platform bundle if any requested languages are missing.
@@ -983,7 +983,7 @@ Downloads the platform bundle if any requested languages are missing.
 pub fn ensure_languages(&self, names: Vec<String>)
 ```
 
-###### Ensure_group()
+###### ensure_group()
 
 Ensure all languages in a named group are available.
 
@@ -993,7 +993,7 @@ Ensure all languages in a named group are available.
 pub fn ensure_group(&self, group: &str)
 ```
 
-###### Lib_path()
+###### lib_path()
 
 Get the expected path for a language's shared library in the cache.
 
@@ -1003,7 +1003,7 @@ Get the expected path for a language's shared library in the cache.
 pub fn lib_path(&self, name: &str) -> PathBuf
 ```
 
-###### Fetch_manifest()
+###### fetch_manifest()
 
 Fetch the parser manifest from GitHub Releases.
 
@@ -1013,7 +1013,7 @@ Fetch the parser manifest from GitHub Releases.
 pub fn fetch_manifest(&self) -> ParserManifest
 ```
 
-###### Clean_cache()
+###### clean_cache()
 
 Remove all cached parser libraries.
 
@@ -1046,7 +1046,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language name (e.g., `"python"`). |
-| `patterns` | `String` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `HashMap<String, ExtractionPattern>` | `HashMap::new()` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1073,7 +1073,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language that was used. |
-| `results` | `String` | — | Results keyed by pattern name. |
+| `results` | `HashMap<String, PatternResult>` | `HashMap::new()` | Results keyed by pattern name. |
 
 
 ---
@@ -1137,7 +1137,7 @@ global instance via the module-level convenience functions
 
 ##### Methods
 
-###### With_libs_dir()
+###### with_libs_dir()
 
 Create a registry with a custom directory for dynamic libraries.
 
@@ -1150,7 +1150,7 @@ dynamic grammar shared libraries are stored in a non-standard location.
 pub fn with_libs_dir(libs_dir: PathBuf) -> LanguageRegistry
 ```
 
-###### Add_extra_libs_dir()
+###### add_extra_libs_dir()
 
 Add an additional directory to search for dynamic libraries.
 
@@ -1168,7 +1168,7 @@ immutable while the directory list is updated.
 pub fn add_extra_libs_dir(&self, dir: PathBuf)
 ```
 
-###### Get_language()
+###### get_language()
 
 Get a tree-sitter `Language` by name.
 
@@ -1187,7 +1187,7 @@ does not match any known grammar.
 pub fn get_language(&self, name: &str) -> Language
 ```
 
-###### Available_languages()
+###### available_languages()
 
 List all available language names, sorted and deduplicated.
 
@@ -1200,7 +1200,7 @@ Includes statically compiled languages, dynamically loadable languages
 pub fn available_languages(&self) -> Vec<String>
 ```
 
-###### Has_language()
+###### has_language()
 
 Check whether a language is available by name or alias.
 
@@ -1213,7 +1213,7 @@ table or from a dynamic library on disk.
 pub fn has_language(&self, name: &str) -> bool
 ```
 
-###### Language_count()
+###### language_count()
 
 Return the total number of available languages (including aliases).
 
@@ -1223,7 +1223,7 @@ Return the total number of available languages (including aliases).
 pub fn language_count(&self) -> usize
 ```
 
-###### Process()
+###### process()
 
 Parse source code and extract file intelligence based on config in a single pass.
 
@@ -1233,7 +1233,7 @@ Parse source code and extract file intelligence based on config in a single pass
 pub fn process(&self, source: &str, config: ProcessConfig) -> ProcessResult
 ```
 
-###### Default()
+###### default()
 
 **Signature:**
 
@@ -1297,7 +1297,7 @@ or passed as a dict/object from language bindings.
 
 ##### Methods
 
-###### From_toml_file()
+###### from_toml_file()
 
 Load configuration from a TOML file.
 
@@ -1311,7 +1311,7 @@ Returns an error if the file cannot be read or the TOML is invalid.
 pub fn from_toml_file(path: PathBuf) -> PackConfig
 ```
 
-###### Discover()
+###### discover()
 
 Discover configuration by searching for `language-pack.toml` in:
 
@@ -1404,11 +1404,11 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
 | `chunk_max_size` | `Option<usize>` | `None` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `Option<String>` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `extractions` | `Option<HashMap<String, ExtractionPattern>>` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
-###### Default()
+###### default()
 
 **Signature:**
 
@@ -1416,7 +1416,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 pub fn default() -> ProcessConfig
 ```
 
-###### With_chunking()
+###### with_chunking()
 
 Enable chunking with the given maximum chunk size in bytes.
 
@@ -1426,7 +1426,7 @@ Enable chunking with the given maximum chunk size in bytes.
 pub fn with_chunking(&self, max_size: usize) -> ProcessConfig
 ```
 
-###### All()
+###### all()
 
 Enable all analysis features.
 
@@ -1436,7 +1436,7 @@ Enable all analysis features.
 pub fn all(&self) -> ProcessConfig
 ```
 
-###### Minimal()
+###### minimal()
 
 Disable all analysis features (only metrics computed).
 
@@ -1469,7 +1469,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `Vec<SymbolInfo>` | `vec![]` | Symbols |
 | `diagnostics` | `Vec<Diagnostic>` | `vec![]` | Diagnostics |
 | `chunks` | `Vec<CodeChunk>` | `vec![]` | Text chunks for chunking/embedding |
-| `extractions` | `String` | — | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `HashMap<String, PatternResult>` | `HashMap::new()` | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1551,7 +1551,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `bool` | — | Whether all patterns are valid. |
-| `patterns` | `String` | — | Per-pattern validation details. |
+| `patterns` | `HashMap<String, PatternValidation>` | `HashMap::new()` | Per-pattern validation details. |
 
 
 ---

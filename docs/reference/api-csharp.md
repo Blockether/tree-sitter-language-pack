@@ -2,7 +2,7 @@
 title: "C# API Reference"
 ---
 
-## C# API Reference <span class="version-badge">v1.8.0-rc.24</span>
+## C# API Reference <span class="version-badge">v1.8.0-rc.26</span>
 
 ### Functions
 
@@ -820,7 +820,7 @@ A single captured node within a match.
 | `Name` | `string` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `Node` | `NodeInfo?` | `null` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `Text` | `string?` | `null` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `ChildFields` | `string` | — | Values of requested child fields, keyed by field name. |
+| `ChildFields` | `Dictionary<string, string?>` | `new Dictionary<string, string?>()` | Values of requested child fields, keyed by field name. |
 | `StartByte` | `nuint` | — | Byte offset where this capture starts in the source. |
 
 
@@ -1046,7 +1046,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Language` | `string` | — | The language name (e.g., `"python"`). |
-| `Patterns` | `string` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `Patterns` | `Dictionary<string, ExtractionPattern>` | `new Dictionary<string, ExtractionPattern>()` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1073,7 +1073,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Language` | `string` | — | The language that was used. |
-| `Results` | `string` | — | Results keyed by pattern name. |
+| `Results` | `Dictionary<string, PatternResult>` | `new Dictionary<string, PatternResult>()` | Results keyed by pattern name. |
 
 
 ---
@@ -1404,7 +1404,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `Symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `Diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
 | `ChunkMaxSize` | `nuint?` | `null` | Maximum chunk size in bytes. `null` disables chunking. |
-| `Extractions` | `string?` | `null` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `Extractions` | `Dictionary<string, ExtractionPattern>?` | `null` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
@@ -1469,7 +1469,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `Symbols` | `List<SymbolInfo>` | `new List<SymbolInfo>()` | Symbols |
 | `Diagnostics` | `List<Diagnostic>` | `new List<Diagnostic>()` | Diagnostics |
 | `Chunks` | `List<CodeChunk>` | `new List<CodeChunk>()` | Text chunks for chunking/embedding |
-| `Extractions` | `string` | — | Results of custom extraction patterns (when `config.extractions` is set). |
+| `Extractions` | `Dictionary<string, PatternResult>` | `new Dictionary<string, PatternResult>()` | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1551,7 +1551,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `Valid` | `bool` | — | Whether all patterns are valid. |
-| `Patterns` | `string` | — | Per-pattern validation details. |
+| `Patterns` | `Dictionary<string, PatternValidation>` | `new Dictionary<string, PatternValidation>()` | Per-pattern validation details. |
 
 
 ---

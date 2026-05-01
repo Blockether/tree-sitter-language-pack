@@ -17,7 +17,7 @@ A single captured node within a match.
 | `name` | `String` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `Option<NodeInfo>` | `Default::default()` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `Option<String>` | `Default::default()` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `child_fields` | `String` | — | Values of requested child fields, keyed by field name. |
+| `child_fields` | `HashMap<String, Option<String>>` | `HashMap::new()` | Values of requested child fields, keyed by field name. |
 | `start_byte` | `usize` | — | Byte offset where this capture starts in the source. |
 
 ---
@@ -51,7 +51,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language that was used. |
-| `results` | `String` | — | Results keyed by pattern name. |
+| `results` | `HashMap<String, PatternResult>` | `HashMap::new()` | Results keyed by pattern name. |
 
 ---
 
@@ -62,7 +62,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `bool` | — | Whether all patterns are valid. |
-| `patterns` | `String` | — | Per-pattern validation details. |
+| `patterns` | `HashMap<String, PatternValidation>` | `HashMap::new()` | Per-pattern validation details. |
 
 ---
 
@@ -86,7 +86,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `Vec<SymbolInfo>` | `vec![]` | Symbols |
 | `diagnostics` | `Vec<Diagnostic>` | `vec![]` | Diagnostics |
 | `chunks` | `Vec<CodeChunk>` | `vec![]` | Text chunks for chunking/embedding |
-| `extractions` | `String` | — | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `HashMap<String, PatternResult>` | `HashMap::new()` | Results of custom extraction patterns (when `config.extractions` is set). |
 
 ---
 
@@ -115,7 +115,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `String` | — | The language name (e.g., `"python"`). |
-| `patterns` | `String` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `HashMap<String, ExtractionPattern>` | `HashMap::new()` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 ---
 
@@ -367,7 +367,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
 | `chunk_max_size` | `Option<usize>` | `None` | Maximum chunk size in bytes. `None` disables chunking. |
-| `extractions` | `Option<String>` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `extractions` | `HashMap<String, ExtractionPattern>` | `None` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ---
 

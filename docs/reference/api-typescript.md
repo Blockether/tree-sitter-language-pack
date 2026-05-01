@@ -2,11 +2,11 @@
 title: "TypeScript API Reference"
 ---
 
-## TypeScript API Reference <span class="version-badge">v1.8.0-rc.24</span>
+## TypeScript API Reference <span class="version-badge">v1.8.0-rc.26</span>
 
 ### Functions
 
-#### DetectLanguageFromExtension()
+#### detectLanguageFromExtension()
 
 Detect language name from a file extension (without leading dot).
 
@@ -29,7 +29,7 @@ function detectLanguageFromExtension(ext: string): string | null
 
 ---
 
-#### DetectLanguageFromPath()
+#### detectLanguageFromPath()
 
 Detect language name from a file path.
 
@@ -53,7 +53,7 @@ function detectLanguageFromPath(path: string): string | null
 
 ---
 
-#### DetectLanguageFromContent()
+#### detectLanguageFromContent()
 
 Detect language name from file content using the shebang line (`#!`).
 
@@ -89,7 +89,7 @@ function detectLanguageFromContent(content: string): string | null
 
 ---
 
-#### RootNodeInfo()
+#### rootNodeInfo()
 
 Get a `NodeInfo` snapshot of the root node.
 
@@ -110,7 +110,7 @@ function rootNodeInfo(tree: Tree): NodeInfo
 
 ---
 
-#### FindNodesByType()
+#### findNodesByType()
 
 Find all nodes matching the given type name, returning their `NodeInfo`.
 
@@ -134,7 +134,7 @@ function findNodesByType(tree: Tree, nodeType: string): Array<NodeInfo>
 
 ---
 
-#### NamedChildrenInfo()
+#### namedChildrenInfo()
 
 Get `NodeInfo` for all named children of the root node.
 
@@ -158,7 +158,7 @@ function namedChildrenInfo(tree: Tree): Array<NodeInfo>
 
 ---
 
-#### ParseString()
+#### parseString()
 
 Parse source code with the named language, returning the syntax tree.
 
@@ -186,7 +186,7 @@ function parseString(language: string, source: Buffer): Tree
 
 ---
 
-#### TreeContainsNodeType()
+#### treeContainsNodeType()
 
 Check whether any node in the tree matches the given type name.
 
@@ -210,7 +210,7 @@ function treeContainsNodeType(tree: Tree, nodeType: string): boolean
 
 ---
 
-#### TreeHasErrorNodes()
+#### treeHasErrorNodes()
 
 Check whether the tree contains any ERROR or MISSING nodes.
 
@@ -233,7 +233,7 @@ function treeHasErrorNodes(tree: Tree): boolean
 
 ---
 
-#### TreeToSexp()
+#### treeToSexp()
 
 Return the S-expression representation of the entire tree.
 
@@ -257,7 +257,7 @@ function treeToSexp(tree: Tree): string
 
 ---
 
-#### TreeErrorCount()
+#### treeErrorCount()
 
 Count the number of ERROR and MISSING nodes in the tree.
 
@@ -280,7 +280,7 @@ function treeErrorCount(tree: Tree): number
 
 ---
 
-#### GetHighlightsQuery()
+#### getHighlightsQuery()
 
 Get the highlights query for a language, if bundled.
 
@@ -304,7 +304,7 @@ function getHighlightsQuery(language: string): string | null
 
 ---
 
-#### GetInjectionsQuery()
+#### getInjectionsQuery()
 
 Get the injections query for a language, if bundled.
 
@@ -328,7 +328,7 @@ function getInjectionsQuery(language: string): string | null
 
 ---
 
-#### GetLocalsQuery()
+#### getLocalsQuery()
 
 Get the locals query for a language, if bundled.
 
@@ -352,7 +352,7 @@ function getLocalsQuery(language: string): string | null
 
 ---
 
-#### RunQuery()
+#### runQuery()
 
 Execute a tree-sitter query pattern against a parsed tree.
 
@@ -386,7 +386,7 @@ function runQuery(tree: Tree, language: string, querySource: string, source: Buf
 
 ---
 
-#### GetLanguage()
+#### getLanguage()
 
 Get a tree-sitter `Language` by name using the global registry.
 
@@ -418,7 +418,7 @@ function getLanguage(name: string): Language
 
 ---
 
-#### GetParser()
+#### getParser()
 
 Get a tree-sitter `Parser` pre-configured for the given language.
 
@@ -449,7 +449,7 @@ function getParser(name: string): Parser
 
 ---
 
-#### AvailableLanguages()
+#### availableLanguages()
 
 List all available language names (sorted, deduplicated, includes aliases).
 
@@ -467,7 +467,7 @@ function availableLanguages(): Array<string>
 
 ---
 
-#### HasLanguage()
+#### hasLanguage()
 
 Check if a language is available by name or alias.
 
@@ -491,7 +491,7 @@ function hasLanguage(name: string): boolean
 
 ---
 
-#### LanguageCount()
+#### languageCount()
 
 Return the number of available languages.
 
@@ -509,7 +509,7 @@ function languageCount(): number
 
 ---
 
-#### Process()
+#### process()
 
 Process source code and extract file intelligence using the global registry.
 
@@ -541,7 +541,7 @@ function process(source: string, config: ProcessConfig): ProcessResult
 
 ---
 
-#### ExtractPatterns()
+#### extractPatterns()
 
 Run extraction patterns against source code.
 
@@ -572,7 +572,7 @@ function extractPatterns(source: string, config: ExtractionConfig): ExtractionRe
 
 ---
 
-#### ValidateExtraction()
+#### validateExtraction()
 
 Validate extraction patterns without running them.
 
@@ -601,7 +601,7 @@ function validateExtraction(config: ExtractionConfig): ValidationResult
 
 ---
 
-#### Init()
+#### init()
 
 Initialize the language pack with the given configuration.
 
@@ -632,7 +632,7 @@ function init(config: PackConfig): void
 
 ---
 
-#### Configure()
+#### configure()
 
 Apply download configuration without downloading anything.
 
@@ -664,7 +664,7 @@ function configure(config: PackConfig): void
 
 ---
 
-#### Download()
+#### download()
 
 Download specific languages to the local cache.
 
@@ -695,7 +695,7 @@ function download(names: Array<string>): number
 
 ---
 
-#### DownloadAll()
+#### downloadAll()
 
 Download all available languages from the remote manifest.
 
@@ -718,7 +718,7 @@ function downloadAll(): number
 
 ---
 
-#### ManifestLanguages()
+#### manifestLanguages()
 
 Return all language names available in the remote manifest (305).
 
@@ -743,7 +743,7 @@ function manifestLanguages(): Array<string>
 
 ---
 
-#### DownloadedLanguages()
+#### downloadedLanguages()
 
 Return languages that are already downloaded and cached locally.
 
@@ -761,7 +761,7 @@ function downloadedLanguages(): Array<string>
 
 ---
 
-#### CleanCache()
+#### cleanCache()
 
 Delete all cached parser shared libraries.
 
@@ -785,7 +785,7 @@ function cleanCache(): void
 
 ---
 
-#### CacheDir()
+#### cacheDir()
 
 Return the effective cache directory path.
 
@@ -820,7 +820,7 @@ A single captured node within a match.
 | `name` | `string` | — | The capture name from the query (e.g., `"fn_name"`). |
 | `node` | `NodeInfo | null` | `null` | The `NodeInfo` snapshot, present when `CaptureOutput` is `Node` or `Full`. |
 | `text` | `string | null` | `null` | The matched source text, present when `CaptureOutput` is `Text` or `Full`. |
-| `childFields` | `string` | — | Values of requested child fields, keyed by field name. |
+| `childFields` | `Record<string, string | null>` | `{}` | Values of requested child fields, keyed by field name. |
 | `startByte` | `number` | — | Byte offset where this capture starts in the source. |
 
 
@@ -922,7 +922,7 @@ Manages downloading and caching of pre-built parser shared libraries.
 
 ##### Methods
 
-###### New()
+###### new()
 
 Create a new download manager for the given version.
 
@@ -932,7 +932,7 @@ Create a new download manager for the given version.
 static new(version: string): DownloadManager
 ```
 
-###### WithCacheDir()
+###### withCacheDir()
 
 Create a download manager with a custom cache directory.
 
@@ -942,7 +942,7 @@ Create a download manager with a custom cache directory.
 static withCacheDir(version: string, cacheDir: string): DownloadManager
 ```
 
-###### DefaultCacheDir()
+###### defaultCacheDir()
 
 Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
 
@@ -952,7 +952,7 @@ Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
 static defaultCacheDir(version: string): string
 ```
 
-###### CacheDir()
+###### cacheDir()
 
 Return the path to the libs cache directory.
 
@@ -962,7 +962,7 @@ Return the path to the libs cache directory.
 cacheDir(): string
 ```
 
-###### InstalledLanguages()
+###### installedLanguages()
 
 List languages that are already downloaded and cached.
 
@@ -972,7 +972,7 @@ List languages that are already downloaded and cached.
 installedLanguages(): Array<string>
 ```
 
-###### EnsureLanguages()
+###### ensureLanguages()
 
 Ensure the specified languages are available in the cache.
 Downloads the platform bundle if any requested languages are missing.
@@ -983,7 +983,7 @@ Downloads the platform bundle if any requested languages are missing.
 ensureLanguages(names: Array<string>): void
 ```
 
-###### EnsureGroup()
+###### ensureGroup()
 
 Ensure all languages in a named group are available.
 
@@ -993,7 +993,7 @@ Ensure all languages in a named group are available.
 ensureGroup(group: string): void
 ```
 
-###### LibPath()
+###### libPath()
 
 Get the expected path for a language's shared library in the cache.
 
@@ -1003,7 +1003,7 @@ Get the expected path for a language's shared library in the cache.
 libPath(name: string): string
 ```
 
-###### FetchManifest()
+###### fetchManifest()
 
 Fetch the parser manifest from GitHub Releases.
 
@@ -1013,7 +1013,7 @@ Fetch the parser manifest from GitHub Releases.
 fetchManifest(): ParserManifest
 ```
 
-###### CleanCache()
+###### cleanCache()
 
 Remove all cached parser libraries.
 
@@ -1046,7 +1046,7 @@ Configuration for an extraction run against a single language.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `string` | — | The language name (e.g., `"python"`). |
-| `patterns` | `string` | — | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
+| `patterns` | `Record<string, ExtractionPattern>` | `{}` | Named patterns to run. Keys become the keys in `ExtractionResult.results`. |
 
 
 ---
@@ -1073,7 +1073,7 @@ Complete extraction results for all patterns.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `language` | `string` | — | The language that was used. |
-| `results` | `string` | — | Results keyed by pattern name. |
+| `results` | `Record<string, PatternResult>` | `{}` | Results keyed by pattern name. |
 
 
 ---
@@ -1137,7 +1137,7 @@ global instance via the module-level convenience functions
 
 ##### Methods
 
-###### WithLibsDir()
+###### withLibsDir()
 
 Create a registry with a custom directory for dynamic libraries.
 
@@ -1150,7 +1150,7 @@ dynamic grammar shared libraries are stored in a non-standard location.
 static withLibsDir(libsDir: string): LanguageRegistry
 ```
 
-###### AddExtraLibsDir()
+###### addExtraLibsDir()
 
 Add an additional directory to search for dynamic libraries.
 
@@ -1168,7 +1168,7 @@ immutable while the directory list is updated.
 addExtraLibsDir(dir: string): void
 ```
 
-###### GetLanguage()
+###### getLanguage()
 
 Get a tree-sitter `Language` by name.
 
@@ -1187,7 +1187,7 @@ does not match any known grammar.
 getLanguage(name: string): Language
 ```
 
-###### AvailableLanguages()
+###### availableLanguages()
 
 List all available language names, sorted and deduplicated.
 
@@ -1200,7 +1200,7 @@ Includes statically compiled languages, dynamically loadable languages
 availableLanguages(): Array<string>
 ```
 
-###### HasLanguage()
+###### hasLanguage()
 
 Check whether a language is available by name or alias.
 
@@ -1213,7 +1213,7 @@ table or from a dynamic library on disk.
 hasLanguage(name: string): boolean
 ```
 
-###### LanguageCount()
+###### languageCount()
 
 Return the total number of available languages (including aliases).
 
@@ -1223,7 +1223,7 @@ Return the total number of available languages (including aliases).
 languageCount(): number
 ```
 
-###### Process()
+###### process()
 
 Parse source code and extract file intelligence based on config in a single pass.
 
@@ -1233,7 +1233,7 @@ Parse source code and extract file intelligence based on config in a single pass
 process(source: string, config: ProcessConfig): ProcessResult
 ```
 
-###### Default()
+###### default()
 
 **Signature:**
 
@@ -1297,7 +1297,7 @@ or passed as a dict/object from language bindings.
 
 ##### Methods
 
-###### FromTomlFile()
+###### fromTomlFile()
 
 Load configuration from a TOML file.
 
@@ -1311,7 +1311,7 @@ Returns an error if the file cannot be read or the TOML is invalid.
 static fromTomlFile(path: string): PackConfig
 ```
 
-###### Discover()
+###### discover()
 
 Discover configuration by searching for `language-pack.toml` in:
 
@@ -1404,11 +1404,11 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `boolean` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `boolean` | `false` | Include parse diagnostics. Default: false. |
 | `chunkMaxSize` | `number | null` | `null` | Maximum chunk size in bytes. `null` disables chunking. |
-| `extractions` | `string | null` | `null` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
+| `extractions` | `Record<string, ExtractionPattern> | null` | `null` | Custom extraction patterns to run against the parsed tree. Keys become the keys in `ProcessResult.extractions`. |
 
 ##### Methods
 
-###### Default()
+###### default()
 
 **Signature:**
 
@@ -1416,7 +1416,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 static default(): ProcessConfig
 ```
 
-###### WithChunking()
+###### withChunking()
 
 Enable chunking with the given maximum chunk size in bytes.
 
@@ -1426,7 +1426,7 @@ Enable chunking with the given maximum chunk size in bytes.
 withChunking(maxSize: number): ProcessConfig
 ```
 
-###### All()
+###### all()
 
 Enable all analysis features.
 
@@ -1436,7 +1436,7 @@ Enable all analysis features.
 all(): ProcessConfig
 ```
 
-###### Minimal()
+###### minimal()
 
 Disable all analysis features (only metrics computed).
 
@@ -1469,7 +1469,7 @@ Fields are populated based on the `crate.ProcessConfig` flags.
 | `symbols` | `Array<SymbolInfo>` | `[]` | Symbols |
 | `diagnostics` | `Array<Diagnostic>` | `[]` | Diagnostics |
 | `chunks` | `Array<CodeChunk>` | `[]` | Text chunks for chunking/embedding |
-| `extractions` | `string` | — | Results of custom extraction patterns (when `config.extractions` is set). |
+| `extractions` | `Record<string, PatternResult>` | `{}` | Results of custom extraction patterns (when `config.extractions` is set). |
 
 
 ---
@@ -1551,7 +1551,7 @@ Validation results for an entire extraction config.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `valid` | `boolean` | — | Whether all patterns are valid. |
-| `patterns` | `string` | — | Per-pattern validation details. |
+| `patterns` | `Record<string, PatternValidation>` | `{}` | Per-pattern validation details. |
 
 
 ---
