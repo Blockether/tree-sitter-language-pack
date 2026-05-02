@@ -99,14 +99,14 @@ println!("Chunks: {}", result.chunks.len());
 
 ## Features
 
-| Feature | Description |
-| --- | --- |
-| **305+ Languages** | Pre-compiled parsers for 305+ programming languages |
-| **On-Demand Downloads** | Parsers are downloaded on-demand and cached locally for fast reuse |
-| **Selective Installation** | Download only the languages you need; unused parsers never downloaded |
-| **Polyglot Bindings** | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++ |
-| **Automatic Caching** | Downloaded parsers cached in platform-specific directories for offline use |
-| **CLI Tool** | `ts-pack download` to pre-download parsers for offline/CI/Docker use |
+| Feature                    | Description                                                                |
+| -------------------------- | -------------------------------------------------------------------------- |
+| **305+ Languages**         | Pre-compiled parsers for 305+ programming languages                        |
+| **On-Demand Downloads**    | Parsers are downloaded on-demand and cached locally for fast reuse         |
+| **Selective Installation** | Download only the languages you need; unused parsers never downloaded      |
+| **Polyglot Bindings**      | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++     |
+| **Automatic Caching**      | Downloaded parsers cached in platform-specific directories for offline use |
+| **CLI Tool**               | `ts-pack download` to pre-download parsers for offline/CI/Docker use       |
 
 ### Downloading Parsers
 
@@ -150,11 +150,10 @@ TSLP_LANGUAGES=python,rust,javascript cargo build
 - `detect_language_from_extension(ext)` -- detect language from a bare file extension
 - `detect_language_from_path(path)` -- detect language from a file path
 - `detect_language_from_content(content)` -- detect language from shebang line
-- `extension_ambiguity(ext)` -- check if an extension is ambiguous (returns assigned language + alternatives)
 
 ### Parsing
 
-- `get_parser(name)` / `parse_string(source, language)` -- parse source code into a syntax tree
+- `get_parser(name)` -- create a tree-sitter parser configured for a supported language
 
 ### Download API
 

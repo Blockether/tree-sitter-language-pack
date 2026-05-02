@@ -1604,27 +1604,6 @@ char *ts_pack_detect_language_from_path(const char *path);
 char *ts_pack_detect_language_from_content(const char *content);
 
 /**
- * Parse source code with the named language, returning the syntax tree.
- *
- * Uses the global registry to look up the language by name.
- * Caches parsers per-thread so repeated calls for the same language avoid
- * re-creating the parser.
- *
- * # Examples
- *
- * ```no_run
- * let tree = tree_sitter_language_pack::parse_string("python", b"def hello(): pass").unwrap();
- * assert_eq!(tree.root_node().kind(), "module");
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TS_PACKTree *ts_pack_parse_string(const char *language,
-                                  const uint8_t *source,
-                                  uintptr_t source_len);
-
-/**
  * Get the highlights query for a language, if bundled.
  *
  * Returns the contents of `highlights.scm` as a static string, or `None`
@@ -1912,8 +1891,8 @@ int32_t ts_pack_configure(const TS_PACKPackConfig *config);
 /**
  * Download specific languages to the local cache.
  *
- * Returns the number of newly downloaded languages (languages that were
- * already cached are not counted).
+ * Returns the number of requested languages available after the call. Already
+ * compiled or cached languages are included in the count.
  *
  * # Errors
  *
@@ -1926,7 +1905,7 @@ int32_t ts_pack_configure(const TS_PACKPackConfig *config);
  * use tree_sitter_language_pack::download;
  *
  * let count = download(&["python", "rust", "typescript"]).unwrap();
- * println!("Downloaded {} new languages", count);
+ * println!("Ensured {} languages", count);
  * ```
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -1937,7 +1916,7 @@ uintptr_t ts_pack_download(const char *names);
 /**
  * Download all available languages from the remote manifest.
  *
- * Returns the number of newly downloaded languages.
+ * Returns the number of manifest languages available after the call.
  *
  * # Errors
  *

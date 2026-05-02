@@ -47,11 +47,11 @@ The flow in detail:
 
 The default cache location is platform-specific:
 
-| Platform | Default Path |
-|----------|-------------|
-| Linux | `$XDG_CACHE_HOME/tree-sitter-language-pack` or `~/.cache/tree-sitter-language-pack` |
-| macOS | `~/Library/Caches/tree-sitter-language-pack` |
-| Windows | `%LOCALAPPDATA%\tree-sitter-language-pack` |
+| Platform | Default Path                                                                        |
+| -------- | ----------------------------------------------------------------------------------- |
+| Linux    | `$XDG_CACHE_HOME/tree-sitter-language-pack` or `~/.cache/tree-sitter-language-pack` |
+| macOS    | `~/Library/Caches/tree-sitter-language-pack`                                        |
+| Windows  | `%LOCALAPPDATA%\tree-sitter-language-pack`                                          |
 
 You can override it programmatically:
 

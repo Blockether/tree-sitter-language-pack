@@ -291,8 +291,8 @@ console.log(`${langs.length} languages available`);
 
 // Parse code
 const tree = tsp.parseString("python", "def hello(): pass");
-console.log(tsp.treeRootNodeType(tree));    // "module"
-console.log(tsp.treeHasErrorNodes(tree));   // false
+console.log(tsp.treeRootNodeType(tree)); // "module"
+console.log(tsp.treeHasErrorNodes(tree)); // false
 tsp.freeTree(tree);
 
 // Process code (config is JS object)
@@ -378,16 +378,16 @@ int main(void) {
 
 ## Summary Table
 
-| Language | Package | Installation | Config | Results | Memory | Pattern Extraction |
-|----------|---------|---------------|--------|---------|--------|-------------------|
-| Python | PyPI | pip | Python dict | Python dict | Auto | Yes |
-| Node.js | npm | npm | JS object | JS object | Auto | Yes |
-| Rust | crates.io | Cargo | Struct | Struct | Auto | Yes (compiled) |
-| Go | go.pkg | go get | Struct | Struct | Manual (Close) | No |
-| Java | Maven | mvn | JSON string | JSON string | Manual (close) | Yes |
-| C# | NuGet | dotnet | Class | Classes | Auto (using) | No |
-| Ruby | RubyGems | gem | JSON string | Map | Auto | Yes |
-| Elixir | Hex | Mix | JSON string | Map | Auto | Yes |
-| PHP | Packagist | composer | Class | Array | Auto | Yes |
-| WebAssembly | npm | npm | JS object | JS object | Manual (freeTree) | Yes |
-| C FFI | Native | Link | N/A | Strings | Manual (free) | Yes |
+| Language    | Package   | Installation | Config      | Results     | Memory            | Pattern Extraction |
+| ----------- | --------- | ------------ | ----------- | ----------- | ----------------- | ------------------ |
+| Python      | PyPI      | pip          | Python dict | Python dict | Auto              | Yes                |
+| Node.js     | npm       | npm          | JS object   | JS object   | Auto              | Yes                |
+| Rust        | crates.io | Cargo        | Struct      | Struct      | Auto              | Yes (compiled)     |
+| Go          | go.pkg    | go get       | Struct      | Struct      | Manual (Close)    | No                 |
+| Java        | Maven     | mvn          | JSON string | JSON string | Manual (close)    | Yes                |
+| C#          | NuGet     | dotnet       | Class       | Classes     | Auto (using)      | No                 |
+| Ruby        | RubyGems  | gem          | JSON string | Map         | Auto              | Yes                |
+| Elixir      | Hex       | Mix          | JSON string | Map         | Auto              | Yes                |
+| PHP         | Packagist | composer     | Class       | Array       | Auto              | Yes                |
+| WebAssembly | npm       | npm          | JS object   | JS object   | Manual (freeTree) | Yes                |
+| C FFI       | Native    | Link         | N/A         | Strings     | Manual (free)     | Yes                |

@@ -6,7 +6,7 @@ exclude: ^e2e/|^test_apps/|vendor/|node_modules/|target/|parsers/|crates/.*/deps
 repos:
   # AI Rules
   - repo: https://github.com/Goldziher/ai-rulez
-    rev: v4.1.4
+    rev: v4.1.5
     hooks:
       - id: ai-rulez-generate
 
@@ -80,7 +80,7 @@ repos:
 
   # Markdown: linting
   - repo: https://github.com/rvben/rumdl-pre-commit
-    rev: "v0.1.85"
+    rev: "v0.1.86"
     hooks:
       - id: rumdl-fmt
         exclude: "^.ai-rulez/"
@@ -137,13 +137,7 @@ repos:
         files: (^crates/tree-sitter-language-pack-ffi/|^crates/ts-pack-core-ffi/)
         exclude: ^crates/ts-pack-core-ffi/include/ts_pack\.h$
       - id: checkstyle
-        args:
-          [
-            "-c",
-            "packages/java/checkstyle.xml",
-            "-p",
-            "packages/java/checkstyle.properties",
-          ]
+        args: ["-c", "packages/java/checkstyle.xml", "-p", "packages/java/checkstyle.properties"]
         exclude: ^(e2e/|test_apps/|packages/java/src/|packages/java/dev/)
       - id: mypy
         exclude: "^(e2e/|fixtures/bench/|scripts/clone_vendors\\.py$)"
@@ -188,7 +182,7 @@ repos:
 
   # Alef: polyglot binding generation and version sync
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.12.15
+    rev: v0.13.6
     hooks:
       - id: alef-verify
       - id: alef-sync-versions

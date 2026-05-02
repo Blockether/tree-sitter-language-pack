@@ -63,12 +63,12 @@ graph TD
 
 All logic lives in a single crate: `crates/ts-pack-core`.
 
-| Component | Responsibility |
-|-----------|---------------|
-| **Download Manager** | Resolves the remote manifest, fetches platform-specific parser binaries, stores them in the local cache. |
-| **Parser Cache** | Maps language names to loaded `tree_sitter::Language` values. Once loaded, a parser is reused without re-reading from disk. |
-| **Code Intelligence Engine** | Runs tree-sitter queries against a parsed tree to extract structure, imports, exports, symbols, comments, and docstrings. |
-| **Chunker** | Walks the syntax tree and splits source code at natural boundaries, respecting a configurable token budget. |
+| Component                    | Responsibility                                                                                                              |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **Download Manager**         | Resolves the remote manifest, fetches platform-specific parser binaries, stores them in the local cache.                    |
+| **Parser Cache**             | Maps language names to loaded `tree_sitter::Language` values. Once loaded, a parser is reused without re-reading from disk. |
+| **Code Intelligence Engine** | Runs tree-sitter queries against a parsed tree to extract structure, imports, exports, symbols, comments, and docstrings.   |
+| **Chunker**                  | Walks the syntax tree and splits source code at natural boundaries, respecting a configurable token budget.                 |
 
 The core has no language-specific code. It calls tree-sitter through its stable C ABI using dynamically loaded parser binaries.
 
@@ -84,18 +84,18 @@ Each binding is a thin crate that:
 
 Binding crates contain no parsing logic, no query definitions, and no chunking code.
 
-| Location | Framework | Distribution |
-|----------|-----------|--------------|
-| `crates/ts-pack-core-py` | PyO3 + maturin | PyPI wheels |
-| `crates/ts-pack-core-node` | NAPI-RS | npm (multi-platform) |
-| `packages/ruby` | Magnus | RubyGems native gem |
-| `packages/elixir` | Rustler NIF | Hex.pm |
-| `crates/ts-pack-core-php` | ext-php-rs | Packagist |
-| `crates/ts-pack-core-wasm` | wasm-bindgen | npm (Wasm) |
-| `crates/ts-pack-core-ffi` | cbindgen (C FFI) | GitHub releases |
-| `packages/go` | cgo | Go modules |
-| `packages/java` | Panama FFM | Maven Central |
-| `packages/csharp` | P/Invoke | NuGet |
+| Location                   | Framework        | Distribution         |
+| -------------------------- | ---------------- | -------------------- |
+| `crates/ts-pack-core-py`   | PyO3 + maturin   | PyPI wheels          |
+| `crates/ts-pack-core-node` | NAPI-RS          | npm (multi-platform) |
+| `packages/ruby`            | Magnus           | RubyGems native gem  |
+| `packages/elixir`          | Rustler NIF      | Hex.pm               |
+| `crates/ts-pack-core-php`  | ext-php-rs       | Packagist            |
+| `crates/ts-pack-core-wasm` | wasm-bindgen     | npm (Wasm)           |
+| `crates/ts-pack-core-ffi`  | cbindgen (C FFI) | GitHub releases      |
+| `packages/go`              | cgo              | Go modules           |
+| `packages/java`            | Panama FFM       | Maven Central        |
+| `packages/csharp`          | P/Invoke         | NuGet                |
 
 ---
 

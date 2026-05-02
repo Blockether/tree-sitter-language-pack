@@ -37,7 +37,7 @@ task test
 ```
 
 !!! Tip "Linux"
-    On Debian/Ubuntu, install Task with `apt install go-task` or download from [taskfile.dev](https://taskfile.dev/installation/).
+On Debian/Ubuntu, install Task with `apt install go-task` or download from [taskfile.dev](https://taskfile.dev/installation/).
 
 ## Common tasks
 
@@ -84,16 +84,16 @@ Always pin to an **exact commit** (`rev`), not a branch tip. This ensures reprod
 
 Available fields:
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `repo` | Yes | Grammar repository URL |
-| `rev` | Yes | Exact commit SHA to pin |
-| `branch` | No | Branch name (used by `scripts/pin_vendors.py` to find latest) |
-| `directory` | No | Subdirectory within the repo containing the grammar |
-| `extensions` | No | File extensions that map to this language (e.g. `["rs"]`) |
-| `ambiguous` | No | Extensions shared with other languages (e.g. `{"h": ["cpp", "objc"]}`) |
-| `c_symbol` | No | Override for the C symbol name when it differs from the language name |
-| `generate` | No | Set to `true` to force running `tree-sitter generate` before compiling |
+| Field        | Required | Description                                                            |
+| ------------ | -------- | ---------------------------------------------------------------------- |
+| `repo`       | Yes      | Grammar repository URL                                                 |
+| `rev`        | Yes      | Exact commit SHA to pin                                                |
+| `branch`     | No       | Branch name (used by `scripts/pin_vendors.py` to find latest)          |
+| `directory`  | No       | Subdirectory within the repo containing the grammar                    |
+| `extensions` | No       | File extensions that map to this language (e.g. `["rs"]`)              |
+| `ambiguous`  | No       | Extensions shared with other languages (e.g. `{"h": ["cpp", "objc"]}`) |
+| `c_symbol`   | No       | Override for the C symbol name when it differs from the language name  |
+| `generate`   | No       | Set to `true` to force running `tree-sitter generate` before compiling |
 
 ### 3. Build and test
 
@@ -171,7 +171,7 @@ Doc fixes and new guides follow the same workflow as code changes:
 5. Open a pull request.
 
 !!! Tip "Quick edits"
-    Use the **Edit** button in the page header to jump directly from any docs page to the matching file on GitHub.
+Use the **Edit** button in the page header to jump directly from any docs page to the matching file on GitHub.
 
 ## Code quality
 

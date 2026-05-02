@@ -1,6 +1,7 @@
 ---
 priority: high
 ---
+
 # Language Registry Management
 
 - Each language entry must specify: grammar repo, commit/tag, optional external scanner flag.

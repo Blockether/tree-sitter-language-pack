@@ -20,12 +20,11 @@ func DetectLanguageFromExtension(ext string) *string
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Ext` | `string` | Yes | The ext |
+| Name  | Type     | Required | Description |
+| ----- | -------- | -------- | ----------- |
+| `Ext` | `string` | Yes      | The ext     |
 
 **Returns:** `*string`
-
 
 ---
 
@@ -44,12 +43,11 @@ func DetectLanguageFromPath(path string) *string
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Path` | `string` | Yes | Path to the file |
+| Name   | Type     | Required | Description      |
+| ------ | -------- | -------- | ---------------- |
+| `Path` | `string` | Yes      | Path to the file |
 
 **Returns:** `*string`
-
 
 ---
 
@@ -80,40 +78,11 @@ func DetectLanguageFromContent(content string) *string
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Content` | `string` | Yes | The content to process |
+| Name      | Type     | Required | Description            |
+| --------- | -------- | -------- | ---------------------- |
+| `Content` | `string` | Yes      | The content to process |
 
 **Returns:** `*string`
-
-
----
-
-#### ParseString()
-
-Parse source code with the named language, returning the syntax tree.
-
-Uses the global registry to look up the language by name.
-Caches parsers per-thread so repeated calls for the same language avoid
-re-creating the parser.
-
-**Signature:**
-
-```go
-func ParseString(language string, source []byte) (Tree, error)
-```
-
-**Parameters:**
-
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Language` | `string` | Yes | The language |
-| `Source` | `[]byte` | Yes | The source |
-
-**Returns:** `Tree`
-
-**Errors:** Returns `error`.
-
 
 ---
 
@@ -132,12 +101,11 @@ func GetHighlightsQuery(language string) *string
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Language` | `string` | Yes | The language |
+| Name       | Type     | Required | Description  |
+| ---------- | -------- | -------- | ------------ |
+| `Language` | `string` | Yes      | The language |
 
 **Returns:** `*string`
-
 
 ---
 
@@ -156,12 +124,11 @@ func GetInjectionsQuery(language string) *string
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Language` | `string` | Yes | The language |
+| Name       | Type     | Required | Description  |
+| ---------- | -------- | -------- | ------------ |
+| `Language` | `string` | Yes      | The language |
 
 **Returns:** `*string`
-
 
 ---
 
@@ -180,12 +147,11 @@ func GetLocalsQuery(language string) *string
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Language` | `string` | Yes | The language |
+| Name       | Type     | Required | Description  |
+| ---------- | -------- | -------- | ------------ |
+| `Language` | `string` | Yes      | The language |
 
 **Returns:** `*string`
-
 
 ---
 
@@ -210,14 +176,13 @@ func GetLanguage(name string) (Language, error)
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Name` | `string` | Yes | The name |
+| Name   | Type     | Required | Description |
+| ------ | -------- | -------- | ----------- |
+| `Name` | `string` | Yes      | The name    |
 
 **Returns:** `Language`
 
 **Errors:** Returns `error`.
-
 
 ---
 
@@ -241,14 +206,13 @@ func GetParser(name string) (Parser, error)
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Name` | `string` | Yes | The name |
+| Name   | Type     | Required | Description |
+| ------ | -------- | -------- | ----------- |
+| `Name` | `string` | Yes      | The name    |
 
 **Returns:** `Parser`
 
 **Errors:** Returns `error`.
-
 
 ---
 
@@ -266,12 +230,11 @@ func DetectLanguage(path string) *string
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Path` | `string` | Yes | Path to the file |
+| Name   | Type     | Required | Description      |
+| ------ | -------- | -------- | ---------------- |
+| `Path` | `string` | Yes      | Path to the file |
 
 **Returns:** `*string`
-
 
 ---
 
@@ -290,7 +253,6 @@ func AvailableLanguages() []string
 
 **Returns:** `[]string`
 
-
 ---
 
 #### HasLanguage()
@@ -308,12 +270,11 @@ func HasLanguage(name string) bool
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Name` | `string` | Yes | The name |
+| Name   | Type     | Required | Description |
+| ------ | -------- | -------- | ----------- |
+| `Name` | `string` | Yes      | The name    |
 
 **Returns:** `bool`
-
 
 ---
 
@@ -331,7 +292,6 @@ func LanguageCount() int
 ```
 
 **Returns:** `int`
-
 
 ---
 
@@ -355,15 +315,14 @@ func Process(source string, config ProcessConfig) (ProcessResult, error)
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Source` | `string` | Yes | The source |
-| `Config` | `ProcessConfig` | Yes | The configuration options |
+| Name     | Type            | Required | Description               |
+| -------- | --------------- | -------- | ------------------------- |
+| `Source` | `string`        | Yes      | The source                |
+| `Config` | `ProcessConfig` | Yes      | The configuration options |
 
 **Returns:** `ProcessResult`
 
 **Errors:** Returns `error`.
-
 
 ---
 
@@ -387,14 +346,13 @@ func Init(config PackConfig) error
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Config` | `PackConfig` | Yes | The configuration options |
+| Name     | Type         | Required | Description               |
+| -------- | ------------ | -------- | ------------------------- |
+| `Config` | `PackConfig` | Yes      | The configuration options |
 
 **Returns:** ``
 
 **Errors:** Returns `error`.
-
 
 ---
 
@@ -419,14 +377,13 @@ func Configure(config PackConfig) error
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Config` | `PackConfig` | Yes | The configuration options |
+| Name     | Type         | Required | Description               |
+| -------- | ------------ | -------- | ------------------------- |
+| `Config` | `PackConfig` | Yes      | The configuration options |
 
 **Returns:** ``
 
 **Errors:** Returns `error`.
-
 
 ---
 
@@ -434,8 +391,8 @@ func Configure(config PackConfig) error
 
 Download specific languages to the local cache.
 
-Returns the number of newly downloaded languages (languages that were
-already cached are not counted).
+Returns the number of requested languages available after the call. Already
+compiled or cached languages are included in the count.
 
 **Errors:**
 
@@ -450,14 +407,13 @@ func Download(names []string) (int, error)
 
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Names` | `[]string` | Yes | The names |
+| Name    | Type       | Required | Description |
+| ------- | ---------- | -------- | ----------- |
+| `Names` | `[]string` | Yes      | The names   |
 
 **Returns:** `int`
 
 **Errors:** Returns `error`.
-
 
 ---
 
@@ -465,7 +421,7 @@ func Download(names []string) (int, error)
 
 Download all available languages from the remote manifest.
 
-Returns the number of newly downloaded languages.
+Returns the number of manifest languages available after the call.
 
 **Errors:**
 
@@ -480,7 +436,6 @@ func DownloadAll() (int, error)
 **Returns:** `int`
 
 **Errors:** Returns `error`.
-
 
 ---
 
@@ -506,7 +461,6 @@ func ManifestLanguages() ([]string, error)
 
 **Errors:** Returns `error`.
 
-
 ---
 
 #### DownloadedLanguages()
@@ -523,7 +477,6 @@ func DownloadedLanguages() []string
 ```
 
 **Returns:** `[]string`
-
 
 ---
 
@@ -548,7 +501,6 @@ func CleanCache() error
 
 **Errors:** Returns `error`.
 
-
 ---
 
 #### CacheDir()
@@ -572,7 +524,6 @@ func CacheDir() (string, error)
 
 **Errors:** Returns `error`.
 
-
 ---
 
 ### Types
@@ -581,18 +532,17 @@ func CacheDir() (string, error)
 
 Metadata for a single chunk of source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Language` | `string` | — | Language |
-| `ChunkIndex` | `int` | — | Chunk index |
-| `TotalChunks` | `int` | — | Total chunks |
-| `NodeTypes` | `[]string` | `nil` | Node types |
-| `ContextPath` | `[]string` | `nil` | Context path |
-| `SymbolsDefined` | `[]string` | `nil` | Symbols defined |
-| `Comments` | `[]CommentInfo` | `nil` | Comments |
-| `Docstrings` | `[]DocstringInfo` | `nil` | Docstrings |
-| `HasErrorNodes` | `bool` | — | Whether error nodes |
-
+| Field            | Type              | Default | Description         |
+| ---------------- | ----------------- | ------- | ------------------- |
+| `Language`       | `string`          | —       | Language            |
+| `ChunkIndex`     | `int`             | —       | Chunk index         |
+| `TotalChunks`    | `int`             | —       | Total chunks        |
+| `NodeTypes`      | `[]string`        | `nil`   | Node types          |
+| `ContextPath`    | `[]string`        | `nil`   | Context path        |
+| `SymbolsDefined` | `[]string`        | `nil`   | Symbols defined     |
+| `Comments`       | `[]CommentInfo`   | `nil`   | Comments            |
+| `Docstrings`     | `[]DocstringInfo` | `nil`   | Docstrings          |
+| `HasErrorNodes`  | `bool`            | —       | Whether error nodes |
 
 ---
 
@@ -600,15 +550,14 @@ Metadata for a single chunk of source code.
 
 A chunk of source code with rich metadata.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Content` | `string` | — | The extracted text content |
-| `StartByte` | `int` | — | Start byte |
-| `EndByte` | `int` | — | End byte |
-| `StartLine` | `int` | — | Start line |
-| `EndLine` | `int` | — | End line |
-| `Metadata` | `ChunkContext` | — | Document metadata |
-
+| Field       | Type           | Default | Description                |
+| ----------- | -------------- | ------- | -------------------------- |
+| `Content`   | `string`       | —       | The extracted text content |
+| `StartByte` | `int`          | —       | Start byte                 |
+| `EndByte`   | `int`          | —       | End byte                   |
+| `StartLine` | `int`          | —       | Start line                 |
+| `EndLine`   | `int`          | —       | End line                   |
+| `Metadata`  | `ChunkContext` | —       | Document metadata          |
 
 ---
 
@@ -616,13 +565,12 @@ A chunk of source code with rich metadata.
 
 A comment extracted from source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Text` | `string` | — | Text |
-| `Kind` | `CommentKind` | `CommentKind.Line` | Kind (comment kind) |
-| `Span` | `Span` | — | Span (span) |
-| `AssociatedNode` | `*string` | `nil` | Associated node |
-
+| Field            | Type          | Default            | Description         |
+| ---------------- | ------------- | ------------------ | ------------------- |
+| `Text`           | `string`      | —                  | Text                |
+| `Kind`           | `CommentKind` | `CommentKind.Line` | Kind (comment kind) |
+| `Span`           | `Span`        | —                  | Span (span)         |
+| `AssociatedNode` | `*string`     | `nil`              | Associated node     |
 
 ---
 
@@ -630,12 +578,11 @@ A comment extracted from source code.
 
 A diagnostic (syntax error, missing node, etc.) from parsing.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Message` | `string` | — | Message |
+| Field      | Type                 | Default                    | Description                    |
+| ---------- | -------------------- | -------------------------- | ------------------------------ |
+| `Message`  | `string`             | —                          | Message                        |
 | `Severity` | `DiagnosticSeverity` | `DiagnosticSeverity.Error` | Severity (diagnostic severity) |
-| `Span` | `Span` | — | Span (span) |
-
+| `Span`     | `Span`               | —                          | Span (span)                    |
 
 ---
 
@@ -643,12 +590,11 @@ A diagnostic (syntax error, missing node, etc.) from parsing.
 
 A section within a docstring (e.g., Args, Returns, Raises).
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Kind` | `string` | — | Kind |
-| `Name` | `*string` | `nil` | The name |
-| `Description` | `string` | — | Human-readable description |
-
+| Field         | Type      | Default | Description                |
+| ------------- | --------- | ------- | -------------------------- |
+| `Kind`        | `string`  | —       | Kind                       |
+| `Name`        | `*string` | `nil`   | The name                   |
+| `Description` | `string`  | —       | Human-readable description |
 
 ---
 
@@ -656,14 +602,13 @@ A section within a docstring (e.g., Args, Returns, Raises).
 
 A docstring extracted from source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Text` | `string` | — | Text |
-| `Format` | `DocstringFormat` | `DocstringFormat.PythonTripleQuote` | Format (docstring format) |
-| `Span` | `Span` | — | Span (span) |
-| `AssociatedItem` | `*string` | `nil` | Associated item |
-| `ParsedSections` | `[]DocSection` | `nil` | Parsed sections |
-
+| Field            | Type              | Default                             | Description               |
+| ---------------- | ----------------- | ----------------------------------- | ------------------------- |
+| `Text`           | `string`          | —                                   | Text                      |
+| `Format`         | `DocstringFormat` | `DocstringFormat.PythonTripleQuote` | Format (docstring format) |
+| `Span`           | `Span`            | —                                   | Span (span)               |
+| `AssociatedItem` | `*string`         | `nil`                               | Associated item           |
+| `ParsedSections` | `[]DocSection`    | `nil`                               | Parsed sections           |
 
 ---
 
@@ -774,19 +719,17 @@ Remove all cached parser libraries.
 func (o *DownloadManager) CleanCache() error
 ```
 
-
 ---
 
 #### ExportInfo
 
 An export statement extracted from source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Name` | `string` | — | The name |
+| Field  | Type         | Default            | Description        |
+| ------ | ------------ | ------------------ | ------------------ |
+| `Name` | `string`     | —                  | The name           |
 | `Kind` | `ExportKind` | `ExportKind.Named` | Kind (export kind) |
-| `Span` | `Span` | — | Span (span) |
-
+| `Span` | `Span`       | —                  | Span (span)        |
 
 ---
 
@@ -794,17 +737,16 @@ An export statement extracted from source code.
 
 Aggregate metrics for a source file.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `TotalLines` | `int` | — | Total lines |
-| `CodeLines` | `int` | — | Code lines |
-| `CommentLines` | `int` | — | Comment lines |
-| `BlankLines` | `int` | — | Blank lines |
-| `TotalBytes` | `int` | — | Total bytes |
-| `NodeCount` | `int` | — | Number of nodes |
-| `ErrorCount` | `int` | — | Number of errors |
-| `MaxDepth` | `int` | — | Maximum depth |
-
+| Field          | Type  | Default | Description      |
+| -------------- | ----- | ------- | ---------------- |
+| `TotalLines`   | `int` | —       | Total lines      |
+| `CodeLines`    | `int` | —       | Code lines       |
+| `CommentLines` | `int` | —       | Comment lines    |
+| `BlankLines`   | `int` | —       | Blank lines      |
+| `TotalBytes`   | `int` | —       | Total bytes      |
+| `NodeCount`    | `int` | —       | Number of nodes  |
+| `ErrorCount`   | `int` | —       | Number of errors |
+| `MaxDepth`     | `int` | —       | Maximum depth    |
 
 ---
 
@@ -812,29 +754,26 @@ Aggregate metrics for a source file.
 
 An import statement extracted from source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Source` | `string` | — | Source |
-| `Items` | `[]string` | `nil` | Items |
-| `Alias` | `*string` | `nil` | Alias |
-| `IsWildcard` | `bool` | — | Whether wildcard |
-| `Span` | `Span` | — | Span (span) |
-
+| Field        | Type       | Default | Description      |
+| ------------ | ---------- | ------- | ---------------- |
+| `Source`     | `string`   | —       | Source           |
+| `Items`      | `[]string` | `nil`   | Items            |
+| `Alias`      | `*string`  | `nil`   | Alias            |
+| `IsWildcard` | `bool`     | —       | Whether wildcard |
+| `Span`       | `Span`     | —       | Span (span)      |
 
 ---
 
 #### Language
 
-
 ---
 
 #### LanguageInfo
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Group` | `string` | — | Group |
-| `Size` | `uint64` | — | Size in bytes |
-
+| Field   | Type     | Default | Description   |
+| ------- | -------- | ------- | ------------- |
+| `Group` | `string` | —       | Group         |
+| `Size`  | `uint64` | —       | Size in bytes |
 
 ---
 
@@ -953,7 +892,6 @@ func (o *LanguageRegistry) Process(source string, config ProcessConfig) (Process
 func (o *LanguageRegistry) Default() LanguageRegistry
 ```
 
-
 ---
 
 #### PackConfig
@@ -964,11 +902,11 @@ Controls cache directory and which languages to pre-download.
 Can be loaded from a TOML file, constructed programmatically,
 or passed as a dict/object from language bindings.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `CacheDir` | `*string` | `nil` | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
-| `Languages` | `*[]string` | `nil` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`). |
-| `Groups` | `*[]string` | `nil` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). |
+| Field       | Type        | Default | Description                                                                                      |
+| ----------- | ----------- | ------- | ------------------------------------------------------------------------------------------------ |
+| `CacheDir`  | `*string`   | `nil`   | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
+| `Languages` | `*[]string` | `nil`   | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`).    |
+| `Groups`    | `*[]string` | `nil`   | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).                      |
 
 ##### Methods
 
@@ -1002,11 +940,9 @@ Returns `nil` if no configuration file is found.
 func (o *PackConfig) Discover() *PackConfig
 ```
 
-
 ---
 
 #### Parser
-
 
 ---
 
@@ -1014,24 +950,22 @@ func (o *PackConfig) Discover() *PackConfig
 
 Manifest describing available parser downloads for a specific version.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Version` | `string` | — | Version string |
-| `Platforms` | `map[string]PlatformBundle` | — | Platforms |
-| `Languages` | `map[string]LanguageInfo` | — | Languages |
-| `Groups` | `map[string][]string` | — | Groups |
-
+| Field       | Type                        | Default | Description    |
+| ----------- | --------------------------- | ------- | -------------- |
+| `Version`   | `string`                    | —       | Version string |
+| `Platforms` | `map[string]PlatformBundle` | —       | Platforms      |
+| `Languages` | `map[string]LanguageInfo`   | —       | Languages      |
+| `Groups`    | `map[string][]string`       | —       | Groups         |
 
 ---
 
 #### PlatformBundle
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Url` | `string` | — | Url |
-| `Sha256` | `string` | — | Sha256 |
-| `Size` | `uint64` | — | Size in bytes |
-
+| Field    | Type     | Default | Description   |
+| -------- | -------- | ------- | ------------- |
+| `Url`    | `string` | —       | Url           |
+| `Sha256` | `string` | —       | Sha256        |
+| `Size`   | `uint64` | —       | Size in bytes |
 
 ---
 
@@ -1041,17 +975,17 @@ Configuration for the `process()` function.
 
 Controls which analysis features are enabled and whether chunking is performed.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Language` | `string` | — | Language name (required). |
-| `Structure` | `bool` | `true` | Extract structural items (functions, classes, etc.). Default: true. |
-| `Imports` | `bool` | `true` | Extract import statements. Default: true. |
-| `Exports` | `bool` | `true` | Extract export statements. Default: true. |
-| `Comments` | `bool` | `false` | Extract comments. Default: false. |
-| `Docstrings` | `bool` | `false` | Extract docstrings. Default: false. |
-| `Symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
-| `Diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
-| `ChunkMaxSize` | `*int` | `nil` | Maximum chunk size in bytes. `nil` disables chunking. |
+| Field          | Type     | Default | Description                                                         |
+| -------------- | -------- | ------- | ------------------------------------------------------------------- |
+| `Language`     | `string` | —       | Language name (required).                                           |
+| `Structure`    | `bool`   | `true`  | Extract structural items (functions, classes, etc.). Default: true. |
+| `Imports`      | `bool`   | `true`  | Extract import statements. Default: true.                           |
+| `Exports`      | `bool`   | `true`  | Extract export statements. Default: true.                           |
+| `Comments`     | `bool`   | `false` | Extract comments. Default: false.                                   |
+| `Docstrings`   | `bool`   | `false` | Extract docstrings. Default: false.                                 |
+| `Symbols`      | `bool`   | `false` | Extract symbol definitions. Default: false.                         |
+| `Diagnostics`  | `bool`   | `false` | Include parse diagnostics. Default: false.                          |
+| `ChunkMaxSize` | `*int`   | `nil`   | Maximum chunk size in bytes. `nil` disables chunking.               |
 
 ##### Methods
 
@@ -1093,7 +1027,6 @@ Disable all analysis features (only metrics computed).
 func (o *ProcessConfig) Minimal() ProcessConfig
 ```
 
-
 ---
 
 #### ProcessResult
@@ -1104,19 +1037,18 @@ Contains metrics, structural analysis, imports/exports, comments,
 docstrings, symbols, diagnostics, and optionally chunked code segments.
 Fields are populated based on the `crate.ProcessConfig` flags.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Language` | `string` | — | Language |
-| `Metrics` | `FileMetrics` | — | Metrics (file metrics) |
-| `Structure` | `[]StructureItem` | `nil` | Structure |
-| `Imports` | `[]ImportInfo` | `nil` | Imports |
-| `Exports` | `[]ExportInfo` | `nil` | Exports |
-| `Comments` | `[]CommentInfo` | `nil` | Comments |
-| `Docstrings` | `[]DocstringInfo` | `nil` | Docstrings |
-| `Symbols` | `[]SymbolInfo` | `nil` | Symbols |
-| `Diagnostics` | `[]Diagnostic` | `nil` | Diagnostics |
-| `Chunks` | `[]CodeChunk` | `nil` | Text chunks for chunking/embedding |
-
+| Field         | Type              | Default | Description                        |
+| ------------- | ----------------- | ------- | ---------------------------------- |
+| `Language`    | `string`          | —       | Language                           |
+| `Metrics`     | `FileMetrics`     | —       | Metrics (file metrics)             |
+| `Structure`   | `[]StructureItem` | `nil`   | Structure                          |
+| `Imports`     | `[]ImportInfo`    | `nil`   | Imports                            |
+| `Exports`     | `[]ExportInfo`    | `nil`   | Exports                            |
+| `Comments`    | `[]CommentInfo`   | `nil`   | Comments                           |
+| `Docstrings`  | `[]DocstringInfo` | `nil`   | Docstrings                         |
+| `Symbols`     | `[]SymbolInfo`    | `nil`   | Symbols                            |
+| `Diagnostics` | `[]Diagnostic`    | `nil`   | Diagnostics                        |
+| `Chunks`      | `[]CodeChunk`     | `nil`   | Text chunks for chunking/embedding |
 
 ---
 
@@ -1127,15 +1059,14 @@ Byte and line/column range in source code.
 Represents both byte offsets (for slicing) and human-readable line/column
 positions (for display and diagnostics).
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `StartByte` | `int` | — | Start byte |
-| `EndByte` | `int` | — | End byte |
-| `StartLine` | `int` | — | Start line |
-| `StartColumn` | `int` | — | Start column |
-| `EndLine` | `int` | — | End line |
-| `EndColumn` | `int` | — | End column |
-
+| Field         | Type  | Default | Description  |
+| ------------- | ----- | ------- | ------------ |
+| `StartByte`   | `int` | —       | Start byte   |
+| `EndByte`     | `int` | —       | End byte     |
+| `StartLine`   | `int` | —       | Start line   |
+| `StartColumn` | `int` | —       | Start column |
+| `EndLine`     | `int` | —       | End line     |
+| `EndColumn`   | `int` | —       | End column   |
 
 ---
 
@@ -1143,18 +1074,17 @@ positions (for display and diagnostics).
 
 A structural item (function, class, struct, etc.) in source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Kind` | `StructureKind` | `StructureKind.Function` | Kind (structure kind) |
-| `Name` | `*string` | `nil` | The name |
-| `Visibility` | `*string` | `nil` | Visibility |
-| `Span` | `Span` | — | Span (span) |
-| `Children` | `[]StructureItem` | `nil` | Children |
-| `Decorators` | `[]string` | `nil` | Decorators |
-| `DocComment` | `*string` | `nil` | Doc comment |
-| `Signature` | `*string` | `nil` | Signature |
-| `BodySpan` | `*Span` | `nil` | Body span (span) |
-
+| Field        | Type              | Default                  | Description           |
+| ------------ | ----------------- | ------------------------ | --------------------- |
+| `Kind`       | `StructureKind`   | `StructureKind.Function` | Kind (structure kind) |
+| `Name`       | `*string`         | `nil`                    | The name              |
+| `Visibility` | `*string`         | `nil`                    | Visibility            |
+| `Span`       | `Span`            | —                        | Span (span)           |
+| `Children`   | `[]StructureItem` | `nil`                    | Children              |
+| `Decorators` | `[]string`        | `nil`                    | Decorators            |
+| `DocComment` | `*string`         | `nil`                    | Doc comment           |
+| `Signature`  | `*string`         | `nil`                    | Signature             |
+| `BodySpan`   | `*Span`           | `nil`                    | Body span (span)      |
 
 ---
 
@@ -1162,19 +1092,17 @@ A structural item (function, class, struct, etc.) in source code.
 
 A symbol (variable, function, type, etc.) extracted from source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Name` | `string` | — | The name |
-| `Kind` | `SymbolKind` | `SymbolKind.Variable` | Kind (symbol kind) |
-| `Span` | `Span` | — | Span (span) |
-| `TypeAnnotation` | `*string` | `nil` | Type annotation |
-| `Doc` | `*string` | `nil` | Doc |
-
+| Field            | Type         | Default               | Description        |
+| ---------------- | ------------ | --------------------- | ------------------ |
+| `Name`           | `string`     | —                     | The name           |
+| `Kind`           | `SymbolKind` | `SymbolKind.Variable` | Kind (symbol kind) |
+| `Span`           | `Span`       | —                     | Span (span)        |
+| `TypeAnnotation` | `*string`    | `nil`                 | Type annotation    |
+| `Doc`            | `*string`    | `nil`                 | Doc                |
 
 ---
 
 #### Tree
-
 
 ---
 
@@ -1188,20 +1116,19 @@ Categorizes top-level and nested declarations such as functions, classes,
 structs, enums, traits, and more. Use `Other` for
 language-specific constructs that do not fit a standard category.
 
-| Value | Description |
-|-------|-------------|
-| `Function` | Function |
-| `Method` | Method |
-| `Class` | Class |
-| `Struct` | Struct |
-| `Interface` | Interface |
-| `Enum` | Enum |
-| `Module` | Module |
-| `Trait` | Trait |
-| `Impl` | Impl |
-| `Namespace` | Namespace |
-| `Other` | Other — Fields: `0`: `string` |
-
+| Value       | Description                   |
+| ----------- | ----------------------------- |
+| `Function`  | Function                      |
+| `Method`    | Method                        |
+| `Class`     | Class                         |
+| `Struct`    | Struct                        |
+| `Interface` | Interface                     |
+| `Enum`      | Enum                          |
+| `Module`    | Module                        |
+| `Trait`     | Trait                         |
+| `Impl`      | Impl                          |
+| `Namespace` | Namespace                     |
+| `Other`     | Other — Fields: `0`: `string` |
 
 ---
 
@@ -1212,12 +1139,11 @@ The kind of a comment found in source code.
 Distinguishes between single-line comments, block (multi-line) comments,
 and documentation comments.
 
-| Value | Description |
-|-------|-------------|
-| `Line` | Line |
-| `Block` | Block |
-| `Doc` | Doc |
-
+| Value   | Description |
+| ------- | ----------- |
+| `Line`  | Line        |
+| `Block` | Block       |
+| `Doc`   | Doc         |
 
 ---
 
@@ -1228,15 +1154,14 @@ The format of a docstring extracted from source code.
 Identifies the docstring convention used, which varies by language
 (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 
-| Value | Description |
-|-------|-------------|
-| `PythonTripleQuote` | Python triple quote |
-| `JsDoc` | J s doc |
-| `Rustdoc` | Rustdoc |
-| `GoDoc` | Go doc |
-| `JavaDoc` | Java doc |
-| `Other` | Other — Fields: `0`: `string` |
-
+| Value               | Description                   |
+| ------------------- | ----------------------------- |
+| `PythonTripleQuote` | Python triple quote           |
+| `JsDoc`             | J s doc                       |
+| `Rustdoc`           | Rustdoc                       |
+| `GoDoc`             | Go doc                        |
+| `JavaDoc`           | Java doc                      |
+| `Other`             | Other — Fields: `0`: `string` |
 
 ---
 
@@ -1246,12 +1171,11 @@ The kind of an export statement found in source code.
 
 Covers named exports, default exports, and re-exports from other modules.
 
-| Value | Description |
-|-------|-------------|
-| `Named` | Named |
-| `Default` | Default |
-| `ReExport` | Re export |
-
+| Value      | Description |
+| ---------- | ----------- |
+| `Named`    | Named       |
+| `Default`  | Default     |
+| `ReExport` | Re export   |
 
 ---
 
@@ -1262,18 +1186,17 @@ The kind of a symbol definition found in source code.
 Categorizes symbol definitions such as variables, constants, functions,
 classes, types, interfaces, enums, and modules.
 
-| Value | Description |
-|-------|-------------|
-| `Variable` | Variable |
-| `Constant` | Constant |
-| `Function` | Function |
-| `Class` | Class |
-| `Type` | Type |
-| `Interface` | Interface |
-| `Enum` | Enum |
-| `Module` | Module |
-| `Other` | Other — Fields: `0`: `string` |
-
+| Value       | Description                   |
+| ----------- | ----------------------------- |
+| `Variable`  | Variable                      |
+| `Constant`  | Constant                      |
+| `Function`  | Function                      |
+| `Class`     | Class                         |
+| `Type`      | Type                          |
+| `Interface` | Interface                     |
+| `Enum`      | Enum                          |
+| `Module`    | Module                        |
+| `Other`     | Other — Fields: `0`: `string` |
 
 ---
 
@@ -1284,12 +1207,11 @@ Severity level of a diagnostic produced during parsing.
 Used to classify parse errors, warnings, and informational messages
 found in the syntax tree.
 
-| Value | Description |
-|-------|-------------|
-| `Error` | Error |
-| `Warning` | Warning |
-| `Info` | Info |
-
+| Value     | Description |
+| --------- | ----------- |
+| `Error`   | Error       |
+| `Warning` | Warning     |
+| `Info`    | Info        |
 
 ---
 
@@ -1303,18 +1225,17 @@ Covers language lookup failures, parse errors, query errors, and I/O issues.
 Feature-gated variants are included when `config`, `download`, or related
 features are enabled.
 
-| Variant | Description |
-|---------|-------------|
-| `LanguageNotFound` | Language '{0}' not found |
-| `DynamicLoad` | Dynamic library load error: {0} |
+| Variant               | Description                                       |
+| --------------------- | ------------------------------------------------- |
+| `LanguageNotFound`    | Language '{0}' not found                          |
+| `DynamicLoad`         | Dynamic library load error: {0}                   |
 | `NullLanguagePointer` | Language function returned null pointer for '{0}' |
-| `ParserSetup` | Failed to set parser language: {0} |
-| `LockPoisoned` | Registry lock poisoned: {0} |
-| `Config` | Configuration error: {0} |
-| `ParseFailed` | Parse failed: parsing returned no tree |
-| `QueryError` | Query error: {0} |
-| `InvalidRange` | Invalid byte range: {0} |
-| `Io` | IO error: {0} |
-
+| `ParserSetup`         | Failed to set parser language: {0}                |
+| `LockPoisoned`        | Registry lock poisoned: {0}                       |
+| `Config`              | Configuration error: {0}                          |
+| `ParseFailed`         | Parse failed: parsing returned no tree            |
+| `QueryError`          | Query error: {0}                                  |
+| `InvalidRange`        | Invalid byte range: {0}                           |
+| `Io`                  | IO error: {0}                                     |
 
 ---

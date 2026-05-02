@@ -24,8 +24,6 @@
 //! - [`registry`] - Thread-safe language registry for parser lookup
 //! - [`intel`] - Source code intelligence extraction (structure, imports, exports, etc.)
 //! - [`parse`] - Low-level tree-sitter parsing utilities
-//! - [`node`] - Tree node traversal and information extraction
-//! - [`query`] - Tree-sitter query execution
 //! - [`text_splitter`] - Syntax-aware code chunking
 //! - [`process_config`] - Configuration for the `process` pipeline
 //! - [`pack_config`] - Configuration for the language pack (cache dir, languages to download)
@@ -33,19 +31,13 @@
 
 pub mod error;
 pub(crate) mod extensions;
-#[cfg(test)]
-pub(crate) mod extract;
 pub(crate) mod intel;
 #[cfg(feature = "serde")]
 pub(crate) mod json_utils;
-#[cfg(test)]
-pub(crate) mod node;
 pub mod pack_config;
 pub(crate) mod parse;
 pub mod process_config;
 pub(crate) mod queries;
-#[cfg(test)]
-pub(crate) mod query;
 pub mod registry;
 pub(crate) mod text_splitter;
 
@@ -69,7 +61,6 @@ pub use intel::types::{
     SymbolInfo, SymbolKind,
 };
 pub use pack_config::PackConfig;
-pub use parse::parse_string;
 pub use process_config::ProcessConfig;
 pub use queries::{get_highlights_query, get_injections_query, get_locals_query};
 pub use registry::LanguageRegistry;
@@ -365,8 +356,8 @@ pub fn configure(config: &PackConfig) -> Result<(), Error> {
 
 /// Download specific languages to the local cache.
 ///
-/// Returns the number of newly downloaded languages (languages that were
-/// already cached are not counted).
+/// Returns the number of requested languages available after the call. Already
+/// compiled or cached languages are included in the count.
 ///
 /// # Errors
 ///
@@ -379,22 +370,25 @@ pub fn configure(config: &PackConfig) -> Result<(), Error> {
 /// use tree_sitter_language_pack::download;
 ///
 /// let count = download(&["python", "rust", "typescript"]).unwrap();
-/// println!("Downloaded {} new languages", count);
+/// println!("Ensured {} languages", count);
 /// ```
 #[cfg(feature = "download")]
 pub fn download(names: &[&str]) -> Result<usize, Error> {
     ensure_cache_registered()?;
     let cache_dir = effective_cache_dir()?;
     let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
-    let before = dm.installed_languages().len();
-    dm.ensure_languages(names)?;
-    let after = dm.installed_languages().len();
-    Ok(after.saturating_sub(before))
+    let unavailable: Vec<&str> = names
+        .iter()
+        .copied()
+        .filter(|name| !REGISTRY.has_language(name))
+        .collect();
+    dm.ensure_languages(&unavailable)?;
+    Ok(names.iter().copied().collect::<std::collections::BTreeSet<_>>().len())
 }
 
 /// Download all available languages from the remote manifest.
 ///
-/// Returns the number of newly downloaded languages.
+/// Returns the number of manifest languages available after the call.
 ///
 /// # Errors
 ///

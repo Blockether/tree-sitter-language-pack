@@ -242,35 +242,6 @@ func DetectLanguageFromContent(content string) string {
 	return C.GoString(result)
 }
 
-// ExtensionAmbiguityResult holds the result of an extension ambiguity lookup.
-type ExtensionAmbiguityResult struct {
-	Assigned     string   `json:"assigned"`
-	Alternatives []string `json:"alternatives"`
-}
-
-// ExtensionAmbiguity returns ambiguity information for the given file extension.
-// Returns nil if the extension is not ambiguous.
-func ExtensionAmbiguity(ext string) (*ExtensionAmbiguityResult, error) {
-	cext := C.CString(ext)
-	defer C.free(unsafe.Pointer(cext))
-
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
-	result := C.ts_pack_extension_ambiguity(cext)
-	if result == nil {
-		return nil, nil
-	}
-	defer C.ts_pack_free_string(result)
-
-	rawJSON := C.GoString(result)
-	var out ExtensionAmbiguityResult
-	if err := json.Unmarshal([]byte(rawJSON), &out); err != nil {
-		return nil, fmt.Errorf("tspack: failed to deserialize extension ambiguity: %w", err)
-	}
-	return &out, nil
-}
-
 // GetHighlightsQuery returns the bundled highlights query for the given language.
 // Returns an empty string if no bundled query is available.
 func GetHighlightsQuery(language string) string {
@@ -348,98 +319,6 @@ func (r *Registry) AvailableLanguages() []string {
 	}
 
 	return languages
-}
-
-// Tree wraps an opaque TsPackTree handle representing a parsed syntax tree.
-// It must be freed with Close when no longer needed.
-type Tree struct {
-	ptr *C.TsPackTree
-}
-
-// ParseString parses the given source code using the named language and returns
-// an opaque Tree handle. The caller must call Tree.Close when done.
-//
-// Returns an error if the language is not found or parsing fails.
-func (r *Registry) ParseString(language, source string) (*Tree, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	if err := r.ensureOpen(); err != nil {
-		return nil, err
-	}
-
-	cname := C.CString(language)
-	defer C.free(unsafe.Pointer(cname))
-
-	csource := C.CString(source)
-	defer C.free(unsafe.Pointer(csource))
-
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
-	tree := C.ts_pack_parse_string(r.ptr, cname, csource, C.uintptr_t(len(source)))
-
-	if tree == nil {
-		if err := lastError(); err != nil {
-			return nil, fmt.Errorf("tspack: parse %q: %w", language, err)
-		}
-		return nil, fmt.Errorf("tspack: parse %q failed", language)
-	}
-
-	return &Tree{ptr: tree}, nil
-}
-
-// Close frees the underlying C tree. Safe to call multiple times.
-func (t *Tree) Close() {
-	if t.ptr != nil {
-		C.ts_pack_tree_free(t.ptr)
-		t.ptr = nil
-	}
-}
-
-// RootNodeType returns the type name of the root node.
-func (t *Tree) RootNodeType() (string, error) {
-	if t.ptr == nil {
-		return "", errors.New("tspack: tree is closed")
-	}
-
-	cstr := C.ts_pack_tree_root_node_type(t.ptr)
-	if cstr == nil {
-		return "", errors.New("tspack: failed to get root node type")
-	}
-	defer C.ts_pack_free_string(cstr)
-
-	return C.GoString(cstr), nil
-}
-
-// RootChildCount returns the number of named children of the root node.
-func (t *Tree) RootChildCount() (int, error) {
-	if t.ptr == nil {
-		return 0, errors.New("tspack: tree is closed")
-	}
-
-	return int(C.ts_pack_tree_root_child_count(t.ptr)), nil
-}
-
-// ContainsNodeType checks whether any node in the tree has the given type name.
-func (t *Tree) ContainsNodeType(nodeType string) (bool, error) {
-	if t.ptr == nil {
-		return false, errors.New("tspack: tree is closed")
-	}
-
-	ctype := C.CString(nodeType)
-	defer C.free(unsafe.Pointer(ctype))
-
-	return bool(C.ts_pack_tree_contains_node_type(t.ptr, ctype)), nil
-}
-
-// HasErrorNodes checks whether the tree contains any ERROR or MISSING nodes.
-func (t *Tree) HasErrorNodes() (bool, error) {
-	if t.ptr == nil {
-		return false, errors.New("tspack: tree is closed")
-	}
-
-	return bool(C.ts_pack_tree_has_error_nodes(t.ptr)), nil
 }
 
 // Process extracts file intelligence (and optionally chunks) from the given

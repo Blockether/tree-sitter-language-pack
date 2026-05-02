@@ -1,6 +1,7 @@
 ---
 priority: high
 ---
+
 # Build System
 
 - Use build.rs for compiling tree-sitter C sources into the Rust crate.

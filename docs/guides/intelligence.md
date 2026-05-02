@@ -110,16 +110,16 @@ Here's what a typical result looks like:
 
 Pass `language` plus any of these fields:
 
-| Field | Default | What it extracts |
-|-------|---------|-----------------|
-| `structure` | `True` | Functions, classes, methods, interfaces, structs, traits, enums |
-| `imports` | `True` | Import/require statements — source module and imported names |
-| `exports` | `True` | Exported symbols |
-| `comments` | `False` | All comments with text and location |
-| `docstrings` | `False` | Docstrings attached to declarations (requires `structure=True`) |
-| `symbols` | `False` | Deduplicated list of all identifiers, for search indexing |
-| `diagnostics` | `False` | Syntax error nodes from the parse |
-| `chunk_max_size` | `None` | Maximum chunk size in bytes; see [Chunking for LLMs](chunking.md) |
+| Field            | Default | What it extracts                                                  |
+| ---------------- | ------- | ----------------------------------------------------------------- |
+| `structure`      | `True`  | Functions, classes, methods, interfaces, structs, traits, enums   |
+| `imports`        | `True`  | Import/require statements — source module and imported names      |
+| `exports`        | `True`  | Exported symbols                                                  |
+| `comments`       | `False` | All comments with text and location                               |
+| `docstrings`     | `False` | Docstrings attached to declarations (requires `structure=True`)   |
+| `symbols`        | `False` | Deduplicated list of all identifiers, for search indexing         |
+| `diagnostics`    | `False` | Syntax error nodes from the parse                                 |
+| `chunk_max_size` | `None`  | Maximum chunk size in bytes; see [Chunking for LLMs](chunking.md) |
 
 Enable everything at once: `ProcessConfig.all("python")`.
 
@@ -129,23 +129,23 @@ Enable everything at once: `ProcessConfig.all("python")`.
 
 Each item has:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `kind` | str | `function`, `class`, `method`, `interface`, `struct`, `trait`, `enum`, `impl`, `module`, and so on. |
-| `name` | str | Declaration name |
-| `start_line` | int | First line (1-indexed) |
-| `end_line` | int | Last line (1-indexed) |
-| `docstring` | str \| None | Attached docstring — only present when `docstrings=True` |
+| Field        | Type        | Description                                                                                         |
+| ------------ | ----------- | --------------------------------------------------------------------------------------------------- |
+| `kind`       | str         | `function`, `class`, `method`, `interface`, `struct`, `trait`, `enum`, `impl`, `module`, and so on. |
+| `name`       | str         | Declaration name                                                                                    |
+| `start_line` | int         | First line (1-indexed)                                                                              |
+| `end_line`   | int         | Last line (1-indexed)                                                                               |
+| `docstring`  | str \| None | Attached docstring — only present when `docstrings=True`                                            |
 
 Kinds vary by language:
 
-| Language | Kinds |
-|----------|-------|
-| Python | `function`, `class`, `method`, `async_function` |
+| Language              | Kinds                                                                |
+| --------------------- | -------------------------------------------------------------------- |
+| Python                | `function`, `class`, `method`, `async_function`                      |
 | JavaScript/TypeScript | `function`, `class`, `method`, `async_function`, `interface`, `enum` |
-| Rust | `function`, `struct`, `impl`, `trait`, `enum`, `type_alias`, `mod` |
-| Java | `class`, `interface`, `method`, `constructor`, `enum` |
-| Go | `function`, `struct`, `interface`, `method` |
+| Rust                  | `function`, `struct`, `impl`, `trait`, `enum`, `type_alias`, `mod`   |
+| Java                  | `class`, `interface`, `method`, `constructor`, `enum`                |
+| Go                    | `function`, `struct`, `interface`, `method`                          |
 
 ### `imports`
 
@@ -171,15 +171,15 @@ Each comment has `text`, `start_line`, and `is_block` (True for `/* ... */`, Fal
 
 Docstrings attach to their parent item in `structure` as the `docstring` field. Extraction understands each language's convention:
 
-| Language | Convention |
-|----------|-----------|
-| Python | `"""..."""` immediately after `def`/`class` |
-| Rust | `///` or `//!` above the item |
-| JavaScript/TypeScript | `/** ... */` JSDoc above the function |
-| Java | `/** ... */` Javadoc |
-| Ruby | `# ...` lines immediately before `def`/`class` |
-| Go | `// FuncName ...` comment block above the func |
-| Elixir | `@doc "..."` or `@moduledoc "..."` |
+| Language              | Convention                                     |
+| --------------------- | ---------------------------------------------- |
+| Python                | `"""..."""` immediately after `def`/`class`    |
+| Rust                  | `///` or `//!` above the item                  |
+| JavaScript/TypeScript | `/** ... */` JSDoc above the function          |
+| Java                  | `/** ... */` Javadoc                           |
+| Ruby                  | `# ...` lines immediately before `def`/`class` |
+| Go                    | `// FuncName ...` comment block above the func |
+| Elixir                | `@doc "..."` or `@moduledoc "..."`             |
 
 ### `symbols`
 
@@ -205,13 +205,13 @@ for err in result["diagnostics"]:
 
 File-level statistics, independent of the other fields:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `total_lines` | int | All lines |
-| `code_lines` | int | Non-blank, non-comment lines |
-| `comment_lines` | int | Comment lines |
-| `blank_lines` | int | Empty lines |
-| `max_depth` | int | Maximum nesting depth of the syntax tree |
+| Field           | Type | Description                              |
+| --------------- | ---- | ---------------------------------------- |
+| `total_lines`   | int  | All lines                                |
+| `code_lines`    | int  | Non-blank, non-comment lines             |
+| `comment_lines` | int  | Comment lines                            |
+| `blank_lines`   | int  | Empty lines                              |
+| `max_depth`     | int  | Maximum nesting depth of the syntax tree |
 
 ```python
 result = process(source, ProcessConfig(language="python", metrics=True))
@@ -223,12 +223,7 @@ print(f"{m['total_lines']} lines total, {m['code_lines']} code, {m['comment_line
 
 When `chunk_max_size` has a value, `result["chunks"]` contains syntax-aware splits ready for LLM ingestion. See [Chunking for LLMs](chunking.md) for full documentation.
 
-## Custom patterns
-
-For patterns that go beyond the built-in fields — finding all calls to a specific function, extracting decorator names, listing test methods matching a naming convention — see [Extraction queries](extraction.md). You can also run extraction patterns alongside the standard fields using `ProcessConfig.extractions`.
-
 ## Next steps
 
 - [Chunking for LLMs](chunking.md) — split code at natural boundaries for LLM ingestion
-- [Extraction queries](extraction.md) — run custom tree-sitter S-expression queries
 - [Parsing code](parsing.md) — raw syntax trees and low-level node traversal

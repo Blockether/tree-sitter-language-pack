@@ -1,7 +1,4 @@
-import {
-	availableLanguages,
-	hasLanguage,
-} from "@kreuzberg/tree-sitter-language-pack-wasm";
+import { availableLanguages, hasLanguage } from "@kreuzberg/tree-sitter-language-pack-wasm";
 
 const langs = availableLanguages();
 console.log(`Available languages: ${langs.length}`);

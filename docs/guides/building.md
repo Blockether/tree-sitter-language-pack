@@ -24,16 +24,16 @@ cd tree-sitter-language-pack
 
 The Cargo workspace contains the following crates:
 
-| Crate | Purpose |
-|-------|---------|
-| `crates/ts-pack-core` | Core Rust library (parsers, download, config) |
-| `crates/ts-pack-cli` | `ts-pack` CLI binary |
-| `crates/ts-pack-core-py` | Python bindings (PyO3/maturin) |
-| `crates/ts-pack-core-node` | Node.js bindings (NAPI-RS) |
-| `crates/ts-pack-core-php` | PHP extension (ext-php-rs) |
-| `crates/ts-pack-core-wasm` | WebAssembly bindings (wasm-bindgen) |
-| `crates/ts-pack-core-ffi` | C-compatible FFI library (cbindgen) |
-| `tools/snippet-runner` | Test suite runner |
+| Crate                      | Purpose                                       |
+| -------------------------- | --------------------------------------------- |
+| `crates/ts-pack-core`      | Core Rust library (parsers, download, config) |
+| `crates/ts-pack-cli`       | `ts-pack` CLI binary                          |
+| `crates/ts-pack-core-py`   | Python bindings (PyO3/maturin)                |
+| `crates/ts-pack-core-node` | Node.js bindings (NAPI-RS)                    |
+| `crates/ts-pack-core-php`  | PHP extension (ext-php-rs)                    |
+| `crates/ts-pack-core-wasm` | WebAssembly bindings (wasm-bindgen)           |
+| `crates/ts-pack-core-ffi`  | C-compatible FFI library (cbindgen)           |
+| `tools/snippet-runner`     | Test suite runner                             |
 
 Language-specific packages live under `packages/`: `python/`, `typescript/`, `ruby/`, `elixir/`, `php/`, `go/`, `java/`, `csharp/`, and `wasm/`.
 
@@ -41,12 +41,12 @@ Language-specific packages live under `packages/`: `python/`, `typescript/`, `ru
 
 The core library (`tree-sitter-language-pack`) has four features:
 
-| Feature | Default | What it enables |
-|---------|---------|-----------------|
-| `dynamic-loading` | Yes | Load parser `.so`/`.dylib`/`.dll` files at runtime |
-| `download` | Yes | Download parsers from GitHub releases; implies `dynamic-loading` |
-| `serde` | No | `Serialize`/`Deserialize` on public types |
-| `config` | No | Read `language-pack.toml` config files; implies `serde` |
+| Feature           | Default | What it enables                                                  |
+| ----------------- | ------- | ---------------------------------------------------------------- |
+| `dynamic-loading` | Yes     | Load parser `.so`/`.dylib`/`.dll` files at runtime               |
+| `download`        | Yes     | Download parsers from GitHub releases; implies `dynamic-loading` |
+| `serde`           | No      | `Serialize`/`Deserialize` on public types                        |
+| `config`          | No      | Read `language-pack.toml` config files; implies `serde`          |
 
 To use the library without the download machinery (for example in a Wasm target or with statically compiled parsers):
 
@@ -75,11 +75,11 @@ Names must be alphanumeric or underscore and must exist in `sources/language_def
 
 Controls how statically-selected parsers link. Requires `TSLP_LANGUAGES`.
 
-| Value | Effect |
-|-------|--------|
+| Value               | Effect                                                                 |
+| ------------------- | ---------------------------------------------------------------------- |
 | `dynamic` (default) | Compile parsers into `.so`/`.dylib`/`.dll` files, load them at runtime |
-| `static` | Link parsers directly into the binary |
-| `both` | Produce both static and dynamic variants |
+| `static`            | Link parsers directly into the binary                                  |
+| `both`              | Produce both static and dynamic variants                               |
 
 `wasm32` targets always use `static`, regardless of this setting.
 

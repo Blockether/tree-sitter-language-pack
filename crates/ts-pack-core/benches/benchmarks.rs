@@ -2,8 +2,8 @@ use std::hint::black_box;
 
 use criterion::{Criterion, criterion_group, criterion_main};
 use tree_sitter_language_pack::{
-    ProcessConfig, detect_language_from_content, detect_language_from_extension, detect_language_from_path,
-    parse_string, process,
+    ProcessConfig, detect_language_from_content, detect_language_from_extension, detect_language_from_path, get_parser,
+    process,
 };
 
 // ---------------------------------------------------------------------------
@@ -27,7 +27,7 @@ const GO_MEDIUM: &str = include_str!("../../../fixtures/bench/go/medium.go");
 const GO_LARGE: &str = include_str!("../../../fixtures/bench/go/large.go");
 
 // ---------------------------------------------------------------------------
-// 1. parse — parse_string() across 4 languages x 3 sizes
+// 1. parse — parser.parse() across 4 languages x 3 sizes
 // ---------------------------------------------------------------------------
 
 fn bench_parse(c: &mut Criterion) {
@@ -50,7 +50,8 @@ fn bench_parse(c: &mut Criterion) {
 
     for &(id, lang, source) in cases {
         group.bench_function(id, |b| {
-            b.iter(|| parse_string(black_box(lang), black_box(source.as_bytes())).unwrap());
+            let mut parser = get_parser(lang).unwrap();
+            b.iter(|| parser.parse(black_box(source.as_bytes()), None).unwrap());
         });
     }
 

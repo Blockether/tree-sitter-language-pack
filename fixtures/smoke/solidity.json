@@ -1,16 +1,17 @@
 {
-	"id": "smoke_solidity",
-	"description": "Smoke test: load solidity and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"call": "parse",
-	"input": {
-		"language": "solidity",
-		"source_code": "pragma solidity ^0.8.0;\ncontract Main {}"
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_solidity",
+  "description": "Smoke test: load solidity and parse a simple snippet",
+  "category": "smoke",
+  "tags": ["smoke"],
+  "input": {
+    "source_code": "pragma solidity ^0.8.0;\ncontract Main {}",
+    "config": {
+      "language": "solidity"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ]
 }

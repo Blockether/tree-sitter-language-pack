@@ -3,8 +3,6 @@
 //! Mappings are auto-generated from `sources/language_definitions.json` by `build.rs`.
 //! To add or modify extension mappings, edit that JSON file and rebuild.
 
-#![allow(dead_code)]
-
 use memchr::memchr;
 
 /// Detect language name from a file extension (without leading dot).
@@ -36,39 +34,6 @@ pub fn detect_language_from_extension(ext: &str) -> Option<&'static str> {
 pub fn detect_language_from_path(path: &str) -> Option<&'static str> {
     let ext = std::path::Path::new(path).extension()?.to_str()?;
     detect_language_from_extension(ext)
-}
-
-/// Check if a file extension is ambiguous — i.e. it could reasonably belong to
-/// multiple languages.
-///
-/// Returns `Some((assigned_language, alternatives))` if the extension is known
-/// to be ambiguous, where `assigned_language` is what [`detect_language_from_extension`]
-/// returns and `alternatives` lists other languages it could also belong to.
-///
-/// Returns `None` if the extension is unambiguous or unrecognized.
-pub(crate) fn extension_ambiguity(ext: &str) -> Option<(&'static str, &'static [&'static str])> {
-    let mut buf = [0u8; 32];
-    let ext_lower = if ext.len() <= buf.len() && ext.is_ascii() {
-        for (i, b) in ext.bytes().enumerate() {
-            buf[i] = b.to_ascii_lowercase();
-        }
-        std::str::from_utf8(&buf[..ext.len()]).ok()?
-    } else {
-        return None;
-    };
-
-    include!(concat!(env!("OUT_DIR"), "/ambiguities_generated.rs"))
-}
-
-#[cfg(feature = "serde")]
-pub fn extension_ambiguity_json(ext: &str) -> Option<String> {
-    extension_ambiguity(ext).map(|(assigned, alts)| {
-        serde_json::json!({
-            "assigned": assigned,
-            "alternatives": alts,
-        })
-        .to_string()
-    })
 }
 
 /// Detect language name from file content using the shebang line (`#!`).
@@ -230,46 +195,6 @@ mod tests {
     fn test_long_extension_rejected() {
         let long = "a".repeat(33);
         assert_eq!(detect_language_from_extension(&long), None);
-    }
-
-    #[test]
-    fn test_ambiguity_known() {
-        // .m is ambiguous: assigned to objc, but could be matlab
-        let result = extension_ambiguity("m");
-        assert!(result.is_some(), ".m should be flagged as ambiguous");
-        let (assigned, alternatives) = result.unwrap();
-        assert_eq!(assigned, "objc");
-        assert!(alternatives.contains(&"matlab"));
-
-        // .h is ambiguous: assigned to c, but could be cpp or objc
-        let result = extension_ambiguity("h");
-        assert!(result.is_some(), ".h should be flagged as ambiguous");
-        let (assigned, alternatives) = result.unwrap();
-        assert_eq!(assigned, "c");
-        assert!(alternatives.contains(&"cpp"));
-
-        // .v is ambiguous: assigned to v, but could be verilog
-        let result = extension_ambiguity("v");
-        assert!(result.is_some(), ".v should be flagged as ambiguous");
-        let (assigned, alternatives) = result.unwrap();
-        assert_eq!(assigned, "v");
-        assert!(alternatives.contains(&"verilog"));
-    }
-
-    #[test]
-    fn test_ambiguity_unambiguous() {
-        // .py is not ambiguous
-        assert!(extension_ambiguity("py").is_none());
-        // .rs is not ambiguous
-        assert!(extension_ambiguity("rs").is_none());
-        // unknown extension is not ambiguous
-        assert!(extension_ambiguity("xyz").is_none());
-    }
-
-    #[test]
-    fn test_ambiguity_case_insensitive() {
-        assert!(extension_ambiguity("M").is_some());
-        assert!(extension_ambiguity("H").is_some());
     }
 
     // ── shebang detection tests ────────────────────────────────────────────────

@@ -14,6 +14,8 @@ tasks:
     desc: Build FFI shared library for Java
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "{{.FFI_TEST_LANGUAGES}}"
     cmds:
       - cargo build -p ts-pack-core-ffi --release
 
@@ -61,7 +63,7 @@ tasks:
     desc: Update Java dependencies and plugins (stable releases only)
     dir: packages/java
     vars:
-      RULES_URI: 'file:///${PWD}/maven-version-rules.xml'
+      RULES_URI: "file:///${PWD}/maven-version-rules.xml"
     cmds:
       - echo "Updating Java dependencies and plugins (stable releases only)..."
       - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:use-latest-releases -DprocessDependencies=true -DprocessParent=false -DgenerateBackupPoms=false

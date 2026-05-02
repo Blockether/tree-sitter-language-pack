@@ -209,11 +209,11 @@ Cloning 305 tree-sitter grammar repositories is slow. The build system includes 
 
 ### Environment Variables
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `TSLP_CACHE_DIR` | `<project_root>/parsers` | Override the directory where compiled parser sources are stored |
-| `TSLP_VENDOR_DIR` | `<project_root>/vendor` | Override the directory where grammar repos are cloned |
-| `TSLP_NO_CACHE` | (unset) | Set to `1`, `true`, or `yes` to force a full re-clone, ignoring the cache manifest |
+| Variable          | Default                  | Description                                                                        |
+| ----------------- | ------------------------ | ---------------------------------------------------------------------------------- |
+| `TSLP_CACHE_DIR`  | `<project_root>/parsers` | Override the directory where compiled parser sources are stored                    |
+| `TSLP_VENDOR_DIR` | `<project_root>/vendor`  | Override the directory where grammar repos are cloned                              |
+| `TSLP_NO_CACHE`   | (unset)                  | Set to `1`, `true`, or `yes` to force a full re-clone, ignoring the cache manifest |
 
 ### Common Scenarios
 
@@ -240,20 +240,19 @@ Before proposing a new grammar, verify its license by checking the `LICENSE` fil
 
 1. **Add a language definition** to `sources/language_definitions.json`:
 
-    ```json
-    {
-      "language_name": {
-        "repo": "https://github.com/tree-sitter/tree-sitter-language",
-        "rev": "commit-hash",
-        "branch": "main",
-        "directory": "path/to/src",
-        "generate": false
-      }
-    }
-    ```
+   ```json
+   {
+     "language_name": {
+       "repo": "https://github.com/tree-sitter/tree-sitter-language",
+       "rev": "commit-hash",
+       "branch": "main",
+       "directory": "path/to/src",
+       "generate": false
+     }
+   }
+   ```
 
-    Fields:
-
+   Fields:
    - `repo` (required): Repository URL
    - `rev` (required): Specific commit hash for reproducible builds
    - `branch` (optional): Branch name if not "main"
@@ -264,18 +263,18 @@ Before proposing a new grammar, verify its license by checking the `LICENSE` fil
 
 1. **Clone and build**
 
-    ```bash
-    task clone
-    task build:dev
-    ```
+   ```bash
+   task clone
+   task build:dev
+   ```
 
 1. **Regenerate E2E smoke fixtures and test**
 
-    ```bash
-    task e2e:generate:smoke-fixtures
-    task e2e:generate:all
-    task test
-    ```
+   ```bash
+   task e2e:generate:smoke-fixtures
+   task e2e:generate:all
+   task test
+   ```
 
 ## E2E Tests
 
@@ -342,22 +341,22 @@ We use conventional commits:
 
 1. **Create a feature branch**
 
-    ```bash
-    git checkout -b feat/add-language-support
-    ```
+   ```bash
+   git checkout -b feat/add-language-support
+   ```
 
 1. **Make your changes** and run checks locally:
 
-    ```bash
-    task check
-    ```
+   ```bash
+   task check
+   ```
 
 1. **Commit and push**
 
-    ```bash
-    git commit -m "feat: add support for new language"
-    git push origin feat/add-language-support
-    ```
+   ```bash
+   git commit -m "feat: add support for new language"
+   git push origin feat/add-language-support
+   ```
 
 1. **Create a Pull Request** — link any related issues and ensure CI passes.
 

@@ -152,14 +152,14 @@ ts-pack clean --force  # Skip confirmation
 
 Pre-defined collections of related languages:
 
-| Group | Languages |
-|-------|-----------|
-| `web` | JavaScript, TypeScript, HTML, CSS, JSX, TSX |
-| `systems` | C, C++, Rust, Go, Zig, D |
-| `data` | Python, R, SQL, JSON, YAML, CSV |
-| `jvm` | Java, Kotlin, Scala, Clojure, Groovy |
+| Group        | Languages                                      |
+| ------------ | ---------------------------------------------- |
+| `web`        | JavaScript, TypeScript, HTML, CSS, JSX, TSX    |
+| `systems`    | C, C++, Rust, Go, Zig, D                       |
+| `data`       | Python, R, SQL, JSON, YAML, CSV                |
+| `jvm`        | Java, Kotlin, Scala, Clojure, Groovy           |
 | `functional` | Haskell, Lisp, Scheme, Elixir, Erlang, Clojure |
-| `scripting` | Python, Ruby, Bash, Perl, Lua, Vim Script |
+| `scripting`  | Python, Ruby, Bash, Perl, Lua, Vim Script      |
 
 ### Usage
 
@@ -270,12 +270,12 @@ if let Some(config) = PackConfig::discover() {
 
 ## Environment Variables
 
-| Variable | Type | Default | Description |
-|----------|------|---------|-------------|
-| `TSLP_CACHE_DIR` | string | Platform default | Cache directory |
-| `TSLP_CONFIG` | string | Discovered | Path to language-pack.toml |
-| `TSLP_VERBOSE` | flag | off | Verbose output |
-| `TSLP_NO_COLOR` | flag | off | Disable ANSI colors |
+| Variable         | Type   | Default          | Description                |
+| ---------------- | ------ | ---------------- | -------------------------- |
+| `TSLP_CACHE_DIR` | string | Platform default | Cache directory            |
+| `TSLP_CONFIG`    | string | Discovered       | Path to language-pack.toml |
+| `TSLP_VERBOSE`   | flag   | off              | Verbose output             |
+| `TSLP_NO_COLOR`  | flag   | off              | Disable ANSI colors        |
 
 ## Monorepo Setup
 

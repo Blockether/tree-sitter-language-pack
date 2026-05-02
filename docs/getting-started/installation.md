@@ -8,7 +8,6 @@ description: "Install tree-sitter-language-pack in Python, Node.js, Rust, Go, Ja
 The `ts-pack` CLI allows you to manage parsers and run code analysis directly from your terminal.
 You can use it in CI pipelines, automation scripts, or to explore and experiment with **300+ supported languages**.
 
-
 <div class="install-cli-hero" markdown>
 
 ## :material-console-line: CLI

@@ -1,6 +1,7 @@
 ---
 priority: high
 ---
+
 # C ABI Safety
 
 - All tree-sitter parsers expose C ABI. Ensure symbol visibility is correct.

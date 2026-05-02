@@ -1,16 +1,17 @@
 {
-	"id": "error_handling_invalid_syntax",
-	"description": "Parsing invalid syntax should produce a tree with error nodes.",
-	"category": "error-handling",
-	"tags": ["error-handling"],
-	"call": "parse",
-	"input": {
-		"language": "javascript",
-		"source_code": "function function function @@@ %%%"
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "error_handling_invalid_syntax",
+  "description": "Parsing invalid syntax should produce a tree with error nodes.",
+  "category": "error-handling",
+  "tags": ["error-handling"],
+  "input": {
+    "source_code": "function function function @@@ %%%",
+    "config": {
+      "language": "javascript"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ]
 }

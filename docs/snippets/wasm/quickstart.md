@@ -1,5 +1,9 @@
 ```javascript title="WebAssembly"
-import { availableLanguages, parseString, treeRootNodeType } from "@kreuzberg/tree-sitter-language-pack-wasm";
+import {
+  availableLanguages,
+  parseString,
+  treeRootNodeType,
+} from "@kreuzberg/tree-sitter-language-pack-wasm";
 
 const langs = availableLanguages();
 console.log(`${langs.length} languages available`);

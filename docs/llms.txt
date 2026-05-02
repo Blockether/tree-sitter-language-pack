@@ -59,8 +59,8 @@ Part of the kreuzberg.dev ecosystem (documentation sites):
 - `init(config)` — Configure and pre-download parsers
 - `download(languages)` — Download specific parser libraries
 - `get_language(name)` — Get a tree-sitter Language (auto-downloads if needed)
+- `get_parser(name)` — Get a tree-sitter parser configured for a supported language
 - `process(source, config)` — Extract code intelligence (structure, imports, exports, comments, symbols, chunks)
-- `parse_string(language, source)` — Parse source code into a syntax tree
 - `available_languages()` — List locally available languages
 - `manifest_languages()` — List all 306 available from remote manifest
 - `ProcessConfig` — Configure which analysis features to enable and chunking parameters

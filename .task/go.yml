@@ -6,7 +6,7 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
       TSLP_LINK_MODE: '{{default "static" .TSLP_LINK_MODE}}'
-      TSLP_LANGUAGES: '{{default "python,rust,javascript,typescript,go,html,css,json" .TSLP_LANGUAGES}}'
+      TSLP_LANGUAGES: "{{default .FFI_TEST_LANGUAGES .TSLP_LANGUAGES}}"
     cmds:
       - cargo build -p ts-pack-core-ffi --release
 
