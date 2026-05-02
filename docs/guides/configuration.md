@@ -133,13 +133,13 @@ cache_dir = ".cache/tree-sitter"
 
 `build.rs` reads these at compile time, not at runtime. See [Building from source](building.md) for full details.
 
-| Variable | Description |
-|----------|-------------|
-| `TSLP_LANGUAGES` | Comma-separated languages to compile statically into the binary |
-| `TSLP_LINK_MODE` | `dynamic` (default), `static`, or `both` |
-| `PROJECT_ROOT` | Override directory search for `sources/language_definitions.json` |
-| `WASI_SYSROOT` | WASI sysroot path for `wasm32-wasi` cross-compilation |
-| `TSLP_BUILD` | Set to `1` to force rebuild of the Elixir NIF native extension |
+| Variable         | Description                                                       |
+| ---------------- | ----------------------------------------------------------------- |
+| `TSLP_LANGUAGES` | Comma-separated languages to compile statically into the binary   |
+| `TSLP_LINK_MODE` | `dynamic` (default), `static`, or `both`                          |
+| `PROJECT_ROOT`   | Override directory search for `sources/language_definitions.json` |
+| `WASI_SYSROOT`   | WASI sysroot path for `wasm32-wasi` cross-compilation             |
+| `TSLP_BUILD`     | Set to `1` to force rebuild of the Elixir NIF native extension    |
 
 ## CLI commands
 

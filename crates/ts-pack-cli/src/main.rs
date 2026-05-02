@@ -1,7 +1,7 @@
 use clap::{CommandFactory, Parser, Subcommand};
 use std::io::{self, Read, Write};
 use std::process;
-use tree_sitter_language_pack::{PackConfig, ProcessConfig, parse_string, process};
+use tree_sitter_language_pack::{PackConfig, ProcessConfig, get_parser, process};
 
 #[derive(Parser)]
 #[command(name = "ts-pack", about = "Tree-sitter language pack CLI")]
@@ -153,7 +153,7 @@ fn run() -> Result<(), String> {
 
             if all {
                 let count = tree_sitter_language_pack::download_all().map_err(|e| e.to_string())?;
-                println!("Downloaded {count} new languages.");
+                println!("Ensured {count} languages.");
             } else if !groups.is_empty() {
                 let config = PackConfig {
                     cache_dir: None,
@@ -165,7 +165,7 @@ fn run() -> Result<(), String> {
             } else if !languages.is_empty() {
                 let refs: Vec<&str> = languages.iter().map(String::as_str).collect();
                 let count = tree_sitter_language_pack::download(&refs).map_err(|e| e.to_string())?;
-                println!("Downloaded {count} new languages.");
+                println!("Ensured {count} languages.");
             } else {
                 // No flags: try config discovery
                 match PackConfig::discover() {
@@ -260,7 +260,8 @@ fn run() -> Result<(), String> {
                     .to_string(),
             };
 
-            let tree = parse_string(&lang, &source).map_err(|e| e.to_string())?;
+            let mut parser = get_parser(&lang).map_err(|e| e.to_string())?;
+            let tree = parser.parse(&source, None).ok_or("Failed to parse source")?;
 
             match format {
                 ParseFormat::Sexp => {

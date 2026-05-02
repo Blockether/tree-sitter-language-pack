@@ -14,6 +14,10 @@ tasks:
 
   test:all:
     desc: Run all E2E tests across all supported languages (builds FFI first)
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "{{.FFI_TEST_LANGUAGES}}"
     cmds:
       # Build the C ABI artifact most language bindings depend on.
       - cargo build --release -p ts-pack-core-ffi

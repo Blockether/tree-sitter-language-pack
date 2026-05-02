@@ -1,7 +1,8 @@
 ```typescript title="Node.js"
 import { process } from "@kreuzberg/tree-sitter-language-pack";
 
-const result = process(`
+const result = process(
+  `
 import { readFile } from 'fs/promises';
 
 export async function loadConfig(path: string): Promise<Config> {
@@ -12,7 +13,9 @@ export async function loadConfig(path: string): Promise<Config> {
 export class ConfigManager {
   constructor(private basePath: string) {}
 }
-`, { language: "typescript", structure: true, imports: true, exports: true, comments: true });
+`,
+  { language: "typescript", structure: true, imports: true, exports: true, comments: true },
+);
 
 for (const item of result.structure) {
   console.log(`${item.kind}: ${item.name}`);

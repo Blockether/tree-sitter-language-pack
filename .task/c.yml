@@ -5,6 +5,8 @@ tasks:
     desc: Build FFI library for C tests
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      TSLP_LINK_MODE: static
+      TSLP_LANGUAGES: "{{.FFI_TEST_LANGUAGES}}"
     cmds:
       - cargo build -p ts-pack-core-ffi --release
 

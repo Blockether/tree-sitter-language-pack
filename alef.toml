@@ -1,4 +1,4 @@
-version = "0.13.6"
+version = "0.13.10"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [crate]
@@ -16,54 +16,53 @@ features = ["serde", "config", "download"]
 
 [include]
 types = [
-    "ProcessConfig",
-    "ProcessResult",
-    "FileMetrics",
-    "StructureItem",
-    "StructureKind",
-    "ImportInfo",
-    "ExportInfo",
-    "ExportKind",
-    "CommentInfo",
-    "CommentKind",
-    "DocstringInfo",
-    "DocstringFormat",
-    "DocSection",
-    "SymbolInfo",
-    "SymbolKind",
-    "Diagnostic",
-    "DiagnosticSeverity",
-    "CodeChunk",
-    "ChunkContext",
-    "Span",
-    "PackConfig",
-    "Error",
-    "LanguageRegistry",
-    "DownloadManager",
+  "ProcessConfig",
+  "ProcessResult",
+  "FileMetrics",
+  "StructureItem",
+  "StructureKind",
+  "ImportInfo",
+  "ExportInfo",
+  "ExportKind",
+  "CommentInfo",
+  "CommentKind",
+  "DocstringInfo",
+  "DocstringFormat",
+  "DocSection",
+  "SymbolInfo",
+  "SymbolKind",
+  "Diagnostic",
+  "DiagnosticSeverity",
+  "CodeChunk",
+  "ChunkContext",
+  "Span",
+  "PackConfig",
+  "Error",
+  "LanguageRegistry",
+  "DownloadManager",
 ]
 functions = [
-    "available_languages",
-    "has_language",
-    "language_count",
-    "get_language",
-    "get_parser",
-    "parse_string",
-    "detect_language",
-    "detect_language_from_path",
-    "detect_language_from_extension",
-    "detect_language_from_content",
-    "get_highlights_query",
-    "get_injections_query",
-    "get_locals_query",
-    "process",
-    "init",
-    "configure",
-    "download",
-    "download_all",
-    "manifest_languages",
-    "downloaded_languages",
-    "clean_cache",
-    "cache_dir",
+  "available_languages",
+  "has_language",
+  "language_count",
+  "get_language",
+  "get_parser",
+  "detect_language",
+  "detect_language_from_path",
+  "detect_language_from_extension",
+  "detect_language_from_content",
+  "get_highlights_query",
+  "get_injections_query",
+  "get_locals_query",
+  "process",
+  "init",
+  "configure",
+  "download",
+  "download_all",
+  "manifest_languages",
+  "downloaded_languages",
+  "clean_cache",
+  "cache_dir",
 ]
 
 [opaque_types]
@@ -170,8 +169,8 @@ banner_url = "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8
 
 [sync]
 extra_paths = [
-    "crates/ts-pack-core-node/package.json",
-    "crates/ts-pack-core-node/npm/*/package.json",
+  "crates/ts-pack-core-node/package.json",
+  "crates/ts-pack-core-node/npm/*/package.json",
 ]
 
 [[sync.text_replacements]]
@@ -242,7 +241,7 @@ format = "cd packages/ruby && bundle exec rubocop -a ."
 
 [lint.go]
 precondition = "command -v golangci-lint >/dev/null 2>&1"
-before = "cargo build --release -p ts-pack-core-ffi"
+before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-ffi"
 
 [lint.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
@@ -270,7 +269,7 @@ e2e = "cd e2e/typescript && npx vitest run"
 
 [test.go]
 precondition = "command -v go >/dev/null 2>&1"
-before = "cargo build --release -p ts-pack-core-ffi"
+before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-ffi"
 command = "cd packages/go && go test -tags tspack_dev -v ./..."
 e2e = "cd e2e/go && go test ./... -count=1"
 
@@ -283,12 +282,12 @@ before = "cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.to
 
 [test.java]
 precondition = "command -v mvn >/dev/null 2>&1"
-before = "cargo build --release -p ts-pack-core-ffi"
+before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-ffi"
 command = "cd packages/java && mvn test"
 
 [test.csharp]
 precondition = "command -v dotnet >/dev/null 2>&1"
-before = "cargo build --release -p ts-pack-core-ffi"
+before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-ffi"
 command = "cd packages/csharp && dotnet test -c Release"
 
 [test.elixir]
@@ -330,14 +329,16 @@ cmake_config = true
 [e2e]
 fixtures = "fixtures"
 output = "e2e"
+fields_array = ["chunks"]
 
 [e2e.call]
 function = "process"
 module = "tree_sitter_language_pack"
 result_var = "result"
+returns_result = true
 args = [
-    { name = "source", field = "source_code", type = "string" },
-    { name = "config", field = "config", type = "json_object" },
+  { name = "source", field = "source_code", type = "string" },
+  { name = "config", field = "config", type = "json_object" },
 ]
 
 [e2e.call.overrides.rust]
@@ -356,6 +357,7 @@ function = "process"
 module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 function = "Process"
 alias = "tspack"
+options_type = "ProcessConfig"
 
 [e2e.call.overrides.java]
 class = "dev.kreuzberg.treesitterlanguagepack.TreeSitterLanguagePack"
@@ -363,79 +365,88 @@ class = "dev.kreuzberg.treesitterlanguagepack.TreeSitterLanguagePack"
 [e2e.call.overrides.csharp]
 class = "TreeSitterLanguagePack"
 
-[e2e.calls.parse]
-function = "parse_string"
-module = "tree_sitter_language_pack"
-result_var = "tree"
-args = [
-    { name = "language", field = "language", type = "string" },
-    { name = "source", field = "source_code", type = "bytes" },
-]
-
 [e2e.calls.detect_extension]
 function = "detect_language_from_extension"
 module = "tree_sitter_language_pack"
 result_var = "result"
+result_is_simple = true
+result_is_option = true
 args = [{ name = "ext", field = "extension", type = "string" }]
 
 [e2e.calls.detect_path]
 function = "detect_language_from_path"
 module = "tree_sitter_language_pack"
 result_var = "result"
+result_is_simple = true
+result_is_option = true
 args = [{ name = "path", field = "path", type = "string" }]
 
 [e2e.calls.detect_content]
 function = "detect_language_from_content"
 module = "tree_sitter_language_pack"
 result_var = "result"
+result_is_simple = true
+result_is_option = true
 args = [{ name = "content", field = "content", type = "string" }]
 
 [e2e.calls.has_language]
 function = "has_language"
 module = "tree_sitter_language_pack"
 result_var = "result"
+result_is_simple = true
 args = [{ name = "name", field = "language", type = "string" }]
 
 [e2e.calls.list_languages]
 function = "available_languages"
 module = "tree_sitter_language_pack"
 result_var = "result"
+result_is_simple = true
+result_is_array = true
 args = []
 
 [e2e.calls.highlights]
 function = "get_highlights_query"
 module = "tree_sitter_language_pack"
 result_var = "result"
+result_is_simple = true
+result_is_option = true
 args = [{ name = "language", field = "language", type = "string" }]
 
 [e2e.calls.injections]
 function = "get_injections_query"
 module = "tree_sitter_language_pack"
 result_var = "result"
+result_is_simple = true
+result_is_option = true
 args = [{ name = "language", field = "language", type = "string" }]
 
 [e2e.calls.locals]
 function = "get_locals_query"
 module = "tree_sitter_language_pack"
 result_var = "result"
+result_is_simple = true
+result_is_option = true
 args = [{ name = "language", field = "language", type = "string" }]
 
 [e2e.calls.language_count]
 function = "language_count"
 module = "tree_sitter_language_pack"
 result_var = "result"
+result_is_simple = true
 args = []
 
 [e2e.calls.get_language]
 function = "get_language"
 module = "tree_sitter_language_pack"
 result_var = "language"
+returns_result = true
 args = [{ name = "name", field = "language", type = "string" }]
 
 [e2e.calls.get_parser]
 function = "get_parser"
 module = "tree_sitter_language_pack"
 result_var = "parser"
+returns_result = true
 args = [{ name = "name", field = "language", type = "string" }]
 
 [e2e.calls.init_pack]
@@ -443,47 +454,70 @@ function = "init"
 module = "tree_sitter_language_pack"
 result_var = "result"
 args = [{ name = "config", field = "config", type = "json_object" }]
+returns_result = true
+returns_void = true
+
+[e2e.calls.init_pack.overrides.go]
+options_type = "PackConfig"
 
 [e2e.calls.configure_pack]
 function = "configure"
 module = "tree_sitter_language_pack"
 result_var = "result"
 args = [{ name = "config", field = "config", type = "json_object" }]
+returns_result = true
+returns_void = true
+
+[e2e.calls.configure_pack.overrides.go]
+options_type = "PackConfig"
 
 [e2e.calls.download_languages]
 function = "download"
 module = "tree_sitter_language_pack"
 result_var = "result"
-args = [{ name = "names", field = "languages", type = "json_object" }]
+returns_result = true
+result_is_simple = true
+args = [{ name = "names", field = "languages", type = "json_object", element_type = "String" }]
 
 [e2e.calls.download_all_languages]
 function = "download_all"
 module = "tree_sitter_language_pack"
 result_var = "result"
+returns_result = true
+result_is_simple = true
 args = []
 
 [e2e.calls.manifest_languages]
 function = "manifest_languages"
 module = "tree_sitter_language_pack"
 result_var = "result"
+returns_result = true
+result_is_simple = true
+result_is_array = true
 args = []
 
 [e2e.calls.downloaded_languages]
 function = "downloaded_languages"
 module = "tree_sitter_language_pack"
 result_var = "result"
+result_is_simple = true
+result_is_array = true
 args = []
 
 [e2e.calls.clean_cache]
 function = "clean_cache"
 module = "tree_sitter_language_pack"
 result_var = "result"
+returns_result = true
+returns_void = true
 args = []
 
 [e2e.calls.cache_dir]
 function = "cache_dir"
 module = "tree_sitter_language_pack"
 result_var = "result"
+returns_result = true
+result_is_simple = true
 args = []
 
 [e2e.packages.rust]

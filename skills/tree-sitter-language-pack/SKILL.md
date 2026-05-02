@@ -99,7 +99,10 @@ print(f"Functions: {len(result['structure'])}")
 
 ```typescript
 import {
-  parseString, process, availableLanguages, treeRootNodeType
+  parseString,
+  process,
+  availableLanguages,
+  treeRootNodeType,
 } from "@kreuzberg/tree-sitter-language-pack";
 
 // List languages
@@ -107,7 +110,7 @@ console.log(`${availableLanguages().length} languages supported`);
 
 // Parse code
 const tree = parseString("python", "def hello(): pass");
-console.log(treeRootNodeType(tree));  // "module"
+console.log(treeRootNodeType(tree)); // "module"
 
 // Extract intelligence
 const result = process("def hello(): pass", { language: "python" });
@@ -157,65 +160,65 @@ ts-pack download python javascript typescript rust
 
 ### Language Discovery & Detection
 
-| Function | Purpose |
-|----------|---------|
-| `available_languages()` | List all 305 supported language names |
-| `has_language(name)` | Check if a language is available |
-| `language_count()` | Return total language count |
-| `detect_language(path)` | Detect language from file path/extension |
-| `detect_language_from_content(content)` | Detect from shebang or file content |
-| `detect_language_from_extension(ext)` | Detect from bare file extension |
-| `extension_ambiguity(ext)` | Check if extension maps to multiple languages |
+| Function                                | Purpose                                       |
+| --------------------------------------- | --------------------------------------------- |
+| `available_languages()`                 | List all 305 supported language names         |
+| `has_language(name)`                    | Check if a language is available              |
+| `language_count()`                      | Return total language count                   |
+| `detect_language(path)`                 | Detect language from file path/extension      |
+| `detect_language_from_content(content)` | Detect from shebang or file content           |
+| `detect_language_from_extension(ext)`   | Detect from bare file extension               |
+| `extension_ambiguity(ext)`              | Check if extension maps to multiple languages |
 
 ### Parsing
 
-| Function | Purpose |
-|----------|---------|
-| `parse_string(language, source)` | Parse source code, return tree handle |
-| `tree_root_node_type(tree)` | Get root node type name |
-| `tree_root_child_count(tree)` | Count named children of root |
-| `tree_contains_node_type(tree, type)` | Check if tree has node type anywhere |
-| `tree_has_error_nodes(tree)` | Check for syntax errors |
-| `tree_error_count(tree)` | Count ERROR and MISSING nodes |
-| `tree_to_sexp(tree)` | Return S-expression representation |
+| Function                              | Purpose                               |
+| ------------------------------------- | ------------------------------------- |
+| `parse_string(language, source)`      | Parse source code, return tree handle |
+| `tree_root_node_type(tree)`           | Get root node type name               |
+| `tree_root_child_count(tree)`         | Count named children of root          |
+| `tree_contains_node_type(tree, type)` | Check if tree has node type anywhere  |
+| `tree_has_error_nodes(tree)`          | Check for syntax errors               |
+| `tree_error_count(tree)`              | Count ERROR and MISSING nodes         |
+| `tree_to_sexp(tree)`                  | Return S-expression representation    |
 
 ### Code Intelligence & Processing
 
-| Function | Purpose |
-|----------|---------|
-| `process(source, config)` | Extract structure, imports, exports, comments, docstrings, symbols, diagnostics, chunks |
-| `extract(source, config)` | Run custom tree-sitter query patterns |
-| `validate_extraction(config)` | Validate query patterns without executing |
+| Function                      | Purpose                                                                                 |
+| ----------------------------- | --------------------------------------------------------------------------------------- |
+| `process(source, config)`     | Extract structure, imports, exports, comments, docstrings, symbols, diagnostics, chunks |
+| `extract(source, config)`     | Run custom tree-sitter query patterns                                                   |
+| `validate_extraction(config)` | Validate query patterns without executing                                               |
 
 ### Download Management
 
-| Function | Purpose |
-|----------|---------|
-| `init(config)` | Initialize pack with pre-downloads and configuration |
-| `configure(config)` | Set cache directory without downloading |
-| `download(names)` | Download specific languages |
-| `download_all()` | Download all 305 languages |
-| `manifest_languages()` | Fetch list of available languages from remote manifest |
-| `downloaded_languages()` | List locally cached languages |
-| `clean_cache()` | Delete all cached parsers |
-| `cache_dir()` | Get effective cache directory path |
+| Function                 | Purpose                                                |
+| ------------------------ | ------------------------------------------------------ |
+| `init(config)`           | Initialize pack with pre-downloads and configuration   |
+| `configure(config)`      | Set cache directory without downloading                |
+| `download(names)`        | Download specific languages                            |
+| `download_all()`         | Download all 305 languages                             |
+| `manifest_languages()`   | Fetch list of available languages from remote manifest |
+| `downloaded_languages()` | List locally cached languages                          |
+| `clean_cache()`          | Delete all cached parsers                              |
+| `cache_dir()`            | Get effective cache directory path                     |
 
 ## ProcessConfig Options
 
 Control what analysis features are enabled:
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `language` | string | required | Language name (e.g., "python", "javascript") |
-| `structure` | bool | true | Extract functions, classes, methods |
-| `imports` | bool | true | Extract import statements |
-| `exports` | bool | true | Extract exported symbols |
-| `comments` | bool | false | Extract inline and block comments |
-| `docstrings` | bool | false | Extract docstrings attached to definitions |
-| `symbols` | bool | false | Extract all identifiers for search indexing |
-| `diagnostics` | bool | false | Include parse errors and syntax diagnostics |
-| `chunk_max_size` | int or null | null | Maximum bytes per chunk (enables chunking) |
-| `extractions` | dict or null | null | Custom tree-sitter query patterns |
+| Option           | Type         | Default  | Description                                  |
+| ---------------- | ------------ | -------- | -------------------------------------------- |
+| `language`       | string       | required | Language name (e.g., "python", "javascript") |
+| `structure`      | bool         | true     | Extract functions, classes, methods          |
+| `imports`        | bool         | true     | Extract import statements                    |
+| `exports`        | bool         | true     | Extract exported symbols                     |
+| `comments`       | bool         | false    | Extract inline and block comments            |
+| `docstrings`     | bool         | false    | Extract docstrings attached to definitions   |
+| `symbols`        | bool         | false    | Extract all identifiers for search indexing  |
+| `diagnostics`    | bool         | false    | Include parse errors and syntax diagnostics  |
+| `chunk_max_size` | int or null  | null     | Maximum bytes per chunk (enables chunking)   |
+| `extractions`    | dict or null | null     | Custom tree-sitter query patterns            |
 
 Use `ProcessConfig.all(language)` to enable all features, or `ProcessConfig.minimal(language)` to disable all extractions (metrics only).
 

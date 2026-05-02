@@ -4,18 +4,18 @@
 
 Enable only what you need:
 
-| Option | Type | Default | Extracts |
-|--------|------|---------|----------|
-| `language` | string | required | (Language to parse) |
-| `structure` | bool | true | Functions, classes, methods, modules |
-| `imports` | bool | true | Import statements and their sources |
-| `exports` | bool | true | Exported symbols and their kinds |
-| `comments` | bool | false | Inline and block comments |
-| `docstrings` | bool | false | Docstrings attached to definitions |
-| `symbols` | bool | false | All identifiers (for search indexing) |
-| `diagnostics` | bool | false | Syntax errors and error nodes |
-| `chunk_max_size` | int or null | null | Syntax-aware code chunks (for LLMs) |
-| `extractions` | dict or null | null | Custom tree-sitter query patterns |
+| Option           | Type         | Default  | Extracts                              |
+| ---------------- | ------------ | -------- | ------------------------------------- |
+| `language`       | string       | required | (Language to parse)                   |
+| `structure`      | bool         | true     | Functions, classes, methods, modules  |
+| `imports`        | bool         | true     | Import statements and their sources   |
+| `exports`        | bool         | true     | Exported symbols and their kinds      |
+| `comments`       | bool         | false    | Inline and block comments             |
+| `docstrings`     | bool         | false    | Docstrings attached to definitions    |
+| `symbols`        | bool         | false    | All identifiers (for search indexing) |
+| `diagnostics`    | bool         | false    | Syntax errors and error nodes         |
+| `chunk_max_size` | int or null  | null     | Syntax-aware code chunks (for LLMs)   |
+| `extractions`    | dict or null | null     | Custom tree-sitter query patterns     |
 
 Use `ProcessConfig.all(language)` to enable everything, or `ProcessConfig.minimal(language)` to extract only metrics.
 
@@ -336,16 +336,16 @@ The `chunk_max_size` parameter is an **upper bound**, not exact. Chunks may be s
 
 ## Language-Specific Structure Kinds
 
-| Kind | Languages |
-|------|-----------|
-| `function` | All languages |
-| `class` | Python, JS/TS, Java, C#, Ruby, PHP, Kotlin |
-| `method` | Same as class |
-| `interface` | TS, Java, C#, Go, Kotlin |
-| `struct` | Rust, Go, C, C++, C#, Zig |
-| `module` | Elixir, Ruby, Rust, Go |
-| `enum` | Rust, Java, C#, TypeScript, Kotlin |
-| `trait` | Rust |
-| `type_alias` | TypeScript, Rust |
-| `impl` | Rust |
-| `namespace` | C#, C++, Java |
+| Kind         | Languages                                  |
+| ------------ | ------------------------------------------ |
+| `function`   | All languages                              |
+| `class`      | Python, JS/TS, Java, C#, Ruby, PHP, Kotlin |
+| `method`     | Same as class                              |
+| `interface`  | TS, Java, C#, Go, Kotlin                   |
+| `struct`     | Rust, Go, C, C++, C#, Zig                  |
+| `module`     | Elixir, Ruby, Rust, Go                     |
+| `enum`       | Rust, Java, C#, TypeScript, Kotlin         |
+| `trait`      | Rust                                       |
+| `type_alias` | TypeScript, Rust                           |
+| `impl`       | Rust                                       |
+| `namespace`  | C#, C++, Java                              |

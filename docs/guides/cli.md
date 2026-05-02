@@ -28,17 +28,17 @@ ts-pack --version
 
 ## Commands
 
-| Command | What it does |
-|---------|-------------|
-| [`download`](#ts-pack-download) | Download parser libraries |
-| [`clean`](#ts-pack-clean) | Remove cached parsers |
-| [`list`](#ts-pack-list) | List available languages |
-| [`info`](#ts-pack-info) | Show details about a language |
-| [`parse`](#ts-pack-parse) | Parse a file and output the syntax tree |
-| [`process`](#ts-pack-process) | Run code intelligence on a file |
-| [`cache-dir`](#ts-pack-cache-dir) | Print the cache directory path |
-| [`init`](#ts-pack-init) | Create a `language-pack.toml` config file |
-| [`completions`](#ts-pack-completions) | Generate shell completions |
+| Command                               | What it does                              |
+| ------------------------------------- | ----------------------------------------- |
+| [`download`](#ts-pack-download)       | Download parser libraries                 |
+| [`clean`](#ts-pack-clean)             | Remove cached parsers                     |
+| [`list`](#ts-pack-list)               | List available languages                  |
+| [`info`](#ts-pack-info)               | Show details about a language             |
+| [`parse`](#ts-pack-parse)             | Parse a file and output the syntax tree   |
+| [`process`](#ts-pack-process)         | Run code intelligence on a file           |
+| [`cache-dir`](#ts-pack-cache-dir)     | Print the cache directory path            |
+| [`init`](#ts-pack-init)               | Create a `language-pack.toml` config file |
+| [`completions`](#ts-pack-completions) | Generate shell completions                |
 
 ---
 
@@ -50,11 +50,11 @@ Download parser libraries to the local cache.
 ts-pack download [LANGUAGES...] [OPTIONS]
 ```
 
-| Flag | Description |
-|------|-------------|
-| `--all` | Download all 306 parsers |
+| Flag                | Description                                                                                     |
+| ------------------- | ----------------------------------------------------------------------------------------------- |
+| `--all`             | Download all 306 parsers                                                                        |
 | `--groups <groups>` | Download by group (comma-separated: `web`, `systems`, `scripting`, `data`, `jvm`, `functional`) |
-| `--fresh` | Clear the cache before downloading |
+| `--fresh`           | Clear the cache before downloading                                                              |
 
 ```bash
 # Download specific parsers
@@ -85,8 +85,8 @@ Remove all cached parser libraries. Prompts for confirmation unless you pass `--
 ts-pack clean [OPTIONS]
 ```
 
-| Flag | Description |
-|------|-------------|
+| Flag      | Description                  |
+| --------- | ---------------------------- |
 | `--force` | Skip the confirmation prompt |
 
 ```bash
@@ -104,11 +104,11 @@ List available languages.
 ts-pack list [OPTIONS]
 ```
 
-| Flag | Description |
-|------|-------------|
-| `--downloaded` | Show only locally cached parsers |
-| `--manifest` | Show all languages from the remote manifest (default) |
-| `--filter <text>` | Filter by substring |
+| Flag              | Description                                           |
+| ----------------- | ----------------------------------------------------- |
+| `--downloaded`    | Show only locally cached parsers                      |
+| `--manifest`      | Show all languages from the remote manifest (default) |
+| `--filter <text>` | Filter by substring                                   |
 
 ```bash
 ts-pack list                    # all available languages
@@ -153,10 +153,10 @@ ts-pack parse <FILE> [OPTIONS]
 
 Use `-` as `FILE` to read from stdin (requires `--language`).
 
-| Flag | Description |
-|------|-------------|
+| Flag                      | Description                                                      |
+| ------------------------- | ---------------------------------------------------------------- |
 | `--language <lang>`, `-l` | Language name. Auto-detected from the file extension if omitted. |
-| `--format <fmt>`, `-f` | `sexp` (default) or `json` |
+| `--format <fmt>`, `-f`    | `sexp` (default) or `json`                                       |
 
 ```bash
 ts-pack parse src/main.py
@@ -190,18 +190,18 @@ ts-pack process <FILE> [OPTIONS]
 
 Use `-` as `FILE` to read from stdin. When reading from stdin, you must pass `--language`.
 
-| Flag | Description |
-|------|-------------|
+| Flag                      | Description                                             |
+| ------------------------- | ------------------------------------------------------- |
 | `--language <lang>`, `-l` | Language name. Auto-detected from extension if omitted. |
-| `--all` | Enable all analysis features |
-| `--structure` | Extract functions, classes, and methods |
-| `--imports` | Extract import statements |
-| `--exports` | Extract exported symbols |
-| `--comments` | Extract comments |
-| `--symbols` | Extract all identifiers |
-| `--docstrings` | Extract docstrings |
-| `--diagnostics` | Report syntax errors |
-| `--chunk-size <n>` | Split output into chunks of at most `n` bytes |
+| `--all`                   | Enable all analysis features                            |
+| `--structure`             | Extract functions, classes, and methods                 |
+| `--imports`               | Extract import statements                               |
+| `--exports`               | Extract exported symbols                                |
+| `--comments`              | Extract comments                                        |
+| `--symbols`               | Extract all identifiers                                 |
+| `--docstrings`            | Extract docstrings                                      |
+| `--diagnostics`           | Report syntax errors                                    |
+| `--chunk-size <n>`        | Split output into chunks of at most `n` bytes           |
 
 Without any feature flags, the default extracts structure, imports, and exports.
 
@@ -244,10 +244,10 @@ Create a `language-pack.toml` config file in the current directory.
 ts-pack init [OPTIONS]
 ```
 
-| Flag | Description |
-|------|-------------|
-| `--cache-dir <path>` | Set a custom cache directory in the generated file |
-| `--languages <langs>` | Comma-separated languages to pre-fill |
+| Flag                  | Description                                        |
+| --------------------- | -------------------------------------------------- |
+| `--cache-dir <path>`  | Set a custom cache directory in the generated file |
+| `--languages <langs>` | Comma-separated languages to pre-fill              |
 
 ```bash
 ts-pack init
@@ -291,10 +291,10 @@ ts-pack completions fish > ~/.config/fish/completions/ts-pack.fish
 
 ## Exit codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | Success |
-| `1` | Error — message printed to stderr |
+| Code | Meaning                           |
+| ---- | --------------------------------- |
+| `0`  | Success                           |
+| `1`  | Error — message printed to stderr |
 
 ---
 

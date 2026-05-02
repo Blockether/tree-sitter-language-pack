@@ -77,19 +77,19 @@ for item in result["structure"]:
 
 Supported kinds vary by language:
 
-| Kind | Languages |
-|------|-----------|
-| `function` | All languages |
-| `class` | Python, JS/TS, Java, C#, Ruby, PHP, Kotlin, … |
-| `method` | Same as class |
-| `interface` | TypeScript, Java, C#, Go, Kotlin, … |
-| `struct` | Rust, Go, C, C++, C#, … |
-| `impl` | Rust |
-| `module` | Elixir, Ruby, Rust, … |
-| `enum` | Rust, Java, C#, TypeScript, Kotlin, … |
-| `trait` | Rust |
-| `type_alias` | TypeScript, Rust |
-| `decorator` | Python, TypeScript |
+| Kind         | Languages                                     |
+| ------------ | --------------------------------------------- |
+| `function`   | All languages                                 |
+| `class`      | Python, JS/TS, Java, C#, Ruby, PHP, Kotlin, … |
+| `method`     | Same as class                                 |
+| `interface`  | TypeScript, Java, C#, Go, Kotlin, …           |
+| `struct`     | Rust, Go, C, C++, C#, …                       |
+| `impl`       | Rust                                          |
+| `module`     | Elixir, Ruby, Rust, …                         |
+| `enum`       | Rust, Java, C#, TypeScript, Kotlin, …         |
+| `trait`      | Rust                                          |
+| `type_alias` | TypeScript, Rust                              |
+| `decorator`  | Python, TypeScript                            |
 
 ---
 
@@ -155,15 +155,15 @@ print(func["docstring"])
 
 Docstring extraction understands language-specific conventions:
 
-| Language | Convention |
-|----------|-----------|
-| Python | `"""..."""` triple-quoted string immediately after `def`/`class` |
-| Rust | `///` or `//!` doc comments above item |
-| JavaScript/TypeScript | `/** ... */` JSDoc block above function |
-| Java | `/** ... */` Javadoc block above method/class |
-| Ruby | `# ...` lines immediately above `def`/`class` |
-| Go | `// FuncName ...` comment block above func |
-| Elixir | `@doc "..."` or `@moduledoc "..."` |
+| Language              | Convention                                                       |
+| --------------------- | ---------------------------------------------------------------- |
+| Python                | `"""..."""` triple-quoted string immediately after `def`/`class` |
+| Rust                  | `///` or `//!` doc comments above item                           |
+| JavaScript/TypeScript | `/** ... */` JSDoc block above function                          |
+| Java                  | `/** ... */` Javadoc block above method/class                    |
+| Ruby                  | `# ...` lines immediately above `def`/`class`                    |
+| Go                    | `// FuncName ...` comment block above func                       |
+| Elixir                | `@doc "..."` or `@moduledoc "..."`                               |
 
 ---
 
@@ -303,27 +303,6 @@ print(f"\nLines: {m['total_lines']} total, {m['code_lines']} code, {m['comment_l
 
 ---
 
-## Custom Extraction Queries
+## Custom Queries
 
-The built-in fields cover common use cases. Workflows requiring language-specific patterns can use the `ProcessConfig.extractions` field to define custom tree-sitter query patterns that run alongside the standard analysis.
-
-Each extraction is a named pattern with a tree-sitter S-expression query. Results land in `ProcessResult.extractions`, keyed by the name you provide.
-
-```python
-config = ProcessConfig(
-    language="python",
-    structure=True,
-    extractions={
-        "decorators": {
-            "query": "(decorator (identifier) @name)",
-            "capture_output": "text",
-        },
-    },
-)
-result = process(source, config)
-
-for match in result["extractions"]["decorators"]:
-    print(match)
-```
-
-For a full walkthrough — including `child_fields`, `max_results`, `byte_range`, and compiled extractions for repeated use — see the [Extraction Queries guide](../guides/extraction.md).
+Custom query extraction helpers are not part of the v1.6.2 public API. In Rust, call `get_parser()` and use the `tree-sitter` query APIs directly when the built-in `process()` fields are not enough.

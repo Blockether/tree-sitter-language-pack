@@ -13,7 +13,11 @@ name = "tree_sitter_language_pack_nif"
 crate-type = ["cdylib"]
 
 [dependencies]
-tree-sitter-language-pack = { path = "../../../../crates/ts-pack-core", features = ["serde", "config", "download"] }
+tree-sitter-language-pack = { path = "../../../../crates/ts-pack-core", features = [
+  "serde",
+  "config",
+  "download",
+] }
 rustler = "0.37"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

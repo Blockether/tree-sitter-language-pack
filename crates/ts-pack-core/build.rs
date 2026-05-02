@@ -36,23 +36,20 @@ fn find_project_root() -> PathBuf {
 
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
-    // Check for language_definitions.json in the crate directory itself
-    // (present when published to crates.io or copied during development).
-    if manifest_dir.join("language_definitions.json").exists() {
-        return manifest_dir.clone();
-    }
-
     let mut dir = manifest_dir.as_path();
     loop {
-        if dir.join("sources/language_definitions.json").exists() {
+        if dir.join("sources/language_definitions.json").exists() && dir.join("parsers").exists() {
             return dir.to_path_buf();
         }
         match dir.parent() {
             Some(parent) => dir = parent,
-            // When installed from crates.io, sources/ won't exist — fall back to manifest dir
-            None => return manifest_dir,
+            None => break,
         }
     }
+
+    // Published crates include a crate-local language_definitions.json but not
+    // the workspace-level sources/parsers layout.
+    manifest_dir
 }
 
 fn selected_languages(definitions: &BTreeMap<String, LanguageDefinition>) -> Vec<String> {

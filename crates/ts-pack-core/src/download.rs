@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -148,18 +148,7 @@ impl DownloadManager {
             ))
         })?;
 
-        // Download and extract the platform bundle
-        let archive_data = self.download_bundle(&bundle.url)?;
-
-        // Verify checksum
-        let actual_hash = Self::sha256_hex(&archive_data);
-        if actual_hash != bundle.sha256 {
-            return Err(Error::ChecksumMismatch {
-                file: bundle.url.clone(),
-                expected: bundle.sha256.clone(),
-                actual: actual_hash,
-            });
-        }
+        let archive_data = self.load_or_download_bundle(&platform_key, bundle)?;
 
         // Extract only the requested languages
         self.extract_languages(&archive_data, &missing)?;
@@ -251,6 +240,47 @@ impl DownloadManager {
         Ok(manifest)
     }
 
+    /// Return the cache path for a verified platform bundle archive.
+    fn bundle_cache_path(&self, platform_key: &str, sha256: &str) -> Result<PathBuf, Error> {
+        let version_cache_dir = self
+            .cache_dir
+            .parent()
+            .ok_or_else(|| Error::Download("Cache directory has no parent".to_string()))?;
+        Ok(version_cache_dir
+            .join("bundles")
+            .join(format!("{platform_key}-{sha256}.tar.zst")))
+    }
+
+    /// Load a verified platform bundle from cache, or download and cache it.
+    fn load_or_download_bundle(&self, platform_key: &str, bundle: &PlatformBundle) -> Result<Vec<u8>, Error> {
+        let cache_path = self.bundle_cache_path(platform_key, &bundle.sha256)?;
+
+        if cache_path.exists() {
+            let data = fs::read(&cache_path)?;
+            let actual_hash = Self::sha256_hex(&data);
+            if actual_hash == bundle.sha256 {
+                return Ok(data);
+            }
+            fs::remove_file(&cache_path)?;
+        }
+
+        let data = self.download_bundle(&bundle.url)?;
+        let actual_hash = Self::sha256_hex(&data);
+        if actual_hash != bundle.sha256 {
+            return Err(Error::ChecksumMismatch {
+                file: bundle.url.clone(),
+                expected: bundle.sha256.clone(),
+                actual: actual_hash,
+            });
+        }
+
+        if let Some(parent) = cache_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        fs::write(cache_path, &data)?;
+        Ok(data)
+    }
+
     /// Download a bundle archive from the given URL.
     fn download_bundle(&self, url: &str) -> Result<Vec<u8>, Error> {
         let response = ureq::get(url)
@@ -288,6 +318,7 @@ impl DownloadManager {
                 (filename, *name)
             })
             .collect();
+        let mut extracted_files = HashSet::with_capacity(expected_files.len());
 
         for entry in archive
             .entries()
@@ -308,7 +339,23 @@ impl DownloadManager {
                 entry
                     .unpack(&dest)
                     .map_err(|e| Error::Download(format!("Failed to extract {}: {}", filename, e)))?;
+                extracted_files.insert(filename);
             }
+        }
+
+        let mut missing_languages: Vec<&str> = expected_files
+            .iter()
+            .filter_map(|(filename, name)| {
+                (!extracted_files.contains(filename) && !self.cache_dir.join(filename).exists()).then_some(*name)
+            })
+            .collect();
+        missing_languages.sort_unstable();
+
+        if !missing_languages.is_empty() {
+            return Err(Error::Download(format!(
+                "Downloaded archive did not contain parser libraries for: {}",
+                missing_languages.join(", ")
+            )));
         }
 
         Ok(())
@@ -354,5 +401,89 @@ impl DownloadManager {
         };
 
         format!("{os}-{arch}")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    use super::*;
+
+    fn temp_cache_dir(test_name: &str) -> PathBuf {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("system clock should be after UNIX_EPOCH")
+            .as_nanos();
+        std::env::temp_dir().join(format!("tslp-{test_name}-{nanos}"))
+    }
+
+    fn compressed_tar(entries: &[(&str, &[u8])]) -> Vec<u8> {
+        let encoder = zstd::Encoder::new(Vec::new(), 0).expect("zstd encoder should initialize");
+        let mut builder = tar::Builder::new(encoder);
+
+        for (path, contents) in entries {
+            let mut header = tar::Header::new_gnu();
+            header.set_size(contents.len() as u64);
+            header.set_mode(0o644);
+            header.set_cksum();
+            builder
+                .append_data(&mut header, *path, *contents)
+                .expect("tar entry should append");
+        }
+
+        let encoder = builder.into_inner().expect("tar builder should finish");
+        encoder.finish().expect("zstd encoder should finish")
+    }
+
+    #[test]
+    fn bundle_cache_path_uses_version_cache_dir() {
+        let cache_dir = temp_cache_dir("bundle-path").join("libs");
+        let manager = DownloadManager::with_cache_dir("test", cache_dir.clone());
+
+        let path = manager
+            .bundle_cache_path("macos-arm64", "abc123")
+            .expect("bundle cache path should resolve");
+
+        assert_eq!(
+            path,
+            cache_dir.parent().unwrap().join("bundles/macos-arm64-abc123.tar.zst")
+        );
+        let _ = fs::remove_dir_all(cache_dir.parent().unwrap());
+    }
+
+    #[test]
+    fn extract_languages_writes_requested_library() {
+        let cache_dir = temp_cache_dir("extracts");
+        let manager = DownloadManager::with_cache_dir("test", cache_dir.clone());
+        let filename = manager
+            .lib_path("python")
+            .file_name()
+            .expect("library path should have filename")
+            .to_string_lossy()
+            .into_owned();
+        let archive = compressed_tar(&[(&filename, b"library-bytes")]);
+
+        manager
+            .extract_languages(&archive, &["python"])
+            .expect("requested library should extract");
+
+        let extracted = fs::read(manager.lib_path("python")).expect("extracted library should be readable");
+        assert_eq!(extracted, b"library-bytes");
+        let _ = fs::remove_dir_all(cache_dir);
+    }
+
+    #[test]
+    fn extract_languages_errors_when_requested_library_is_absent() {
+        let cache_dir = temp_cache_dir("missing");
+        let manager = DownloadManager::with_cache_dir("test", cache_dir.clone());
+        let archive = compressed_tar(&[("libtree_sitter_javascript.dylib", b"library-bytes")]);
+
+        let error = manager
+            .extract_languages(&archive, &["python"])
+            .expect_err("missing requested library should error");
+
+        assert!(error.to_string().contains("python"));
+        let _ = fs::remove_dir_all(cache_dir);
     }
 }

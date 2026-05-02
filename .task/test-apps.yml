@@ -104,7 +104,7 @@ tasks:
     desc: Run Homebrew CLI smoke test
     dir: test_apps/homebrew
     env:
-      TS_PACK_BIN: "{{.TS_PACK_BIN | default (printf \"%s/target/release/ts-pack\" .PROJECT_ROOT)}}"
+      TS_PACK_BIN: '{{.TS_PACK_BIN | default (printf "%s/target/release/ts-pack" .PROJECT_ROOT)}}'
     cmds:
       - bash smoke_test.sh
 

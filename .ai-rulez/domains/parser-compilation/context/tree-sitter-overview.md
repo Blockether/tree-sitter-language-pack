@@ -1,11 +1,13 @@
 ---
 priority: high
 ---
+
 # Tree-Sitter Overview
 
 Tree-sitter is an incremental parsing library that builds concrete syntax trees for source code.
 
 Key concepts:
+
 - **Grammar**: A JSON/JS definition describing a language's syntax
 - **Parser**: C code generated from the grammar by `tree-sitter generate`
 - **External Scanner**: Optional C/C++ code for context-sensitive parsing (e.g., indentation)

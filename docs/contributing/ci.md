@@ -8,16 +8,16 @@ The project has 8 GitHub Actions workflows in `.github/workflows/`.
 
 ## Overview
 
-| Workflow | Purpose | Trigger |
-|----------|---------|---------|
-| `ci.yaml` | Main CI — builds and tests all bindings | push/PR to `main` |
-| `ci-cli.yaml` | CLI-specific tests | push/PR to `main` |
-| `ci-docker.yaml` | Docker image build and tests | push/PR to `main` |
-| `docs.yaml` | Build and deploy documentation | push to `main`, manual |
-| `publish.yaml` | Publish packages to all registries | manual, release |
-| `publish-docker.yaml` | Build and push Docker image | manual, release |
-| `validate-issues.yml` | Validate issue format | issue opened/edited |
-| `validate-pr.yml` | Validate PR format | PR opened/edited/synced |
+| Workflow              | Purpose                                 | Trigger                 |
+| --------------------- | --------------------------------------- | ----------------------- |
+| `ci.yaml`             | Main CI — builds and tests all bindings | push/PR to `main`       |
+| `ci-cli.yaml`         | CLI-specific tests                      | push/PR to `main`       |
+| `ci-docker.yaml`      | Docker image build and tests            | push/PR to `main`       |
+| `docs.yaml`           | Build and deploy documentation          | push to `main`, manual  |
+| `publish.yaml`        | Publish packages to all registries      | manual, release         |
+| `publish-docker.yaml` | Build and push Docker image             | manual, release         |
+| `validate-issues.yml` | Validate issue format                   | issue opened/edited     |
+| `validate-pr.yml`     | Validate PR format                      | PR opened/edited/synced |
 
 ---
 

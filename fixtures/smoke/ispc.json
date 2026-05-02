@@ -1,16 +1,17 @@
 {
-	"id": "smoke_ispc",
-	"description": "Smoke test: load ispc and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"call": "parse",
-	"input": {
-		"language": "ispc",
-		"source_code": "export void main() {}"
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_ispc",
+  "description": "Smoke test: load ispc and parse a simple snippet",
+  "category": "smoke",
+  "tags": ["smoke"],
+  "input": {
+    "source_code": "export void main() {}",
+    "config": {
+      "language": "ispc"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ]
 }

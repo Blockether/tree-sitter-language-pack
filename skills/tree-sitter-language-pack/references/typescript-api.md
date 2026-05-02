@@ -40,8 +40,8 @@ Example:
 
 ```typescript
 const tree = parseString("python", "x = 1");
-console.log(treeRootNodeType(tree));        // "module"
-console.log(treeHasErrorNodes(tree));       // false
+console.log(treeRootNodeType(tree)); // "module"
+console.log(treeHasErrorNodes(tree)); // false
 ```
 
 ## Code Intelligence Processing
@@ -80,9 +80,9 @@ Example:
 
 ```typescript
 const result = process("def hello(): pass", { language: "python" });
-console.log(result.structure);     // Functions, classes
-console.log(result.imports);       // Import statements
-console.log(result.chunks);        // Code chunks for LLMs
+console.log(result.structure); // Functions, classes
+console.log(result.imports); // Import statements
+console.log(result.chunks); // Code chunks for LLMs
 ```
 
 Supporting types:
@@ -107,7 +107,7 @@ interface Span {
 }
 
 interface StructureItem {
-  kind: string;           // "function" | "class" | "method" | ...
+  kind: string; // "function" | "class" | "method" | ...
   name: string;
   span: Span;
   parent: string | null;
@@ -246,7 +246,7 @@ const result = extract("def hello(): pass", {
 
 for (const match of result.results.functions.matches) {
   for (const capture of match.captures) {
-    console.log(capture.text);  // "hello"
+    console.log(capture.text); // "hello"
   }
 }
 ```

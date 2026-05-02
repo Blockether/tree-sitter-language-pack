@@ -985,9 +985,9 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
-          distribution: 'temurin'
-          java-version: '25.0.2+10'
-          cache: 'maven'
+          distribution: "temurin"
+          java-version: "25.0.2+10"
+          cache: "maven"
 
       - name: Setup Maven
         uses: kreuzberg-dev/actions/setup-maven@v1
@@ -2078,7 +2078,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '25.0.2+10'
+          java-version: "25.0.2+10"
           cache: maven
           server-id: ossrh
           server-username: MAVEN_USERNAME

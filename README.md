@@ -205,30 +205,30 @@ See [CLI README](crates/ts-pack-cli/README.md) for full documentation.
 
 All bindings expose a unified `process()` function for extracting structured intelligence from source code:
 
-| Language | Function |
-| -------- | -------- |
-| Rust | `ts_pack_core::process(source, &config)` |
-| Python | `process(source, ProcessConfig(...))` |
-| Node.js | `process(source, { language: '...' })` |
-| Go | `registry.Process(source, config)` |
-| Java | `registry.process(source, configJson)` |
-| Ruby | `TreeSitterLanguagePack.process(source, configJson)` |
-| Elixir | `TreeSitterLanguagePack.process(source, configJson)` |
-| WASM | `process(source, { language: '...' })` |
-| C FFI | `ts_pack_process(registry, source, len, configJson)` |
+| Language | Function                                             |
+| -------- | ---------------------------------------------------- |
+| Rust     | `ts_pack_core::process(source, &config)`             |
+| Python   | `process(source, ProcessConfig(...))`                |
+| Node.js  | `process(source, { language: '...' })`               |
+| Go       | `registry.Process(source, config)`                   |
+| Java     | `registry.process(source, configJson)`               |
+| Ruby     | `TreeSitterLanguagePack.process(source, configJson)` |
+| Elixir   | `TreeSitterLanguagePack.process(source, configJson)` |
+| WASM     | `process(source, { language: '...' })`               |
+| C FFI    | `ts_pack_process(registry, source, len, configJson)` |
 
 The `process()` function returns structured analysis including functions, classes, imports, comments, and optionally chunked source segments.
 
 ## Features
 
-| Feature | Description |
-| --- | --- |
-| **305+ Languages** | Pre-compiled parsers for 305+ programming languages |
-| **On-Demand Downloads** | Parsers are downloaded on-demand and cached locally for fast reuse |
-| **Selective Installation** | Download only the languages you need; unused parsers never downloaded |
-| **Polyglot Bindings** | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++ |
-| **Automatic Caching** | Downloaded parsers cached in platform-specific directories for offline use |
-| **CLI Tool** | `ts-pack download` to pre-download parsers for offline/CI/Docker use |
+| Feature                    | Description                                                                |
+| -------------------------- | -------------------------------------------------------------------------- |
+| **305+ Languages**         | Pre-compiled parsers for 305+ programming languages                        |
+| **On-Demand Downloads**    | Parsers are downloaded on-demand and cached locally for fast reuse         |
+| **Selective Installation** | Download only the languages you need; unused parsers never downloaded      |
+| **Polyglot Bindings**      | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++     |
+| **Automatic Caching**      | Downloaded parsers cached in platform-specific directories for offline use |
+| **CLI Tool**               | `ts-pack download` to pre-download parsers for offline/CI/Docker use       |
 
 ## Supported Languages
 

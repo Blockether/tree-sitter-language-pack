@@ -1,6 +1,7 @@
 ---
 priority: critical
 ---
+
 # Grammar Compilation Standards
 
 - Tree-sitter grammars must compile to valid C sources before inclusion.

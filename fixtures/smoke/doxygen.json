@@ -1,16 +1,17 @@
 {
-	"id": "smoke_doxygen",
-	"description": "Smoke test: load doxygen and parse a simple snippet",
-	"category": "smoke",
-	"tags": ["smoke"],
-	"call": "parse",
-	"input": {
-		"language": "doxygen",
-		"source_code": "/** @brief A function */"
-	},
-	"assertions": [
-		{
-			"type": "not_error"
-		}
-	]
+  "id": "smoke_doxygen",
+  "description": "Smoke test: load doxygen and parse a simple snippet",
+  "category": "smoke",
+  "tags": ["smoke"],
+  "input": {
+    "source_code": "/** @brief A function */",
+    "config": {
+      "language": "doxygen"
+    }
+  },
+  "assertions": [
+    {
+      "type": "not_error"
+    }
+  ]
 }

@@ -1,6 +1,7 @@
 ---
 priority: high
 ---
+
 # Parser Testing Standards
 
 - Every included grammar must have at least one test file with representative syntax.

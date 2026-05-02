@@ -4,27 +4,27 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/ci-cli.yaml'
-      - '.cargo/config.toml'
-      - 'rust-toolchain.toml'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'crates/ts-pack-cli/**'
-      - 'crates/ts-pack-core/**'
-      - 'test_apps/cli/**'
-      - 'test_apps/fixtures/**'
+      - ".github/workflows/ci-cli.yaml"
+      - ".cargo/config.toml"
+      - "rust-toolchain.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "crates/ts-pack-cli/**"
+      - "crates/ts-pack-core/**"
+      - "test_apps/cli/**"
+      - "test_apps/fixtures/**"
   pull_request:
     branches: [main]
     paths:
-      - '.github/workflows/ci-cli.yaml'
-      - '.cargo/config.toml'
-      - 'rust-toolchain.toml'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'crates/ts-pack-cli/**'
-      - 'crates/ts-pack-core/**'
-      - 'test_apps/cli/**'
-      - 'test_apps/fixtures/**'
+      - ".github/workflows/ci-cli.yaml"
+      - ".cargo/config.toml"
+      - "rust-toolchain.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "crates/ts-pack-cli/**"
+      - "crates/ts-pack-core/**"
+      - "test_apps/cli/**"
+      - "test_apps/fixtures/**"
   workflow_run:
     workflows: ["Publish Release"]
     types: [completed]
