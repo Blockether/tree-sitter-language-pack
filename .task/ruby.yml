@@ -91,9 +91,5 @@ tasks:
 
   e2e:test:
     desc: Run Ruby E2E tests
-    dir: e2e/ruby
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - bundle install
-      - bundle exec rspec
+      - alef test --lang ruby --e2e --jobs 1

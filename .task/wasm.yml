@@ -68,9 +68,5 @@ tasks:
 
   e2e:test:
     desc: Run WASM E2E tests
-    dir: e2e/wasm
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - npm install
-      - npx vitest run
+      - alef test --lang wasm --e2e --jobs 1

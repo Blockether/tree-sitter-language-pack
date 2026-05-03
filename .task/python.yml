@@ -57,7 +57,7 @@ tasks:
     env:
       PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - cd e2e/python && TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg,wolfram uv run --project . --reinstall-package tree-sitter-language-pack pytest tests/ -q
+      - alef test --lang python --e2e --jobs 1
 
   e2e:verify:
     desc: Full Python E2E pipeline (generate + test)

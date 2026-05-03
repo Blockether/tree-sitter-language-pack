@@ -5,8 +5,8 @@
   "tags": ["download"],
   "call": "clean_cache",
   "skip": {
-    "languages": ["rust", "c", "wasm"],
-    "reason": "Download feature requires network access and is not available in static builds"
+    "languages": ["rust", "c", "wasm", "node"],
+    "reason": "Download feature requires network access and cache cleanup is covered by Rust unit tests"
   },
   "input": {},
   "assertions": [

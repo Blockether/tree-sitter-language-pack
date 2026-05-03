@@ -89,9 +89,5 @@ tasks:
 
   e2e:test:
     desc: Run Java E2E tests
-    deps: [build:ffi]
-    dir: e2e/java
-    env:
-      TSPACK_LIB_PATH: "{{.FFI_LIB_PATH}}"
     cmds:
-      - mvn test
+      - alef test --lang java --e2e --jobs 1

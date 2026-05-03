@@ -72,7 +72,5 @@ tasks:
 
   e2e:test:
     desc: Run TypeScript/Node E2E tests
-    dir: e2e/node
     cmds:
-      - pnpm install
-      - npx vitest run
+      - alef test --lang node --e2e --jobs 1

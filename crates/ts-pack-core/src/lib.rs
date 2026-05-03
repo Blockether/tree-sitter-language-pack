@@ -71,7 +71,7 @@ pub use download::DownloadManager;
 
 use std::sync::LazyLock;
 #[cfg(feature = "download")]
-use std::sync::RwLock;
+use std::sync::{Mutex, RwLock};
 
 static REGISTRY: LazyLock<LanguageRegistry> = LazyLock::new(LanguageRegistry::new);
 
@@ -80,6 +80,9 @@ static CACHE_REGISTERED: std::sync::atomic::AtomicBool = std::sync::atomic::Atom
 
 #[cfg(feature = "download")]
 static CUSTOM_CACHE_DIR: LazyLock<RwLock<Option<std::path::PathBuf>>> = LazyLock::new(|| RwLock::new(None));
+
+#[cfg(feature = "download")]
+static DOWNLOAD_CACHE_LOCK: Mutex<()> = Mutex::new(());
 
 /// Get a tree-sitter [`Language`] by name using the global registry.
 ///
@@ -105,21 +108,29 @@ static CUSTOM_CACHE_DIR: LazyLock<RwLock<Option<std::path::PathBuf>>> = LazyLock
 /// assert_eq!(tree.root_node().kind(), "module");
 /// ```
 pub fn get_language(name: &str) -> Result<Language, Error> {
-    // Fast path: check registry directly (no outer lock needed)
-    if let Ok(lang) = REGISTRY.get_language(name) {
-        return Ok(lang);
-    }
-    // Slow path: auto-download if feature enabled
     #[cfg(feature = "download")]
     {
+        let _cache_guard = DOWNLOAD_CACHE_LOCK
+            .lock()
+            .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        if let Ok(lang) = REGISTRY.get_language(name) {
+            return Ok(lang);
+        }
         ensure_cache_registered()?;
         let cache_dir = effective_cache_dir()?;
         let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
         dm.ensure_languages(&[name])?;
-        REGISTRY.get_language(name)
+        return REGISTRY.get_language(name);
     }
+
     #[cfg(not(feature = "download"))]
-    Err(Error::LanguageNotFound(name.to_string()))
+    {
+        // Fast path: check registry directly (no outer lock needed)
+        if let Ok(lang) = REGISTRY.get_language(name) {
+            return Ok(lang);
+        }
+        Err(Error::LanguageNotFound(name.to_string()))
+    }
 }
 
 /// Get a tree-sitter [`Parser`] pre-configured for the given language.
@@ -298,10 +309,13 @@ fn effective_cache_dir() -> Result<std::path::PathBuf, Error> {
 /// ```
 #[cfg(feature = "download")]
 pub fn init(config: &PackConfig) -> Result<(), Error> {
-    configure(config)?;
+    let _cache_guard = DOWNLOAD_CACHE_LOCK
+        .lock()
+        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+    configure_inner(config)?;
     if let Some(ref languages) = config.languages {
         let refs: Vec<&str> = languages.iter().map(String::as_str).collect();
-        download(&refs)?;
+        download_inner(&refs)?;
     }
     if let Some(ref groups) = config.groups {
         let cache_dir = effective_cache_dir()?;
@@ -340,6 +354,14 @@ pub fn init(config: &PackConfig) -> Result<(), Error> {
 /// ```
 #[cfg(feature = "download")]
 pub fn configure(config: &PackConfig) -> Result<(), Error> {
+    let _cache_guard = DOWNLOAD_CACHE_LOCK
+        .lock()
+        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+    configure_inner(config)
+}
+
+#[cfg(feature = "download")]
+fn configure_inner(config: &PackConfig) -> Result<(), Error> {
     if let Some(ref dir) = config.cache_dir {
         let mut custom = CUSTOM_CACHE_DIR
             .write()
@@ -374,6 +396,14 @@ pub fn configure(config: &PackConfig) -> Result<(), Error> {
 /// ```
 #[cfg(feature = "download")]
 pub fn download(names: &[&str]) -> Result<usize, Error> {
+    let _cache_guard = DOWNLOAD_CACHE_LOCK
+        .lock()
+        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+    download_inner(names)
+}
+
+#[cfg(feature = "download")]
+fn download_inner(names: &[&str]) -> Result<usize, Error> {
     ensure_cache_registered()?;
     let cache_dir = effective_cache_dir()?;
     let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
@@ -479,6 +509,9 @@ pub fn downloaded_languages() -> Vec<String> {
 /// ```
 #[cfg(feature = "download")]
 pub fn clean_cache() -> Result<(), Error> {
+    let _cache_guard = DOWNLOAD_CACHE_LOCK
+        .lock()
+        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
     let cache_dir = effective_cache_dir()?;
     let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
     dm.clean_cache()?;
