@@ -1,11 +1,11 @@
 {
-  "id": "injections_query_javascript",
-  "description": "get_injections_query returns non-empty for javascript (has embedded languages)",
+  "id": "injections_query_rust",
+  "description": "get_injections_query returns non-empty for rust",
   "category": "query",
   "tags": ["query", "injections"],
   "call": "injections",
   "input": {
-    "language": "javascript"
+    "language": "rust"
   },
   "assertions": [
     {

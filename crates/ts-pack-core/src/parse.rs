@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::sync::Mutex;
 
 use ahash::AHashMap;
 
@@ -7,6 +8,8 @@ use crate::Error;
 thread_local! {
     static PARSER_CACHE: RefCell<AHashMap<String, tree_sitter::Parser>> = RefCell::new(AHashMap::new());
 }
+
+static PARSE_LOCK: Mutex<()> = Mutex::new(());
 
 /// Parse source code with a pre-loaded `Language`, using the thread-local parser cache.
 ///
@@ -17,6 +20,10 @@ pub(crate) fn parse_with_language(
     language: &tree_sitter::Language,
     source: &[u8],
 ) -> Result<tree_sitter::Tree, Error> {
+    // Some third-party grammar scanner code keeps process-global mutable state.
+    // The public API remains safe for concurrent callers by serializing entry
+    // into parser execution while retaining thread-local parser instances.
+    let _guard = PARSE_LOCK.lock().map_err(|e| Error::LockPoisoned(e.to_string()))?;
     PARSER_CACHE.with(|cache| {
         let mut cache = cache.borrow_mut();
         if let Some(parser) = cache.get_mut(language_name) {

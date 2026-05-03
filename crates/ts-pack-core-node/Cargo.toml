@@ -15,7 +15,6 @@ crate-type = ["cdylib"]
 napi = { version = "3", features = ["async"] }
 napi-derive = "3"
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
 tree-sitter-language-pack = { path = "../ts-pack-core", features = ["download", "serde", "config"] }
 
 [build-dependencies]

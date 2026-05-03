@@ -1,14 +1,18 @@
 use ahash::{AHashMap, AHashSet};
 #[cfg(feature = "dynamic-loading")]
 use std::path::PathBuf;
+#[cfg(not(feature = "dynamic-loading"))]
+use std::sync::Mutex;
 #[cfg(feature = "dynamic-loading")]
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use tree_sitter::Language;
 
 use crate::error::Error;
 
 // Include the build.rs-generated language table
 include!(concat!(env!("OUT_DIR"), "/registry_generated.rs"));
+
+static LANGUAGE_LOAD_LOCK: Mutex<()> = Mutex::new(());
 
 /// Alternative names that resolve to an existing grammar.
 const LANGUAGE_ALIASES: &[(&str, &str)] = &[
@@ -120,16 +124,19 @@ mod dynamic {
 #[cfg(all(feature = "dynamic-loading", not(target_arch = "wasm32")))]
 mod dynamic {
     use std::collections::HashMap;
-    use std::path::PathBuf;
-    use std::sync::RwLock;
+    use std::path::{Path, PathBuf};
+    use std::sync::{LazyLock, RwLock};
     use tree_sitter::Language;
 
     use crate::error::Error;
 
+    static LOADED_LIBRARIES: LazyLock<RwLock<HashMap<PathBuf, libloading::Library>>> =
+        LazyLock::new(|| RwLock::new(HashMap::new()));
+
     /// Holds dynamically loaded libraries to keep them alive.
     /// The Library must outlive the Language since Language references code in the loaded library.
     pub(crate) struct DynamicLibs {
-        libs: HashMap<String, (libloading::Library, Language)>,
+        languages: HashMap<String, Language>,
     }
 
     pub(crate) struct DynamicLoader {
@@ -141,7 +148,9 @@ mod dynamic {
     impl DynamicLoader {
         pub(crate) fn new(libs_dir: PathBuf, dynamic_names: Vec<&'static str>) -> Self {
             Self {
-                inner: RwLock::new(DynamicLibs { libs: HashMap::new() }),
+                inner: RwLock::new(DynamicLibs {
+                    languages: HashMap::new(),
+                }),
                 libs_dir,
                 dynamic_names,
             }
@@ -149,12 +158,12 @@ mod dynamic {
 
         pub(crate) fn get_cached(&self, name: &str) -> Result<Option<Language>, Error> {
             let dynamic = self.inner.read().map_err(|e| Error::LockPoisoned(e.to_string()))?;
-            Ok(dynamic.libs.get(name).map(|(_, lang)| lang.clone()))
+            Ok(dynamic.languages.get(name).cloned())
         }
 
         pub(crate) fn cached_names(&self) -> Vec<String> {
             if let Ok(dynamic) = self.inner.read() {
-                dynamic.libs.keys().cloned().collect()
+                dynamic.languages.keys().cloned().collect()
             } else {
                 Vec::new()
             }
@@ -194,41 +203,66 @@ mod dynamic {
             self.load_from_path(name, &lib_path)
         }
 
-        fn load_from_path(&self, name: &str, lib_path: &std::path::Path) -> Result<Language, Error> {
+        fn load_from_path(&self, name: &str, lib_path: &Path) -> Result<Language, Error> {
             let mut dynamic = self.inner.write().map_err(|e| Error::LockPoisoned(e.to_string()))?;
 
             // Another thread may have loaded it between our read and write lock
-            if let Some((_, lang)) = dynamic.libs.get(name) {
+            if let Some(lang) = dynamic.languages.get(name) {
                 return Ok(lang.clone());
             }
 
             let func_name = format!("tree_sitter_{}", super::c_symbol_for(name));
+            let lib_key = lib_path.canonicalize().unwrap_or_else(|_| lib_path.to_path_buf());
+            let language = language_from_process_library(name, &func_name, &lib_key, lib_path)?;
 
-            // SAFETY: We are loading a known tree-sitter grammar shared library that exports
-            // a `tree_sitter_<name>` function returning a pointer to a TSLanguage struct.
-            let lib = unsafe { libloading::Library::new(lib_path) }
-                .map_err(|e| Error::DynamicLoad(format!("Failed to load library {}: {}", lib_path.display(), e)))?;
-
-            let language = unsafe {
-                let func: libloading::Symbol<unsafe extern "C" fn() -> *const tree_sitter::ffi::TSLanguage> =
-                    lib.get(func_name.as_bytes()).map_err(|e| {
-                        Error::DynamicLoad(format!(
-                            "Symbol '{}' not found in {}: {}",
-                            func_name,
-                            lib_path.display(),
-                            e
-                        ))
-                    })?;
-                let ptr = func();
-                if ptr.is_null() {
-                    return Err(Error::NullLanguagePointer(name.to_string()));
-                }
-                Language::from_raw(ptr)
-            };
-
-            dynamic.libs.insert(name.to_string(), (lib, language.clone()));
+            dynamic.languages.insert(name.to_string(), language.clone());
             Ok(language)
         }
+    }
+
+    fn language_from_process_library(
+        name: &str,
+        func_name: &str,
+        lib_key: &Path,
+        lib_path: &Path,
+    ) -> Result<Language, Error> {
+        let mut libraries = LOADED_LIBRARIES
+            .write()
+            .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+        if !libraries.contains_key(lib_key) {
+            // SAFETY: We load a tree-sitter grammar shared library from an explicit path
+            // selected by the registry/download cache and keep it in a process-wide map.
+            let lib = unsafe { libloading::Library::new(lib_path) }
+                .map_err(|e| Error::DynamicLoad(format!("Failed to load library {}: {}", lib_path.display(), e)))?;
+            libraries.insert(lib_key.to_path_buf(), lib);
+        }
+
+        let lib = libraries
+            .get(lib_key)
+            .ok_or_else(|| Error::DynamicLoad(format!("Loaded library {} missing from cache", lib_path.display())))?;
+        // SAFETY: The loaded library is kept alive for the process lifetime by LOADED_LIBRARIES,
+        // and tree-sitter grammars export `tree_sitter_<name>() -> *const TSLanguage`.
+        unsafe {
+            let func: libloading::Symbol<unsafe extern "C" fn() -> *const tree_sitter::ffi::TSLanguage> =
+                lib.get(func_name.as_bytes()).map_err(|e| {
+                    Error::DynamicLoad(format!(
+                        "Symbol '{}' not found in {}: {}",
+                        func_name,
+                        lib_path.display(),
+                        e
+                    ))
+                })?;
+            let ptr = func();
+            if ptr.is_null() {
+                return Err(Error::NullLanguagePointer(name.to_string()));
+            }
+            Ok(Language::from_raw(ptr))
+        }
+    }
+
+    #[cfg(test)]
+    pub(super) fn loaded_library_count_for_tests() -> usize {
+        LOADED_LIBRARIES.read().map(|libs| libs.len()).unwrap_or_default()
     }
 }
 
@@ -325,6 +359,9 @@ impl LanguageRegistry {
     /// Returns [`Error::LanguageNotFound`] if the name (after alias resolution)
     /// does not match any known grammar.
     pub fn get_language(&self, name: &str) -> Result<Language, Error> {
+        let _guard = LANGUAGE_LOAD_LOCK
+            .lock()
+            .map_err(|e| Error::LockPoisoned(e.to_string()))?;
         let name = resolve_alias(name);
         // Try static first
         if let Some(loader) = self.static_lookup.get(name) {
@@ -533,6 +570,83 @@ mod tests {
             assert!(registry.has_language(lang));
         }
         assert!(!registry.has_language("nonexistent_lang_xyz"));
+    }
+
+    #[cfg(all(feature = "dynamic-loading", not(target_arch = "wasm32")))]
+    #[test]
+    fn test_dynamic_language_survives_registry_drop() {
+        let language_name = {
+            let registry = LanguageRegistry::new();
+            let Some(name) = registry.dynamic_loader.dynamic_names.first() else {
+                return;
+            };
+            (*name).to_string()
+        };
+        let language = {
+            let registry = LanguageRegistry::new();
+            let Ok(language) = registry.get_language(&language_name) else {
+                return;
+            };
+            language
+        };
+
+        let mut parser = tree_sitter::Parser::new();
+        parser
+            .set_language(&language)
+            .expect("language should remain valid after registry drop");
+        let tree = parser.parse("x", None).expect("parser should work after registry drop");
+        assert!(tree.root_node().end_byte() <= 1);
+    }
+
+    #[cfg(all(feature = "dynamic-loading", not(target_arch = "wasm32")))]
+    #[test]
+    fn test_dynamic_library_is_loaded_once_across_registries() {
+        let registry = LanguageRegistry::new();
+        let Some(language_name) = registry.dynamic_loader.dynamic_names.first().copied() else {
+            return;
+        };
+        drop(registry);
+
+        let before = dynamic::loaded_library_count_for_tests();
+        let first = LanguageRegistry::new();
+        let first_language = first
+            .get_language(language_name)
+            .expect("first registry should load dynamic language");
+        let after_first = dynamic::loaded_library_count_for_tests();
+
+        let second = LanguageRegistry::new();
+        let second_language = second
+            .get_language(language_name)
+            .expect("second registry should reuse process-loaded dynamic library");
+        let after_second = dynamic::loaded_library_count_for_tests();
+
+        assert!(after_first >= before);
+        assert_eq!(after_first, after_second);
+        assert_eq!(first_language.abi_version(), second_language.abi_version());
+    }
+
+    #[test]
+    fn test_global_process_is_safe_from_multiple_threads() {
+        let languages: Vec<String> = ["python", "rust", "javascript", "go"]
+            .into_iter()
+            .filter(|name| crate::has_language(name))
+            .map(str::to_string)
+            .collect();
+        if languages.is_empty() {
+            return;
+        }
+
+        std::thread::scope(|scope| {
+            for language in &languages {
+                scope.spawn(move || {
+                    for _ in 0..16 {
+                        let config = ProcessConfig::new(language);
+                        let result = crate::process("x", &config).expect("process should be thread-safe");
+                        assert_eq!(result.language, *language);
+                    }
+                });
+            }
+        });
     }
 
     #[cfg(feature = "serde")]

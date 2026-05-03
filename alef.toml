@@ -1,20 +1,142 @@
-version = "0.13.10"
+[workspace]
+alef_version = "0.14.0"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
-[crate]
+[workspace.opaque_types]
+Language = "tree_sitter_language_pack::Language"
+Parser = "tree_sitter_language_pack::Parser"
+Tree = "tree_sitter_language_pack::Tree"
+
+[workspace.dto]
+python = "dataclass"
+python_output = "typed-dict"
+node = "interface"
+ruby = "struct"
+php = "readonly-class"
+go = "struct"
+java = "record"
+csharp = "record"
+
+[workspace.sync]
+extra_paths = [
+  "crates/ts-pack-core-node/package.json",
+  "crates/ts-pack-core-node/npm/*/package.json",
+]
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/node/package.json"
+search = '"@kreuzberg/tree-sitter-language-pack": "[^"]*"'
+replace = '"@kreuzberg/tree-sitter-language-pack": "{version}"'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/wasm/package.json"
+search = '"@kreuzberg/tree-sitter-language-pack-wasm": "[^"]*"'
+replace = '"@kreuzberg/tree-sitter-language-pack-wasm": "{version}"'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/java/pom.xml"
+search = "<version>{version}</version>"
+replace = "<version>{version}</version>"
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/csharp/TestApp.csproj"
+search = 'Include="TreeSitterLanguagePack" Version="[^"]*"'
+replace = 'Include="TreeSitterLanguagePack" Version="{version}"'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/go/go.mod"
+search = 'kreuzberg-dev/tree-sitter-language-pack/packages/go v[^\s]*'
+replace = 'kreuzberg-dev/tree-sitter-language-pack/packages/go v{version}'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/rust/Cargo.toml"
+search = 'tree-sitter-language-pack = \{ version = "[^"]*"'
+replace = 'tree-sitter-language-pack = { version = "{version}"'
+
+[[workspace.sync.text_replacements]]
+path = "test_apps/ruby/Gemfile"
+search = "gem 'tree_sitter_language_pack', '[^']*'"
+replace = "gem 'tree_sitter_language_pack', '{version}'"
+
+[[workspace.sync.text_replacements]]
+path = "packages/elixir/native/tree_sitter_language_pack_nif/Cargo.toml"
+search = '^version = "[^"]*"'
+replace = 'version = "{version}"'
+
+[[crates]]
 name = "tree-sitter-language-pack"
 core_import = "tree_sitter_language_pack"
 sources = ["crates/ts-pack-core/src/lib.rs"]
 version_from = "Cargo.toml"
 features = ["serde", "config", "download"]
 
-[[crate.source_crates]]
+[[crates.source_crates]]
 name = "tree-sitter-language-pack"
 sources = ["crates/ts-pack-core/src/lib.rs"]
 workspace_root = "."
 features = ["serde", "config", "download"]
 
-[include]
+[crates.python]
+module_name = "_native"
+pip_name = "tree-sitter-language-pack"
+release_gil = true
+
+[crates.python.stubs]
+output = "packages/python/tree_sitter_language_pack/"
+
+[crates.python.capsule_types]
+Language = "tree_sitter.Language"
+
+[crates.node]
+package_name = "@kreuzberg/tree-sitter-language-pack"
+
+[crates.ruby]
+gem_name = "tree_sitter_language_pack"
+exclude_functions = ["download", "download_all"]
+
+[crates.ruby.stubs]
+output = "packages/ruby/sig"
+
+[crates.php]
+extension_name = "tree_sitter_language_pack"
+
+[crates.elixir]
+app_name = "tree_sitter_language_pack"
+exclude_functions = ["download", "download_all"]
+
+[crates.wasm]
+env_shims = ["iswspace", "iswalnum", "towupper", "iswalpha"]
+features = ["serde", "config", "dynamic-loading"]
+
+[crates.ffi]
+prefix = "ts_pack"
+header_name = "ts_pack.h"
+lib_name = "ts_pack_core_ffi"
+
+[crates.go]
+module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
+package_name = "tspack"
+
+[crates.java]
+package = "dev.kreuzberg.treesitterlanguagepack"
+
+[crates.csharp]
+namespace = "TreeSitterLanguagePack"
+project_file = "packages/csharp/TreeSitterLanguagePack/TreeSitterLanguagePack.csproj"
+
+[crates.output]
+python = "crates/ts-pack-core-py/src/"
+node = "crates/ts-pack-core-node/src/"
+ruby = "packages/ruby/ext/ts_pack_core_rb/src/"
+php = "crates/ts-pack-core-php/src/"
+ffi = "crates/ts-pack-core-ffi/src/"
+go = "packages/go/"
+java = "packages/java/src/main/java/"
+csharp = "packages/csharp/"
+elixir = "packages/elixir/native/tree_sitter_language_pack_nif/src/"
+wasm = "crates/ts-pack-core-wasm/src/"
+
+[crates.include]
 types = [
   "ProcessConfig",
   "ProcessResult",
@@ -65,273 +187,123 @@ functions = [
   "cache_dir",
 ]
 
-[opaque_types]
-Language = "tree_sitter_language_pack::Language"
-Parser = "tree_sitter_language_pack::Parser"
-Tree = "tree_sitter_language_pack::Tree"
-
-[output]
-python = "crates/ts-pack-core-py/src/"
-node = "crates/ts-pack-core-node/src/"
-ruby = "packages/ruby/ext/ts_pack_core_rb/src/"
-php = "crates/ts-pack-core-php/src/"
-ffi = "crates/ts-pack-core-ffi/src/"
-go = "packages/go/"
-java = "packages/java/src/main/java/"
-csharp = "packages/csharp/"
-elixir = "packages/elixir/native/tree_sitter_language_pack_nif/src/"
-wasm = "crates/ts-pack-core-wasm/src/"
-
-[python]
-module_name = "_native"
-pip_name = "tree-sitter-language-pack"
-release_gil = true
-
-[python.stubs]
-output = "packages/python/tree_sitter_language_pack/"
-
-[python.capsule_types]
-Language = "tree_sitter.Language"
-
-[node]
-package_name = "@kreuzberg/tree-sitter-language-pack"
-
-[ffi]
-prefix = "ts_pack"
-header_name = "ts_pack.h"
-lib_name = "ts_pack_core_ffi"
-
-[go]
-module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
-package_name = "tspack"
-
-[java]
-package = "dev.kreuzberg.treesitterlanguagepack"
-
-[csharp]
-namespace = "TreeSitterLanguagePack"
-project_file = "packages/csharp/TreeSitterLanguagePack/TreeSitterLanguagePack.csproj"
-
-[elixir]
-app_name = "tree_sitter_language_pack"
-# alef-backend-rustler doesn't yet bridge `&[&str]` (it punts on Vec<String>+is_ref
-# in the serde-recovery path); exclude these download helpers until alef gains
-# slice-of-str support. They remain available in Python/Node/Ruby bindings.
-exclude_functions = ["download", "download_all"]
-
-[wasm]
-env_shims = ["iswspace", "iswalnum", "towupper", "iswalpha"]
-# wasm32-unknown-unknown cannot link the download feature stack: ureq pulls
-# getrandom (which needs the `js` feature) and zstd needs a C toolchain.
-# Keep dynamic-loading because alef-generated wasm wrappers reference
-# PackConfig::discover / LanguageRegistry::with_libs_dir which are gated
-# behind it.
-features = ["serde", "config", "dynamic-loading"]
-
-[ruby]
-gem_name = "tree_sitter_language_pack"
-# Same &[&str] limitation as the elixir nif — alef-backend-magnus emits
-# `download(&names_refs)` but never declares `names_refs`. Exclude until
-# alef gains slice-of-str support.
-exclude_functions = ["download", "download_all"]
-
-[ruby.stubs]
-output = "packages/ruby/sig"
-
-[php]
-extension_name = "tree_sitter_language_pack"
-
-[scaffold]
-description = "Pre-compiled tree-sitter grammars for 305 programming languages"
-license = "MIT"
-repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
-authors = ["Kreuzberg Team"]
-keywords = ["tree-sitter", "parser", "syntax", "language-pack"]
-
-# Opt in to alef-managed workspace .cargo/config.toml. Empty section uses
-# canonical defaults (6-target template + macOS dynamic_lookup rustflag).
-[scaffold.cargo]
-
-[dto]
-python = "dataclass"
-python_output = "typed-dict"
-node = "interface"
-ruby = "struct"
-php = "readonly-class"
-go = "struct"
-java = "record"
-csharp = "record"
-
-[readme]
-snippets_dir = "docs/snippets"
-discord_url = "https://discord.gg/xt9WY3GnKR"
-banner_url = "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8"
-
-[sync]
-extra_paths = [
-  "crates/ts-pack-core-node/package.json",
-  "crates/ts-pack-core-node/npm/*/package.json",
-]
-
-[[sync.text_replacements]]
-path = "test_apps/node/package.json"
-search = '"@kreuzberg/tree-sitter-language-pack": "[^"]*"'
-replace = '"@kreuzberg/tree-sitter-language-pack": "{version}"'
-
-[[sync.text_replacements]]
-path = "test_apps/wasm/package.json"
-search = '"@kreuzberg/tree-sitter-language-pack-wasm": "[^"]*"'
-replace = '"@kreuzberg/tree-sitter-language-pack-wasm": "{version}"'
-
-[[sync.text_replacements]]
-path = "test_apps/java/pom.xml"
-search = "<version>{version}</version>"
-replace = "<version>{version}</version>"
-
-[[sync.text_replacements]]
-path = "test_apps/csharp/TestApp.csproj"
-search = 'Include="TreeSitterLanguagePack" Version="[^"]*"'
-replace = 'Include="TreeSitterLanguagePack" Version="{version}"'
-
-[[sync.text_replacements]]
-path = "test_apps/go/go.mod"
-search = 'kreuzberg-dev/tree-sitter-language-pack/packages/go v[^\s]*'
-replace = 'kreuzberg-dev/tree-sitter-language-pack/packages/go v{version}'
-
-[[sync.text_replacements]]
-path = "test_apps/rust/Cargo.toml"
-search = 'tree-sitter-language-pack = \{ version = "[^"]*"'
-replace = 'tree-sitter-language-pack = { version = "{version}"'
-
-[[sync.text_replacements]]
-path = "test_apps/ruby/Gemfile"
-search = "gem 'tree_sitter_language_pack', '[^']*'"
-replace = "gem 'tree_sitter_language_pack', '{version}'"
-
-[[sync.text_replacements]]
-path = "packages/elixir/native/tree_sitter_language_pack_nif/Cargo.toml"
-search = '^version = "[^"]*"'
-replace = 'version = "{version}"'
-
-[lint.python]
+[crates.lint.python]
 precondition = "command -v ruff >/dev/null 2>&1"
 before = "uv sync --no-install-project"
 format = "uv run --no-sync ruff check --fix --select I packages/python scripts && uv run --no-sync ruff format packages/python scripts"
 check = "uv run --no-sync ruff check packages/python scripts && uv run --no-sync ruff format --check packages/python scripts"
 
-[lint.node]
+[crates.lint.node]
 precondition = "command -v npx >/dev/null 2>&1"
 format = "npx oxfmt packages/typescript"
 check = "npx oxlint packages/typescript"
 
-[lint.wasm]
+[crates.lint.wasm]
 precondition = "command -v npx >/dev/null 2>&1"
 format = "npx oxfmt packages/wasm"
 check = "npx oxlint packages/wasm"
 
-[lint.php]
+[crates.lint.php]
 precondition = "command -v php >/dev/null 2>&1"
 format = "cd packages/php && PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config php-cs-fixer.php src"
 check = "cd packages/php && PHP_CS_FIXER_IGNORE_ENV=1 php vendor/bin/php-cs-fixer fix --config php-cs-fixer.php --dry-run src"
 
-[lint.ruby]
+[crates.lint.ruby]
 precondition = "command -v bundle >/dev/null 2>&1"
 before = "cd packages/ruby && bundle install"
 format = "cd packages/ruby && bundle exec rubocop -a ."
 
-[lint.go]
+[crates.lint.go]
 precondition = "command -v golangci-lint >/dev/null 2>&1"
 before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-ffi"
 
-[lint.elixir]
+[crates.lint.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
 before = "cd packages/elixir && mix deps.get"
 check = "cd packages/elixir && mix credo"
 
-[lint.java]
+[crates.lint.java]
 precondition = "command -v mvn >/dev/null 2>&1"
 format = "mvn --batch-mode -f packages/java/pom.xml spotless:apply -q"
 check = "mvn -f packages/java/pom.xml spotless:check -q"
 
-[lint.ffi]
+[crates.lint.ffi]
 precondition = "test -d crates/ts-pack-core-ffi/src"
 
-[test.python]
+[crates.test.python]
 precondition = "command -v ruff >/dev/null 2>&1"
 before = "maturin develop --manifest-path crates/ts-pack-core-py/Cargo.toml"
 command = "cd packages/python && python -m pytest"
-e2e = "cd e2e/python && python3 -m pytest tests/ -q"
+e2e = "cd e2e/python && TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg,wolfram uv run --project . --reinstall-package tree-sitter-language-pack pytest tests/ -q"
 
-[test.node]
+[crates.test.node]
 precondition = "command -v npx >/dev/null 2>&1"
 command = "cd crates/ts-pack-core-node && node -e \"const m = require('./'); console.log('OK:', m.availableLanguages().length)\""
-e2e = "cd e2e/typescript && npx vitest run"
+e2e = "cd e2e/node && npx vitest run"
 
-[test.go]
+[crates.test.go]
 precondition = "command -v go >/dev/null 2>&1"
 before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-ffi"
 command = "cd packages/go && go test -tags tspack_dev -v ./..."
 e2e = "cd e2e/go && go test ./... -count=1"
 
-[test.ruby]
+[crates.test.ruby]
 before = "cd packages/ruby && bundle exec rake compile"
 
-[test.php]
+[crates.test.php]
 precondition = "command -v php >/dev/null 2>&1"
 before = "cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml"
 
-[test.java]
+[crates.test.java]
 precondition = "command -v mvn >/dev/null 2>&1"
 before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-ffi"
 command = "cd packages/java && mvn test"
 
-[test.csharp]
+[crates.test.csharp]
 precondition = "command -v dotnet >/dev/null 2>&1"
 before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-ffi"
 command = "cd packages/csharp && dotnet test -c Release"
 
-[test.elixir]
+[crates.test.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
 e2e = "cd e2e/elixir && mix test"
 
-[test.wasm]
+[crates.test.wasm]
 precondition = "command -v npx >/dev/null 2>&1"
 e2e = "cd e2e/wasm && npm test"
 
-[test.rust]
+[crates.test.rust]
 precondition = "command -v cargo >/dev/null 2>&1"
 e2e = "cd e2e/rust && cargo test"
 
-[test.c]
+[crates.test.c]
 precondition = "command -v make >/dev/null 2>&1"
 e2e = "cd e2e/c && make clean && make && DYLD_LIBRARY_PATH=../../target/release ./test_runner"
 
-# Override node setup: the Node.js package lives in packages/typescript, not packages/node
-[setup.node]
+[crates.setup.node]
 precondition = "command -v pnpm >/dev/null 2>&1"
 install = "cd packages/typescript && pnpm install"
 
-# E2E test generation configuration
-[publish]
+[crates.publish]
 core_crate = "crates/ts-pack-core"
 
-[publish.languages.ruby]
+[crates.publish.languages.ruby]
 vendor_mode = "core-only"
 
-[publish.languages.elixir]
+[crates.publish.languages.elixir]
 vendor_mode = "core-only"
 nif_versions = ["2.16", "2.17"]
 
-[publish.languages.ffi]
+[crates.publish.languages.ffi]
 pkg_config = true
 cmake_config = true
 
-[e2e]
+[crates.e2e]
 fixtures = "fixtures"
 output = "e2e"
-fields_array = ["chunks"]
+fields_array = ["chunks", "imports", "structure"]
 
-[e2e.call]
+[crates.e2e.call]
 function = "process"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -341,31 +313,31 @@ args = [
   { name = "config", field = "config", type = "json_object" },
 ]
 
-[e2e.call.overrides.rust]
+[crates.e2e.call.overrides.rust]
 crate_name = "tree_sitter_language_pack"
 function = "process"
 
-[e2e.call.overrides.python]
+[crates.e2e.call.overrides.python]
 module = "tree_sitter_language_pack"
 function = "process"
 
-[e2e.call.overrides.node]
+[crates.e2e.call.overrides.node]
 module = "@kreuzberg/tree-sitter-language-pack"
 function = "process"
 
-[e2e.call.overrides.go]
+[crates.e2e.call.overrides.go]
 module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 function = "Process"
 alias = "tspack"
 options_type = "ProcessConfig"
 
-[e2e.call.overrides.java]
+[crates.e2e.call.overrides.java]
 class = "dev.kreuzberg.treesitterlanguagepack.TreeSitterLanguagePack"
 
-[e2e.call.overrides.csharp]
+[crates.e2e.call.overrides.csharp]
 class = "TreeSitterLanguagePack"
 
-[e2e.calls.detect_extension]
+[crates.e2e.calls.detect_extension]
 function = "detect_language_from_extension"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -373,7 +345,7 @@ result_is_simple = true
 result_is_option = true
 args = [{ name = "ext", field = "extension", type = "string" }]
 
-[e2e.calls.detect_path]
+[crates.e2e.calls.detect_path]
 function = "detect_language_from_path"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -381,7 +353,7 @@ result_is_simple = true
 result_is_option = true
 args = [{ name = "path", field = "path", type = "string" }]
 
-[e2e.calls.detect_content]
+[crates.e2e.calls.detect_content]
 function = "detect_language_from_content"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -389,14 +361,14 @@ result_is_simple = true
 result_is_option = true
 args = [{ name = "content", field = "content", type = "string" }]
 
-[e2e.calls.has_language]
+[crates.e2e.calls.has_language]
 function = "has_language"
 module = "tree_sitter_language_pack"
 result_var = "result"
 result_is_simple = true
 args = [{ name = "name", field = "language", type = "string" }]
 
-[e2e.calls.list_languages]
+[crates.e2e.calls.list_languages]
 function = "available_languages"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -404,7 +376,7 @@ result_is_simple = true
 result_is_array = true
 args = []
 
-[e2e.calls.highlights]
+[crates.e2e.calls.highlights]
 function = "get_highlights_query"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -412,7 +384,7 @@ result_is_simple = true
 result_is_option = true
 args = [{ name = "language", field = "language", type = "string" }]
 
-[e2e.calls.injections]
+[crates.e2e.calls.injections]
 function = "get_injections_query"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -420,7 +392,7 @@ result_is_simple = true
 result_is_option = true
 args = [{ name = "language", field = "language", type = "string" }]
 
-[e2e.calls.locals]
+[crates.e2e.calls.locals]
 function = "get_locals_query"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -428,28 +400,28 @@ result_is_simple = true
 result_is_option = true
 args = [{ name = "language", field = "language", type = "string" }]
 
-[e2e.calls.language_count]
+[crates.e2e.calls.language_count]
 function = "language_count"
 module = "tree_sitter_language_pack"
 result_var = "result"
 result_is_simple = true
 args = []
 
-[e2e.calls.get_language]
+[crates.e2e.calls.get_language]
 function = "get_language"
 module = "tree_sitter_language_pack"
 result_var = "language"
 returns_result = true
 args = [{ name = "name", field = "language", type = "string" }]
 
-[e2e.calls.get_parser]
+[crates.e2e.calls.get_parser]
 function = "get_parser"
 module = "tree_sitter_language_pack"
 result_var = "parser"
 returns_result = true
 args = [{ name = "name", field = "language", type = "string" }]
 
-[e2e.calls.init_pack]
+[crates.e2e.calls.init_pack]
 function = "init"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -457,10 +429,10 @@ args = [{ name = "config", field = "config", type = "json_object" }]
 returns_result = true
 returns_void = true
 
-[e2e.calls.init_pack.overrides.go]
+[crates.e2e.calls.init_pack.overrides.go]
 options_type = "PackConfig"
 
-[e2e.calls.configure_pack]
+[crates.e2e.calls.configure_pack]
 function = "configure"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -468,10 +440,10 @@ args = [{ name = "config", field = "config", type = "json_object" }]
 returns_result = true
 returns_void = true
 
-[e2e.calls.configure_pack.overrides.go]
+[crates.e2e.calls.configure_pack.overrides.go]
 options_type = "PackConfig"
 
-[e2e.calls.download_languages]
+[crates.e2e.calls.download_languages]
 function = "download"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -479,7 +451,7 @@ returns_result = true
 result_is_simple = true
 args = [{ name = "names", field = "languages", type = "json_object", element_type = "String" }]
 
-[e2e.calls.download_all_languages]
+[crates.e2e.calls.download_all_languages]
 function = "download_all"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -487,7 +459,7 @@ returns_result = true
 result_is_simple = true
 args = []
 
-[e2e.calls.manifest_languages]
+[crates.e2e.calls.manifest_languages]
 function = "manifest_languages"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -496,7 +468,7 @@ result_is_simple = true
 result_is_array = true
 args = []
 
-[e2e.calls.downloaded_languages]
+[crates.e2e.calls.downloaded_languages]
 function = "downloaded_languages"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -504,7 +476,7 @@ result_is_simple = true
 result_is_array = true
 args = []
 
-[e2e.calls.clean_cache]
+[crates.e2e.calls.clean_cache]
 function = "clean_cache"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -512,7 +484,7 @@ returns_result = true
 returns_void = true
 args = []
 
-[e2e.calls.cache_dir]
+[crates.e2e.calls.cache_dir]
 function = "cache_dir"
 module = "tree_sitter_language_pack"
 result_var = "result"
@@ -520,52 +492,65 @@ returns_result = true
 result_is_simple = true
 args = []
 
-[e2e.packages.rust]
+[crates.e2e.packages.rust]
 path = "../../crates/ts-pack-core"
 
-[e2e.packages.python]
+[crates.e2e.packages.python]
 name = "tree-sitter-language-pack"
 path = "../../packages/python"
 
-[e2e.packages.node]
+[crates.e2e.packages.node]
 name = "@kreuzberg/tree-sitter-language-pack"
 path = "../../crates/ts-pack-node"
 
-[e2e.packages.go]
+[crates.e2e.packages.go]
 module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 path = "../../packages/go"
 version = "v0.0.0"
 
-[e2e.format]
+[crates.e2e.format]
 python = "ruff check --fix {dir} && ruff format {dir}"
 go = "gofmt -w {dir}"
 rust = "(cd {dir} && cargo fmt --all)"
 
-# Registry-mode test apps (standalone, use published packages)
-[e2e.registry]
+[crates.e2e.registry]
 output = "test_apps"
 
-[e2e.registry.packages.rust]
+[crates.e2e.registry.packages.rust]
 name = "tree-sitter-language-pack"
 
-[e2e.registry.packages.python]
+[crates.e2e.registry.packages.python]
 name = "tree-sitter-language-pack"
 
-[e2e.registry.packages.node]
+[crates.e2e.registry.packages.node]
 name = "@kreuzberg/tree-sitter-language-pack"
 
-[e2e.registry.packages.go]
+[crates.e2e.registry.packages.go]
 module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 
-[e2e.registry.packages.java]
+[crates.e2e.registry.packages.java]
 group_id = "dev.kreuzberg.treesitterlanguagepack"
 artifact_id = "tree-sitter-language-pack"
 
-[e2e.registry.packages.csharp]
+[crates.e2e.registry.packages.csharp]
 name = "TreeSitterLanguagePack"
 
-[e2e.registry.packages.ruby]
+[crates.e2e.registry.packages.ruby]
 name = "tree_sitter_language_pack"
 
-[e2e.registry.packages.wasm]
+[crates.e2e.registry.packages.wasm]
 name = "@kreuzberg/tree-sitter-language-pack-wasm"
+
+[crates.scaffold]
+description = "Pre-compiled tree-sitter grammars for 305 programming languages"
+license = "MIT"
+repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
+authors = ["Kreuzberg Team"]
+keywords = ["tree-sitter", "parser", "syntax", "language-pack"]
+
+[crates.scaffold.cargo]
+
+[crates.readme]
+snippets_dir = "docs/snippets"
+discord_url = "https://discord.gg/xt9WY3GnKR"
+banner_url = "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8"
