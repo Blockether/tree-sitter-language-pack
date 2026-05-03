@@ -1,5 +1,5 @@
 {
-  "name": "@kreuzberg/tree-sitter-language-pack-e2e-typescript",
+  "name": "@kreuzberg/tree-sitter-language-pack-e2e",
   "version": "0.1.0",
   "private": true,
   "type": "module",
