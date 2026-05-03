@@ -13,7 +13,7 @@ composer require kreuzberg-dev/tree-sitter-language-pack
 ```php
 <?php
 
-use ts_pack_core_php;
+use tree_sitter_language_pack;
 
 // See https://github.com/kreuzberg-dev/tree-sitter-language-pack for usage examples.
 ```

@@ -194,14 +194,14 @@ format = "uv run --no-sync ruff check --fix --select I packages/python scripts &
 check = "uv run --no-sync ruff check packages/python scripts && uv run --no-sync ruff format --check packages/python scripts"
 
 [crates.lint.node]
-precondition = "command -v npx >/dev/null 2>&1"
-format = "npx oxfmt packages/typescript"
-check = "npx oxlint packages/typescript"
+precondition = "command -v pnpm >/dev/null 2>&1"
+format = "pnpm dlx oxfmt packages/typescript"
+check = "pnpm dlx oxlint packages/typescript"
 
 [crates.lint.wasm]
-precondition = "command -v npx >/dev/null 2>&1"
-format = "npx oxfmt packages/wasm"
-check = "npx oxlint packages/wasm"
+precondition = "command -v pnpm >/dev/null 2>&1"
+format = "pnpm dlx oxfmt packages/wasm"
+check = "pnpm dlx oxlint packages/wasm"
 
 [crates.lint.php]
 precondition = "command -v php >/dev/null 2>&1"
@@ -270,8 +270,8 @@ precondition = "command -v mix >/dev/null 2>&1"
 e2e = "cd e2e/elixir && mix test"
 
 [crates.test.wasm]
-precondition = "command -v npx >/dev/null 2>&1"
-e2e = "cd e2e/wasm && npm test"
+precondition = "command -v pnpm >/dev/null 2>&1"
+e2e = "cd e2e/wasm && pnpm test"
 
 [crates.test.rust]
 precondition = "command -v cargo >/dev/null 2>&1"
@@ -524,6 +524,8 @@ path = "../../packages/elixir"
 python = "ruff check --fix {dir} && ruff format {dir}"
 go = "gofmt -w {dir}"
 rust = "(cd {dir} && cargo fmt --all)"
+node = "pnpm dlx oxfmt {dir}"
+wasm = "pnpm dlx oxfmt {dir}"
 
 [crates.e2e.registry]
 output = "test_apps"
