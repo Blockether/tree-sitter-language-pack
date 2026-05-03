@@ -2316,7 +2316,6 @@ dependencies = [
  "napi-build",
  "napi-derive",
  "serde",
- "serde_json",
  "tree-sitter-language-pack",
 ]
 
