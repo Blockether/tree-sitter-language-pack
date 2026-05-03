@@ -101,11 +101,5 @@ tasks:
 
   e2e:test:
     desc: Run C# E2E tests
-    deps: [build:ffi]
-    dir: e2e/csharp
-    env:
-      TSPACK_FFI_DIR: "{{.FFI_LIB_PATH}}"
-      LD_LIBRARY_PATH: "{{.PROJECT_ROOT}}/target/release:${LD_LIBRARY_PATH:-}"
-      DYLD_LIBRARY_PATH: "{{.PROJECT_ROOT}}/target/release:${DYLD_LIBRARY_PATH:-}"
     cmds:
-      - dotnet test -c Release
+      - alef test --lang csharp --e2e --jobs 1

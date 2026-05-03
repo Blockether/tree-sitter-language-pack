@@ -14,7 +14,7 @@ Complete analysis result from processing a source file.
 
 Contains metrics, structural analysis, imports/exports, comments,
 docstrings, symbols, diagnostics, and optionally chunked code segments.
-Fields are populated based on the `crate.ProcessConfig` flags.
+Fields are populated based on the `ProcessConfig` flags.
 
 | Field         | Type                 | Default  | Description                        |
 | ------------- | -------------------- | -------- | ---------------------------------- |
@@ -255,7 +255,7 @@ Thread-safe registry of tree-sitter language parsers.
 Manages both statically compiled and dynamically loaded language grammars.
 Use `LanguageRegistry.new()` for the default registry, or access the
 global instance via the module-level convenience functions
-(`crate.get_language`, `crate.available_languages`, etc.).
+(`get_language`, `available_languages`, etc.).
 
 _Opaque type — fields are not directly accessible._
 

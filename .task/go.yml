@@ -93,9 +93,5 @@ tasks:
 
   e2e:test:
     desc: Run Go E2E tests
-    deps: [build:ffi]
-    dir: e2e/go
-    env:
-      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
     cmds:
-      - go test -tags tspack_dev -v ./...
+      - alef test --lang go --e2e --jobs 1

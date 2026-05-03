@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.14.0"
+alef_version = "0.14.2"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [workspace.opaque_types]
@@ -237,9 +237,10 @@ command = "cd packages/python && python -m pytest"
 e2e = "cd e2e/python && TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg,wolfram uv run --project . --reinstall-package tree-sitter-language-pack pytest tests/ -q"
 
 [crates.test.node]
-precondition = "command -v npx >/dev/null 2>&1"
+precondition = "command -v node >/dev/null 2>&1 && command -v pnpm >/dev/null 2>&1 && command -v napi >/dev/null 2>&1"
+before = "cd crates/ts-pack-core-node && TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg,wolfram napi build --release"
 command = "cd crates/ts-pack-core-node && node -e \"const m = require('./'); console.log('OK:', m.availableLanguages().length)\""
-e2e = "cd e2e/node && npx vitest run"
+e2e = "cd e2e/node && pnpm install && node ./node_modules/vitest/vitest.mjs run --fileParallelism=false"
 
 [crates.test.go]
 precondition = "command -v go >/dev/null 2>&1"

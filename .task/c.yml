@@ -43,7 +43,5 @@ tasks:
 
   e2e:test:
     desc: Run C E2E tests
-    deps: [e2e:build]
-    dir: e2e/c/build
     cmds:
-      - ctest --output-on-failure
+      - alef test --lang c --e2e --jobs 1

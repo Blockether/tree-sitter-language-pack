@@ -3,6 +3,8 @@ use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
+use std::thread;
+use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -10,6 +12,8 @@ use sha2::{Digest, Sha256};
 use crate::error::Error;
 
 const GITHUB_RELEASE_BASE: &str = "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download";
+const CACHE_REMOVE_RETRIES: usize = 5;
+const CACHE_REMOVE_RETRY_DELAY: Duration = Duration::from_millis(10);
 
 /// Manifest describing available parser downloads for a specific version.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -386,11 +390,19 @@ impl DownloadManager {
     }
 
     fn remove_dir_if_exists(path: &Path) -> Result<(), Error> {
-        match fs::remove_dir_all(path) {
-            Ok(()) => Ok(()),
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
-            Err(error) => Err(error.into()),
+        for attempt in 0..=CACHE_REMOVE_RETRIES {
+            match fs::remove_dir_all(path) {
+                Ok(()) => return Ok(()),
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+                Err(error)
+                    if error.kind() == std::io::ErrorKind::DirectoryNotEmpty && attempt < CACHE_REMOVE_RETRIES =>
+                {
+                    thread::sleep(CACHE_REMOVE_RETRY_DELAY);
+                }
+                Err(error) => return Err(error.into()),
+            }
         }
+        Ok(())
     }
 
     fn remove_file_if_exists(path: &Path) -> Result<(), Error> {
