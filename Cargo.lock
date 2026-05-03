@@ -2280,6 +2280,7 @@ dependencies = [
  "serde_json",
  "sha2 0.11.0",
  "tar",
+ "tempfile",
  "thiserror",
  "toml 1.1.2+spec-1.1.0",
  "tree-sitter",

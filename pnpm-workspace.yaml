@@ -1,4 +1,4 @@
 packages:
   - "."
-  - "crates/ts-pack-node"
-  - "e2e/typescript"
+  - "crates/ts-pack-core-node"
+  - "e2e/node"

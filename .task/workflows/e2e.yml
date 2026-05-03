@@ -21,31 +21,31 @@ tasks:
     cmds:
       # Build the C ABI artifact most language bindings depend on.
       - cargo build --release -p ts-pack-core-ffi
-      - task: rust:e2e:test
-      - task: python:e2e:test
-      - task: node:e2e:test
-      - task: go:e2e:test
-      - task: java:e2e:test
-      - task: csharp:e2e:test
-      - task: ruby:e2e:test
-      - task: php:e2e:test
-      - task: elixir:e2e:test
-      - task: wasm:e2e:test
-      - task: c:e2e:test
+      - task rust:e2e:test
+      - task python:e2e:test
+      - task node:e2e:test
+      - task go:e2e:test
+      - task java:e2e:test
+      - task csharp:e2e:test
+      - task ruby:e2e:test
+      - task php:e2e:test
+      - task elixir:e2e:test
+      - task wasm:e2e:test
+      - task c:e2e:test
 
   test:quick:
     desc: Quick E2E test (Rust only — fastest feedback)
     cmds:
-      - task: rust:e2e:test
+      - task rust:e2e:test
 
   verify:all:
     desc: Full E2E pipeline — generate, lint, and test all suites
     cmds:
-      - task: generate:all
-      - task: lint:all
-      - task: test:all
+      - task _e2e_wf:generate:all
+      - task _e2e_wf:lint:all
+      - task _e2e_wf:test:all
 
   lint:all:
     desc: Lint all generated E2E test code
     cmds:
-      - task: rust:e2e:format
+      - task rust:e2e:format

@@ -242,26 +242,24 @@ impl DownloadManager {
 
     /// Return the cache path for a verified platform bundle archive.
     fn bundle_cache_path(&self, platform_key: &str, sha256: &str) -> Result<PathBuf, Error> {
-        let version_cache_dir = self
-            .cache_dir
-            .parent()
-            .ok_or_else(|| Error::Download("Cache directory has no parent".to_string()))?;
-        Ok(version_cache_dir
+        Ok(self
+            .version_cache_dir()?
             .join("bundles")
             .join(format!("{platform_key}-{sha256}.tar.zst")))
+    }
+
+    fn version_cache_dir(&self) -> Result<&Path, Error> {
+        self.cache_dir
+            .parent()
+            .ok_or_else(|| Error::Download("Cache directory has no parent".to_string()))
     }
 
     /// Load a verified platform bundle from cache, or download and cache it.
     fn load_or_download_bundle(&self, platform_key: &str, bundle: &PlatformBundle) -> Result<Vec<u8>, Error> {
         let cache_path = self.bundle_cache_path(platform_key, &bundle.sha256)?;
 
-        if cache_path.exists() {
-            let data = fs::read(&cache_path)?;
-            let actual_hash = Self::sha256_hex(&data);
-            if actual_hash == bundle.sha256 {
-                return Ok(data);
-            }
-            fs::remove_file(&cache_path)?;
+        if let Some(data) = Self::load_verified_cached_bundle(&cache_path, &bundle.sha256)? {
+            return Ok(data);
         }
 
         let data = self.download_bundle(&bundle.url)?;
@@ -279,6 +277,21 @@ impl DownloadManager {
         }
         fs::write(cache_path, &data)?;
         Ok(data)
+    }
+
+    fn load_verified_cached_bundle(cache_path: &Path, expected_sha256: &str) -> Result<Option<Vec<u8>>, Error> {
+        if !cache_path.exists() {
+            return Ok(None);
+        }
+
+        let data = fs::read(cache_path)?;
+        let actual_hash = Self::sha256_hex(&data);
+        if actual_hash == expected_sha256 {
+            return Ok(Some(data));
+        }
+
+        fs::remove_file(cache_path)?;
+        Ok(None)
     }
 
     /// Download a bundle archive from the given URL.
@@ -363,10 +376,29 @@ impl DownloadManager {
 
     /// Remove all cached parser libraries.
     pub fn clean_cache(&self) -> Result<(), Error> {
-        if self.cache_dir.exists() {
-            fs::remove_dir_all(&self.cache_dir)?;
-        }
+        Self::remove_dir_if_exists(&self.cache_dir)?;
+        let version_cache_dir = self.version_cache_dir()?;
+        let bundle_dir = version_cache_dir.join("bundles");
+        Self::remove_dir_if_exists(&bundle_dir)?;
+        let manifest_path = version_cache_dir.join("manifest.json");
+        Self::remove_file_if_exists(&manifest_path)?;
         Ok(())
+    }
+
+    fn remove_dir_if_exists(path: &Path) -> Result<(), Error> {
+        match fs::remove_dir_all(path) {
+            Ok(()) => Ok(()),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            Err(error) => Err(error.into()),
+        }
+    }
+
+    fn remove_file_if_exists(path: &Path) -> Result<(), Error> {
+        match fs::remove_file(path) {
+            Ok(()) => Ok(()),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            Err(error) => Err(error.into()),
+        }
     }
 
     /// Compute SHA-256 hex digest.
@@ -406,16 +438,19 @@ impl DownloadManager {
 
 #[cfg(test)]
 mod tests {
-    use std::time::{SystemTime, UNIX_EPOCH};
+    use std::sync::Arc;
 
     use super::*;
 
-    fn temp_cache_dir(test_name: &str) -> PathBuf {
-        let nanos = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("system clock should be after UNIX_EPOCH")
-            .as_nanos();
-        std::env::temp_dir().join(format!("tslp-{test_name}-{nanos}"))
+    fn temp_cache_dir() -> tempfile::TempDir {
+        tempfile::Builder::new()
+            .prefix("tslp-cache-")
+            .tempdir()
+            .expect("temporary cache directory should be created")
+    }
+
+    fn manager_for_temp_dir(temp_dir: &tempfile::TempDir) -> DownloadManager {
+        DownloadManager::with_cache_dir("test", temp_dir.path().join("libs"))
     }
 
     fn compressed_tar(entries: &[(&str, &[u8])]) -> Vec<u8> {
@@ -438,8 +473,9 @@ mod tests {
 
     #[test]
     fn bundle_cache_path_uses_version_cache_dir() {
-        let cache_dir = temp_cache_dir("bundle-path").join("libs");
-        let manager = DownloadManager::with_cache_dir("test", cache_dir.clone());
+        let temp_dir = temp_cache_dir();
+        let cache_dir = temp_dir.path().join("libs");
+        let manager = manager_for_temp_dir(&temp_dir);
 
         let path = manager
             .bundle_cache_path("macos-arm64", "abc123")
@@ -449,13 +485,48 @@ mod tests {
             path,
             cache_dir.parent().unwrap().join("bundles/macos-arm64-abc123.tar.zst")
         );
-        let _ = fs::remove_dir_all(cache_dir.parent().unwrap());
+    }
+
+    #[test]
+    fn verified_bundle_cache_returns_matching_archive_bytes() {
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+        let data = b"verified archive bytes";
+        let sha256 = DownloadManager::sha256_hex(data);
+        let cache_path = manager
+            .bundle_cache_path("macos-arm64", &sha256)
+            .expect("bundle cache path should resolve");
+        fs::create_dir_all(cache_path.parent().unwrap()).expect("bundle cache directory should be created");
+        fs::write(&cache_path, data).expect("bundle cache file should be written");
+
+        let cached = DownloadManager::load_verified_cached_bundle(&cache_path, &sha256)
+            .expect("verified cache read should succeed");
+
+        assert_eq!(cached, Some(data.to_vec()));
+        assert!(cache_path.exists());
+    }
+
+    #[test]
+    fn verified_bundle_cache_removes_hash_mismatch() {
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+        let cache_path = manager
+            .bundle_cache_path("macos-arm64", "expected-hash")
+            .expect("bundle cache path should resolve");
+        fs::create_dir_all(cache_path.parent().unwrap()).expect("bundle cache directory should be created");
+        fs::write(&cache_path, b"corrupt archive bytes").expect("bundle cache file should be written");
+
+        let cached = DownloadManager::load_verified_cached_bundle(&cache_path, "expected-hash")
+            .expect("corrupt cache should be removed");
+
+        assert_eq!(cached, None);
+        assert!(!cache_path.exists());
     }
 
     #[test]
     fn extract_languages_writes_requested_library() {
-        let cache_dir = temp_cache_dir("extracts");
-        let manager = DownloadManager::with_cache_dir("test", cache_dir.clone());
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
         let filename = manager
             .lib_path("python")
             .file_name()
@@ -470,13 +541,12 @@ mod tests {
 
         let extracted = fs::read(manager.lib_path("python")).expect("extracted library should be readable");
         assert_eq!(extracted, b"library-bytes");
-        let _ = fs::remove_dir_all(cache_dir);
     }
 
     #[test]
     fn extract_languages_errors_when_requested_library_is_absent() {
-        let cache_dir = temp_cache_dir("missing");
-        let manager = DownloadManager::with_cache_dir("test", cache_dir.clone());
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
         let archive = compressed_tar(&[("libtree_sitter_javascript.dylib", b"library-bytes")]);
 
         let error = manager
@@ -484,6 +554,54 @@ mod tests {
             .expect_err("missing requested library should error");
 
         assert!(error.to_string().contains("python"));
-        let _ = fs::remove_dir_all(cache_dir);
+    }
+
+    #[test]
+    fn clean_cache_removes_libraries_bundles_and_manifest() {
+        let temp_dir = temp_cache_dir();
+        let manager = manager_for_temp_dir(&temp_dir);
+        let version_cache_dir = manager
+            .version_cache_dir()
+            .expect("cache directory should have a parent")
+            .to_path_buf();
+        let library_path = manager.lib_path("python");
+        let bundle_path = version_cache_dir.join("bundles/macos-arm64-abc123.tar.zst");
+        let manifest_path = version_cache_dir.join("manifest.json");
+        let unrelated_path = version_cache_dir.join("unrelated.txt");
+
+        fs::create_dir_all(library_path.parent().unwrap()).expect("library cache directory should be created");
+        fs::create_dir_all(bundle_path.parent().unwrap()).expect("bundle cache directory should be created");
+        fs::write(&library_path, b"library").expect("library cache file should be written");
+        fs::write(&bundle_path, b"bundle").expect("bundle cache file should be written");
+        fs::write(&manifest_path, b"{}").expect("manifest cache file should be written");
+        fs::write(&unrelated_path, b"keep").expect("unrelated cache file should be written");
+
+        manager.clean_cache().expect("cache cleanup should succeed");
+
+        assert!(!manager.cache_dir().exists());
+        assert!(!version_cache_dir.join("bundles").exists());
+        assert!(!manifest_path.exists());
+        assert!(
+            unrelated_path.exists(),
+            "cleanup should not remove unrelated sibling files"
+        );
+    }
+
+    #[test]
+    fn clean_cache_is_idempotent_and_safe_for_concurrent_callers() {
+        let temp_dir = temp_cache_dir();
+        let manager = Arc::new(manager_for_temp_dir(&temp_dir));
+        let library_path = manager.lib_path("python");
+        fs::create_dir_all(library_path.parent().unwrap()).expect("library cache directory should be created");
+        fs::write(&library_path, b"library").expect("library cache file should be written");
+
+        std::thread::scope(|scope| {
+            for _ in 0..8 {
+                let manager = Arc::clone(&manager);
+                scope.spawn(move || manager.clean_cache().expect("concurrent cleanup should succeed"));
+            }
+        });
+
+        assert!(!manager.cache_dir().exists());
     }
 }

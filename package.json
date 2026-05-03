@@ -2,8 +2,8 @@
   "private": true,
   "workspaces": [
     ".",
-    "crates/ts-pack-node",
-    "e2e/typescript"
+    "crates/ts-pack-core-node",
+    "e2e/node"
   ],
   "devDependencies": {
     "@textlint-rule/textlint-rule-no-invalid-control-character": "^3.0.0",
