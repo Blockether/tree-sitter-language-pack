@@ -2,7 +2,11 @@
   "id": "get_parser_unknown",
   "description": "get_parser('nonexistent_xyz') returns an error for unknown language",
   "category": "registry",
-  "tags": ["registry", "get_parser", "error"],
+  "tags": [
+    "registry",
+    "get_parser",
+    "error"
+  ],
   "call": "get_parser",
   "input": {
     "language": "nonexistent_xyz"
@@ -11,9 +15,5 @@
     {
       "type": "error"
     }
-  ],
-  "skip": {
-    "languages": ["rust"],
-    "reason": "Opaque return type not supported in Rust e2e"
-  }
+  ]
 }

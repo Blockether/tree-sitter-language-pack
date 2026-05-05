@@ -75,6 +75,13 @@ fn selected_languages(definitions: &BTreeMap<String, LanguageDefinition>) -> Vec
         return selected;
     }
 
+    // On wasm32, dynamic loading and network downloads are unavailable, so all grammars
+    // must be compiled in statically. Select every known language when TSLP_LANGUAGES
+    // is not explicitly set — this is what makes the WASM binary a "pre-compiled language pack".
+    if env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_default() == "wasm32" {
+        return definitions.keys().cloned().collect();
+    }
+
     Vec::new()
 }
 
@@ -109,8 +116,8 @@ fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path,
     let parser_c = src_dir.join("parser.c");
 
     if !parser_c.exists() {
-        eprintln!(
-            "Skipping language '{}': parser.c not found at {}",
+        println!(
+            "cargo:warning=Skipping language '{}': parser.c not found at {}",
             name,
             parser_c.display()
         );
@@ -198,11 +205,15 @@ fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path,
                     cmd.arg(&scanner_obj);
                 }
                 Ok(s) => {
-                    eprintln!("Failed to compile C++ scanner for '{}': exit code {:?}", name, s.code());
+                    println!(
+                        "cargo:warning=Failed to compile C++ scanner for '{}': exit code {:?}",
+                        name,
+                        s.code()
+                    );
                     return false;
                 }
                 Err(e) => {
-                    eprintln!("Failed to run C++ compiler for '{}': {}", name, e);
+                    println!("cargo:warning=Failed to run C++ compiler for '{}': {}", name, e);
                     return false;
                 }
             }
@@ -213,6 +224,16 @@ fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path,
         } else {
             cmd.arg("-shared");
         }
+        // When a C++ scanner is included, link the C++ standard library so
+        // symbols like std::logic_error, operator new/delete, and the C++ ABI
+        // (__cxa_*) are resolved.
+        if scanner_cc.exists() {
+            if os == "macos" || os == "ios" {
+                cmd.arg("-lc++");
+            } else {
+                cmd.arg("-lstdc++");
+            }
+        }
         cmd.arg("-o");
         cmd.arg(&output_path);
     }
@@ -221,15 +242,15 @@ fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path,
     match status {
         Ok(s) if s.success() => true,
         Ok(s) => {
-            eprintln!(
-                "Failed to compile shared library for '{}': exit code {:?}",
+            println!(
+                "cargo:warning=Failed to compile shared library for '{}': exit code {:?}",
                 name,
                 s.code()
             );
             false
         }
         Err(e) => {
-            eprintln!("Failed to run compiler for '{}': {}", name, e);
+            println!("cargo:warning=Failed to run compiler for '{}': {}", name, e);
             false
         }
     }
@@ -336,7 +357,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
     }
 
     if let Err(e) = build.try_compile(&format!("tree_sitter_{name}_parser")) {
-        eprintln!("Failed to compile parser for '{}': {}", name, e);
+        println!("cargo:warning=Failed to compile parser for '{}': {}", name, e);
         return false;
     }
 
@@ -364,7 +385,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
             scanner_build.include(&common_dir);
         }
         if let Err(e) = scanner_build.try_compile(&format!("tree_sitter_{name}_scanner")) {
-            eprintln!("Failed to compile C scanner for '{}': {}", name, e);
+            println!("cargo:warning=Failed to compile C scanner for '{}': {}", name, e);
             return false;
         }
     }
@@ -390,7 +411,7 @@ fn compile_parser_static(name: &str, parser_dir: &Path) -> bool {
             cpp_build.include(&common_dir);
         }
         if let Err(e) = cpp_build.try_compile(&format!("tree_sitter_{name}_scanner_cpp")) {
-            eprintln!("Failed to compile C++ scanner for '{}': {}", name, e);
+            println!("cargo:warning=Failed to compile C++ scanner for '{}': {}", name, e);
             return false;
         }
     }
@@ -751,45 +772,73 @@ fn main() {
 
     let mut static_compiled = Vec::new();
     let mut dynamic_compiled = Vec::new();
+    let mut failed = Vec::new();
 
     for name in &selected {
         let parser_dir = parsers_dir.join(name);
         if !parser_dir.join("src/parser.c").exists() {
-            eprintln!("Parser sources not found for '{}' at {}", name, parser_dir.display());
+            println!("cargo:warning=Parser sources not found for '{}', skipping", name);
+            failed.push(name.clone());
             continue;
         }
 
         emit_rerun_if_changed(&parser_dir);
 
-        match link_mode.as_str() {
+        let ok = match link_mode.as_str() {
             "static" => {
-                if compile_parser_static(name, &parser_dir) {
+                let ok = compile_parser_static(name, &parser_dir);
+                if ok {
                     static_compiled.push(name.clone());
                 }
+                ok
             }
             "dynamic" => {
                 let c_sym = definitions.get(name.as_str()).and_then(|d| d.c_symbol.as_deref());
-                if compile_parser_dynamic(name, c_sym, &parser_dir, &libs_dir) {
+                let ok = compile_parser_dynamic(name, c_sym, &parser_dir, &libs_dir);
+                if ok {
                     dynamic_compiled.push(name.clone());
                 }
+                ok
             }
             "both" => {
-                if compile_parser_static(name, &parser_dir) {
+                let ok_s = compile_parser_static(name, &parser_dir);
+                if ok_s {
                     static_compiled.push(name.clone());
                 }
                 let c_sym = definitions.get(name.as_str()).and_then(|d| d.c_symbol.as_deref());
-                if compile_parser_dynamic(name, c_sym, &parser_dir, &libs_dir) {
+                let ok_d = compile_parser_dynamic(name, c_sym, &parser_dir, &libs_dir);
+                if ok_d {
                     dynamic_compiled.push(name.clone());
                 }
+                ok_s || ok_d
             }
             _ => {
-                eprintln!("Unknown TSLP_LINK_MODE '{}', defaulting to dynamic", link_mode);
+                println!(
+                    "cargo:warning=Unknown TSLP_LINK_MODE '{}', defaulting to dynamic",
+                    link_mode
+                );
                 let c_sym = definitions.get(name.as_str()).and_then(|d| d.c_symbol.as_deref());
-                if compile_parser_dynamic(name, c_sym, &parser_dir, &libs_dir) {
+                let ok = compile_parser_dynamic(name, c_sym, &parser_dir, &libs_dir);
+                if ok {
                     dynamic_compiled.push(name.clone());
                 }
+                ok
             }
+        };
+        if !ok {
+            failed.push(name.clone());
         }
+    }
+
+    if !failed.is_empty() {
+        println!(
+            "cargo:warning=FAILED to compile {} language(s): {}",
+            failed.len(),
+            failed.join(", ")
+        );
+        // Write failed languages so CI/release tooling can detect and fail the build.
+        let failed_path = out_dir.join("failed_languages.txt");
+        fs::write(&failed_path, failed.join("\n") + "\n").expect("Failed to write failed_languages.txt");
     }
 
     generate_registry(&static_compiled, &dynamic_compiled, &definitions, &libs_dir, &out_dir);

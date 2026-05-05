@@ -2,7 +2,10 @@
   "id": "get_language_python",
   "description": "get_language('python') returns a valid Language object",
   "category": "registry",
-  "tags": ["registry", "get_language"],
+  "tags": [
+    "registry",
+    "get_language"
+  ],
   "call": "get_language",
   "input": {
     "language": "python"
@@ -11,9 +14,5 @@
     {
       "type": "not_error"
     }
-  ],
-  "skip": {
-    "languages": ["rust"],
-    "reason": "Opaque return type not supported in Rust e2e"
-  }
+  ]
 }

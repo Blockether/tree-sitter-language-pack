@@ -2,10 +2,15 @@
   "id": "download_configure_custom_dir",
   "description": "Configure language pack with a custom cache directory",
   "category": "download",
-  "tags": ["download"],
+  "tags": [
+    "download"
+  ],
   "call": "configure_pack",
   "skip": {
-    "languages": ["rust", "c", "wasm", "node"],
+    "languages": [
+      "c",
+      "wasm"
+    ],
     "reason": "Download feature requires network access and global cache configuration is covered by Rust unit tests"
   },
   "input": {

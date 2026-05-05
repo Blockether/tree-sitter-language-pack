@@ -180,7 +180,7 @@ dev = [
 ]
 
 [[package]]
-name = "tree-sitter-language-pack-e2e-tests"
+name = "tree-sitter-language-pack-e2e"
 version = "0.0.0"
 source = { editable = "." }
 dependencies = [

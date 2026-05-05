@@ -6,6 +6,11 @@
     "phpunit/phpunit": "^13.1",
     "guzzlehttp/guzzle": "^7.0"
   },
+  "autoload": {
+    "psr-4": {
+      "Tree\\Sitter\\Language\\Pack\\": "../../packages/php/src/"
+    }
+  },
   "autoload-dev": {
     "psr-4": {
       "Tree\\Sitter\\Language\\Pack\\E2e\\": "tests/"

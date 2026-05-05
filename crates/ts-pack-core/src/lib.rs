@@ -314,8 +314,7 @@ pub fn init(config: &PackConfig) -> Result<(), Error> {
         .map_err(|e| Error::LockPoisoned(e.to_string()))?;
     configure_inner(config)?;
     if let Some(ref languages) = config.languages {
-        let refs: Vec<&str> = languages.iter().map(String::as_str).collect();
-        download_inner(&refs)?;
+        download_inner(languages)?;
     }
     if let Some(ref groups) = config.groups {
         let cache_dir = effective_cache_dir()?;
@@ -395,7 +394,7 @@ fn configure_inner(config: &PackConfig) -> Result<(), Error> {
 /// println!("Ensured {} languages", count);
 /// ```
 #[cfg(feature = "download")]
-pub fn download(names: &[&str]) -> Result<usize, Error> {
+pub fn download<S: AsRef<str>>(names: &[S]) -> Result<usize, Error> {
     let _cache_guard = DOWNLOAD_CACHE_LOCK
         .lock()
         .map_err(|e| Error::LockPoisoned(e.to_string()))?;
@@ -403,26 +402,33 @@ pub fn download(names: &[&str]) -> Result<usize, Error> {
 }
 
 #[cfg(feature = "download")]
-fn download_inner(names: &[&str]) -> Result<usize, Error> {
+fn download_inner<S: AsRef<str>>(names: &[S]) -> Result<usize, Error> {
     ensure_cache_registered()?;
     let cache_dir = effective_cache_dir()?;
     let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
     let unavailable: Vec<&str> = names
         .iter()
-        .copied()
+        .map(|s| s.as_ref())
         .filter(|name| !REGISTRY.has_language(name))
         .collect();
     dm.ensure_languages(&unavailable)?;
-    Ok(names.iter().copied().collect::<std::collections::BTreeSet<_>>().len())
+    let unique: std::collections::BTreeSet<&str> = names.iter().map(|s| s.as_ref()).collect();
+    Ok(unique.len())
 }
 
 /// Download all available languages from the remote manifest.
 ///
-/// Returns the number of manifest languages available after the call.
+/// Downloads the platform bundle and extracts every library it contains.
+/// Languages that appear in the manifest but are absent from the bundle
+/// (e.g. grammars that failed to compile at release time) are silently
+/// skipped — they are not treated as an error.
+///
+/// Returns the total number of languages now available (statically compiled
+/// plus downloaded and cached).
 ///
 /// # Errors
 ///
-/// Returns an error if the manifest cannot be fetched or a download fails.
+/// Returns an error if the manifest cannot be fetched or the bundle download fails.
 ///
 /// # Example
 ///
@@ -430,13 +436,18 @@ fn download_inner(names: &[&str]) -> Result<usize, Error> {
 /// use tree_sitter_language_pack::download_all;
 ///
 /// let count = download_all().unwrap();
-/// println!("Downloaded {} languages", count);
+/// println!("{} languages available", count);
 /// ```
 #[cfg(feature = "download")]
 pub fn download_all() -> Result<usize, Error> {
-    let langs = manifest_languages()?;
-    let refs: Vec<&str> = langs.iter().map(String::as_str).collect();
-    download(&refs)
+    let _cache_guard = DOWNLOAD_CACHE_LOCK
+        .lock()
+        .map_err(|e| Error::LockPoisoned(e.to_string()))?;
+    ensure_cache_registered()?;
+    let cache_dir = effective_cache_dir()?;
+    let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
+    dm.download_all_best_effort()?;
+    Ok(REGISTRY.language_count())
 }
 
 /// Return all language names available in the remote manifest (305).
@@ -537,8 +548,8 @@ pub fn clean_cache() -> Result<(), Error> {
 /// println!("Cache directory: {}", dir.display());
 /// ```
 #[cfg(feature = "download")]
-pub fn cache_dir() -> Result<std::path::PathBuf, Error> {
-    effective_cache_dir()
+pub fn cache_dir() -> Result<String, Error> {
+    effective_cache_dir().map(|p| p.to_string_lossy().into_owned())
 }
 
 #[cfg(test)]

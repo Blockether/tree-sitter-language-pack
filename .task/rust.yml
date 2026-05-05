@@ -138,6 +138,11 @@ tasks:
 
   e2e:test:
     desc: Run Rust E2E tests
+    env:
+      PROJECT_ROOT: "{{.PROJECT_ROOT}}"
+      # These parsers exist locally but are missing from the release archive.
+      # Compile them statically so smoke tests can run without a download fallback.
+      TSLP_LANGUAGES: "mojo,nim,norg,wolfram"
     cmds:
       - alef test --lang rust --e2e --jobs 1
 

@@ -378,6 +378,101 @@ impl DownloadManager {
         Ok(())
     }
 
+    /// Download the platform bundle and extract every library file it contains.
+    ///
+    /// Unlike [`ensure_languages`], this does not check the manifest language list
+    /// against archive contents — it simply extracts all `.so`/`.dylib`/`.dll` files
+    /// from the bundle. Languages in the manifest that are missing from the archive
+    /// are silently ignored rather than returning an error.
+    ///
+    /// Returns the number of library files extracted (including those already cached).
+    pub fn download_all_best_effort(&self) -> Result<usize, Error> {
+        {
+            let mut guard = self.manifest.lock().unwrap();
+            if guard.is_none() {
+                *guard = Some(self.fetch_manifest_inner()?);
+            }
+        }
+
+        let guard = self.manifest.lock().unwrap();
+        let manifest = guard.as_ref().expect("manifest loaded above");
+        let platform_key = Self::platform_key();
+        let bundle = manifest.platforms.get(&platform_key).ok_or_else(|| {
+            Error::Download(format!(
+                "No pre-built parsers available for platform '{}'. Available: {:?}",
+                platform_key,
+                manifest.platforms.keys().collect::<Vec<_>>()
+            ))
+        })?;
+        let bundle = bundle.clone();
+        drop(guard);
+
+        let archive_data = self.load_or_download_bundle(&platform_key, &bundle)?;
+        self.extract_all_libs(&archive_data)
+    }
+
+    /// Extract every library file from a zstd-compressed tar archive into the cache directory.
+    ///
+    /// Files are matched by extension (`.so`, `.dylib`, `.dll`) — no per-language
+    /// verification is performed. Returns the count of files now present in the cache dir.
+    fn extract_all_libs(&self, archive_data: &[u8]) -> Result<usize, Error> {
+        fs::create_dir_all(&self.cache_dir)?;
+
+        let (lib_prefix, lib_ext) = if cfg!(target_os = "macos") {
+            ("lib", "dylib")
+        } else if cfg!(target_os = "windows") {
+            ("", "dll")
+        } else {
+            ("lib", "so")
+        };
+
+        let decoder = zstd::Decoder::new(archive_data)
+            .map_err(|e| Error::Download(format!("Failed to decompress archive: {}", e)))?;
+        let mut archive = tar::Archive::new(decoder);
+
+        for entry in archive
+            .entries()
+            .map_err(|e| Error::Download(format!("Failed to read archive entries: {}", e)))?
+        {
+            let mut entry = entry.map_err(|e| Error::Download(format!("Failed to read archive entry: {}", e)))?;
+            let path = entry
+                .path()
+                .map_err(|e| Error::Download(format!("Failed to read entry path: {}", e)))?;
+
+            let filename = path
+                .file_name()
+                .map(|f| f.to_string_lossy().into_owned())
+                .unwrap_or_default();
+
+            let is_lib = filename.ends_with(&format!(".{lib_ext}"))
+                && (lib_prefix.is_empty() || filename.starts_with(lib_prefix));
+
+            if is_lib {
+                let dest = self.cache_dir.join(&filename);
+                if !dest.exists() {
+                    entry
+                        .unpack(&dest)
+                        .map_err(|e| Error::Download(format!("Failed to extract {}: {}", filename, e)))?;
+                }
+            }
+        }
+
+        // Count all library files now in the cache directory.
+        let count = fs::read_dir(&self.cache_dir)
+            .map(|entries| {
+                entries
+                    .flatten()
+                    .filter(|e| {
+                        let name = e.file_name().to_string_lossy().into_owned();
+                        name.ends_with(&format!(".{lib_ext}"))
+                    })
+                    .count()
+            })
+            .unwrap_or(0);
+
+        Ok(count)
+    }
+
     /// Remove all cached parser libraries.
     pub fn clean_cache(&self) -> Result<(), Error> {
         Self::remove_dir_if_exists(&self.cache_dir)?;

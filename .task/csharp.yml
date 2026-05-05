@@ -3,6 +3,7 @@ version: "3"
 vars:
   FFI_LIB_PATH: '{{.PROJECT_ROOT}}/target/release/libts_pack_core_ffi.{{if eq OS "darwin"}}dylib{{else if eq OS "windows"}}dll{{else}}so{{end}}'
   DOTNET_VERSION: "9.0"
+  CS_PROJ: "TreeSitterLanguagePack/TreeSitterLanguagePack.csproj"
 
 tasks:
   build:ffi:
@@ -19,13 +20,13 @@ tasks:
     deps: [build:ffi]
     dir: packages/csharp
     cmds:
-      - dotnet build TreeSitterLanguagePack.csproj -c Release
+      - dotnet build {{.CS_PROJ}} -c Release
 
   build:ci:
     desc: Build C# package (CI, FFI already built)
     dir: packages/csharp
     cmds:
-      - dotnet build TreeSitterLanguagePack.csproj -c Release
+      - dotnet build {{.CS_PROJ}} -c Release
 
   test:
     desc: Run C# tests (requires FFI built first)
@@ -36,44 +37,44 @@ tasks:
       LD_LIBRARY_PATH: "{{.PROJECT_ROOT}}/target/release:${LD_LIBRARY_PATH:-}"
       DYLD_LIBRARY_PATH: "{{.PROJECT_ROOT}}/target/release:${DYLD_LIBRARY_PATH:-}"
     cmds:
-      - dotnet test TreeSitterLanguagePack.csproj -c Release --no-build
+      - dotnet test {{.CS_PROJ}} -c Release --no-build
 
   test:ci:
     desc: Run C# tests (CI, FFI already available)
     dir: packages/csharp
     cmds:
-      - dotnet test TreeSitterLanguagePack.csproj -c Release
+      - dotnet test {{.CS_PROJ}} -c Release
 
   package:
     desc: Create NuGet package
     deps: [build]
     dir: packages/csharp
     cmds:
-      - dotnet pack -c Release
+      - dotnet pack {{.CS_PROJ}} -c Release
 
   lint:
     desc: Lint C# code
     dir: packages/csharp
     cmds:
-      - dotnet build TreeSitterLanguagePack.csproj -c Release -warnaserror
+      - dotnet build {{.CS_PROJ}} -c Release -warnaserror
 
   format:
     desc: Format C# code
     dir: packages/csharp
     cmds:
-      - dotnet format TreeSitterLanguagePack.csproj
+      - dotnet format {{.CS_PROJ}}
 
   format:check:
     desc: Check C# formatting (CI)
     dir: packages/csharp
     cmds:
-      - dotnet format TreeSitterLanguagePack.csproj --verify-no-changes
+      - dotnet format {{.CS_PROJ}} --verify-no-changes
 
   lint:check:
     desc: Check C# linting without modifications (CI)
     dir: packages/csharp
     cmds:
-      - dotnet build TreeSitterLanguagePack.csproj -c Release -warnaserror
+      - dotnet build {{.CS_PROJ}} -c Release -warnaserror
 
   update:
     desc: Update C# dependencies to latest versions (including major versions)
@@ -81,16 +82,16 @@ tasks:
     cmds:
       - echo "Updating C# dependencies to latest versions..."
       - dotnet tool install --global dotnet-outdated-tool || dotnet tool update --global dotnet-outdated-tool
-      - dotnet outdated TreeSitterLanguagePack.csproj --upgrade
+      - dotnet outdated {{.CS_PROJ}} --upgrade
       - echo "Checking remaining outdated packages..."
-      - dotnet list TreeSitterLanguagePack.csproj package --outdated || true
+      - dotnet list {{.CS_PROJ}} package --outdated || true
 
   clean:
     desc: Clean C# build artifacts
     dir: packages/csharp
     cmds:
-      - dotnet clean TreeSitterLanguagePack.csproj -c Release
-      - dotnet clean TreeSitterLanguagePack.csproj -c Debug
+      - dotnet clean {{.CS_PROJ}} -c Release
+      - dotnet clean {{.CS_PROJ}} -c Debug
 
   e2e:generate:
     desc: Generate C# E2E tests from fixtures
