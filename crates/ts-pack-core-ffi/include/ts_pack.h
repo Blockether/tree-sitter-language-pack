@@ -1421,6 +1421,21 @@ char *ts_pack_download_manager_lib_path(const TS_PACKDownloadManager *this_,
 TS_PACKParserManifest *ts_pack_download_manager_fetch_manifest(const TS_PACKDownloadManager *this_);
 
 /**
+ * Download the platform bundle and extract every library file it contains.
+ *
+ * Unlike [`ensure_languages`], this does not check the manifest language list
+ * against archive contents — it simply extracts all `.so`/`.dylib`/`.dll` files
+ * from the bundle. Languages in the manifest that are missing from the archive
+ * are silently ignored rather than returning an error.
+ *
+ * Returns the number of library files extracted (including those already cached).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+uintptr_t ts_pack_download_manager_download_all_best_effort(const TS_PACKDownloadManager *this_);
+
+/**
  * Remove all cached parser libraries.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -1916,11 +1931,17 @@ uintptr_t ts_pack_download(const char *names);
 /**
  * Download all available languages from the remote manifest.
  *
- * Returns the number of manifest languages available after the call.
+ * Downloads the platform bundle and extracts every library it contains.
+ * Languages that appear in the manifest but are absent from the bundle
+ * (e.g. grammars that failed to compile at release time) are silently
+ * skipped — they are not treated as an error.
+ *
+ * Returns the total number of languages now available (statically compiled
+ * plus downloaded and cached).
  *
  * # Errors
  *
- * Returns an error if the manifest cannot be fetched or a download fails.
+ * Returns an error if the manifest cannot be fetched or the bundle download fails.
  *
  * # Example
  *
@@ -1928,7 +1949,7 @@ uintptr_t ts_pack_download(const char *names);
  * use tree_sitter_language_pack::download_all;
  *
  * let count = download_all().unwrap();
- * println!("Downloaded {} languages", count);
+ * println!("{} languages available", count);
  * ```
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.

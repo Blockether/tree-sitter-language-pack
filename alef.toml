@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.14.10"
+alef_version = "0.14.23"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [workspace.opaque_types]
@@ -92,17 +92,16 @@ package_name = "@kreuzberg/tree-sitter-language-pack"
 
 [crates.ruby]
 gem_name = "tree_sitter_language_pack"
-exclude_functions = ["download", "download_all"]
 
 [crates.ruby.stubs]
 output = "packages/ruby/sig"
 
 [crates.php]
 extension_name = "tree_sitter_language_pack"
+cargo_crate_name = "ts-pack-core-php"
 
 [crates.elixir]
 app_name = "tree_sitter_language_pack"
-exclude_functions = ["download", "download_all"]
 
 [crates.wasm]
 env_shims = ["iswspace", "iswalnum", "towupper", "iswalpha"]
@@ -233,7 +232,6 @@ precondition = "test -d crates/ts-pack-core-ffi/src"
 [crates.test.python]
 precondition = "command -v ruff >/dev/null 2>&1"
 before = "maturin develop --manifest-path crates/ts-pack-core-py/Cargo.toml"
-command = "cd packages/python && python -m pytest"
 e2e = "cd e2e/python && TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg,wolfram uv run --project . --reinstall-package tree-sitter-language-pack pytest tests/ -q"
 
 [crates.test.node]
@@ -253,7 +251,7 @@ before = "cd packages/ruby && bundle exec rake compile"
 
 [crates.test.php]
 precondition = "command -v php >/dev/null 2>&1"
-before = "cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml"
+before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg,wolfram cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml"
 
 [crates.test.java]
 precondition = "command -v mvn >/dev/null 2>&1"
@@ -263,7 +261,8 @@ command = "cd packages/java && mvn test"
 [crates.test.csharp]
 precondition = "command -v dotnet >/dev/null 2>&1"
 before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-ffi"
-command = "cd packages/csharp && dotnet test -c Release"
+command = "cd packages/csharp && dotnet test TreeSitterLanguagePack/TreeSitterLanguagePack.csproj -c Release"
+e2e = "DYLD_LIBRARY_PATH=$PWD/target/release:${DYLD_LIBRARY_PATH:-} LD_LIBRARY_PATH=$PWD/target/release:${LD_LIBRARY_PATH:-} dotnet test e2e/csharp/TreeSitterLanguagePack.E2eTests.csproj -c Release"
 
 [crates.test.elixir]
 precondition = "command -v mix >/dev/null 2>&1"
@@ -271,7 +270,7 @@ e2e = "cd e2e/elixir && mix test"
 
 [crates.test.wasm]
 precondition = "command -v pnpm >/dev/null 2>&1"
-e2e = "cd e2e/wasm && pnpm test"
+e2e = "cd e2e/wasm && pnpm install && pnpm test"
 
 [crates.test.rust]
 precondition = "command -v cargo >/dev/null 2>&1"
@@ -334,9 +333,18 @@ options_type = "ProcessConfig"
 
 [crates.e2e.call.overrides.java]
 class = "dev.kreuzberg.treesitterlanguagepack.TreeSitterLanguagePack"
+options_type = "ProcessConfig"
 
 [crates.e2e.call.overrides.csharp]
 class = "TreeSitterLanguagePackLib"
+options_type = "ProcessConfig"
+
+[crates.e2e.call.overrides.php]
+options_type = "ProcessConfig"
+
+[crates.e2e.call.overrides.c]
+function = "ts_pack_process"
+result_type = "ProcessResult"
 options_type = "ProcessConfig"
 
 [crates.e2e.calls.detect_extension]
@@ -437,6 +445,9 @@ options_type = "PackConfig"
 [crates.e2e.calls.init_pack.overrides.csharp]
 options_type = "PackConfig"
 
+[crates.e2e.calls.init_pack.overrides.php]
+options_type = "PackConfig"
+
 [crates.e2e.calls.configure_pack]
 function = "configure"
 module = "tree_sitter_language_pack"
@@ -449,6 +460,9 @@ returns_void = true
 options_type = "PackConfig"
 
 [crates.e2e.calls.configure_pack.overrides.csharp]
+options_type = "PackConfig"
+
+[crates.e2e.calls.configure_pack.overrides.php]
 options_type = "PackConfig"
 
 [crates.e2e.calls.download_languages]

@@ -2,7 +2,10 @@
   "id": "locals_query_cue",
   "description": "get_locals_query returns non-empty for cue",
   "category": "query",
-  "tags": ["query", "locals"],
+  "tags": [
+    "query",
+    "locals"
+  ],
   "call": "locals",
   "input": {
     "language": "cue"
@@ -11,9 +14,5 @@
     {
       "type": "not_empty"
     }
-  ],
-  "skip": {
-    "languages": ["rust"],
-    "reason": "Query files not bundled in limited TSLP_LANGUAGES builds"
-  }
+  ]
 }

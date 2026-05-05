@@ -2,3 +2,4 @@ packages:
   - "."
   - "crates/ts-pack-core-node"
   - "e2e/node"
+  - "e2e/wasm"
