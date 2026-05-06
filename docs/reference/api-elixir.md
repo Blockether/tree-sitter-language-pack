@@ -587,7 +587,7 @@ A chunk of source code with rich metadata.
 A comment extracted from source code.
 
 | Field             | Type          | Default | Description         |
-| ----------------- | ------------- | ------- | ------------------- | --------------- |
+| ----------------- | ------------- | ------- | ------------------- |
 | `text`            | `String.t()`  | —       | Text                |
 | `kind`            | `CommentKind` | `:line` | Kind (comment kind) |
 | `span`            | `Span`        | —       | Span (span)         |
@@ -612,7 +612,7 @@ A diagnostic (syntax error, missing node, etc.) from parsing.
 A section within a docstring (e.g., Args, Returns, Raises).
 
 | Field         | Type         | Default | Description                |
-| ------------- | ------------ | ------- | -------------------------- | -------- |
+| ------------- | ------------ | ------- | -------------------------- |
 | `kind`        | `String.t()` | —       | Kind                       |
 | `name`        | `String.t()  | nil`    | `nil`                      | The name |
 | `description` | `String.t()` | —       | Human-readable description |
@@ -624,7 +624,7 @@ A section within a docstring (e.g., Args, Returns, Raises).
 A docstring extracted from source code.
 
 | Field             | Type               | Default                | Description               |
-| ----------------- | ------------------ | ---------------------- | ------------------------- | --------------- |
+| ----------------- | ------------------ | ---------------------- | ------------------------- |
 | `text`            | `String.t()`       | —                      | Text                      |
 | `format`          | `DocstringFormat`  | `:python_triple_quote` | Format (docstring format) |
 | `span`            | `Span`             | —                      | Span (span)               |
@@ -776,7 +776,7 @@ Aggregate metrics for a source file.
 An import statement extracted from source code.
 
 | Field         | Type               | Default | Description      |
-| ------------- | ------------------ | ------- | ---------------- | ----- |
+| ------------- | ------------------ | ------- | ---------------- |
 | `source`      | `String.t()`       | —       | Source           |
 | `items`       | `list(String.t())` | `[]`    | Items            |
 | `alias`       | `String.t()        | nil`    | `nil`            | Alias |
@@ -924,7 +924,7 @@ Can be loaded from a TOML file, constructed programmatically,
 or passed as a dict/object from language bindings.
 
 | Field       | Type              | Default | Description |
-| ----------- | ----------------- | ------- | ----------- | ------------------------------------------------------------------------------------------------ |
+| ----------- | ----------------- | ------- | ----------- |
 | `cache_dir` | `String.t()       | nil`    | `nil`       | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
 | `languages` | `list(String.t()) | nil`    | `[]`        | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`).    |
 | `groups`    | `list(String.t()) | nil`    | `[]`        | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).                      |
@@ -997,7 +997,7 @@ Configuration for the `process()` function.
 Controls which analysis features are enabled and whether chunking is performed.
 
 | Field            | Type         | Default | Description                                                         |
-| ---------------- | ------------ | ------- | ------------------------------------------------------------------- | ----------------------------------------------------- |
+| ---------------- | ------------ | ------- | ------------------------------------------------------------------- |
 | `language`       | `String.t()` | —       | Language name (required).                                           |
 | `structure`      | `boolean()`  | `true`  | Extract structural items (functions, classes, etc.). Default: true. |
 | `imports`        | `boolean()`  | `true`  | Extract import statements. Default: true.                           |
@@ -1096,7 +1096,7 @@ positions (for display and diagnostics).
 A structural item (function, class, struct, etc.) in source code.
 
 | Field         | Type                  | Default     | Description           |
-| ------------- | --------------------- | ----------- | --------------------- | ---------------- |
+| ------------- | --------------------- | ----------- | --------------------- |
 | `kind`        | `StructureKind`       | `:function` | Kind (structure kind) |
 | `name`        | `String.t()           | nil`        | `nil`                 | The name         |
 | `visibility`  | `String.t()           | nil`        | `nil`                 | Visibility       |
@@ -1114,7 +1114,7 @@ A structural item (function, class, struct, etc.) in source code.
 A symbol (variable, function, type, etc.) extracted from source code.
 
 | Field             | Type         | Default     | Description        |
-| ----------------- | ------------ | ----------- | ------------------ | --------------- |
+| ----------------- | ------------ | ----------- | ------------------ |
 | `name`            | `String.t()` | —           | The name           |
 | `kind`            | `SymbolKind` | `:variable` | Kind (symbol kind) |
 | `span`            | `Span`       | —           | Span (span)        |

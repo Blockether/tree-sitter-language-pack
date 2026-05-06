@@ -120,7 +120,7 @@ pub fn get_language(name: &str) -> Result<Language, Error> {
         let cache_dir = effective_cache_dir()?;
         let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
         dm.ensure_languages(&[name])?;
-        return REGISTRY.get_language(name);
+        REGISTRY.get_language(name)
     }
 
     #[cfg(not(feature = "download"))]

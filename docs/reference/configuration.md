@@ -69,7 +69,7 @@ Aggregate metrics for a source file.
 A structural item (function, class, struct, etc.) in source code.
 
 | Field         | Type                  | Default                  | Description           |
-| ------------- | --------------------- | ------------------------ | --------------------- | ---------------- |
+| ------------- | --------------------- | ------------------------ | --------------------- |
 | `kind`        | `StructureKind`       | `StructureKind.FUNCTION` | Kind (structure kind) |
 | `name`        | `str                  | None`                    | `None`                | The name         |
 | `visibility`  | `str                  | None`                    | `None`                | Visibility       |
@@ -87,7 +87,7 @@ A structural item (function, class, struct, etc.) in source code.
 A comment extracted from source code.
 
 | Field             | Type          | Default            | Description         |
-| ----------------- | ------------- | ------------------ | ------------------- | --------------- |
+| ----------------- | ------------- | ------------------ | ------------------- |
 | `text`            | `str`         | —                  | Text                |
 | `kind`            | `CommentKind` | `CommentKind.LINE` | Kind (comment kind) |
 | `span`            | `Span`        | —                  | Span (span)         |
@@ -100,7 +100,7 @@ A comment extracted from source code.
 A docstring extracted from source code.
 
 | Field             | Type               | Default                               | Description               |
-| ----------------- | ------------------ | ------------------------------------- | ------------------------- | --------------- |
+| ----------------- | ------------------ | ------------------------------------- | ------------------------- |
 | `text`            | `str`              | —                                     | Text                      |
 | `format`          | `DocstringFormat`  | `DocstringFormat.PYTHON_TRIPLE_QUOTE` | Format (docstring format) |
 | `span`            | `Span`             | —                                     | Span (span)               |
@@ -114,7 +114,7 @@ A docstring extracted from source code.
 A section within a docstring (e.g., Args, Returns, Raises).
 
 | Field         | Type  | Default | Description                |
-| ------------- | ----- | ------- | -------------------------- | -------- |
+| ------------- | ----- | ------- | -------------------------- |
 | `kind`        | `str` | —       | Kind                       |
 | `name`        | `str  | None`   | `None`                     | The name |
 | `description` | `str` | —       | Human-readable description |
@@ -126,7 +126,7 @@ A section within a docstring (e.g., Args, Returns, Raises).
 An import statement extracted from source code.
 
 | Field         | Type        | Default | Description      |
-| ------------- | ----------- | ------- | ---------------- | ----- |
+| ------------- | ----------- | ------- | ---------------- |
 | `source`      | `str`       | —       | Source           |
 | `items`       | `list[str]` | `[]`    | Items            |
 | `alias`       | `str        | None`   | `None`           | Alias |
@@ -152,7 +152,7 @@ An export statement extracted from source code.
 A symbol (variable, function, type, etc.) extracted from source code.
 
 | Field             | Type         | Default               | Description        |
-| ----------------- | ------------ | --------------------- | ------------------ | --------------- |
+| ----------------- | ------------ | --------------------- | ------------------ |
 | `name`            | `str`        | —                     | The name           |
 | `kind`            | `SymbolKind` | `SymbolKind.VARIABLE` | Kind (symbol kind) |
 | `span`            | `Span`       | —                     | Span (span)        |
@@ -215,7 +215,7 @@ Can be loaded from a TOML file, constructed programmatically,
 or passed as a dict/object from language bindings.
 
 | Field       | Type       | Default | Description |
-| ----------- | ---------- | ------- | ----------- | ------------------------------------------------------------------------------------------------ |
+| ----------- | ---------- | ------- | ----------- |
 | `cache_dir` | `str       | None`   | `None`      | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
 | `languages` | `list[str] | None`   | `[]`        | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`).    |
 | `groups`    | `list[str] | None`   | `[]`        | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).                      |
@@ -229,7 +229,7 @@ Configuration for the `process()` function.
 Controls which analysis features are enabled and whether chunking is performed.
 
 | Field            | Type   | Default | Description                                                         |
-| ---------------- | ------ | ------- | ------------------------------------------------------------------- | ------------------------------------------------------ |
+| ---------------- | ------ | ------- | ------------------------------------------------------------------- |
 | `language`       | `str`  | —       | Language name (required).                                           |
 | `structure`      | `bool` | `True`  | Extract structural items (functions, classes, etc.). Default: true. |
 | `imports`        | `bool` | `True`  | Extract import statements. Default: true.                           |

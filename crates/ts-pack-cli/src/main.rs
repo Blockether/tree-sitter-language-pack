@@ -1,5 +1,6 @@
 use clap::{CommandFactory, Parser, Subcommand};
 use std::io::{self, Read, Write};
+use std::path::PathBuf;
 use std::process;
 use tree_sitter_language_pack::{PackConfig, ProcessConfig, get_parser, process};
 
@@ -228,7 +229,7 @@ fn run() -> Result<(), String> {
             let known = tree_sitter_language_pack::has_language(&language);
             let downloaded = tree_sitter_language_pack::downloaded_languages();
             let is_downloaded = downloaded.contains(&language);
-            let cache = tree_sitter_language_pack::cache_dir().map_err(|e| e.to_string())?;
+            let cache = PathBuf::from(tree_sitter_language_pack::cache_dir().map_err(|e| e.to_string())?);
 
             println!("Language:    {language}");
             println!("Known:       {known}");
@@ -337,7 +338,7 @@ fn run() -> Result<(), String> {
 
         Commands::CacheDir => {
             let dir = tree_sitter_language_pack::cache_dir().map_err(|e| e.to_string())?;
-            println!("{}", dir.display());
+            println!("{dir}");
         }
 
         Commands::Init { cache_dir, languages } => {
