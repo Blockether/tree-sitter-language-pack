@@ -2,15 +2,10 @@
   "id": "download_downloaded_empty",
   "description": "List downloaded languages (may be empty before any downloads)",
   "category": "download",
-  "tags": [
-    "download"
-  ],
+  "tags": ["download"],
   "call": "downloaded_languages",
   "skip": {
-    "languages": [
-      "c",
-      "wasm"
-    ],
+    "languages": ["c", "wasm"],
     "reason": "Download feature requires network access and is not available in static builds"
   },
   "input": {},

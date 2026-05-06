@@ -2,9 +2,7 @@
   "id": "registry_language_count",
   "description": "language_count returns the number of languages available in the current build/cache",
   "category": "registry",
-  "tags": [
-    "registry"
-  ],
+  "tags": ["registry"],
   "call": "language_count",
   "input": {},
   "assertions": [

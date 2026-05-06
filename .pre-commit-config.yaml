@@ -1,6 +1,7 @@
 default_install_hook_types:
   - pre-commit
   - commit-msg
+default_stages: [pre-commit]
 exclude: ^e2e/|^test_apps/|vendor/|node_modules/|target/|parsers/|crates/.*/deps/|crates/.*/tmp/|_build/
 
 repos:
@@ -91,6 +92,8 @@ repos:
       - id: mypy
         exclude: "^(e2e/|fixtures/bench/|scripts/clone_vendors\\.py$)"
         args: [--strict, scripts]
+        env:
+          MYPYPATH: packages/python
       - id: go-fmt
         exclude: ^(e2e/|test_apps/)
       - id: golangci-lint

@@ -247,16 +247,19 @@ command = "cd packages/go && go test -tags tspack_dev -v ./..."
 e2e = "cd e2e/go && go test ./... -count=1"
 
 [crates.test.ruby]
-before = "cd packages/ruby && bundle exec rake compile"
+before = "cd packages/ruby && TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg,wolfram bundle exec rake compile"
+e2e = "cd e2e/ruby && bundle exec rspec spec/"
 
 [crates.test.php]
 precondition = "command -v php >/dev/null 2>&1"
 before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg,wolfram cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml"
+e2e = "cd e2e/php && php run_tests.php"
 
 [crates.test.java]
 precondition = "command -v mvn >/dev/null 2>&1"
-before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-ffi"
+before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-ffi && mvn package -f packages/java/pom.xml -DskipTests -B -q"
 command = "cd packages/java && mvn test"
+e2e = "cd e2e/java && mvn test -B"
 
 [crates.test.csharp]
 precondition = "command -v dotnet >/dev/null 2>&1"
@@ -446,6 +449,9 @@ options_type = "PackConfig"
 options_type = "PackConfig"
 
 [crates.e2e.calls.init_pack.overrides.php]
+options_type = "PackConfig"
+
+[crates.e2e.calls.init_pack.overrides.java]
 options_type = "PackConfig"
 
 [crates.e2e.calls.configure_pack]

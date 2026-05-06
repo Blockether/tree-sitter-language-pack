@@ -8,6 +8,9 @@ readme = false
 keywords = ["tree-sitter", "parser", "syntax", "language-pack"]
 categories = ["text-processing"]
 
+[package.metadata.cargo-machete]
+ignored = ["serde"]
+
 [lib]
 crate-type = ["cdylib"]
 
