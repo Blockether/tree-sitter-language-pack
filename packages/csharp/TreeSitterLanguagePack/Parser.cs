@@ -13,7 +13,6 @@ namespace TreeSitterLanguagePack;
 
 internal sealed class ParserSafeHandle : SafeHandle
 {
-{
     internal ParserSafeHandle(IntPtr handle) : base(IntPtr.Zero, true)
     {
         SetHandle(handle);
@@ -29,7 +28,6 @@ internal sealed class ParserSafeHandle : SafeHandle
 }
 
 public sealed class Parser : IDisposable
-{
 {
     private readonly ParserSafeHandle _safeHandle;
 

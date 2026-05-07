@@ -13,7 +13,6 @@ namespace TreeSitterLanguagePack;
 
 internal sealed class LanguageSafeHandle : SafeHandle
 {
-{
     internal LanguageSafeHandle(IntPtr handle) : base(IntPtr.Zero, true)
     {
         SetHandle(handle);
@@ -29,7 +28,6 @@ internal sealed class LanguageSafeHandle : SafeHandle
 }
 
 public sealed class Language : IDisposable
-{
 {
     private readonly LanguageSafeHandle _safeHandle;
 
