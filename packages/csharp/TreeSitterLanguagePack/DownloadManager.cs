@@ -16,7 +16,6 @@ namespace TreeSitterLanguagePack;
 
 internal sealed class DownloadManagerSafeHandle : SafeHandle
 {
-{
     internal DownloadManagerSafeHandle(IntPtr handle) : base(IntPtr.Zero, true)
     {
         SetHandle(handle);
@@ -35,7 +34,6 @@ internal sealed class DownloadManagerSafeHandle : SafeHandle
 /// Manages downloading and caching of pre-built parser shared libraries.
 /// </summary>
 public sealed class DownloadManager : IDisposable
-{
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

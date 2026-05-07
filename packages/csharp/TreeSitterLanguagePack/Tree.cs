@@ -13,7 +13,6 @@ namespace TreeSitterLanguagePack;
 
 internal sealed class TreeSafeHandle : SafeHandle
 {
-{
     internal TreeSafeHandle(IntPtr handle) : base(IntPtr.Zero, true)
     {
         SetHandle(handle);
@@ -29,7 +28,6 @@ internal sealed class TreeSafeHandle : SafeHandle
 }
 
 public sealed class Tree : IDisposable
-{
 {
     private readonly TreeSafeHandle _safeHandle;
 

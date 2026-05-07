@@ -16,7 +16,6 @@ namespace TreeSitterLanguagePack;
 
 internal sealed class LanguageRegistrySafeHandle : SafeHandle
 {
-{
     internal LanguageRegistrySafeHandle(IntPtr handle) : base(IntPtr.Zero, true)
     {
         SetHandle(handle);
@@ -54,7 +53,6 @@ internal sealed class LanguageRegistrySafeHandle : SafeHandle
 /// ```
 /// </summary>
 public sealed class LanguageRegistry : IDisposable
-{
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
