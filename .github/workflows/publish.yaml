@@ -686,12 +686,25 @@ jobs:
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-      - name: Add swap (avoid OOM during 305-grammar static link)
+      - name: Add swap (best-effort; avoid OOM during 305-grammar static link)
         shell: bash
         run: |
-          sudo fallocate -l 8G /swapfile
+          # Best-effort: free runners often already have swap, and fallocate
+          # can fail on some FS layouts. Don't fail the job if swap isn't
+          # creatable — we still rely on CARGO_BUILD_JOBS=1 to keep peak RAM low.
+          set +e
+          # Fallocate first, dd as fallback (slower but works on more filesystems).
+          if sudo fallocate -l 6G /swapfile 2>/dev/null; then
+            :
+          elif sudo dd if=/dev/zero of=/swapfile bs=1M count=6144 status=none 2>/dev/null; then
+            :
+          else
+            echo "swap allocation failed; continuing without extra swap"
+            free -h
+            exit 0
+          fi
           sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
+          sudo mkswap /swapfile >/dev/null
           sudo swapon /swapfile
           free -h
 
