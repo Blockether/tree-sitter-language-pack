@@ -63,7 +63,7 @@ tasks:
   ai-rulez:
     desc: Generate ai-rulez configuration files (CLAUDE.md, etc.)
     cmds:
-      - npx -y ai-rulez@latest generate
+      - pnpm dlx ai-rulez@latest generate
 
   clone:
     desc: "Clone all language grammar repositories (full re-clone)"
@@ -242,7 +242,7 @@ tasks:
   docs:generate:languages:
     desc: Generate supported languages documentation from language_definitions.json
     cmds:
-      - python3 scripts/generate_grammar_table.py
+      - uv run --no-sync scripts/generate_grammar_table.py
     sources:
       - sources/language_definitions.json
     generates:
