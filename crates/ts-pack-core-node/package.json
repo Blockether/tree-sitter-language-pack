@@ -1,6 +1,6 @@
 {
   "name": "@kreuzberg/tree-sitter-language-pack",
-  "version": "1.8.0-rc.36",
+  "version": "1.8.0-rc.37",
   "description": "Tree-sitter language pack - pre-compiled parsers for 305 languages (Node.js NAPI bindings)",
   "keywords": [
     "kreuzberg",
@@ -38,7 +38,6 @@
     "binaryName": "ts-pack-core-node",
     "targets": [
       "aarch64-apple-darwin",
-      "x86_64-apple-darwin",
       "x86_64-unknown-linux-gnu",
       "aarch64-unknown-linux-gnu",
       "x86_64-pc-windows-msvc",
