@@ -911,9 +911,11 @@ jobs:
         shell: bash
         run: |
           RESOURCES_DIR="packages/java/src/main/resources/natives"
-          # RIDs must match the build-java-natives matrix platform values
+          # RIDs must match the build-java-natives matrix platform values.
+          # Native lib name varies by platform: libts_pack_core_ffi.{so,dylib} on Unix,
+          # ts_pack_core_ffi.dll on Windows. The wildcard *ts_pack_core_ffi.* matches both.
           for rid in linux-x86_64 linux-arm64 macos-arm64 windows-x86_64; do
-            if ! ls "$RESOURCES_DIR/$rid"/ts_pack_core_ffi.* "$RESOURCES_DIR/$rid"/libts_pack_core_ffi.* >/dev/null 2>&1; then
+            if ! compgen -G "$RESOURCES_DIR/$rid/*ts_pack_core_ffi.*" >/dev/null; then
               echo "::error::Missing native lib for $rid in $RESOURCES_DIR/$rid"
               exit 1
             fi
