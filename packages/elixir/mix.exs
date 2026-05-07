@@ -4,7 +4,7 @@ defmodule TreeSitterLanguagePack.MixProject do
   def project do
     [
       app: :tree_sitter_language_pack,
-      version: "1.8.0-rc.35",
+      version: "1.8.0-rc.36",
       elixir: "~> 1.14",
       elixirc_paths: ["lib", "../..//packages/elixir/native/tree_sitter_language_pack_nif/src"],
       rustler_crates: [tree_sitter_language_pack_nif: [mode: :release]],
@@ -18,7 +18,8 @@ defmodule TreeSitterLanguagePack.MixProject do
     [
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/kreuzberg-dev/tree-sitter-language-pack"},
-      files: ~w(lib native .formatter.exs mix.exs README* checksum-*.exs)
+      files:
+        ~w(lib native/tree_sitter_language_pack_nif/src native/tree_sitter_language_pack_nif/Cargo.toml native/tree_sitter_language_pack_nif/Cargo.lock .formatter.exs mix.exs README* checksum-*.exs)
     ]
   end
 
