@@ -46,22 +46,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      tag:              ${{ steps.meta.outputs.tag }}
-      version:          ${{ steps.meta.outputs.version }}
-      npm_tag:          ${{ steps.meta.outputs.npm_tag }}
-      dry_run:          ${{ steps.meta.outputs.dry_run }}
-      force_republish:  ${{ steps.meta.outputs.force_republish }}
-      release_crates:   ${{ steps.meta.outputs.release_crates }}
-      release_python:   ${{ steps.meta.outputs.release_python }}
-      release_node:     ${{ steps.meta.outputs.release_node }}
-      release_wasm:     ${{ steps.meta.outputs.release_wasm }}
-      release_ruby:     ${{ steps.meta.outputs.release_ruby }}
-      release_go:       ${{ steps.meta.outputs.release_go }}
-      release_java:     ${{ steps.meta.outputs.release_java }}
-      release_elixir:   ${{ steps.meta.outputs.release_elixir }}
-      release_c_ffi:    ${{ steps.meta.outputs.release_c_ffi }}
-      release_php:      ${{ steps.meta.outputs.release_php }}
-      release_csharp:   ${{ steps.meta.outputs.release_csharp }}
+      tag: ${{ steps.meta.outputs.tag }}
+      version: ${{ steps.meta.outputs.version }}
+      npm_tag: ${{ steps.meta.outputs.npm_tag }}
+      dry_run: ${{ steps.meta.outputs.dry_run }}
+      force_republish: ${{ steps.meta.outputs.force_republish }}
+      release_crates: ${{ steps.meta.outputs.release_crates }}
+      release_python: ${{ steps.meta.outputs.release_python }}
+      release_node: ${{ steps.meta.outputs.release_node }}
+      release_wasm: ${{ steps.meta.outputs.release_wasm }}
+      release_ruby: ${{ steps.meta.outputs.release_ruby }}
+      release_go: ${{ steps.meta.outputs.release_go }}
+      release_java: ${{ steps.meta.outputs.release_java }}
+      release_elixir: ${{ steps.meta.outputs.release_elixir }}
+      release_c_ffi: ${{ steps.meta.outputs.release_c_ffi }}
+      release_php: ${{ steps.meta.outputs.release_php }}
+      release_csharp: ${{ steps.meta.outputs.release_csharp }}
       release_homebrew: ${{ steps.meta.outputs.release_homebrew }}
     steps:
       - name: Checkout
@@ -479,6 +479,48 @@ jobs:
         with:
           name: python-wheel-${{ matrix.label }}
           path: dist/*.whl
+          retention-days: 14
+
+  # ─── Build Python sdist ────────────────────────────────────────────
+  build-python-sdist:
+    name: Build Python sdist
+    needs: [prepare, validate-versions, clone-vendors]
+    if: needs.prepare.outputs.release_python == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.tag }}
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
+
+      - name: Setup Rust
+        uses: kreuzberg-dev/actions/setup-rust@v1
+        with:
+          components: ""
+          use-sccache: "false"
+          install-llvm-cov: "false"
+
+      - name: Install maturin
+        run: pip install maturin
+
+      - name: Build sdist
+        working-directory: packages/python
+        run: maturin sdist --out ../../dist
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+
+      - name: Upload sdist
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-sdist
+          path: dist/*.tar.gz
           retention-days: 14
 
   # ─── Build Node.js native modules ─────────────────────────────────
@@ -1259,9 +1301,8 @@ jobs:
           - os: windows-latest
             label: windows-x86_64
             target: x86_64-pc-windows-msvc
-          - os: windows-11-arm
-            label: windows-aarch64
-            target: aarch64-pc-windows-msvc
+          # windows-aarch64 omitted: ext-php-rs C wrapper compilation fails on
+          # Windows ARM64 because PHP SDK headers (mmintrin.h) are X86-only.
     steps:
       - name: Checkout
         uses: actions/checkout@v6 # v6
@@ -1722,11 +1763,12 @@ jobs:
   # ─── Publish Python to PyPI ────────────────────────────────────────
   publish-pypi:
     name: Publish Python to PyPI
-    needs: [prepare, validate-versions, check-pypi, build-python-wheels]
+    needs: [prepare, validate-versions, check-pypi, build-python-wheels, build-python-sdist]
     if: |
       always() &&
       needs.prepare.outputs.release_python == 'true' &&
       needs.build-python-wheels.result == 'success' &&
+      needs.build-python-sdist.result == 'success' &&
       (needs.check-pypi.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -1741,6 +1783,12 @@ jobs:
           pattern: python-wheel-*
           merge-multiple: true
 
+      - name: Download sdist
+        uses: actions/download-artifact@v8
+        with:
+          name: python-sdist
+          path: dist
+
       - name: Dry run summary
         if: ${{ inputs.dry_run }}
         run: |
@@ -1749,6 +1797,10 @@ jobs:
             echo "Wheels staged for PyPI:"
             echo '```'
             ls -1 dist/*.whl
+            echo '```'
+            echo "Sdist staged for PyPI:"
+            echo '```'
+            ls -1 dist/*.tar.gz
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
