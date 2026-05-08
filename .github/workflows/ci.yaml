@@ -24,6 +24,9 @@ on:
       - "pyproject.toml"
       - ".clang-format"
       - "alef.toml"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
   pull_request:
     branches: [main]
     paths:
@@ -47,6 +50,9 @@ on:
       - "pyproject.toml"
       - ".clang-format"
       - "alef.toml"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
   workflow_run:
     workflows: ["Publish Release"]
     types: [completed]
