@@ -48,9 +48,12 @@ render_bottle_block() {
 
   for jf in "${jsons[@]}"; do
     local tag_key sha cellar formatted_cellar
-    tag_key=$(jq -r --arg name "$formula_name" '.[$name].bottle.tags | keys[0]' "$jf")
-    sha=$(jq -r --arg name "$formula_name" --arg tag "$tag_key" '.[$name].bottle.tags[$tag].sha256' "$jf")
-    cellar=$(jq -r --arg name "$formula_name" --arg tag "$tag_key" '.[$name].bottle.tags[$tag].cellar // .[$name].bottle.cellar' "$jf")
+    # brew bottle --json keys the top-level object by the fully-qualified
+    # tap formula name (e.g. "kreuzberg-dev/tap/ts-pack"), not bare formula
+    # name. There's exactly one key per file, so dereference via keys[0].
+    tag_key=$(jq -r '.[keys[0]].bottle.tags | keys[0]' "$jf")
+    sha=$(jq -r --arg tag "$tag_key" '.[keys[0]].bottle.tags[$tag].sha256' "$jf")
+    cellar=$(jq -r --arg tag "$tag_key" '.[keys[0]].bottle.tags[$tag].cellar // .[keys[0]].bottle.cellar' "$jf")
 
     # Symbols like :any_skip_relocation pass through unquoted; literal paths get
     # wrapped in double quotes.
