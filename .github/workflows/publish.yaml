@@ -2496,174 +2496,168 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
-  # ─── Build Homebrew bottle ─────────────────────────────────────────
-  homebrew-bottles:
-    name: Build Homebrew bottle (${{ matrix.bottle_tag }})
-    needs: [prepare, check-homebrew, clone-vendors]
+  # ─── Update Homebrew formula source URLs + SHAs ────────────────────
+  publish-homebrew-formula:
+    name: Update Homebrew formula
+    needs: [prepare, check-homebrew, upload-c-ffi-release]
     if: |
+      always() &&
       needs.prepare.outputs.release_homebrew == 'true' &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.upload-c-ffi-release.result == 'success' &&
       (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: macos-latest
-            bottle_tag: arm64_sequoia
-          - runner: macos-15-intel
-            bottle_tag: sequoia
-          - runner: ubuntu-latest
-            bottle_tag: x86_64_linux
-          - runner: ubuntu-24.04-arm
-            bottle_tag: arm64_linux
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
     steps:
-      - name: Checkout
+      - name: Checkout source repo
         uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.tag }}
 
-      - name: Download parsers
-        uses: actions/download-artifact@v8
+      - name: Checkout homebrew-tap
+        uses: actions/checkout@v6
         with:
-          name: language-parsers
-          path: parsers
+          repository: kreuzberg-dev/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TOKEN }}
+          path: homebrew-tap
 
-      - name: Setup Rust
-        uses: kreuzberg-dev/actions/setup-rust@v1
-        with:
-          components: ""
-          use-sccache: "false"
-          install-llvm-cov: "false"
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Get all language names
-        id: langs
-        shell: bash
-        run: |
-          LANGS=$(python3 -c "import json; d=json.load(open('sources/language_definitions.json')); print(','.join(sorted(d.keys())))")
-          echo "names=$LANGS" >> "$GITHUB_OUTPUT"
-
-      - name: Build CLI (with all parsers statically linked)
-        run: cargo build --release -p ts-pack-cli
+      - name: Update formula files
         env:
-          PROJECT_ROOT: ${{ github.workspace }}
-          TSLP_LANGUAGES: ${{ steps.langs.outputs.names }}
-          TSLP_LINK_MODE: static
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+          TAP_DIR: ${{ github.workspace }}/homebrew-tap
+        run: scripts/publish/update-homebrew-formula.sh
 
-      - name: Create Homebrew bottle
-        id: bottle
-        shell: bash
+      - name: Commit and push to tap
+        working-directory: homebrew-tap
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
         run: |
-          VERSION="${{ needs.prepare.outputs.version }}"
-          BOTTLE_TAG="${{ matrix.bottle_tag }}"
-          bottle_root="/tmp/ts-pack-bottle"
-          bottle_dir="${bottle_root}/ts-pack/${VERSION}"
-          mkdir -p "${bottle_dir}/bin"
-          cp target/release/ts-pack "${bottle_dir}/bin/"
-          cd "${bottle_root}"
-          BOTTLE_FILE="ts-pack-${VERSION}.${BOTTLE_TAG}.bottle.tar.gz"
-          tar -czf "${BOTTLE_FILE}" ts-pack/
-          SHA256=$(shasum -a 256 "${BOTTLE_FILE}" | cut -d' ' -f1)
-          {
-            echo "bottle_file=${BOTTLE_FILE}"
-            echo "bottle_sha=${SHA256}"
-          } >> "$GITHUB_OUTPUT"
-          cp "${BOTTLE_FILE}" "$GITHUB_WORKSPACE/"
+          git config user.name "tree-sitter-language-pack-bot"
+          git config user.email "bot@kreuzberg.dev"
+          if git diff --quiet Formula/; then
+            echo "No formula changes; skipping commit."
+            exit 0
+          fi
+          git add Formula/ts-pack.rb Formula/libts-pack.rb
+          git commit -m "tree-sitter-language-pack ${{ needs.prepare.outputs.version }}"
+          git push origin HEAD
 
-      - name: Upload bottle artifact
+  # ─── Build real Homebrew bottles per platform ──────────────────────
+  homebrew-bottles:
+    name: Build Homebrew bottle (${{ matrix.bottle_tag }})
+    needs: [prepare, publish-homebrew-formula]
+    if: |
+      always() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      needs.publish-homebrew-formula.result == 'success'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            bottle_tag: arm64_sequoia
+            install_brew: false
+          - os: macos-15-intel
+            bottle_tag: sequoia
+            install_brew: false
+          - os: ubuntu-latest
+            bottle_tag: x86_64_linux
+            install_brew: true
+          - os: ubuntu-24.04-arm
+            bottle_tag: arm64_linux
+            install_brew: true
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.tag }}
+
+      - name: Install Homebrew (Linux)
+        if: ${{ matrix.install_brew }}
+        run: scripts/publish/install-homebrew-linux.sh
+        shell: bash
+
+      - name: Build bottles
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+          TAP: kreuzberg-dev/tap
+          OUT_DIR: ${{ github.workspace }}/bottle-json
+        run: scripts/publish/build-homebrew-bottles.sh
+        shell: bash
+
+      - name: Upload bottle JSON manifests
         uses: actions/upload-artifact@v7
         with:
-          name: homebrew-bottle-${{ matrix.bottle_tag }}
-          path: ts-pack-*.bottle.tar.gz
-          retention-days: 14
+          name: homebrew-bottle-json-${{ matrix.bottle_tag }}
+          path: ${{ github.workspace }}/bottle-json/*.json
+          if-no-files-found: error
 
-  # ─── Upload Homebrew bottles to Release ────────────────────────────
-  upload-homebrew-bottles:
-    name: Upload Homebrew bottles to Release
-    needs: [prepare, homebrew-bottles]
+  # ─── Merge bottle DSL into formulas in the tap ─────────────────────
+  publish-homebrew-bottles:
+    name: Merge Homebrew bottle DSL
+    needs: [prepare, publish-homebrew-formula, homebrew-bottles]
     if: |
+      always() &&
       needs.prepare.outputs.dry_run != 'true' &&
+      needs.publish-homebrew-formula.result == 'success' &&
       needs.homebrew-bottles.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: write
     steps:
-      - name: Checkout
+      - name: Checkout source repo
         uses: actions/checkout@v6
         with:
           ref: ${{ needs.prepare.outputs.tag }}
 
-      - name: Download bottle artifacts
+      - name: Checkout homebrew-tap
+        uses: actions/checkout@v6
+        with:
+          repository: kreuzberg-dev/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TOKEN }}
+          path: homebrew-tap
+
+      - name: Download all bottle JSON manifests
         uses: actions/download-artifact@v8
         with:
-          pattern: homebrew-bottle-*
-          path: dist/homebrew
+          path: ${{ github.workspace }}/bottle-json
+          pattern: homebrew-bottle-json-*
           merge-multiple: true
 
-      - name: Upload to GitHub Release
-        uses: kreuzberg-dev/actions/publish-github-release@v1
-        with:
-          tag: ${{ needs.prepare.outputs.tag }}
-          title: "Release ${{ needs.prepare.outputs.tag }}"
-          artifacts: "dist/homebrew/ts-pack-*.bottle.tar.gz"
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
+      - name: Merge bottle DSL into formulas
         env:
-          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+          TAP_DIR: ${{ github.workspace }}/homebrew-tap
+          JSON_DIR: ${{ github.workspace }}/bottle-json
+        run: scripts/publish/merge-homebrew-bottles.sh
+        shell: bash
 
-  # ─── Publish Homebrew formula ──────────────────────────────────────
-  publish-homebrew:
-    name: Publish Homebrew formula
-    needs: [prepare, validate-versions, check-homebrew, upload-homebrew-bottles]
-    if: |
-      always() &&
-      needs.prepare.outputs.release_homebrew == 'true' &&
-      needs.prepare.outputs.dry_run != 'true' &&
-      needs.upload-homebrew-bottles.result == 'success' &&
-      (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ needs.prepare.outputs.tag }}
-
-      - name: Download bottle artifacts
-        uses: actions/download-artifact@v8
-        with:
-          pattern: homebrew-bottle-*
-          path: dist/homebrew
-          merge-multiple: true
-
-      - name: Setup Git credentials for tap push
+      - name: Commit and push bottle DSL
+        working-directory: homebrew-tap
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
         run: |
-          git config --global credential.helper store
-          echo "https://x-access-token:${GH_TOKEN}@github.com" > ~/.git-credentials
-          git config --global user.name "kreuzberg-bot"
-          git config --global user.email "bot@kreuzberg.dev"
-
-      - name: Publish to Homebrew tap
-        uses: kreuzberg-dev/actions/publish-homebrew@v1
-        with:
-          bottles-dir: dist/homebrew
-          formula-name: ts-pack
-          tap-repo: kreuzberg-dev/homebrew-tap
-          tag: ${{ needs.prepare.outputs.tag }}
-          version: ${{ needs.prepare.outputs.version }}
-          github-repo: kreuzberg-dev/tree-sitter-language-pack
-          dry-run: ${{ needs.prepare.outputs.dry_run }}
-        env:
-          GH_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
+          git config user.name "tree-sitter-language-pack-bot"
+          git config user.email "bot@kreuzberg.dev"
+          if git diff --quiet Formula/; then
+            echo "No bottle DSL changes; skipping commit."
+            exit 0
+          fi
+          git add Formula/ts-pack.rb Formula/libts-pack.rb
+          git commit -m "tree-sitter-language-pack ${{ needs.prepare.outputs.version }}: add bottle DSL"
+          git push origin HEAD
 
   # ─── Release finalize ──────────────────────────────────────────────
   release-finalize:
@@ -2695,9 +2689,10 @@ jobs:
       - check-packagist
       - check-nuget
       - check-homebrew
-      - upload-homebrew-bottles
+      - publish-homebrew-formula
+      - homebrew-bottles
       - upload-cli-release
-      - publish-homebrew
+      - publish-homebrew-bottles
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -2759,8 +2754,8 @@ jobs:
           RESULT_UPLOAD_GO: ${{ needs.upload-go-release.result }}
           RESULT_UPLOAD_C_FFI: ${{ needs.upload-c-ffi-release.result }}
           RESULT_UPLOAD_ELIXIR: ${{ needs.upload-elixir-release.result }}
-          RESULT_UPLOAD_HOMEBREW: ${{ needs.upload-homebrew-bottles.result }}
-          RESULT_PUBLISH_HOMEBREW: ${{ needs.publish-homebrew.result }}
+          RESULT_UPLOAD_HOMEBREW: ${{ needs.homebrew-bottles.result }}
+          RESULT_PUBLISH_HOMEBREW: ${{ needs.publish-homebrew-bottles.result }}
         run: |
           {
             echo "## Release Summary"
