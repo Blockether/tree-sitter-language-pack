@@ -324,6 +324,8 @@ jobs:
             label: linux-aarch64
           - os: macos-latest
             label: macos-arm64
+          - os: macos-15-intel
+            label: macos-x86_64
           - os: windows-latest
             label: windows-x86_64
           - os: windows-11-arm
@@ -429,6 +431,8 @@ jobs:
             label: linux-aarch64
           - os: macos-latest
             label: macos-arm64
+          - os: macos-15-intel
+            label: macos-x86_64
           - os: windows-latest
             label: windows-x86_64
           - os: windows-11-arm
@@ -608,6 +612,9 @@ jobs:
           - os: macos-latest
             label: macos-arm64
             ruby_platform: arm64-darwin
+          - os: macos-15-intel
+            label: macos-x86_64
+            ruby_platform: x86_64-darwin
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -847,6 +854,9 @@ jobs:
           - os: macos-latest
             label: macos-arm64
             target: aarch64-apple-darwin
+          - os: macos-15-intel
+            label: macos-x86_64
+            target: x86_64-apple-darwin
           - os: windows-latest
             label: windows-x86_64
             target: x86_64-pc-windows-msvc
@@ -913,6 +923,10 @@ jobs:
             label: macos-arm64
             target: aarch64-apple-darwin
             platform: macos-arm64
+          - os: macos-15-intel
+            label: macos-x86_64
+            target: x86_64-apple-darwin
+            platform: macos-x86_64
           - os: windows-latest
             label: windows-x86_64
             target: x86_64-pc-windows-msvc
@@ -1013,7 +1027,7 @@ jobs:
           # RIDs must match the build-java-natives matrix platform values.
           # Native lib name varies by platform: libts_pack_core_ffi.{so,dylib} on Unix,
           # ts_pack_core_ffi.dll on Windows. The wildcard *ts_pack_core_ffi.* matches both.
-          for rid in linux-x86_64 linux-arm64 macos-arm64 windows-x86_64 windows-aarch64; do
+          for rid in linux-x86_64 linux-arm64 macos-arm64 macos-x86_64 windows-x86_64 windows-aarch64; do
             if ! compgen -G "$RESOURCES_DIR/$rid/*ts_pack_core_ffi.*" >/dev/null; then
               echo "::error::Missing native lib for $rid in $RESOURCES_DIR/$rid"
               exit 1
@@ -1075,6 +1089,9 @@ jobs:
           - os: macos-latest
             label: macos-arm64
             target: aarch64-apple-darwin
+          - os: macos-15-intel
+            label: macos-x86_64
+            target: x86_64-apple-darwin
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -1292,6 +1309,9 @@ jobs:
           - os: macos-latest
             label: macos-arm64
             target: aarch64-apple-darwin
+          - os: macos-15-intel
+            label: macos-x86_64
+            target: x86_64-apple-darwin
           - os: windows-latest
             label: windows-x86_64
             target: x86_64-pc-windows-msvc
@@ -1390,6 +1410,10 @@ jobs:
             label: macos-arm64
             target: aarch64-apple-darwin
             rid: osx-arm64
+          - os: macos-15-intel
+            label: macos-x86_64
+            target: x86_64-apple-darwin
+            rid: osx-x64
           - os: windows-latest
             label: windows-x86_64
             target: x86_64-pc-windows-msvc
@@ -2408,6 +2432,10 @@ jobs:
             label: macos-arm64
             target: aarch64-apple-darwin
             artifact: ts-pack-macos-arm64
+          - os: macos-15-intel
+            label: macos-x86_64
+            target: x86_64-apple-darwin
+            artifact: ts-pack-macos-x86_64
           - os: windows-latest
             label: windows-x86_64
             target: x86_64-pc-windows-msvc
