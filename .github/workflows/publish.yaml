@@ -2872,3 +2872,40 @@ jobs:
             echo "- **Dry run**: ${{ inputs.dry_run }}"
             echo "- **Force republish**: ${{ inputs.force_republish }}"
           } >> "$GITHUB_STEP_SUMMARY"
+
+  announce-discord:
+    name: Announce release on Discord
+    needs:
+      - prepare
+      - publish-crates
+      - publish-pypi
+      - publish-node
+      - publish-wasm
+      - publish-rubygems
+      - publish-maven
+      - publish-hex
+      - publish-packagist
+      - publish-nuget
+      - publish-homebrew-formula
+      - publish-homebrew-bottles
+      - upload-parser-binaries
+      - upload-go-release
+      - upload-c-ffi-release
+      - upload-elixir-release
+      - upload-php-pie-release
+      - upload-cli-release
+      - release-finalize
+    if: |
+      always() &&
+      !cancelled() &&
+      needs.prepare.outputs.dry_run != 'true' &&
+      !contains(needs.*.result, 'failure')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: kreuzberg-dev/actions/announce-release-discord@v1
+        with:
+          tag: ${{ needs.prepare.outputs.tag }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          project-name: tree-sitter-language-pack
