@@ -10,7 +10,7 @@
 
 set -uo pipefail
 
-VERSION="${VERSION:-1.8.0-rc.38}"
+VERSION="${VERSION:-1.8.0}"
 TAG="v${VERSION}"
 REPO="${REPO:-kreuzberg-dev/tree-sitter-language-pack}"
 NPM_VERSION="$VERSION"                  # npm uses canonical

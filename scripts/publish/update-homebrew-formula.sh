@@ -6,12 +6,12 @@ set -euo pipefail
 # - libts-pack: pre-built FFI library tarballs per platform (4 SHAs)
 #
 # Usage:
-#   TAG=v1.8.0-rc.38 VERSION=1.8.0-rc.38 \
+#   TAG=v1.8.0 VERSION=1.8.0 \
 #   TAP_DIR=/path/to/homebrew-tap \
 #   ./update-homebrew-formula.sh
 
-tag="${TAG:?TAG is required (e.g. v1.8.0-rc.38)}"
-version="${VERSION:?VERSION is required (e.g. 1.8.0-rc.38)}"
+tag="${TAG:?TAG is required (e.g. v1.8.0)}"
+version="${VERSION:?VERSION is required (e.g. 1.8.0)}"
 tap_dir="${TAP_DIR:?TAP_DIR is required (path to homebrew-tap checkout)}"
 
 cli_formula="${tap_dir}/Formula/ts-pack.rb"

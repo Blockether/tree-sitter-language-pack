@@ -129,12 +129,12 @@ See [Go README](packages/go/README.md) for full documentation.
 <dependency>
   <groupId>dev.kreuzberg.treesitterlanguagepack</groupId>
   <artifactId>tree-sitter-language-pack</artifactId>
-  <version>1.8.0-rc.17</version>
+  <version>1.8.0</version>
 </dependency>
 ```
 
 ```groovy
-implementation("dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.8.0-rc.17")
+implementation("dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.8.0")
 ```
 
 See [Java README](packages/java/README.md) for full documentation.
