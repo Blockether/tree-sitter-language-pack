@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.15.7"
+alef_version = "0.15.34"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [workspace.opaque_types]
@@ -91,6 +91,8 @@ output = "packages/python/tree_sitter_language_pack/"
 
 [crates.python.capsule_types]
 Language = "tree_sitter.Language"
+Parser = "tree_sitter.Parser"
+Tree = "tree_sitter.Tree"
 
 [crates.node]
 package_name = "@kreuzberg/tree-sitter-language-pack"
