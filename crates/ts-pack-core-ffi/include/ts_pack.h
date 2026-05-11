@@ -1567,6 +1567,156 @@ int32_t ts_pack_diagnostic_severity_from_i32(int32_t value);
 int32_t ts_pack_diagnostic_severity_from_str(const char *name);
 
 /**
+ * Free a heap-allocated `StructureKind` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_structure_kind_free(TS_PACKStructureKind *ptr);
+
+/**
+ * Serialize a heap-allocated `StructureKind` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_structure_kind_to_json(const TS_PACKStructureKind *ptr);
+
+/**
+ * Render a heap-allocated `StructureKind` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_structure_kind_to_string(const TS_PACKStructureKind *ptr);
+
+/**
+ * Free a heap-allocated `CommentKind` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_comment_kind_free(TS_PACKCommentKind *ptr);
+
+/**
+ * Serialize a heap-allocated `CommentKind` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_comment_kind_to_json(const TS_PACKCommentKind *ptr);
+
+/**
+ * Render a heap-allocated `CommentKind` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_comment_kind_to_string(const TS_PACKCommentKind *ptr);
+
+/**
+ * Free a heap-allocated `DocstringFormat` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_docstring_format_free(TS_PACKDocstringFormat *ptr);
+
+/**
+ * Serialize a heap-allocated `DocstringFormat` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_docstring_format_to_json(const TS_PACKDocstringFormat *ptr);
+
+/**
+ * Render a heap-allocated `DocstringFormat` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_docstring_format_to_string(const TS_PACKDocstringFormat *ptr);
+
+/**
+ * Free a heap-allocated `ExportKind` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_export_kind_free(TS_PACKExportKind *ptr);
+
+/**
+ * Serialize a heap-allocated `ExportKind` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_export_kind_to_json(const TS_PACKExportKind *ptr);
+
+/**
+ * Render a heap-allocated `ExportKind` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_export_kind_to_string(const TS_PACKExportKind *ptr);
+
+/**
+ * Free a heap-allocated `SymbolKind` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_symbol_kind_free(TS_PACKSymbolKind *ptr);
+
+/**
+ * Serialize a heap-allocated `SymbolKind` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_symbol_kind_to_json(const TS_PACKSymbolKind *ptr);
+
+/**
+ * Render a heap-allocated `SymbolKind` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_symbol_kind_to_string(const TS_PACKSymbolKind *ptr);
+
+/**
+ * Free a heap-allocated `DiagnosticSeverity` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_diagnostic_severity_free(TS_PACKDiagnosticSeverity *ptr);
+
+/**
+ * Serialize a heap-allocated `DiagnosticSeverity` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_diagnostic_severity_to_json(const TS_PACKDiagnosticSeverity *ptr);
+
+/**
+ * Render a heap-allocated `DiagnosticSeverity` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_diagnostic_severity_to_string(const TS_PACKDiagnosticSeverity *ptr);
+
+/**
  * Detect language name from a file extension (without leading dot).
  *
  * Returns `None` for unrecognized extensions. The match is case-insensitive.
