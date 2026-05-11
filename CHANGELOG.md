@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-05-11
+
+### Fixed
+
+- Python: restore `SupportedLanguage` as `Literal[...]` of all 306 grammars at `tree_sitter_language_pack.SupportedLanguage`. The symbol was dropped during the alef 0.15.x codegen migration and re-importing it raised `ImportError` in 1.8.0 (#121).
+- Python: `get_parser("python").parse(b"...")` returns a real `tree_sitter.Tree` again instead of raising `AttributeError`. `get_parser` / `get_language` now return native `tree_sitter.Parser` / `tree_sitter.Language` instances via PyO3 capsule pass-through (alef v0.15.39 wires `capsule_types` through `gen_bindings`) (#121).
+
 ## [1.8.0] - 2026-05-09
 
 ### Added
