@@ -63,6 +63,13 @@ public class CodeChunkBuilder {
 
     /** Builds the CodeChunk instance. */
     public CodeChunk build() {
-        return new CodeChunk(content, startByte, endByte, startLine, endLine, metadata);
+        return new CodeChunk(
+            content,
+            startByte,
+            endByte,
+            startLine,
+            endLine,
+            metadata
+        );
     }
 }

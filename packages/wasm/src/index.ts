@@ -55,5 +55,5 @@ export {
   init,
   languageCount,
   manifestLanguages,
-  process,
-} from "./wasm";
+  process
+} from './wasm';

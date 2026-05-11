@@ -55,6 +55,12 @@ public class ImportInfoBuilder {
 
     /** Builds the ImportInfo instance. */
     public ImportInfo build() {
-        return new ImportInfo(source, items, alias.orElse(null), isWildcard, span);
+        return new ImportInfo(
+            source,
+            items,
+            alias.orElse(null),
+            isWildcard,
+            span
+        );
     }
 }

@@ -23,7 +23,7 @@ export {
   languageCount,
   manifestLanguages,
   process,
-} from "@kreuzberg/tree-sitter-language-pack";
+} from '@kreuzberg/tree-sitter-language-pack';
 
 export type {
   JsChunkContext,
@@ -55,4 +55,4 @@ export type {
   JsSymbolInfo,
   JsSymbolKind,
   JsTree,
-} from "@kreuzberg/tree-sitter-language-pack";
+} from '@kreuzberg/tree-sitter-language-pack';

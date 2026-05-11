@@ -47,6 +47,11 @@ public class CommentInfoBuilder {
 
     /** Builds the CommentInfo instance. */
     public CommentInfo build() {
-        return new CommentInfo(text, kind, span, associatedNode.orElse(null));
+        return new CommentInfo(
+            text,
+            kind,
+            span,
+            associatedNode.orElse(null)
+        );
     }
 }
