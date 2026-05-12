@@ -32,7 +32,16 @@
     "prepublishOnly": "napi prepublish -t npm --skip-optional-publish"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^3.6.2"
+    "@napi-rs/cli": "^3.6.2",
+    "tree-sitter": "^0.22.4"
+  },
+  "peerDependencies": {
+    "tree-sitter": "^0.22.0"
+  },
+  "peerDependenciesMeta": {
+    "tree-sitter": {
+      "optional": true
+    }
   },
   "napi": {
     "binaryName": "ts-pack-core-node",
