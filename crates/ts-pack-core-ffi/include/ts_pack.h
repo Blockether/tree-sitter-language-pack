@@ -97,6 +97,14 @@ const char *ts_pack_version(void);
 TS_PACKSpan *ts_pack_span_from_json(const char *json);
 
 /**
+ * Serialize a `Span` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_span_to_json(const TS_PACKSpan *ptr);
+
+/**
  * Free a `Span` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.
@@ -245,6 +253,14 @@ char *ts_pack_process_result_chunks(const TS_PACKProcessResult *ptr);
  * Returned handle must be freed with `ts_pack_file_metrics_free`.
  */
 TS_PACKFileMetrics *ts_pack_file_metrics_from_json(const char *json);
+
+/**
+ * Serialize a `FileMetrics` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_file_metrics_to_json(const TS_PACKFileMetrics *ptr);
 
 /**
  * Free a `FileMetrics` handle.
@@ -511,6 +527,14 @@ char *ts_pack_docstring_info_parsed_sections(const TS_PACKDocstringInfo *ptr);
  * Returned handle must be freed with `ts_pack_doc_section_free`.
  */
 TS_PACKDocSection *ts_pack_doc_section_from_json(const char *json);
+
+/**
+ * Serialize a `DocSection` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_doc_section_to_json(const TS_PACKDocSection *ptr);
 
 /**
  * Free a `DocSection` handle.
@@ -985,6 +1009,22 @@ TS_PACKPackConfig *ts_pack_pack_config_from_toml_file(const char *path);
 TS_PACKPackConfig *ts_pack_pack_config_discover(void);
 
 /**
+ * Create a `Point` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_point_free`.
+ */
+TS_PACKPoint *ts_pack_point_from_json(const char *json);
+
+/**
+ * Serialize a `Point` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_point_to_json(const TS_PACKPoint *ptr);
+
+/**
  * Free a `Point` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.
@@ -1011,6 +1051,22 @@ uintptr_t ts_pack_point_column(const TS_PACKPoint *ptr);
  * Returned pointers must be freed with the appropriate free function.
  */
 TS_PACKPoint *ts_pack_point_from(const TS_PACKPoint *p);
+
+/**
+ * Create a `ByteRange` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_byte_range_free`.
+ */
+TS_PACKByteRange *ts_pack_byte_range_from_json(const char *json);
+
+/**
+ * Serialize a `ByteRange` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_byte_range_to_json(const TS_PACKByteRange *ptr);
 
 /**
  * Free a `ByteRange` handle.
@@ -1356,6 +1412,14 @@ char *ts_pack_tree_cursor_field_name(const TS_PACKTreeCursor *this_);
 TS_PACKProcessConfig *ts_pack_process_config_from_json(const char *json);
 
 /**
+ * Serialize a `ProcessConfig` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_process_config_to_json(const TS_PACKProcessConfig *ptr);
+
+/**
  * Free a `ProcessConfig` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.
@@ -1611,6 +1675,14 @@ char *ts_pack_parser_manifest_groups(const TS_PACKParserManifest *ptr);
 TS_PACKPlatformBundle *ts_pack_platform_bundle_from_json(const char *json);
 
 /**
+ * Serialize a `PlatformBundle` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_platform_bundle_to_json(const TS_PACKPlatformBundle *ptr);
+
+/**
  * Free a `PlatformBundle` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.
@@ -1645,6 +1717,14 @@ uint64_t ts_pack_platform_bundle_size(const TS_PACKPlatformBundle *ptr);
  * Returned handle must be freed with `ts_pack_language_info_free`.
  */
 TS_PACKLanguageInfo *ts_pack_language_info_from_json(const char *json);
+
+/**
+ * Serialize a `LanguageInfo` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_language_info_to_json(const TS_PACKLanguageInfo *ptr);
 
 /**
  * Free a `LanguageInfo` handle.
