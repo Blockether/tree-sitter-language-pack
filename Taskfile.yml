@@ -23,6 +23,8 @@ includes:
     taskfile: .task/php.yml
   csharp:
     taskfile: .task/csharp.yml
+  docs:
+    taskfile: ./.task/tools/docs.yml
   version:
     taskfile: .task/version.yml
   test-apps:

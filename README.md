@@ -57,7 +57,7 @@ A comprehensive collection of tree-sitter language parsers with polyglot binding
 
 ## Overview
 
-**tree-sitter-language-pack** bundles 305+ tree-sitter language parsers into a single package with native bindings for multiple programming languages. Ship syntax analysis in your application without managing individual parser dependencies.
+**tree-sitter-language-pack** bundles 306 tree-sitter language parsers into a single package with native bindings for multiple programming languages. Ship syntax analysis in your application without managing individual parser dependencies.
 
 ## Architecture
 
@@ -223,7 +223,7 @@ The `process()` function returns structured analysis including functions, classe
 
 | Feature                    | Description                                                                |
 | -------------------------- | -------------------------------------------------------------------------- |
-| **305+ Languages**         | Pre-compiled parsers for 305+ programming languages                        |
+| **306 Languages**          | Pre-compiled parsers for 306 programming languages                         |
 | **On-Demand Downloads**    | Parsers are downloaded on-demand and cached locally for fast reuse         |
 | **Selective Installation** | Download only the languages you need; unused parsers never downloaded      |
 | **Polyglot Bindings**      | Native bindings for Rust, Python, Node.js, Go, Java, Elixir, and C/C++     |
@@ -232,18 +232,18 @@ The `process()` function returns structured analysis including functions, classe
 
 ## Supported Languages
 
-This pack includes 305+ languages. See the [full language list](docs/languages.md) for all supported grammars with extensions and repository links.
+This pack includes 306 languages. See the [full language list](docs/languages.md) for all supported grammars with extensions and repository links.
 
 ## Package READMEs
 
-- [Rust](crates/ts-pack-core/README.md) -- Rust core library providing access to 305 tree-sitter parsers with on-demand download and caching support.
-- [Python](crates/ts-pack-python/README.md) -- Python bindings for tree-sitter-language-pack, providing access to 305 pre-compiled tree-sitter parsers with on-demand downloads.
+- [Rust](crates/ts-pack-core/README.md) -- Rust core library providing access to 306 tree-sitter parsers with on-demand download and caching support.
+- [Python](crates/ts-pack-python/README.md) -- Python bindings for tree-sitter-language-pack, providing access to 306 pre-compiled tree-sitter parsers with on-demand downloads.
 - [Node.js](crates/ts-pack-node/README.md) -- Node.js NAPI bindings for tree-sitter-language-pack with on-demand parser downloads.
 - [Go](packages/go/README.md) -- Go bindings for tree-sitter-language-pack with on-demand parser caching.
 - [Java](crates/ts-pack-java/README.md) -- Java bindings for tree-sitter-language-pack with on-demand parser downloads (JDK 22+).
 - [Elixir](crates/ts-pack-elixir/README.md) -- Elixir bindings for tree-sitter-language-pack with on-demand parser downloads.
 - [Ruby](crates/ts-pack-ruby/README.md) -- Ruby bindings for tree-sitter-language-pack with on-demand parser downloads.
-- [WebAssembly](crates/ts-pack-wasm/README.md) -- WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 30 languages optimized for browser and edge runtimes. For all 305 languages, use native bindings (Python, Node.js, etc.).
+- [WebAssembly](crates/ts-pack-wasm/README.md) -- WebAssembly bindings for tree-sitter-language-pack. Includes a curated subset of 30 languages optimized for browser and edge runtimes. For all 306 languages, use native bindings (Python, Node.js, etc.).
 - [PHP](packages/php/README.md) -- PHP extension via ext-php-rs with on-demand parser downloads.
 - [.NET (C#)](packages/csharp/TreeSitterLanguagePack/README.md) -- .NET P/Invoke bindings with on-demand parser downloads.
 - [C/C++ (FFI)](crates/ts-pack-ffi/README.md) -- C-compatible FFI bindings for tree-sitter-language-pack. Use from any language with C interop.
@@ -254,6 +254,15 @@ This pack includes 305+ languages. See the [full language list](docs/languages.m
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 Join our [Discord community](https://discord.gg/xt9WY3GnKR) for questions and discussion.
+
+## Part of Kreuzberg, Inc
+
+- [Kreuzberg](https://docs.kreuzberg.dev) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Kreuzberg Cloud](https://docs.kreuzberg.cloud) — managed extraction API with SDKs, dashboards, and observability.
+- [kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
+- [html-to-markdown](https://docs.html-to-markdown.kreuzberg.dev) — fast, lossless HTML→Markdown engine.
+- [liter-llm](https://docs.liter-llm.kreuzberg.dev) — universal LLM API client with native bindings for 14 languages and 143 providers.
+- [Discord](https://discord.gg/xt9WY3GnKR) — community, roadmap, announcements.
 
 ## License
 
