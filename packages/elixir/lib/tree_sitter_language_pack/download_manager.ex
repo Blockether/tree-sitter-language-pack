@@ -66,4 +66,5 @@ defmodule TreeSitterLanguagePack.DownloadManager do
   def clean_cache(obj) do
     Native.downloadmanager_clean_cache(obj.ref)
   end
+
 end

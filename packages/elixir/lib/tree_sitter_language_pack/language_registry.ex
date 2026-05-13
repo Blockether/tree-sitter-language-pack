@@ -56,4 +56,5 @@ defmodule TreeSitterLanguagePack.LanguageRegistry do
   def default() do
     Native.languageregistry_default()
   end
+
 end

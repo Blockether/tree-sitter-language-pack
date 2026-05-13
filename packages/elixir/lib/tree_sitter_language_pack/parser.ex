@@ -41,4 +41,5 @@ defmodule TreeSitterLanguagePack.Parser do
   def default() do
     Native.parser_default()
   end
+
 end
