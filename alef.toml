@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.15.51"
+alef_version = "0.15.52"
 languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm"]
 
 [workspace.opaque_types]
@@ -333,6 +333,7 @@ function = "process"
 module = "tree_sitter_language_pack"
 result_var = "result"
 returns_result = true
+streaming = false
 args = [
   { name = "source", field = "source_code", type = "string" },
   { name = "config", field = "config", type = "json_object" },

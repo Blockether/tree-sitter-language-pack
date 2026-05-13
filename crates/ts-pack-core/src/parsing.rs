@@ -18,6 +18,7 @@ use crate::error::Error;
 
 /// A source position — row + column, zero-indexed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Point {
     /// Zero-indexed row number.
     pub row: usize,
@@ -44,6 +45,7 @@ impl From<tree_sitter::Point> for Point {
 
 /// A byte range — start (inclusive) to end (exclusive).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ByteRange {
     /// Inclusive start byte offset.
     pub start: usize,
