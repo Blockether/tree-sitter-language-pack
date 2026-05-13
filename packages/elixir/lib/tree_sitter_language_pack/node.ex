@@ -115,4 +115,5 @@ defmodule TreeSitterLanguagePack.Node do
   def walk(obj) do
     Native.node_walk(obj.ref)
   end
+
 end

@@ -11,4 +11,5 @@ defmodule TreeSitterLanguagePack.Language do
   defstruct [:ref]
 
   @type t :: %__MODULE__{ref: reference()}
+
 end
