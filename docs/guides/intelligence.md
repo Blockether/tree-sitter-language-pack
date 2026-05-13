@@ -214,7 +214,7 @@ File-level statistics, independent of the other fields:
 | `max_depth`     | int  | Maximum nesting depth of the syntax tree |
 
 ```python
-result = process(source, ProcessConfig(language="python", metrics=True))
+result = process(source, ProcessConfig(language="python"))
 m = result["metrics"]
 print(f"{m['total_lines']} lines total, {m['code_lines']} code, {m['comment_lines']} comments")
 ```

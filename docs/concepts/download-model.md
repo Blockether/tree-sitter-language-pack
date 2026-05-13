@@ -89,24 +89,32 @@ You can override it programmatically:
 
 ## Parser Manifest
 
-The manifest is a JSON file (`parsers.json`) hosted on each GitHub release. It maps language names to platform-specific download URLs:
+The manifest is a JSON file (`parsers.json`) hosted on each GitHub release. It has one bundle per platform (each bundle contains every grammar for that target), plus per-language metadata and group definitions:
 
 ```json
 {
-  "version": "1.0.0",
+  "version": "1.8.1",
+  "platforms": {
+    "linux-x64":   { "url": "https://github.com/.../parsers-linux-x64.tar.zst",   "sha256": "…", "size": 12345678 },
+    "linux-arm64": { "url": "https://github.com/.../parsers-linux-arm64.tar.zst", "sha256": "…", "size": 12345678 },
+    "macos-x64":   { "url": "https://github.com/.../parsers-macos-x64.tar.zst",   "sha256": "…", "size": 12345678 },
+    "macos-arm64": { "url": "https://github.com/.../parsers-macos-arm64.tar.zst", "sha256": "…", "size": 12345678 },
+    "windows-x64": { "url": "https://github.com/.../parsers-windows-x64.zip",     "sha256": "…", "size": 12345678 }
+  },
   "languages": {
-    "python": {
-      "linux-x64": "https://github.com/.../python-linux-x64.so",
-      "linux-arm64": "https://github.com/.../python-linux-arm64.so",
-      "macos-x64": "https://github.com/.../python-macos-x64.dylib",
-      "macos-arm64": "https://github.com/.../python-macos-arm64.dylib",
-      "windows-x64": "https://github.com/.../python-windows-x64.dll"
-    }
+    "python":     { "group": "scripting", "size": 524288 },
+    "rust":       { "group": "systems",   "size": 786432 },
+    "javascript": { "group": "web",       "size": 458752 }
+  },
+  "groups": {
+    "scripting": ["python", "ruby", "lua", "perl", "..."],
+    "systems":   ["rust", "c", "cpp", "go", "..."],
+    "web":       ["javascript", "typescript", "html", "css", "..."]
   }
 }
 ```
 
-The manifest caches locally alongside the parser binaries and refreshes on version upgrades.
+The manifest caches locally alongside the parser binaries and refreshes on version upgrades. See `ParserManifest` in `crates/ts-pack-core/src/download.rs` for the authoritative schema.
 
 ---
 
