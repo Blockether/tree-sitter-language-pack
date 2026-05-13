@@ -168,7 +168,7 @@ Requires JDK 25+ (uses Panama FFM API).
     <dependency>
         <groupId>dev.kreuzberg.treesitterlanguagepack</groupId>
         <artifactId>tree-sitter-language-pack</artifactId>
-        <version>1.7.0</version>
+        <version>1.8.1</version>
     </dependency>
     ```
 
@@ -176,7 +176,7 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```kotlin
     dependencies {
-        implementation("dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.7.0")
+        implementation("dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.8.1")
     }
     ```
 
@@ -184,14 +184,14 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```groovy
     dependencies {
-        implementation 'dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.7.0'
+        implementation 'dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.8.1'
     }
     ```
 
 Verify:
 
 ```java
-import dev.kreuzberg.TreeSitterLanguagePack;
+import dev.kreuzberg.treesitterlanguagepack.TreeSitterLanguagePack;
 
 public class Main {
     public static void main(String[] args) {
@@ -215,7 +215,7 @@ Requires Ruby 3.2+.
 === "Gemfile"
 
     ```ruby
-    gem "tree_sitter_language_pack", "~> 1.0"
+    gem "tree_sitter_language_pack", "~> 1.8"
     ```
 
     ```bash
@@ -241,7 +241,7 @@ Requires Elixir 1.14+ and OTP 25+.
     ```elixir
     defp deps do
       [
-        {:tree_sitter_language_pack, "~> 1.0"}
+        {:tree_sitter_language_pack, "~> 1.8"}
       ]
     end
     ```
@@ -260,7 +260,7 @@ IO.puts TreeSitterLanguagePack.language_count() # 306
 
 ### PHP
 
-Requires PHP 8.4+. This package is a native PHP extension (`type: php-ext`). Install
+Requires PHP 8.2+. This package is a native PHP extension (`type: php-ext`). Install
 [`mlocati/php-extension-installer`](https://github.com/mlocati/php-extension-installer) first
 so Composer can download and register the compiled `.so`/`.dll`:
 

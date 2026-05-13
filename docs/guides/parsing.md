@@ -38,7 +38,7 @@ Language bindings expose higher-level APIs such as `process()` and `extract()` f
 
 For batch processing in Rust, reuse the parser object. Creating one parser per parse works at small scale but adds avoidable setup overhead when processing a large file set for the same language.
 
-!!! Tip "Language names" Names are case-insensitive. Aliases exist: `shell` -> `bash`, `makefile` -> `make`, `bazel` -> `starlark`. See [Languages](../languages.md) for the full list.
+!!! Tip "Language names" Names are case-sensitive — use the lowercase canonical form. Aliases exist: `shell` -> `bash`, `makefile` -> `make`, `bazel` -> `starlark`. See [Languages](../languages.md) for the full list.
 
 ## The syntax tree
 

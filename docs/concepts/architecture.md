@@ -103,9 +103,9 @@ Binding crates contain no parsing logic, no query definitions, and no chunking c
 
 Tree-sitter parsers are **not** compiled into the package. Instead:
 
-1. A `parsers.json` manifest (on GitHub releases) lists all 306 languages with per-platform download URLs.
-2. On first use, the matching binary downloads to the local cache directory.
-3. The runtime opens the binary via `dlopen` / `LoadLibrary` and resolves the `tree_sitter_<language>` symbol.
+1. A `parsers.json` manifest (on GitHub releases) lists one bundle per target platform plus per-language metadata for all 306 grammars.
+2. On first use, the matching platform bundle downloads and extracts to the local cache directory.
+3. The runtime opens the relevant grammar binary via `dlopen` / `LoadLibrary` and resolves the `tree_sitter_<language>` symbol.
 
 This keeps installation fast and download sizes minimal. See [Download Model](download-model.md) for the full detail.
 

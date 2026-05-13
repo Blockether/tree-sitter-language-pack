@@ -305,4 +305,4 @@ print(f"\nLines: {m['total_lines']} total, {m['code_lines']} code, {m['comment_l
 
 ## Custom Queries
 
-Custom query extraction helpers are not part of the v1.6.2 public API. In Rust, call `get_parser()` and use the `tree-sitter` query APIs directly when the built-in `process()` fields are not enough.
+Custom query extraction helpers are not part of the v1.8 public API. In Rust, call `get_parser()` and use the `tree-sitter` query APIs directly when the built-in `process()` fields are not enough.

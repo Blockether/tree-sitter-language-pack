@@ -46,7 +46,7 @@ Then build the image from the repository root (the full context must be present)
 docker build -f docker/Dockerfile -t ts-pack .
 ```
 
-The build takes five minutes — it compiles every grammar in `sources/language_definitions.json` from C.
+The build takes several minutes — it compiles every grammar in `sources/language_definitions.json` from C.
 
 ## Verify the image
 
