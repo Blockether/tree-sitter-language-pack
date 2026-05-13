@@ -261,7 +261,7 @@ fn run() -> Result<(), String> {
             };
 
             let mut parser = get_parser(&lang).map_err(|e| e.to_string())?;
-            let tree = parser.parse(&source, None).ok_or("Failed to parse source")?;
+            let tree = parser.parse_bytes(&source).ok_or("Failed to parse source")?;
 
             match format {
                 ParseFormat::Sexp => {
