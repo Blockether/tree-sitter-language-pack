@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 /* Opaque type forward declarations */
+typedef struct TS_PACKByteRange TS_PACKByteRange;
 typedef struct TS_PACKChunkContext TS_PACKChunkContext;
 typedef struct TS_PACKCodeChunk TS_PACKCodeChunk;
 typedef struct TS_PACKCommentInfo TS_PACKCommentInfo;
@@ -27,10 +28,12 @@ typedef struct TS_PACKImportInfo TS_PACKImportInfo;
 typedef struct TS_PACKLanguage TS_PACKLanguage;
 typedef struct TS_PACKLanguageInfo TS_PACKLanguageInfo;
 typedef struct TS_PACKLanguageRegistry TS_PACKLanguageRegistry;
+typedef struct TS_PACKNode TS_PACKNode;
 typedef struct TS_PACKPackConfig TS_PACKPackConfig;
 typedef struct TS_PACKParser TS_PACKParser;
 typedef struct TS_PACKParserManifest TS_PACKParserManifest;
 typedef struct TS_PACKPlatformBundle TS_PACKPlatformBundle;
+typedef struct TS_PACKPoint TS_PACKPoint;
 typedef struct TS_PACKProcessConfig TS_PACKProcessConfig;
 typedef struct TS_PACKProcessResult TS_PACKProcessResult;
 typedef struct TS_PACKSpan TS_PACKSpan;
@@ -39,6 +42,7 @@ typedef struct TS_PACKStructureKind TS_PACKStructureKind;
 typedef struct TS_PACKSymbolInfo TS_PACKSymbolInfo;
 typedef struct TS_PACKSymbolKind TS_PACKSymbolKind;
 typedef struct TS_PACKTree TS_PACKTree;
+typedef struct TS_PACKTreeCursor TS_PACKTreeCursor;
 
 
 /**
@@ -1005,6 +1009,369 @@ TS_PACKPackConfig *ts_pack_pack_config_from_toml_file(const char *path);
 TS_PACKPackConfig *ts_pack_pack_config_discover(void);
 
 /**
+ * Free a `Point` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_point_free(TS_PACKPoint *ptr);
+
+/**
+ * Get the `row` field from a `Point`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_point_row(const TS_PACKPoint *ptr);
+
+/**
+ * Get the `column` field from a `Point`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_point_column(const TS_PACKPoint *ptr);
+
+/**
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKPoint *ts_pack_point_from(const TS_PACKPoint *p);
+
+/**
+ * Free a `ByteRange` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_byte_range_free(TS_PACKByteRange *ptr);
+
+/**
+ * Get the `start` field from a `ByteRange`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_byte_range_start(const TS_PACKByteRange *ptr);
+
+/**
+ * Get the `end` field from a `ByteRange`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+uintptr_t ts_pack_byte_range_end(const TS_PACKByteRange *ptr);
+
+/**
+ * Free a `Parser` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_parser_free(TS_PACKParser *ptr);
+
+/**
+ * Configure the parser to use the language identified by name (e.g. `"python"`).
+ *
+ * Resolves the language through the global registry — auto-downloading
+ * if necessary, when the `download` feature is enabled.
+ *
+ * # Errors
+ *
+ * Returns [`Error::LanguageNotFound`] if the language is not recognized,
+ * or [`Error::ParserSetup`] if the language ABI is incompatible.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_parser_set_language(TS_PACKParser *this_,
+                                    const char *name);
+
+/**
+ * Parse a UTF-8 source string. Returns `None` if parsing was cancelled
+ * or no language is set.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKTree *ts_pack_parser_parse(TS_PACKParser *this_,
+                                  const char *source);
+
+/**
+ * Parse a raw byte slice. Returns `None` if parsing was cancelled or
+ * no language is set.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKTree *ts_pack_parser_parse_bytes(TS_PACKParser *this_,
+                                        const uint8_t *source,
+                                        uintptr_t source_len);
+
+/**
+ * Reset internal state. The next call to [`parse`](Self::parse) will
+ * not be incremental.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+void ts_pack_parser_reset(TS_PACKParser *this_);
+
+/**
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKParser *ts_pack_parser_default(void);
+
+/**
+ * Free a `Tree` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_tree_free(TS_PACKTree *ptr);
+
+/**
+ * Return the root [`Node`] of this tree.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKNode *ts_pack_tree_root_node(const TS_PACKTree *this_);
+
+/**
+ * Return a [`TreeCursor`] positioned at the root.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKTreeCursor *ts_pack_tree_walk(const TS_PACKTree *this_);
+
+/**
+ * Free a `Node` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_node_free(TS_PACKNode *ptr);
+
+/**
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKNode *ts_pack_node_clone(const TS_PACKNode *this_);
+
+/**
+ * Return the node's kind name (e.g. `"function_definition"`).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+char *ts_pack_node_kind(const TS_PACKNode *this_);
+
+/**
+ * Return the node's numeric kind ID.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+uint16_t ts_pack_node_kind_id(const TS_PACKNode *this_);
+
+/**
+ * Return the inclusive start byte offset of this node.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+uintptr_t ts_pack_node_start_byte(const TS_PACKNode *this_);
+
+/**
+ * Return the exclusive end byte offset of this node.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+uintptr_t ts_pack_node_end_byte(const TS_PACKNode *this_);
+
+/**
+ * Return the node's byte range as a [`ByteRange`].
+ *
+ * Callers should slice their own source bytes — this is a zero-copy
+ * text accessor.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKByteRange *ts_pack_node_byte_range(const TS_PACKNode *this_);
+
+/**
+ * Return the start [`Point`] (row, column).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKPoint *ts_pack_node_start_position(const TS_PACKNode *this_);
+
+/**
+ * Return the end [`Point`] (row, column).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKPoint *ts_pack_node_end_position(const TS_PACKNode *this_);
+
+/**
+ * True when this node is named (not punctuation/whitespace).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_node_is_named(const TS_PACKNode *this_);
+
+/**
+ * True when this is an error node.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_node_is_error(const TS_PACKNode *this_);
+
+/**
+ * True when this is a missing-token node.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_node_is_missing(const TS_PACKNode *this_);
+
+/**
+ * True when this is an "extra" node (e.g. a comment).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_node_is_extra(const TS_PACKNode *this_);
+
+/**
+ * True when this node or any descendant is an error.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_node_has_error(const TS_PACKNode *this_);
+
+/**
+ * Return this node's parent, if any.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKNode *ts_pack_node_parent(const TS_PACKNode *this_);
+
+/**
+ * Return the i-th child of this node, if any.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKNode *ts_pack_node_child(const TS_PACKNode *this_,
+                                uint32_t index);
+
+/**
+ * Total number of children (including unnamed).
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+uintptr_t ts_pack_node_child_count(const TS_PACKNode *this_);
+
+/**
+ * Return the i-th named child of this node, if any.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKNode *ts_pack_node_named_child(const TS_PACKNode *this_,
+                                      uint32_t index);
+
+/**
+ * Number of named children of this node.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+uintptr_t ts_pack_node_named_child_count(const TS_PACKNode *this_);
+
+/**
+ * Look up a child by its grammar-defined field name.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKNode *ts_pack_node_child_by_field_name(const TS_PACKNode *this_,
+                                              const char *name);
+
+/**
+ * Return the S-expression form of this node's subtree.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+char *ts_pack_node_to_sexp(const TS_PACKNode *this_);
+
+/**
+ * Return a [`TreeCursor`] positioned at this node.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKTreeCursor *ts_pack_node_walk(const TS_PACKNode *this_);
+
+/**
+ * Free a `TreeCursor` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_tree_cursor_free(TS_PACKTreeCursor *ptr);
+
+/**
+ * Return the [`Node`] at the cursor's current position.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+TS_PACKNode *ts_pack_tree_cursor_node(const TS_PACKTreeCursor *this_);
+
+/**
+ * Move the cursor to the first child of the current node.
+ * Returns `true` if a child existed.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_tree_cursor_goto_first_child(TS_PACKTreeCursor *this_);
+
+/**
+ * Move the cursor to the parent of the current node.
+ * Returns `true` if a parent existed.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_tree_cursor_goto_parent(TS_PACKTreeCursor *this_);
+
+/**
+ * Move the cursor to the next sibling of the current node.
+ * Returns `true` if a sibling existed.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_tree_cursor_goto_next_sibling(TS_PACKTreeCursor *this_);
+
+/**
+ * Return the field name for the current node, if any.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+char *ts_pack_tree_cursor_field_name(const TS_PACKTreeCursor *this_);
+
+/**
  * Create a `ProcessConfig` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
@@ -1463,20 +1830,6 @@ int32_t ts_pack_download_manager_clean_cache(const TS_PACKDownloadManager *this_
 void ts_pack_language_free(TS_PACKLanguage *ptr);
 
 /**
- * Free a `Parser` handle.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void ts_pack_parser_free(TS_PACKParser *ptr);
-
-/**
- * Free a `Tree` handle.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void ts_pack_tree_free(TS_PACKTree *ptr);
-
-/**
  * Convert an integer to a `StructureKind` variant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -1862,14 +2215,14 @@ char *ts_pack_get_locals_query(const char *language);
  * # Example
  *
  * ```no_run
- * use tree_sitter_language_pack::get_language;
+ * use tree_sitter_language_pack::{get_language, Parser};
  *
- * let lang = get_language("python").unwrap();
- * // Use the Language with a tree-sitter Parser
- * let mut parser = tree_sitter::Parser::new();
- * parser.set_language(&lang).unwrap();
- * let tree = parser.parse("x = 1", None).unwrap();
+ * let _lang = get_language("python")?;
+ * let mut parser = Parser::new();
+ * parser.set_language("python")?;
+ * let tree = parser.parse("x = 1").expect("parse failed");
  * assert_eq!(tree.root_node().kind(), "module");
+ * # Ok::<(), tree_sitter_language_pack::Error>(())
  * ```
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -1878,7 +2231,7 @@ char *ts_pack_get_locals_query(const char *language);
 TS_PACKLanguage *ts_pack_get_language(const char *name);
 
 /**
- * Get a tree-sitter [`Parser`] pre-configured for the given language.
+ * Get a [`Parser`] pre-configured for the given language.
  *
  * This is a convenience function that calls [`get_language`] and configures
  * a new parser in one step.
@@ -1893,9 +2246,10 @@ TS_PACKLanguage *ts_pack_get_language(const char *name);
  * ```no_run
  * use tree_sitter_language_pack::get_parser;
  *
- * let mut parser = get_parser("rust").unwrap();
- * let tree = parser.parse("fn main() {}", None).unwrap();
+ * let mut parser = get_parser("rust")?;
+ * let tree = parser.parse("fn main() {}").expect("parse failed");
  * assert!(!tree.root_node().has_error());
+ * # Ok::<(), tree_sitter_language_pack::Error>(())
  * ```
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.

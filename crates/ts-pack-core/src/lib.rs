@@ -19,6 +19,17 @@
 //! println!("Functions: {}", result.structure.len());
 //! ```
 //!
+//! ## Parser API
+//!
+//! ```no_run
+//! use tree_sitter_language_pack::get_parser;
+//!
+//! let mut parser = get_parser("python")?;
+//! let tree = parser.parse("def foo(): pass").expect("parse failed");
+//! assert_eq!(tree.root_node().kind(), "module");
+//! # Ok::<(), tree_sitter_language_pack::Error>(())
+//! ```
+//!
 //! ## Modules
 //!
 //! - [`registry`] - Thread-safe language registry for parser lookup
@@ -36,6 +47,7 @@ pub(crate) mod intel;
 pub(crate) mod json_utils;
 pub mod pack_config;
 pub(crate) mod parse;
+pub mod parsing;
 pub mod process_config;
 pub(crate) mod queries;
 pub mod registry;
@@ -61,10 +73,11 @@ pub use intel::types::{
     SymbolInfo, SymbolKind,
 };
 pub use pack_config::PackConfig;
+pub use parsing::{ByteRange, Node, Parser, Point, Tree, TreeCursor};
 pub use process_config::ProcessConfig;
 pub use queries::{get_highlights_query, get_injections_query, get_locals_query};
 pub use registry::LanguageRegistry;
-pub use tree_sitter::{Language, Parser, Tree};
+pub use tree_sitter::Language;
 
 #[cfg(feature = "download")]
 pub use download::DownloadManager;
@@ -98,14 +111,14 @@ static DOWNLOAD_CACHE_LOCK: Mutex<()> = Mutex::new(());
 /// # Example
 ///
 /// ```no_run
-/// use tree_sitter_language_pack::get_language;
+/// use tree_sitter_language_pack::{get_language, Parser};
 ///
-/// let lang = get_language("python").unwrap();
-/// // Use the Language with a tree-sitter Parser
-/// let mut parser = tree_sitter::Parser::new();
-/// parser.set_language(&lang).unwrap();
-/// let tree = parser.parse("x = 1", None).unwrap();
+/// let _lang = get_language("python")?;
+/// let mut parser = Parser::new();
+/// parser.set_language("python")?;
+/// let tree = parser.parse("x = 1").expect("parse failed");
 /// assert_eq!(tree.root_node().kind(), "module");
+/// # Ok::<(), tree_sitter_language_pack::Error>(())
 /// ```
 pub fn get_language(name: &str) -> Result<Language, Error> {
     #[cfg(feature = "download")]
@@ -133,7 +146,7 @@ pub fn get_language(name: &str) -> Result<Language, Error> {
     }
 }
 
-/// Get a tree-sitter [`Parser`] pre-configured for the given language.
+/// Get a [`Parser`] pre-configured for the given language.
 ///
 /// This is a convenience function that calls [`get_language`] and configures
 /// a new parser in one step.
@@ -148,16 +161,14 @@ pub fn get_language(name: &str) -> Result<Language, Error> {
 /// ```no_run
 /// use tree_sitter_language_pack::get_parser;
 ///
-/// let mut parser = get_parser("rust").unwrap();
-/// let tree = parser.parse("fn main() {}", None).unwrap();
+/// let mut parser = get_parser("rust")?;
+/// let tree = parser.parse("fn main() {}").expect("parse failed");
 /// assert!(!tree.root_node().has_error());
+/// # Ok::<(), tree_sitter_language_pack::Error>(())
 /// ```
-pub fn get_parser(name: &str) -> Result<tree_sitter::Parser, Error> {
-    let language = get_language(name)?;
-    let mut parser = tree_sitter::Parser::new();
-    parser
-        .set_language(&language)
-        .map_err(|e| Error::ParserSetup(format!("{e}")))?;
+pub fn get_parser(name: &str) -> Result<Parser, Error> {
+    let mut parser = Parser::new();
+    parser.set_language(name)?;
     Ok(parser)
 }
 
