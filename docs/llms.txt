@@ -1,92 +1,63 @@
 # tree-sitter-language-pack
 
-> Universal code parser for 306 programming languages with code intelligence, syntax-aware chunking, and polyglot bindings.
+> A Rust core that bundles 306 tree-sitter grammars behind one parsing and code-intelligence API, with native bindings for Python, TypeScript / Node.js, Rust, Go, Java, C#, Ruby, PHP, Elixir, and WebAssembly, plus the `ts-pack` CLI. Parsers download on demand and cache locally.
 
-## About
+## Getting Started
 
-Tree-sitter-language-pack provides pre-compiled tree-sitter grammars for 306 programming languages with a unified API for parsing, structure extraction, import/export detection, and intelligent code chunking for LLMs. Built in Rust with thin bindings for every major platform.
+- [Installation](https://docs.tree-sitter-language-pack.kreuzberg.dev/getting-started/installation/): Install for Python, TypeScript, Rust, Go, Java, C#, Ruby, PHP, Elixir, WebAssembly, or the `ts-pack` CLI.
+- [Quick Start](https://docs.tree-sitter-language-pack.kreuzberg.dev/getting-started/quickstart/): Parse your first file and run code intelligence in minutes.
 
-Parsers are downloaded on demand and cached locally — the initial package is small (~3MB) and parsers (~50KB each) are fetched automatically on first use.
+## Concepts
 
-## Organization
+- [Architecture](https://docs.tree-sitter-language-pack.kreuzberg.dev/concepts/architecture/): Rust core with polyglot bindings — where each binding lives and how it reaches Rust.
+- [Download Model](https://docs.tree-sitter-language-pack.kreuzberg.dev/concepts/download-model/): How parsers are fetched on demand, cached locally, and reused across runs.
+- [Code Intelligence](https://docs.tree-sitter-language-pack.kreuzberg.dev/concepts/code-intelligence/): Structure, imports, exports, comments, symbols, and chunking pipeline.
 
-Part of the kreuzberg.dev ecosystem (documentation sites):
-- **Kreuzberg** — Document intelligence: https://docs.kreuzberg.dev/ — repo: https://github.com/kreuzberg-dev/Kreuzberg
-- **html-to-markdown** — HTML to Markdown: https://docs.html-to-markdown.kreuzberg.dev/ — repo: https://github.com/kreuzberg-dev/html-to-markdown
-- **liter-llm** — Universal LLM API client: https://docs.liter-llm.kreuzberg.dev/ — repo: https://github.com/kreuzberg-dev/liter-llm
-- **tree-sitter-language-pack** — Universal code parser (this repo): https://docs.tree-sitter-language-pack.kreuzberg.dev — https://github.com/kreuzberg-dev/tree-sitter-language-pack
+## Guides
 
-## Links
-
-- Website: https://kreuzberg.dev
-- Documentation: https://docs.tree-sitter-language-pack.kreuzberg.dev
-- Repository: https://github.com/kreuzberg-dev/tree-sitter-language-pack
-- Discord: https://discord.gg/xt9WY3GnKR
-- Contact: naaman@kreuzberg.dev
-- License: MIT
-
-## Packages
-
-- Python: https://pypi.org/project/tree-sitter-language-pack/
-- Node.js: https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack
-- Rust: https://crates.io/crates/tree-sitter-language-pack
-- Go: https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go
-- Java: https://central.sonatype.com/artifact/dev.kreuzberg/tree-sitter-language-pack
-- Ruby: https://rubygems.org/gems/tree_sitter_language_pack
-- Elixir: https://hex.pm/packages/tree_sitter_language_pack
-- PHP: https://packagist.org/packages/kreuzberg/tree-sitter-language-pack
-- WebAssembly: https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm
-- CLI: https://github.com/kreuzberg-dev/homebrew-tap
-
-## Documentation Pages
-
-- Installation: https://docs.tree-sitter-language-pack.kreuzberg.dev/getting-started/installation/
-- Quick Start: https://docs.tree-sitter-language-pack.kreuzberg.dev/getting-started/quickstart/
-- Architecture: https://docs.tree-sitter-language-pack.kreuzberg.dev/concepts/architecture/
-- Download Model: https://docs.tree-sitter-language-pack.kreuzberg.dev/concepts/download-model/
-- Code Intelligence: https://docs.tree-sitter-language-pack.kreuzberg.dev/concepts/code-intelligence/
-- Parsing Guide: https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/parsing/
-- Chunking for LLMs: https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/chunking/
-- Configuration: https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/configuration/
-- CLI Usage: https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/cli/
-- Python API: https://docs.tree-sitter-language-pack.kreuzberg.dev/api/python/
-- TypeScript API: https://docs.tree-sitter-language-pack.kreuzberg.dev/api/typescript/
-- Rust API: https://docs.tree-sitter-language-pack.kreuzberg.dev/api/rust/
-- Supported Languages: https://docs.tree-sitter-language-pack.kreuzberg.dev/languages/
-
-## Key APIs
-
-- `init(config)` — Configure and pre-download parsers
-- `download(languages)` — Download specific parser libraries
-- `get_language(name)` — Get a tree-sitter Language (auto-downloads if needed)
-- `get_parser(name)` — Get a tree-sitter parser configured for a supported language
-- `process(source, config)` — Extract code intelligence (structure, imports, exports, comments, symbols, chunks)
-- `available_languages()` — List locally available languages
-- `manifest_languages()` — List all 306 available from remote manifest
-- `ProcessConfig` — Configure which analysis features to enable and chunking parameters
-- `PackConfig` — Configure cache directory and languages to pre-download
+- [Parsing Code](https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/parsing/): Build syntax trees, choose a language, walk nodes, recover from errors.
+- [Code Intelligence](https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/intelligence/): Extract structure, imports, exports, comments, docstrings.
+- [Chunking for LLMs](https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/chunking/): Split source at natural boundaries for embeddings and prompt windows.
+- [Configuration](https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/configuration/): `PackConfig` and `ProcessConfig` options.
+- [Extraction Queries](https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/extraction/): Tree-sitter queries for custom extractors.
+- [Building from Source](https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/building/): Compile the Rust core and bindings locally.
+- [Docker](https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/docker/): Container image with `ts-pack` and the parser cache pre-populated.
+- [Performance & Benchmarks](https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/performance/): Throughput characteristics and tuning.
 
 ## CLI
 
-The `ts-pack` CLI bundles all 306 parsers into a single static binary:
-- `ts-pack download [languages]` — Download parser libraries
-- `ts-pack parse <file> --language <lang>` — Parse source code
-- `ts-pack process <file> --all` — Run full code intelligence pipeline
-- `ts-pack list --manifest` — List all available languages
+- [CLI Usage](https://docs.tree-sitter-language-pack.kreuzberg.dev/guides/cli/): `ts-pack` command-line reference (`download`, `parse`, `process`, `list`).
 
-Install: `curl -fsSL https://raw.githubusercontent.com/kreuzberg-dev/tree-sitter-language-pack/main/install.sh | bash`
+## API Reference
 
-## Supported Languages
+- [Python API](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/api-python/): Python binding reference.
+- [TypeScript / Node.js API](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/api-typescript/): Node.js native-addon binding reference.
+- [Rust API](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/api-rust/): Rust core library reference.
+- [Go API](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/api-go/): Go module reference (cgo).
+- [Java API](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/api-java/): Java binding reference (Foreign Function & Memory).
+- [C# API](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/api-csharp/): C# / .NET binding reference (P/Invoke).
+- [Ruby API](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/api-ruby/): Ruby binding reference (Magnus).
+- [PHP API](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/api-php/): PHP extension reference (ext-php-rs).
+- [Elixir API](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/api-elixir/): Elixir binding reference (Rustler NIF).
+- [WebAssembly API](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/api-wasm/): WebAssembly binding reference.
+- [C / FFI API](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/api-c/): C FFI surface (header + shared library).
+- [Configuration Reference](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/configuration/): Full configuration options.
+- [Types](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/types/): Type definitions across bindings.
+- [Errors](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/errors/): Error categories and handling patterns.
+- [Supported Languages](https://docs.tree-sitter-language-pack.kreuzberg.dev/languages/): The full list of 306 supported grammars.
 
-306 languages including: Python, JavaScript, TypeScript, Rust, Go, Java, C, C++, C#, Ruby, PHP, Swift, Kotlin, Scala, Haskell, Elixir, Erlang, Lua, R, Julia, Dart, Zig, Nim, and 226+ more.
+## Ecosystem
 
-## Minimum Versions
+Part of the [kreuzberg.dev](https://kreuzberg.dev) family of Rust-core, polyglot-bindings libraries:
 
-- Python: 3.10+
-- Node.js: 18+
-- Rust: 1.85+
-- Go: 1.26+
-- Java: 25+
-- Ruby: 3.2+
-- Elixir: 1.14+ / OTP 25+
-- PHP: 8.2+
+- [Kreuzberg](https://docs.kreuzberg.dev/) — Document intelligence: PDF, Office, images, HTML, email, with OCR. Consumes tree-sitter-language-pack for code-intelligence extraction from source files.
+- [Kreuzberg Cloud](https://docs.kreuzberg.cloud/) — Managed document extraction API.
+- [html-to-markdown](https://docs.html-to-markdown.kreuzberg.dev/) — Fast HTML to Markdown conversion.
+- [kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev/) — Polite, resumable web crawler.
+- [liter-llm](https://docs.liter-llm.kreuzberg.dev/) — Universal LLM API client.
+
+## Optional
+
+- [Changelog](https://docs.tree-sitter-language-pack.kreuzberg.dev/CHANGELOG/): Release history.
+- [Contributing](https://docs.tree-sitter-language-pack.kreuzberg.dev/contributing/): Contribution guidelines.
+- [CI / CD](https://docs.tree-sitter-language-pack.kreuzberg.dev/contributing/ci/): Build, test, and release pipelines.
