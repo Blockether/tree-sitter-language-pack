@@ -670,6 +670,110 @@ keywords = ["tree-sitter", "parser", "syntax", "language-pack"]
 [crates.scaffold.cargo]
 
 [crates.readme]
+template_dir = "templates/readme"
 snippets_dir = "docs/snippets"
 discord_url = "https://discord.gg/xt9WY3GnKR"
 banner_url = "https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8"
+
+[crates.readme.languages.rust]
+template = "language_package.md"
+output_path = "crates/ts-pack-core/README.md"
+name = "Rust"
+package_name = "tree-sitter-language-pack"
+badge_url = "https://img.shields.io/crates/v/tree-sitter-language-pack?label=Rust&color=007ec6"
+docs_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
+description = "Pre-compiled tree-sitter grammars for 306 programming languages, with on-demand download and caching. Polyglot core that powers every binding in the kreuzberg.dev ecosystem."
+package_manager = ["cargo"]
+
+[crates.readme.languages.python]
+template = "language_package.md"
+name = "Python"
+package_name = "tree-sitter-language-pack"
+badge_url = "https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6"
+docs_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
+description = "Pre-compiled tree-sitter grammars for 306 programming languages with on-demand parser download and caching."
+package_manager = ["pip"]
+
+[crates.readme.languages.typescript]
+template = "language_package.md"
+output_path = "packages/typescript/README.md"
+name = "TypeScript / Node.js"
+package_name = "@kreuzberg/tree-sitter-language-pack"
+badge_url = "https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack?label=Node.js&color=007ec6"
+docs_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
+description = "Pre-compiled tree-sitter grammars for 306 programming languages with TypeScript types."
+package_manager = ["npm", "pnpm", "yarn"]
+
+[crates.readme.languages.go]
+template = "language_package.md"
+name = "Go"
+package_name = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
+badge_url = "https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6"
+docs_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
+description = "Pre-compiled tree-sitter grammars for 306 programming languages with idiomatic Go bindings via cgo."
+package_manager = ["go"]
+
+[crates.readme.languages.java]
+template = "language_package.md"
+name = "Java"
+package_name = "dev.kreuzberg:tree-sitter-language-pack"
+badge_url = "https://img.shields.io/maven-central/v/dev.kreuzberg/tree-sitter-language-pack?label=Java&color=007ec6"
+docs_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
+description = "Pre-compiled tree-sitter grammars for 306 programming languages with Java bindings via Panama FFM."
+package_manager = ["maven", "gradle"]
+
+[crates.readme.languages.php]
+template = "language_package.md"
+name = "PHP"
+package_name = "kreuzberg/tree-sitter-language-pack"
+badge_url = "https://img.shields.io/packagist/v/kreuzberg/tree-sitter-language-pack?label=PHP&color=007ec6"
+docs_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
+description = "Pre-compiled tree-sitter grammars for 306 programming languages with PHP bindings via ext-php-rs."
+package_manager = ["composer"]
+
+[crates.readme.languages.ruby]
+template = "language_package.md"
+name = "Ruby"
+package_name = "tree_sitter_language_pack"
+badge_url = "https://img.shields.io/gem/v/tree_sitter_language_pack?label=Ruby&color=007ec6"
+docs_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
+description = "Pre-compiled tree-sitter grammars for 306 programming languages with Ruby bindings via Magnus."
+package_manager = ["gem", "bundler"]
+
+[crates.readme.languages.csharp]
+template = "language_package.md"
+name = "C#"
+package_name = "TreeSitterLanguagePack"
+badge_url = "https://img.shields.io/nuget/v/TreeSitterLanguagePack?label=C%23&color=007ec6"
+docs_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
+description = "Pre-compiled tree-sitter grammars for 306 programming languages with C# bindings via P/Invoke."
+package_manager = ["dotnet"]
+
+[crates.readme.languages.elixir]
+template = "language_package.md"
+name = "Elixir"
+package_name = "tree_sitter_language_pack"
+badge_url = "https://img.shields.io/hexpm/v/tree_sitter_language_pack?label=Elixir&color=007ec6"
+docs_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
+description = "Pre-compiled tree-sitter grammars for 306 programming languages with Elixir bindings via Rustler NIF."
+package_manager = ["hex", "mix"]
+
+[crates.readme.languages.wasm]
+template = "language_package.md"
+output_path = "crates/tree-sitter-language-pack-wasm/README.md"
+name = "WebAssembly"
+package_name = "@kreuzberg/tree-sitter-language-pack-wasm"
+badge_url = "https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack-wasm?label=WASM&color=007ec6"
+docs_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
+description = "Pre-compiled tree-sitter grammars in a WebAssembly bundle for browsers, Deno, and edge runtimes."
+package_manager = ["npm", "pnpm", "yarn"]
+
+[crates.readme.languages.ffi]
+template = "language_package.md"
+output_path = "crates/tree-sitter-language-pack-ffi/README.md"
+name = "FFI (C/C++)"
+package_name = "tree-sitter-language-pack-ffi"
+badge_url = "https://img.shields.io/badge/C-FFI-007ec6"
+docs_url = "https://docs.tree-sitter-language-pack.kreuzberg.dev"
+description = "C ABI for tree-sitter-language-pack — link against the shared library to use the parser pack from any language with C FFI."
+package_manager = []
