@@ -23,7 +23,7 @@ export {
   languageCount,
   manifestLanguages,
   process,
-} from '@kreuzberg/tree-sitter-language-pack';
+} from "@kreuzberg/tree-sitter-language-pack";
 
 export type {
   JsByteRange,
@@ -58,4 +58,4 @@ export type {
   JsSymbolKind,
   JsTree,
   JsTreeCursor,
-} from '@kreuzberg/tree-sitter-language-pack';
+} from "@kreuzberg/tree-sitter-language-pack";
