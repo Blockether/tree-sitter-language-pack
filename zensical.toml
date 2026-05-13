@@ -10,44 +10,58 @@ copyright = "Copyright &copy; 2024-2026 Kreuzberg, inc."
 extra_css = ["css/extra.css"]
 nav = [
   { "Home" = "index.md" },
-  { "Installation" = "getting-started/installation.md" },
-  { "Quick Start" = "getting-started/quickstart.md" },
+
+  { "Get Started" = [
+    { "Installation" = "getting-started/installation.md" },
+    { "Quick Start" = "getting-started/quickstart.md" },
+  ] },
+
+  { "Guides" = [
+    { "Core" = [
+      { "Parsing Code" = "guides/parsing.md" },
+      { "Code Intelligence" = "guides/intelligence.md" },
+      { "Chunking for LLMs" = "guides/chunking.md" },
+      { "Configuration" = "guides/configuration.md" },
+      { "Extraction Queries" = "guides/extraction.md" },
+    ] },
+    { "CLI" = "guides/cli.md" },
+    { "Deployment" = [
+      { "Docker" = "guides/docker.md" },
+      { "Building from Source" = "guides/building.md" },
+      { "Performance & Benchmarks" = "guides/performance.md" },
+    ] },
+  ] },
+
   { "Concepts" = [
     { "Architecture" = "concepts/architecture.md" },
     { "Download Model" = "concepts/download-model.md" },
     { "Code Intelligence" = "concepts/code-intelligence.md" },
   ] },
-  { "Guides" = [
-    { "Parsing Code" = "guides/parsing.md" },
-    { "Code Intelligence" = "guides/intelligence.md" },
-    { "Chunking for LLMs" = "guides/chunking.md" },
-    { "Configuration" = "guides/configuration.md" },
-    { "CLI Usage" = "guides/cli.md" },
-    { "Extraction Queries" = "guides/extraction.md" },
-    { "Building from Source" = "guides/building.md" },
-    { "Docker" = "guides/docker.md" },
-    { "Performance & Benchmarks" = "guides/performance.md" },
-  ] },
-  { "API Reference" = [
-    { "Python" = "reference/api-python.md" },
-    { "TypeScript / Node.js" = "reference/api-typescript.md" },
-    { "Rust" = "reference/api-rust.md" },
-    { "Go" = "reference/api-go.md" },
-    { "Java" = "reference/api-java.md" },
-    { "Ruby" = "reference/api-ruby.md" },
-    { "Elixir" = "reference/api-elixir.md" },
-    { "PHP" = "reference/api-php.md" },
-    { "WebAssembly" = "reference/api-wasm.md" },
-    { "C / FFI" = "reference/api-c.md" },
+
+  { "Reference" = [
+    { "API" = [
+      { "Python" = "reference/api-python.md" },
+      { "TypeScript / Node.js" = "reference/api-typescript.md" },
+      { "Rust" = "reference/api-rust.md" },
+      { "Go" = "reference/api-go.md" },
+      { "Java" = "reference/api-java.md" },
+      { "C#" = "reference/api-csharp.md" },
+      { "Ruby" = "reference/api-ruby.md" },
+      { "PHP" = "reference/api-php.md" },
+      { "Elixir" = "reference/api-elixir.md" },
+      { "WebAssembly" = "reference/api-wasm.md" },
+      { "C / FFI" = "reference/api-c.md" },
+    ] },
+    { "Languages" = "languages.md" },
     { "Types" = "reference/types.md" },
     { "Errors" = "reference/errors.md" },
     { "Configuration" = "reference/configuration.md" },
   ] },
-  { "Languages" = "languages.md" },
-  { "Changelog" = "CHANGELOG.md" },
-  { "Contributing" = [
-    { "Overview" = "contributing.md" },
+
+  { "More" = [
+    { "Contributing" = "contributing.md" },
     { "CI / CD" = "contributing/ci.md" },
+    { "Changelog" = "CHANGELOG.md" },
   ] },
 ]
 
