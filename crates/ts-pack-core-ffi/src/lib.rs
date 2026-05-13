@@ -2651,7 +2651,7 @@ pub unsafe extern "C" fn ts_pack_point_from(
         return std::ptr::null_mut();
     }
     // SAFETY: null check above guarantees p is a valid pointer.
-    let p_rs = unsafe { &*p }.clone();
+    let p_rs = *unsafe { &*p };
     let result = tree_sitter_language_pack::Point::from(p_rs);
     Box::into_raw(Box::new(result))
 }
