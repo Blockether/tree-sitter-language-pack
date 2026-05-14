@@ -1,9 +1,11 @@
 use serde::Deserialize;
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::env;
 use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 
 #[derive(Debug, Deserialize)]
 struct LanguageDefinition {
@@ -719,6 +721,98 @@ fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>,
     gen_query_fn(&mut f, "get_locals_query_impl", &locals, "locals.scm");
 }
 
+/// Fetch grammar sources from the GitHub release artifact when they aren't on
+/// disk locally — covers the sdist install case where the workspace `parsers/`
+/// tree isn't shipped. Returns the directory to use as the parsers root (either
+/// the original `parsers_dir` or a fresh extracted copy under `OUT_DIR`).
+///
+/// Behavior gates:
+/// - `TSLP_OFFLINE=1` disables the download entirely; the existing
+///   "missing parser, skipping" warning path remains.
+/// - `TSLP_SOURCE_BUNDLE_URL` overrides the URL (also accepts `file://` for
+///   local-bundle smoke testing).
+/// - If `parsers_dir/{first_selected}/src/parser.c` exists we assume the
+///   workspace tree is healthy and skip the download.
+fn ensure_parser_sources(parsers_dir: &Path, selected: &[String], out_dir: &Path) -> PathBuf {
+    if selected.is_empty() {
+        return parsers_dir.to_path_buf();
+    }
+    let first = &selected[0];
+    if parsers_dir.join(first).join("src/parser.c").exists() {
+        return parsers_dir.to_path_buf();
+    }
+    if env::var("TSLP_OFFLINE").is_ok_and(|v| !v.is_empty() && v != "0") {
+        println!("cargo:warning=TSLP_OFFLINE set; refusing to download parser sources");
+        return parsers_dir.to_path_buf();
+    }
+
+    let cache_dir = out_dir.join("_parsers");
+    if cache_dir.join(first).join("src/parser.c").exists() {
+        return cache_dir;
+    }
+
+    let version = env::var("CARGO_PKG_VERSION").unwrap_or_else(|_| "unknown".to_string());
+    let default_url = format!(
+        "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v{version}/parser-sources-{version}.tar.zst"
+    );
+    let url = env::var("TSLP_SOURCE_BUNDLE_URL").unwrap_or(default_url);
+    let sha_url = format!("{url}.sha256");
+
+    println!("cargo:rerun-if-env-changed=TSLP_OFFLINE");
+    println!("cargo:rerun-if-env-changed=TSLP_SOURCE_BUNDLE_URL");
+    println!("cargo:warning=Downloading parser sources from {url}");
+
+    let body = fetch_bytes(&url).unwrap_or_else(|e| {
+        panic!(
+            "Failed to download parser sources from {url}: {e}. Set TSLP_OFFLINE=1 to skip, or ensure network access and that v{version} is published with a parser-sources-{version}.tar.zst asset."
+        )
+    });
+    if let Ok(sha_text) = fetch_text(&sha_url) {
+        let expected = sha_text.split_whitespace().next().unwrap_or("").to_lowercase();
+        if !expected.is_empty() {
+            let digest = Sha256::digest(&body);
+            let actual: String = digest.iter().map(|b| format!("{b:02x}")).collect();
+            assert_eq!(
+                expected, actual,
+                "SHA-256 mismatch for {url}: expected {expected}, got {actual}"
+            );
+        }
+    }
+
+    fs::create_dir_all(&cache_dir).expect("create OUT_DIR/_parsers");
+    let cursor = std::io::Cursor::new(body);
+    let decoder = zstd::stream::read::Decoder::with_buffer(cursor).expect("zstd decoder");
+    let mut archive = tar::Archive::new(decoder);
+    archive.unpack(&cache_dir).expect("extract parser-sources tarball");
+
+    // Tarballs created with `tar -cf foo.tar.zst parsers sources` produce
+    // top-level `parsers/` and `sources/` entries. We extracted those under
+    // `OUT_DIR/_parsers/`, so the actual parsers root is one level deeper.
+    let inner = cache_dir.join("parsers");
+    if inner.is_dir() { inner } else { cache_dir }
+}
+
+fn fetch_bytes(url: &str) -> Result<Vec<u8>, String> {
+    if let Some(path) = url.strip_prefix("file://") {
+        return fs::read(path).map_err(|e| format!("read {path}: {e}"));
+    }
+    let response = ureq::get(url)
+        .config()
+        .timeout_global(Some(Duration::from_secs(300)))
+        .build()
+        .call()
+        .map_err(|e| format!("GET {url}: {e}"))?;
+    let mut reader = response.into_body().into_reader();
+    let mut buf = Vec::new();
+    std::io::Read::read_to_end(&mut reader, &mut buf).map_err(|e| format!("read body: {e}"))?;
+    Ok(buf)
+}
+
+fn fetch_text(url: &str) -> Result<String, String> {
+    let bytes = fetch_bytes(url)?;
+    String::from_utf8(bytes).map_err(|e| format!("decode utf8: {e}"))
+}
+
 fn main() {
     println!("cargo:rerun-if-env-changed=TSLP_LANGUAGES");
     println!("cargo:rerun-if-env-changed=PROJECT_ROOT");
@@ -753,7 +847,7 @@ fn main() {
         // No definitions available — empty set
         BTreeMap::new()
     };
-    let parsers_dir = project_root.join("parsers");
+    let workspace_parsers_dir = project_root.join("parsers");
 
     let selected = selected_languages(&definitions);
 
@@ -769,6 +863,11 @@ fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let libs_dir = out_dir.join("libs");
     fs::create_dir_all(&libs_dir).expect("Failed to create libs directory");
+
+    // When parser sources aren't checked out locally (sdist install path),
+    // fetch them from the release artifact and use the extracted copy. This
+    // is the fix for #122.
+    let parsers_dir = ensure_parser_sources(&workspace_parsers_dir, &selected, &out_dir);
 
     let mut static_compiled = Vec::new();
     let mut dynamic_compiled = Vec::new();
