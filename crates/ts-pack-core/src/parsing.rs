@@ -58,11 +58,10 @@ pub struct ByteRange {
 /// # Example
 ///
 /// ```no_run
-/// use tree_sitter_language_pack::{get_language, Parser};
+/// use tree_sitter_language_pack::Parser;
 ///
-/// let language = get_language("python")?;
 /// let mut parser = Parser::new();
-/// parser.set_language(&language)?;
+/// parser.set_language("python")?;
 /// let tree = parser.parse("def hello(): pass").expect("parse failed");
 /// assert_eq!(tree.root_node().kind(), "module");
 /// # Ok::<(), tree_sitter_language_pack::Error>(())
