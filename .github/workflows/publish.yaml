@@ -882,16 +882,13 @@ jobs:
           use-sccache: "false"
           install-llvm-cov: "false"
 
-      - name: Install alef
-        uses: kreuzberg-dev/actions/install-alef@v1
-
       - name: Build and package Go FFI library
-        shell: bash
-        run: |
-          alef publish build --lang ffi --target ${{ matrix.target }}
-          alef publish package --lang go --target ${{ matrix.target }} -o dist/go-ffi
-        env:
-          PROJECT_ROOT: ${{ github.workspace }}
+        uses: kreuzberg-dev/actions/build-go-ffi@v1
+        with:
+          target: ${{ matrix.target }}
+          crate-name: ts-pack-core-ffi
+          lib-name: ts_pack_core_ffi
+          output-dir: dist/go-ffi
 
       - name: Upload FFI artifact
         uses: actions/upload-artifact@v7
