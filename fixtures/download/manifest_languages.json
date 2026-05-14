@@ -5,8 +5,8 @@
   "tags": ["download"],
   "call": "manifest_languages",
   "skip": {
-    "languages": ["wasm"],
-    "reason": "Download feature requires network access and is not available in static builds"
+    "languages": ["wasm", "rust"],
+    "reason": "Download feature requires network access (wasm: static build; rust: pre-release CI when v{version} release artifacts not yet published)"
   },
   "input": {},
   "assertions": [
