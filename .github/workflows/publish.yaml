@@ -104,158 +104,66 @@ jobs:
           version: ${{ needs.prepare.outputs.version }}
 
   # ─── Registry checks ──────────────────────────────────────────────
-  check-cratesio:
-    name: Check crates.io
+  check-registries:
+    name: Check registries
     needs: prepare
-    if: needs.prepare.outputs.release_crates == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if version exists
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: cratesio
-          package: tree-sitter-language-pack
-          version: ${{ needs.prepare.outputs.version }}
-
-  check-pypi:
-    name: Check PyPI
-    needs: prepare
-    if: needs.prepare.outputs.release_python == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if version exists
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: pypi
-          package: tree-sitter-language-pack
-          version: ${{ needs.prepare.outputs.version }}
-
-  check-npm:
-    name: Check npm
-    needs: prepare
-    if: needs.prepare.outputs.release_node == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if version exists
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: npm
-          package: "@kreuzberg/tree-sitter-language-pack"
-          version: ${{ needs.prepare.outputs.version }}
-
-  check-npm-wasm:
-    name: Check npm (WASM)
-    needs: prepare
-    if: needs.prepare.outputs.release_wasm == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if version exists
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: npm
-          package: "@kreuzberg/tree-sitter-language-pack-wasm"
-          version: ${{ needs.prepare.outputs.version }}
-
-  check-rubygems:
-    name: Check RubyGems
-    needs: prepare
-    if: needs.prepare.outputs.release_ruby == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if version exists
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: rubygems
-          package: tree_sitter_language_pack
-          version: ${{ needs.prepare.outputs.version }}
-
-  check-maven:
-    name: Check Maven Central
-    needs: prepare
-    if: needs.prepare.outputs.release_java == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if version exists
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: maven
-          package: dev.kreuzberg:tree-sitter-language-pack
-          version: ${{ needs.prepare.outputs.version }}
-
-  check-hex:
-    name: Check Hex.pm
-    needs: prepare
-    if: needs.prepare.outputs.release_elixir == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if version exists
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: hex
-          package: tree_sitter_language_pack
-          version: ${{ needs.prepare.outputs.version }}
-
-  check-packagist:
-    name: Check Packagist
-    needs: prepare
-    if: needs.prepare.outputs.release_php == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if version exists
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: packagist
-          package: kreuzberg/tree-sitter-language-pack
-          version: ${{ needs.prepare.outputs.version }}
-
-  check-nuget:
-    name: Check NuGet
-    needs: prepare
-    if: needs.prepare.outputs.release_csharp == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if version exists
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: nuget
-          package: TreeSitterLanguagePack
-          version: ${{ needs.prepare.outputs.version }}
+    uses: kreuzberg-dev/actions/.github/workflows/reusable-check-registries.yml@v1
+    with:
+      version: ${{ needs.prepare.outputs.version }}
+      registries: |
+        [
+          {
+            "name": "cratesio",
+            "registry": "cratesio",
+            "package": "tree-sitter-language-pack"
+          },
+          {
+            "name": "pypi",
+            "registry": "pypi",
+            "package": "tree-sitter-language-pack"
+          },
+          {
+            "name": "npm",
+            "registry": "npm",
+            "package": "@kreuzberg/tree-sitter-language-pack"
+          },
+          {
+            "name": "npm-wasm",
+            "registry": "npm",
+            "package": "@kreuzberg/tree-sitter-language-pack-wasm"
+          },
+          {
+            "name": "rubygems",
+            "registry": "rubygems",
+            "package": "tree_sitter_language_pack"
+          },
+          {
+            "name": "maven",
+            "registry": "maven",
+            "package": "dev.kreuzberg:tree-sitter-language-pack"
+          },
+          {
+            "name": "hex",
+            "registry": "hex",
+            "package": "tree_sitter_language_pack"
+          },
+          {
+            "name": "packagist",
+            "registry": "packagist",
+            "package": "kreuzberg/tree-sitter-language-pack"
+          },
+          {
+            "name": "nuget",
+            "registry": "nuget",
+            "package": "TreeSitterLanguagePack"
+          },
+          {
+            "name": "homebrew",
+            "registry": "homebrew",
+            "package": "ts-pack",
+            "tap-repo": "kreuzberg-dev/homebrew-tap"
+          }
+        ]
 
   # ─── Clone vendors ────────────────────────────────────────────────
   clone-vendors:
@@ -1704,13 +1612,13 @@ jobs:
   # ─── Publish Rust crates ───────────────────────────────────────────
   publish-crates:
     name: Publish Rust crates
-    needs: [prepare, validate-versions, clone-vendors, check-cratesio]
+    needs: [prepare, validate-versions, clone-vendors, check-registries]
     if: |
       always() &&
       needs.prepare.outputs.release_crates == 'true' &&
       needs.validate-versions.result == 'success' &&
       needs.clone-vendors.result == 'success' &&
-      (needs.check-cratesio.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+      (fromJson(needs.check-registries.outputs.results).cratesio != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -1781,13 +1689,13 @@ jobs:
   # ─── Publish Python to PyPI ────────────────────────────────────────
   publish-pypi:
     name: Publish Python to PyPI
-    needs: [prepare, validate-versions, check-pypi, build-python-wheels, build-python-sdist]
+    needs: [prepare, validate-versions, check-registries, build-python-wheels, build-python-sdist]
     if: |
       always() &&
       needs.prepare.outputs.release_python == 'true' &&
       needs.build-python-wheels.result == 'success' &&
       needs.build-python-sdist.result == 'success' &&
-      (needs.check-pypi.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+      (fromJson(needs.check-registries.outputs.results).pypi != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: pypi
@@ -1832,12 +1740,12 @@ jobs:
   # ─── Publish Node.js to npm ────────────────────────────────────────
   publish-node:
     name: Publish Node.js to npm
-    needs: [prepare, validate-versions, check-npm, build-node-native]
+    needs: [prepare, validate-versions, check-registries, build-node-native]
     if: |
       always() &&
       needs.prepare.outputs.release_node == 'true' &&
       needs.build-node-native.result == 'success' &&
-      (needs.check-npm.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+      (fromJson(needs.check-registries.outputs.results).npm != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -1931,12 +1839,12 @@ jobs:
   # ─── Publish WASM to npm ───────────────────────────────────────────
   publish-wasm:
     name: Publish WASM to npm
-    needs: [prepare, validate-versions, check-npm-wasm, build-wasm, publish-node]
+    needs: [prepare, validate-versions, check-registries, build-wasm, publish-node]
     if: |
       always() &&
       needs.prepare.outputs.release_wasm == 'true' &&
       needs.build-wasm.result == 'success' &&
-      (needs.check-npm-wasm.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+      (fromJson(needs.check-registries.outputs.results).'npm-wasm' != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -2003,12 +1911,12 @@ jobs:
   # ─── Publish Ruby gems ────────────────────────────────────────────
   publish-rubygems:
     name: Publish Ruby gems
-    needs: [prepare, validate-versions, check-rubygems, build-ruby-gem]
+    needs: [prepare, validate-versions, check-registries, build-ruby-gem]
     if: |
       always() &&
       needs.prepare.outputs.release_ruby == 'true' &&
       needs.build-ruby-gem.result == 'success' &&
-      (needs.check-rubygems.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+      (fromJson(needs.check-registries.outputs.results).rubygems != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -2094,12 +2002,12 @@ jobs:
   # ─── Publish Maven package ────────────────────────────────────────
   publish-maven:
     name: Publish Maven package
-    needs: [prepare, validate-versions, check-maven, build-java-package]
+    needs: [prepare, validate-versions, check-registries, build-java-package]
     if: |
       always() &&
       needs.prepare.outputs.release_java == 'true' &&
       needs.build-java-package.result == 'success' &&
-      (needs.check-maven.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+      (fromJson(needs.check-registries.outputs.results).maven != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -2188,12 +2096,12 @@ jobs:
   # ─── Publish Elixir to Hex.pm ──────────────────────────────────────
   publish-hex:
     name: Publish Elixir to Hex.pm
-    needs: [prepare, validate-versions, check-hex, publish-crates, upload-elixir-release]
+    needs: [prepare, validate-versions, check-registries, publish-crates, upload-elixir-release]
     if: |
       always() &&
       needs.prepare.outputs.release_elixir == 'true' &&
       needs.upload-elixir-release.result == 'success' &&
-      (needs.check-hex.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+      (fromJson(needs.check-registries.outputs.results).hex != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: hex
@@ -2321,12 +2229,12 @@ jobs:
   # ─── Publish PHP to Packagist ────────────────────────────────────
   publish-packagist:
     name: Publish PHP to Packagist
-    needs: [prepare, validate-versions, check-packagist, build-php-extension]
+    needs: [prepare, validate-versions, check-registries, build-php-extension]
     if: |
       always() &&
       needs.prepare.outputs.release_php == 'true' &&
       needs.build-php-extension.result == 'success' &&
-      (needs.check-packagist.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+      (fromJson(needs.check-registries.outputs.results).packagist != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -2357,12 +2265,12 @@ jobs:
   # ─── Publish C# to NuGet ─────────────────────────────────────────
   publish-nuget:
     name: Publish C# to NuGet
-    needs: [prepare, validate-versions, check-nuget, build-csharp-package]
+    needs: [prepare, validate-versions, check-registries, build-csharp-package]
     if: |
       always() &&
       needs.prepare.outputs.release_csharp == 'true' &&
       needs.build-csharp-package.result == 'success' &&
-      (needs.check-nuget.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+      (fromJson(needs.check-registries.outputs.results).nuget != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -2403,25 +2311,6 @@ jobs:
           dry-run: ${{ needs.prepare.outputs.dry_run }}
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-
-  # ─── Check Homebrew ────────────────────────────────────────────────
-  check-homebrew:
-    name: Check Homebrew
-    needs: prepare
-    if: needs.prepare.outputs.release_homebrew == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if version exists
-        id: check
-        uses: kreuzberg-dev/actions/check-registry@v1
-        with:
-          registry: homebrew
-          package: ts-pack
-          version: ${{ needs.prepare.outputs.version }}
-          tap-repo: kreuzberg-dev/homebrew-tap
 
   # ─── Build CLI binaries ───────────────────────────────────────────
   build-cli:
@@ -2561,13 +2450,13 @@ jobs:
   # ─── Update Homebrew formula source URLs + SHAs ────────────────────
   publish-homebrew-formula:
     name: Update Homebrew formula
-    needs: [prepare, check-homebrew, upload-c-ffi-release]
+    needs: [prepare, check-registries, upload-c-ffi-release]
     if: |
       always() &&
       needs.prepare.outputs.release_homebrew == 'true' &&
       needs.prepare.outputs.dry_run != 'true' &&
       needs.upload-c-ffi-release.result == 'success' &&
-      (needs.check-homebrew.outputs.exists != 'true' || needs.prepare.outputs.force_republish == 'true')
+      (fromJson(needs.check-registries.outputs.results).homebrew != 'true' || needs.prepare.outputs.force_republish == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
