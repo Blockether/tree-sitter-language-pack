@@ -6,14 +6,23 @@
 >
   <!-- Built with -->
   <a href="https://github.com/kreuzberg-dev/alef">
-    <img src="https://img.shields.io/badge/built%20with-alef%20%D7%90-007ec6" alt="Built with alef" />
+    <img
+      src="https://img.shields.io/badge/built%20with-alef%20%D7%90-007ec6"
+      alt="Built with alef"
+    />
   </a>
   <!-- Language Bindings -->
   <a href="https://crates.io/crates/tree-sitter-language-pack">
-    <img src="https://img.shields.io/crates/v/tree-sitter-language-pack?label=Rust&color=007ec6" alt="Rust" />
+    <img
+      src="https://img.shields.io/crates/v/tree-sitter-language-pack?label=Rust&color=007ec6"
+      alt="Rust"
+    />
   </a>
   <a href="https://pypi.org/project/tree-sitter-language-pack/">
-    <img src="https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6" alt="Python" />
+    <img
+      src="https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6"
+      alt="Python"
+    />
   </a>
   <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack">
     <img
@@ -63,7 +72,9 @@
       alt="Elixir"
     />
   </a>
-  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/tree-sitter-language-pack-ffi">
+  <a
+    href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/tree-sitter-language-pack-ffi"
+  >
     <img src="https://img.shields.io/badge/C-FFI-007ec6" alt="C FFI" />
   </a>
 
@@ -80,11 +91,14 @@ Pre-compiled tree-sitter grammars for 306 programming languages, with on-demand 
 
 ## Installation
 
+
 ```bash
 cargo add tree-sitter-language-pack
 ```
 
+
 ## Quick Start
+
 
 ```rust
 use tree_sitter_language_pack::{get_language, get_parser};
@@ -93,6 +107,7 @@ let mut parser = get_parser("python").expect("language available");
 let tree = parser.parse("def hello(): pass", None).unwrap();
 println!("{}", tree.root_node().to_sexp());
 ```
+
 
 ## Features
 
