@@ -301,7 +301,7 @@ e2e = "cd e2e/wasm && pnpm install && pnpm test"
 
 [crates.test.rust]
 precondition = "command -v cargo >/dev/null 2>&1"
-e2e = "cd e2e/rust && cargo test"
+e2e = "cd e2e/rust && cargo test -- --test-threads=1"
 
 [crates.test.c]
 precondition = "command -v make >/dev/null 2>&1"
