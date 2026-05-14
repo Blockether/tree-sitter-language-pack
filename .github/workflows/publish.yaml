@@ -550,8 +550,10 @@ jobs:
           import tree_sitter_language_pack as t
           p = t.get_parser('python')
           tree = p.parse('def foo(): pass')
-          assert tree.root_node.type == 'module', tree.root_node.type
-          print('OK:', tree.root_node.type)
+          root = tree.root_node()
+          kind = root.kind()
+          assert kind == 'module', kind
+          print('OK:', kind)
           "
           # Restore parsers/ for any subsequent steps.
           mv /tmp/parsers-bak parsers
