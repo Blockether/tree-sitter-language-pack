@@ -11,6 +11,8 @@ on:
       - "Cargo.lock"
       - "rust-toolchain.toml"
       - ".cargo/config.toml"
+      - "sources/**"
+      - "scripts/clone_vendors.py"
       - ".github/workflows/ci-rust.yaml"
   pull_request:
     branches: [main]
@@ -22,6 +24,8 @@ on:
       - "Cargo.lock"
       - "rust-toolchain.toml"
       - ".cargo/config.toml"
+      - "sources/**"
+      - "scripts/clone_vendors.py"
       - ".github/workflows/ci-rust.yaml"
   workflow_run:
     workflows: ["Publish Release"]
@@ -44,13 +48,67 @@ env:
 
 jobs:
   # ---------------------------------------------------------------------------
-  # 4. rust-tests — Core Rust unit + e2e tests
+  # 1. clone-vendors — fetch vendor grammar sources for static linking
+  # ---------------------------------------------------------------------------
+  clone-vendors:
+    name: Clone vendors
+    if: github.repository == 'kreuzberg-dev/tree-sitter-language-pack' && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install Python dependencies
+        run: uv sync --no-install-project
+
+      - name: Cache parsers
+        uses: actions/cache@v5
+        with:
+          path: parsers
+          key: parsers-${{ hashFiles('sources/language_definitions.json') }}
+          restore-keys: |
+            parsers-
+
+      - name: Clone vendors
+        run: |
+          mkdir -p parsers
+          uv run --script scripts/clone_vendors.py
+
+      - name: Upload parsers
+        uses: actions/upload-artifact@v7
+        with:
+          name: language-parsers
+          path: parsers
+          retention-days: 1
+
+  # ---------------------------------------------------------------------------
+  # 2. rust-tests — Core Rust unit + e2e tests
   # ---------------------------------------------------------------------------
   rust-tests:
     name: Rust Tests
     if: |
       github.repository == 'kreuzberg-dev/tree-sitter-language-pack' &&
       github.actor != 'dependabot[bot]'
+    needs: [clone-vendors]
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -60,6 +118,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Download parsers
+        uses: actions/download-artifact@v8
+        with:
+          name: language-parsers
+          path: parsers
 
       - name: Setup Rust
         uses: kreuzberg-dev/actions/setup-rust@v1
