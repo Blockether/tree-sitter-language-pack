@@ -59,7 +59,13 @@ fn selected_languages(definitions: &BTreeMap<String, LanguageDefinition>) -> Vec
     // statically. If not set, no languages are compiled statically — they are
     // downloaded at runtime via the `download` feature instead.
     if let Ok(langs) = env::var("TSLP_LANGUAGES") {
-        let selected: Vec<String> = langs.split(',').map(|s| s.trim().to_string()).collect();
+        let trimmed = langs.trim();
+        // TSLP_LANGUAGES=all (or *) statically compiles every grammar in language_definitions.json.
+        // Useful for CI/WASM where every parser must be available without a runtime download path.
+        if trimmed.eq_ignore_ascii_case("all") || trimmed == "*" {
+            return definitions.keys().cloned().collect();
+        }
+        let selected: Vec<String> = trimmed.split(',').map(|s| s.trim().to_string()).collect();
         for name in &selected {
             if !name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
                 panic!(
