@@ -47,6 +47,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       tag: ${{ steps.meta.outputs.tag }}
+      checkout_ref: ${{ steps.ref.outputs.checkout_ref }}
       version: ${{ steps.meta.outputs.version }}
       npm_tag: ${{ steps.meta.outputs.npm_tag }}
       dry_run: ${{ steps.meta.outputs.dry_run }}
@@ -73,6 +74,22 @@ jobs:
         with:
           available-targets: "crates,python,node,wasm,ruby,go,java,elixir,c-ffi,php,csharp,homebrew"
 
+      # In dry-run we may not yet have the tag pushed; check out the dispatch
+      # SHA instead so jobs can still validate the workflow against current
+      # workspace contents. Real publish keeps using the immutable tag.
+      - name: Resolve checkout ref
+        id: ref
+        env:
+          DRY_RUN: ${{ steps.meta.outputs.dry_run }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          DISPATCH_SHA: ${{ github.sha }}
+        run: |
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            echo "checkout_ref=${DISPATCH_SHA}" >> "$GITHUB_OUTPUT"
+          else
+            echo "checkout_ref=${TAG}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Release info
         run: |
           {
@@ -96,7 +113,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Validate versions
         uses: kreuzberg-dev/actions/validate-versions@v1
@@ -175,7 +192,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -228,7 +245,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -291,7 +308,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -398,7 +415,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -453,7 +470,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -565,7 +582,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -635,7 +652,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -730,7 +747,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -886,7 +903,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -955,7 +972,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -997,7 +1014,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -1109,7 +1126,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -1265,7 +1282,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -1334,7 +1351,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6 # v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
 
       - name: Download parsers
@@ -1439,7 +1456,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -1481,7 +1498,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
@@ -1535,7 +1552,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parser binary artifacts
         uses: actions/download-artifact@v8
@@ -1611,7 +1628,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download Go FFI artifacts
         uses: actions/download-artifact@v8
@@ -1648,7 +1665,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download C FFI artifacts
         uses: actions/download-artifact@v8
@@ -1685,7 +1702,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download Elixir NIF artifacts
         uses: actions/download-artifact@v8
@@ -1728,7 +1745,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -1855,7 +1872,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -1954,7 +1971,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -2026,7 +2043,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -2116,7 +2133,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Re-check Maven Central before publish
         id: recheck
@@ -2212,7 +2229,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
 
       - name: Setup Elixir
@@ -2305,7 +2322,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download PHP package artifacts
         uses: actions/download-artifact@v8
@@ -2344,7 +2361,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Dry run summary
         if: ${{ inputs.dry_run }}
@@ -2379,7 +2396,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
@@ -2451,7 +2468,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download parsers
         uses: actions/download-artifact@v8
@@ -2526,7 +2543,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Download CLI artifacts
         uses: actions/download-artifact@v8
@@ -2565,7 +2582,7 @@ jobs:
       - name: Checkout source repo
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Checkout homebrew-tap
         uses: actions/checkout@v6
@@ -2629,7 +2646,7 @@ jobs:
       - name: Checkout source repo
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Install Homebrew (Linux)
         if: ${{ matrix.install_brew }}
@@ -2672,7 +2689,7 @@ jobs:
       - name: Checkout source repo
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
 
       - name: Checkout homebrew-tap
         uses: actions/checkout@v6
@@ -2749,7 +2766,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.prepare.outputs.tag }}
+          ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
 
       - name: Finalize release (publish from draft, tag Go module)
