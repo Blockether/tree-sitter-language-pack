@@ -2,7 +2,6 @@
 members = ["crates/*", "packages/dart/rust", "packages/swift/rust", "tools/snippet-runner"]
 exclude = [
     "crates/tree-sitter-language-pack-ffi",
-    "crates/tree-sitter-language-pack-jni",
     "crates/tree-sitter-language-pack-wasm",
     "crates/ts-pack-elixir",
     "crates/ts-pack-java",

@@ -157,25 +157,21 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     mut env: JNIEnv,
     _class: JClass,
     name: JString,
-) -> jstring {
+) -> jlong {
     let name = match jstring_to_string(&mut env, name) {
         Ok(s) => s,
         Err(e) => {
             throw_jni_error(&mut env, &format!("{e}"));
-            return std::ptr::null_mut();
+            return 0;
         }
     };
     let result = core_crate::get_language(&name);
     match result {
         Err(e) => {
             throw_jni_error(&mut env, &format!("{e}"));
-            std::ptr::null_mut()
+            0
         }
-        Ok(v) => {
-            let handle_raw = Box::into_raw(Box::new(v)) as jlong;
-            let json = format!("{{\"handle\": {}}}", handle_raw);
-            string_to_jstring(&mut env, &json)
-        }
+        Ok(v) => Box::into_raw(Box::new(v)) as jlong,
     }
 }
 
@@ -184,25 +180,21 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     mut env: JNIEnv,
     _class: JClass,
     name: JString,
-) -> jstring {
+) -> jlong {
     let name = match jstring_to_string(&mut env, name) {
         Ok(s) => s,
         Err(e) => {
             throw_jni_error(&mut env, &format!("{e}"));
-            return std::ptr::null_mut();
+            return 0;
         }
     };
     let result = core_crate::get_parser(&name);
     match result {
         Err(e) => {
             throw_jni_error(&mut env, &format!("{e}"));
-            std::ptr::null_mut()
+            0
         }
-        Ok(v) => {
-            let handle_raw = Box::into_raw(Box::new(v)) as jlong;
-            let json = format!("{{\"handle\": {}}}", handle_raw);
-            string_to_jstring(&mut env, &json)
-        }
+        Ok(v) => Box::into_raw(Box::new(v)) as jlong,
     }
 }
 
@@ -297,9 +289,8 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
             std::ptr::null_mut()
         }
         Ok(v) => {
-            let handle_raw = Box::into_raw(Box::new(v)) as jlong;
-            let json = format!("{{\"handle\": {}}}", handle_raw);
-            string_to_jstring(&mut env, &json)
+            let s = serde_json::to_string(&v).unwrap_or_default();
+            string_to_jstring(&mut env, &s)
         }
     }
 }
@@ -1755,5 +1746,21 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // ownership is transferred back here for drop via Box::from_raw.
     unsafe {
         let _ = Box::from_raw(handle as *mut core_crate::DownloadManager);
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeFreeLanguage(
+    _env: JNIEnv,
+    _class: JClass,
+    handle: jlong,
+) {
+    if handle == 0 {
+        return;
+    }
+    // SAFETY: `handle` was allocated by the matching constructor shim and
+    // ownership is transferred back here for drop via Box::from_raw.
+    unsafe {
+        let _ = Box::from_raw(handle as *mut core_crate::Language);
     }
 }
