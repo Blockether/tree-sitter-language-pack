@@ -580,7 +580,7 @@ A comment extracted from source code.
 | `text` | `str` | — | Text |
 | `kind` | `CommentKind` | `CommentKind.LINE` | Kind (comment kind) |
 | `span` | `Span` | — | Span (span) |
-| `associated_node` | `str | None` | `None` | Associated node |
+| `associated_node` | `str \| None` | `None` | Associated node |
 
 
 ---
@@ -605,7 +605,7 @@ A section within a docstring (e.g., Args, Returns, Raises).
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `kind` | `str` | — | Kind |
-| `name` | `str | None` | `None` | The name |
+| `name` | `str \| None` | `None` | The name |
 | `description` | `str` | — | Human-readable description |
 
 
@@ -620,7 +620,7 @@ A docstring extracted from source code.
 | `text` | `str` | — | Text |
 | `format` | `DocstringFormat` | `DocstringFormat.PYTHON_TRIPLE_QUOTE` | Format (docstring format) |
 | `span` | `Span` | — | Span (span) |
-| `associated_item` | `str | None` | `None` | Associated item |
+| `associated_item` | `str \| None` | `None` | Associated item |
 | `parsed_sections` | `list[DocSection]` | `[]` | Parsed sections |
 
 
@@ -794,7 +794,7 @@ An import statement extracted from source code.
 |-------|------|---------|-------------|
 | `source` | `str` | — | Source |
 | `items` | `list[str]` | `[]` | Items |
-| `alias` | `str | None` | `None` | Alias |
+| `alias` | `str \| None` | `None` | Alias |
 | `is_wildcard` | `bool` | — | Whether wildcard |
 | `span` | `Span` | — | Span (span) |
 
@@ -1167,9 +1167,9 @@ or passed as a dict/object from language bindings.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `cache_dir` | `str | None` | `None` | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
-| `languages` | `list[str] | None` | `[]` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`). |
-| `groups` | `list[str] | None` | `[]` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). |
+| `cache_dir` | `str \| None` | `None` | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
+| `languages` | `list[str] \| None` | `[]` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`). |
+| `groups` | `list[str] \| None` | `[]` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). |
 
 ##### Methods
 
@@ -1338,7 +1338,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `docstrings` | `bool` | `False` | Extract docstrings. Default: false. |
 | `symbols` | `bool` | `False` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `False` | Include parse diagnostics. Default: false. |
-| `chunk_max_size` | `int | None` | `None` | Maximum chunk size in bytes. `None` disables chunking. |
+| `chunk_max_size` | `int \| None` | `None` | Maximum chunk size in bytes. `None` disables chunking. |
 
 ##### Methods
 
@@ -1433,14 +1433,14 @@ A structural item (function, class, struct, etc.) in source code.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `kind` | `StructureKind` | `StructureKind.FUNCTION` | Kind (structure kind) |
-| `name` | `str | None` | `None` | The name |
-| `visibility` | `str | None` | `None` | Visibility |
+| `name` | `str \| None` | `None` | The name |
+| `visibility` | `str \| None` | `None` | Visibility |
 | `span` | `Span` | — | Span (span) |
 | `children` | `list[StructureItem]` | `[]` | Children |
 | `decorators` | `list[str]` | `[]` | Decorators |
-| `doc_comment` | `str | None` | `None` | Doc comment |
-| `signature` | `str | None` | `None` | Signature |
-| `body_span` | `Span | None` | `None` | Body span (span) |
+| `doc_comment` | `str \| None` | `None` | Doc comment |
+| `signature` | `str \| None` | `None` | Signature |
+| `body_span` | `Span \| None` | `None` | Body span (span) |
 
 
 ---
@@ -1454,8 +1454,8 @@ A symbol (variable, function, type, etc.) extracted from source code.
 | `name` | `str` | — | The name |
 | `kind` | `SymbolKind` | `SymbolKind.VARIABLE` | Kind (symbol kind) |
 | `span` | `Span` | — | Span (span) |
-| `type_annotation` | `str | None` | `None` | Type annotation |
-| `doc` | `str | None` | `None` | Doc |
+| `type_annotation` | `str \| None` | `None` | Type annotation |
+| `doc` | `str \| None` | `None` | Doc |
 
 
 ---

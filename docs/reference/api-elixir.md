@@ -601,7 +601,7 @@ A comment extracted from source code.
 | `text` | `String.t()` | — | Text |
 | `kind` | `CommentKind` | `:line` | Kind (comment kind) |
 | `span` | `Span` | — | Span (span) |
-| `associated_node` | `String.t() | nil` | `nil` | Associated node |
+| `associated_node` | `String.t() \| nil` | `nil` | Associated node |
 
 
 ---
@@ -626,7 +626,7 @@ A section within a docstring (e.g., Args, Returns, Raises).
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `kind` | `String.t()` | — | Kind |
-| `name` | `String.t() | nil` | `nil` | The name |
+| `name` | `String.t() \| nil` | `nil` | The name |
 | `description` | `String.t()` | — | Human-readable description |
 
 
@@ -641,7 +641,7 @@ A docstring extracted from source code.
 | `text` | `String.t()` | — | Text |
 | `format` | `DocstringFormat` | `:python_triple_quote` | Format (docstring format) |
 | `span` | `Span` | — | Span (span) |
-| `associated_item` | `String.t() | nil` | `nil` | Associated item |
+| `associated_item` | `String.t() \| nil` | `nil` | Associated item |
 | `parsed_sections` | `list(DocSection)` | `[]` | Parsed sections |
 
 
@@ -812,7 +812,7 @@ An import statement extracted from source code.
 |-------|------|---------|-------------|
 | `source` | `String.t()` | — | Source |
 | `items` | `list(String.t())` | `[]` | Items |
-| `alias` | `String.t() | nil` | `nil` | Alias |
+| `alias` | `String.t() \| nil` | `nil` | Alias |
 | `is_wildcard` | `boolean()` | — | Whether wildcard |
 | `span` | `Span` | — | Span (span) |
 
@@ -1183,9 +1183,9 @@ or passed as a dict/object from language bindings.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `cache_dir` | `String.t() | nil` | `nil` | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
-| `languages` | `list(String.t()) | nil` | `[]` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`). |
-| `groups` | `list(String.t()) | nil` | `[]` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). |
+| `cache_dir` | `String.t() \| nil` | `nil` | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
+| `languages` | `list(String.t()) \| nil` | `[]` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`). |
+| `groups` | `list(String.t()) \| nil` | `[]` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). |
 
 ##### Functions
 
@@ -1350,7 +1350,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `docstrings` | `boolean()` | `false` | Extract docstrings. Default: false. |
 | `symbols` | `boolean()` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `boolean()` | `false` | Include parse diagnostics. Default: false. |
-| `chunk_max_size` | `integer() | nil` | `nil` | Maximum chunk size in bytes. `nil` disables chunking. |
+| `chunk_max_size` | `integer() \| nil` | `nil` | Maximum chunk size in bytes. `nil` disables chunking. |
 
 ##### Functions
 
@@ -1444,14 +1444,14 @@ A structural item (function, class, struct, etc.) in source code.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `kind` | `StructureKind` | `:function` | Kind (structure kind) |
-| `name` | `String.t() | nil` | `nil` | The name |
-| `visibility` | `String.t() | nil` | `nil` | Visibility |
+| `name` | `String.t() \| nil` | `nil` | The name |
+| `visibility` | `String.t() \| nil` | `nil` | Visibility |
 | `span` | `Span` | — | Span (span) |
 | `children` | `list(StructureItem)` | `[]` | Children |
 | `decorators` | `list(String.t())` | `[]` | Decorators |
-| `doc_comment` | `String.t() | nil` | `nil` | Doc comment |
-| `signature` | `String.t() | nil` | `nil` | Signature |
-| `body_span` | `Span | nil` | `nil` | Body span (span) |
+| `doc_comment` | `String.t() \| nil` | `nil` | Doc comment |
+| `signature` | `String.t() \| nil` | `nil` | Signature |
+| `body_span` | `Span \| nil` | `nil` | Body span (span) |
 
 
 ---
@@ -1465,8 +1465,8 @@ A symbol (variable, function, type, etc.) extracted from source code.
 | `name` | `String.t()` | — | The name |
 | `kind` | `SymbolKind` | `:variable` | Kind (symbol kind) |
 | `span` | `Span` | — | Span (span) |
-| `type_annotation` | `String.t() | nil` | `nil` | Type annotation |
-| `doc` | `String.t() | nil` | `nil` | Doc |
+| `type_annotation` | `String.t() \| nil` | `nil` | Type annotation |
+| `doc` | `String.t() \| nil` | `nil` | Doc |
 
 
 ---
