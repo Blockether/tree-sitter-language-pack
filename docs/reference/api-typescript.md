@@ -580,7 +580,7 @@ A comment extracted from source code.
 | `text` | `string` | — | Text |
 | `kind` | `CommentKind` | `CommentKind.Line` | Kind (comment kind) |
 | `span` | `Span` | — | Span (span) |
-| `associatedNode` | `string | null` | `null` | Associated node |
+| `associatedNode` | `string \| null` | `null` | Associated node |
 
 
 ---
@@ -605,7 +605,7 @@ A section within a docstring (e.g., Args, Returns, Raises).
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `kind` | `string` | — | Kind |
-| `name` | `string | null` | `null` | The name |
+| `name` | `string \| null` | `null` | The name |
 | `description` | `string` | — | Human-readable description |
 
 
@@ -620,7 +620,7 @@ A docstring extracted from source code.
 | `text` | `string` | — | Text |
 | `format` | `DocstringFormat` | `DocstringFormat.PythonTripleQuote` | Format (docstring format) |
 | `span` | `Span` | — | Span (span) |
-| `associatedItem` | `string | null` | `null` | Associated item |
+| `associatedItem` | `string \| null` | `null` | Associated item |
 | `parsedSections` | `Array<DocSection>` | `[]` | Parsed sections |
 
 
@@ -791,7 +791,7 @@ An import statement extracted from source code.
 |-------|------|---------|-------------|
 | `source` | `string` | — | Source |
 | `items` | `Array<string>` | `[]` | Items |
-| `alias` | `string | null` | `null` | Alias |
+| `alias` | `string \| null` | `null` | Alias |
 | `isWildcard` | `boolean` | — | Whether wildcard |
 | `span` | `Span` | — | Span (span) |
 
@@ -1162,9 +1162,9 @@ or passed as a dict/object from language bindings.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `cacheDir` | `string | null` | `null` | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
-| `languages` | `Array<string> | null` | `[]` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`). |
-| `groups` | `Array<string> | null` | `[]` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). |
+| `cacheDir` | `string \| null` | `null` | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
+| `languages` | `Array<string> \| null` | `[]` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`). |
+| `groups` | `Array<string> \| null` | `[]` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). |
 
 ##### Methods
 
@@ -1329,7 +1329,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `docstrings` | `boolean` | `false` | Extract docstrings. Default: false. |
 | `symbols` | `boolean` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `boolean` | `false` | Include parse diagnostics. Default: false. |
-| `chunkMaxSize` | `number | null` | `null` | Maximum chunk size in bytes. `null` disables chunking. |
+| `chunkMaxSize` | `number \| null` | `null` | Maximum chunk size in bytes. `null` disables chunking. |
 
 ##### Methods
 
@@ -1423,14 +1423,14 @@ A structural item (function, class, struct, etc.) in source code.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `kind` | `StructureKind` | `StructureKind.Function` | Kind (structure kind) |
-| `name` | `string | null` | `null` | The name |
-| `visibility` | `string | null` | `null` | Visibility |
+| `name` | `string \| null` | `null` | The name |
+| `visibility` | `string \| null` | `null` | Visibility |
 | `span` | `Span` | — | Span (span) |
 | `children` | `Array<StructureItem>` | `[]` | Children |
 | `decorators` | `Array<string>` | `[]` | Decorators |
-| `docComment` | `string | null` | `null` | Doc comment |
-| `signature` | `string | null` | `null` | Signature |
-| `bodySpan` | `Span | null` | `null` | Body span (span) |
+| `docComment` | `string \| null` | `null` | Doc comment |
+| `signature` | `string \| null` | `null` | Signature |
+| `bodySpan` | `Span \| null` | `null` | Body span (span) |
 
 
 ---
@@ -1444,8 +1444,8 @@ A symbol (variable, function, type, etc.) extracted from source code.
 | `name` | `string` | — | The name |
 | `kind` | `SymbolKind` | `SymbolKind.Variable` | Kind (symbol kind) |
 | `span` | `Span` | — | Span (span) |
-| `typeAnnotation` | `string | null` | `null` | Type annotation |
-| `doc` | `string | null` | `null` | Doc |
+| `typeAnnotation` | `string \| null` | `null` | Type annotation |
+| `doc` | `string \| null` | `null` | Doc |
 
 
 ---
