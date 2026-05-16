@@ -2,6 +2,7 @@
 
 package dev.kreuzberg.tslp.android
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -107,7 +108,19 @@ object TreeSitterLanguagePack {
      * Returns names of both statically compiled and dynamically loadable languages,
      * plus any configured aliases.
      */
-    fun availableLanguages(): String = TreeSitterLanguagePackBridge.nativeAvailableLanguages()
+    fun availableLanguages(): List<String> {
+        val resultJson = TreeSitterLanguagePackBridge.nativeAvailableLanguages()
+        return mapper.readValue(resultJson, object : TypeReference<List<String>>() {})
+    }
+
+    /**
+     * List all available language names (sorted, deduplicated, includes aliases).
+     *
+     * Returns names of both statically compiled and dynamically loadable languages,
+     * plus any configured aliases.
+     */
+    suspend fun availableLanguagesAsync(): List<String> =
+        withContext(Dispatchers.IO) { availableLanguages() }
 
     /**
      * Check if a language is available by name or alias.
@@ -193,7 +206,7 @@ object TreeSitterLanguagePack {
      * Returns an error if any language is not available in the manifest or if
      * the download fails.
      */
-    fun download(names: String): Long = TreeSitterLanguagePackBridge.nativeDownload(names)
+    fun download(names: List<String>): Long = TreeSitterLanguagePackBridge.nativeDownload(mapper.writeValueAsString(names))
 
     /**
      * Download all available languages from the remote manifest.
@@ -223,7 +236,24 @@ object TreeSitterLanguagePack {
      *
      * Returns an error if the manifest cannot be fetched.
      */
-    fun manifestLanguages(): String = TreeSitterLanguagePackBridge.nativeManifestLanguages()
+    fun manifestLanguages(): List<String> {
+        val resultJson = TreeSitterLanguagePackBridge.nativeManifestLanguages()
+        return mapper.readValue(resultJson, object : TypeReference<List<String>>() {})
+    }
+
+    /**
+     * Return all language names available in the remote manifest (305).
+     *
+     * Fetches (and caches) the remote manifest to discover the full list of
+     * downloadable languages. Use `downloaded_languages` to list what is
+     * already cached locally.
+     *
+     * **Errors:**
+     *
+     * Returns an error if the manifest cannot be fetched.
+     */
+    suspend fun manifestLanguagesAsync(): List<String> =
+        withContext(Dispatchers.IO) { manifestLanguages() }
 
     /**
      * Return languages that are already downloaded and cached locally.
@@ -231,7 +261,19 @@ object TreeSitterLanguagePack {
      * Does not perform any network requests. Returns an empty list if the
      * cache directory does not exist or cannot be read.
      */
-    fun downloadedLanguages(): String = TreeSitterLanguagePackBridge.nativeDownloadedLanguages()
+    fun downloadedLanguages(): List<String> {
+        val resultJson = TreeSitterLanguagePackBridge.nativeDownloadedLanguages()
+        return mapper.readValue(resultJson, object : TypeReference<List<String>>() {})
+    }
+
+    /**
+     * Return languages that are already downloaded and cached locally.
+     *
+     * Does not perform any network requests. Returns an empty list if the
+     * cache directory does not exist or cannot be read.
+     */
+    suspend fun downloadedLanguagesAsync(): List<String> =
+        withContext(Dispatchers.IO) { downloadedLanguages() }
 
     /**
      * Delete all cached parser shared libraries.

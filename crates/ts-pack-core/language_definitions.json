@@ -24,12 +24,12 @@
   "al": {
     "extensions": ["al"],
     "repo": "https://github.com/SShadowS/tree-sitter-al",
-    "rev": "0d5b5cf95b2c239a57907c5b240c2b1303e7096d"
+    "rev": "60b68247a43d31f02f9f56ec67be6ebb14912498"
   },
   "angular": {
     "extensions": [],
     "repo": "https://github.com/dlvandenberg/tree-sitter-angular",
-    "rev": "f0d0685701b70883fa2dfe94ee7dc27965cab841"
+    "rev": "38a8014ed5452cd6b7cf1399c00177a1f5374256"
   },
   "apex": {
     "branch": "main",
@@ -87,7 +87,7 @@
     "branch": "master",
     "extensions": ["beancount"],
     "repo": "https://github.com/polarmutex/tree-sitter-beancount",
-    "rev": "81769709e26c3469d827f1b1c6c34120bb4966b1"
+    "rev": "c5e6cdf260629f76035a0c0de830947f385ae622"
   },
   "bibtex": {
     "branch": "master",
@@ -119,7 +119,7 @@
     "branch": "develop",
     "extensions": ["bsl"],
     "repo": "https://github.com/alkoleft/tree-sitter-bsl",
-    "rev": "71c1fce00c412bd80c840a0355a87c0ab1534c8f"
+    "rev": "b424b53e72ca0746ea9a7131d80aec1947523a0c"
   },
   "c": {
     "ambiguous": {
@@ -172,7 +172,7 @@
     "directory": "cfml",
     "extensions": ["cfc"],
     "repo": "https://github.com/cfmleditor/tree-sitter-cfml",
-    "rev": "a71d674de231b1bf22e9257f096643d015e72efe"
+    "rev": "7f59b2808bf64a123cfc401a7f9c1f071934af53"
   },
   "chatito": {
     "extensions": ["chatito"],
@@ -418,7 +418,7 @@
   "erlang": {
     "extensions": ["erl", "hrl"],
     "repo": "https://github.com/WhatsApp/tree-sitter-erlang",
-    "rev": "2ace143dea47c872b334660956742dda4efa4ea3"
+    "rev": "cd372956af6b515b222923d096d0b4878bc7300c"
   },
   "facility": {
     "extensions": ["fsd"],
@@ -525,7 +525,7 @@
   "gitcommit": {
     "extensions": [],
     "repo": "https://github.com/gbprod/tree-sitter-gitcommit",
-    "rev": "fae7e726b8ea7f669264887aa8d9d7e9dffa8a5e"
+    "rev": "49715a9e6f19ce3d33b875aacdd6ad8ddaee0ffe"
   },
   "gitignore": {
     "extensions": ["gitignore"],
@@ -556,7 +556,7 @@
   "gnuplot": {
     "extensions": ["gp", "gnuplot", "plt"],
     "repo": "https://github.com/dpezto/tree-sitter-gnuplot",
-    "rev": "8923c1e38b9634a688a6c0dce7c18c8ffb823e79"
+    "rev": "29586d47b9363c29bf02cc4d1b45c4379adf6317"
   },
   "go": {
     "branch": "master",
@@ -959,7 +959,7 @@
     "branch": "master",
     "extensions": ["nix"],
     "repo": "https://github.com/nix-community/tree-sitter-nix",
-    "rev": "35b2a51e93625e50e0bbff58b4aad45706cdc299"
+    "rev": "69fbfb02896cdd27cb7ff3cd61f7f3f6bde4f017"
   },
   "norg": {
     "extensions": ["norg"],
@@ -995,14 +995,14 @@
     "directory": "grammars/ocaml",
     "extensions": ["ml"],
     "repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-    "rev": "ec8dcc936f90007b86cb1a1683d09c0bf6d8183b"
+    "rev": "6902a86ab5b3b80c622030210aae2d8cb95eb775"
   },
   "ocaml_interface": {
     "branch": "master",
     "directory": "grammars/interface",
     "extensions": ["mli"],
     "repo": "https://github.com/tree-sitter/tree-sitter-ocaml",
-    "rev": "ec8dcc936f90007b86cb1a1683d09c0bf6d8183b"
+    "rev": "6902a86ab5b3b80c622030210aae2d8cb95eb775"
   },
   "ocamllex": {
     "extensions": ["mll"],
@@ -1042,7 +1042,7 @@
     "branch": "release",
     "extensions": ["pl", "pm"],
     "repo": "https://github.com/tree-sitter-perl/tree-sitter-perl",
-    "rev": "4d64ea48056f24a79a1be29925fe8462a80a7cd1"
+    "rev": "883aa6a07fd4949e797e41d52abe976d78e236d1"
   },
   "pgn": {
     "branch": "master",
@@ -1065,7 +1065,7 @@
     "extensions": ["pkl"],
     "generate": true,
     "repo": "https://github.com/apple/tree-sitter-pkl",
-    "rev": "4b0c34dde3fa8a6bb3c3e6118e5cec745f452c9a"
+    "rev": "ed7b2e15909c8806e9f9a08300df64336d74b06a"
   },
   "po": {
     "extensions": ["po", "pot"],
@@ -1169,7 +1169,7 @@
   "qmldir": {
     "extensions": [],
     "repo": "https://github.com/tree-sitter-grammars/tree-sitter-qmldir",
-    "rev": "408bd08ef5ada87a45e9cf58795fb95b2654e862"
+    "rev": "1fa9200b3e57f728291f7a85b0a6990fc98387ac"
   },
   "qmljs": {
     "branch": "master",
@@ -1397,7 +1397,7 @@
     "extensions": ["swift"],
     "generate": true,
     "repo": "https://github.com/alex-pinkus/tree-sitter-swift",
-    "rev": "30f30560932cf5b6ab26a383b372233db461b80a"
+    "rev": "3d38a39612badc2a2525dde3676c90b0fe8128cd"
   },
   "systemverilog": {
     "ambiguous": {
@@ -1502,7 +1502,7 @@
   "twig": {
     "extensions": ["twig"],
     "repo": "https://github.com/gbprod/tree-sitter-twig",
-    "rev": "7195ee573ab5c3b3bb0e91b042e6f83ac1b11104"
+    "rev": "0afd9a6d808944e65a7be393e31868b85345735f"
   },
   "typescript": {
     "directory": "typescript",

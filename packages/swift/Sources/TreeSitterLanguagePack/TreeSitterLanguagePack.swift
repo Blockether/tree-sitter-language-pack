@@ -196,10 +196,50 @@ public typealias ChunkContext = RustBridge.ChunkContext
 public typealias PackConfig = RustBridge.PackConfig
 
 /// A source position — row + column, zero-indexed.
-public typealias Point = RustBridge.Point
+public struct Point: Codable, Sendable, Hashable {
+  /// Zero-indexed row number.
+  public let row: UInt
+  /// Zero-indexed column number, in UTF-16 code units.
+  public let column: UInt
+  public init(row: UInt, column: UInt) {
+    self.row = row
+    self.column = column
+  }
+}
+
+// MARK: - Internal FFI conversions for Point
+extension Point {
+  init(_ rb: RustBridge.Point) throws {
+    self.row = rb.row()
+    self.column = rb.column()
+  }
+  func intoRust() throws -> RustBridge.Point {
+    return RustBridge.Point(self.row, self.column)
+  }
+}
 
 /// A byte range — start (inclusive) to end (exclusive).
-public typealias ByteRange = RustBridge.ByteRange
+public struct ByteRange: Codable, Sendable, Hashable {
+  /// Inclusive start byte offset.
+  public let start: UInt
+  /// Exclusive end byte offset.
+  public let end: UInt
+  public init(start: UInt, end: UInt) {
+    self.start = start
+    self.end = end
+  }
+}
+
+// MARK: - Internal FFI conversions for ByteRange
+extension ByteRange {
+  init(_ rb: RustBridge.ByteRange) throws {
+    self.start = rb.start()
+    self.end = rb.end()
+  }
+  func intoRust() throws -> RustBridge.ByteRange {
+    return RustBridge.ByteRange(self.start, self.end)
+  }
+}
 
 /// Configuration for the `process()` function.
 ///
@@ -392,7 +432,8 @@ public func packConfigFromJson(_ json: String) throws -> PackConfig {
 }
 
 public func pointFromJson(_ json: String) throws -> Point {
-  return try RustBridge.pointFromJson(json)
+  let data = json.data(using: .utf8) ?? Data()
+  return try JSONDecoder().decode(Point.self, from: data)
 }
 
 public func processConfigFromJson(_ json: String) throws -> ProcessConfig {

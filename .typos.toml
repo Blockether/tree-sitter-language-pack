@@ -3,12 +3,12 @@
 
 [default]
 extend-ignore-re = [
-    # Hex strings (e.g. commit hashes, checksums)
-    "[a-fA-F0-9]{32,}",
-    # Base64 encoded strings
-    "[A-Za-z0-9+/]{40,}={0,2}",
-    # URLs — avoid flagging path segments
-    "https?://[^\\s]+",
+  # Hex strings (e.g. commit hashes, checksums)
+  "[a-fA-F0-9]{32,}",
+  # Base64 encoded strings
+  "[A-Za-z0-9+/]{40,}={0,2}",
+  # URLs — avoid flagging path segments
+  "https?://[^\\s]+",
 ]
 
 [default.extend-words]
@@ -35,27 +35,27 @@ PyPI = "PyPI"
 
 [files]
 extend-exclude = [
-    "fixtures/",
-    "*.lock",
-    "pnpm-lock.yaml",
-    "target/",
-    "node_modules/",
-    "dist/",
-    "site/",
-    "parsers/",
-    "crates/*/deps/",
-    "crates/*/tmp/",
-    "sources/",
-    "e2e/",
-    "vendor/",
-    "*.whl",
-    "*.tar.gz",
-    "*.png",
-    "*.ico",
-    "*.svg",
-    "CHANGELOG.md",
-    "docs/CHANGELOG.md",
-    "docs/snippets/",
-    "docs/supported-languages.md",
-    "docs/languages.md",
+  "fixtures/",
+  "*.lock",
+  "pnpm-lock.yaml",
+  "target/",
+  "node_modules/",
+  "dist/",
+  "site/",
+  "parsers/",
+  "crates/*/deps/",
+  "crates/*/tmp/",
+  "sources/",
+  "e2e/",
+  "vendor/",
+  "*.whl",
+  "*.tar.gz",
+  "*.png",
+  "*.ico",
+  "*.svg",
+  "CHANGELOG.md",
+  "docs/CHANGELOG.md",
+  "docs/snippets/",
+  "docs/supported-languages.md",
+  "docs/languages.md",
 ]

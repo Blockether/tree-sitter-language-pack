@@ -1,21 +1,21 @@
 [workspace]
-alef_version = "0.16.18"
+alef_version = "0.16.21"
 languages = [
-    "python",
-    "node",
-    "ruby",
-    "php",
-    "ffi",
-    "go",
-    "java",
-    "csharp",
-    "elixir",
-    "wasm",
-    "dart",
-    "kotlin_android",
-    "swift",
-    "zig",
-    "jni",
+  "python",
+  "node",
+  "ruby",
+  "php",
+  "ffi",
+  "go",
+  "java",
+  "csharp",
+  "elixir",
+  "wasm",
+  "dart",
+  "kotlin_android",
+  "swift",
+  "zig",
+  "jni",
 ]
 
 [workspace.opaque_types]
@@ -39,10 +39,10 @@ csharp = "record"
 
 [workspace.sync]
 extra_paths = [
-    "crates/ts-pack-core-node/package.json",
-    "crates/ts-pack-core-node/npm/*/package.json",
-    "packages/ruby/ext/ts_pack_core_rb/native/Cargo.toml",
-    "pyproject.toml",
+  "crates/ts-pack-core-node/package.json",
+  "crates/ts-pack-core-node/npm/*/package.json",
+  "packages/ruby/ext/ts_pack_core_rb/native/Cargo.toml",
+  "pyproject.toml",
 ]
 
 [[workspace.sync.text_replacements]]
@@ -196,59 +196,59 @@ zig = "packages/zig/src/"
 
 [crates.include]
 types = [
-    "ProcessConfig",
-    "ProcessResult",
-    "FileMetrics",
-    "StructureItem",
-    "StructureKind",
-    "ImportInfo",
-    "ExportInfo",
-    "ExportKind",
-    "CommentInfo",
-    "CommentKind",
-    "DocstringInfo",
-    "DocstringFormat",
-    "DocSection",
-    "SymbolInfo",
-    "SymbolKind",
-    "Diagnostic",
-    "DiagnosticSeverity",
-    "CodeChunk",
-    "ChunkContext",
-    "Span",
-    "PackConfig",
-    "Error",
-    "LanguageRegistry",
-    "DownloadManager",
-    "Parser",
-    "Tree",
-    "Node",
-    "TreeCursor",
-    "Point",
-    "ByteRange",
+  "ProcessConfig",
+  "ProcessResult",
+  "FileMetrics",
+  "StructureItem",
+  "StructureKind",
+  "ImportInfo",
+  "ExportInfo",
+  "ExportKind",
+  "CommentInfo",
+  "CommentKind",
+  "DocstringInfo",
+  "DocstringFormat",
+  "DocSection",
+  "SymbolInfo",
+  "SymbolKind",
+  "Diagnostic",
+  "DiagnosticSeverity",
+  "CodeChunk",
+  "ChunkContext",
+  "Span",
+  "PackConfig",
+  "Error",
+  "LanguageRegistry",
+  "DownloadManager",
+  "Parser",
+  "Tree",
+  "Node",
+  "TreeCursor",
+  "Point",
+  "ByteRange",
 ]
 functions = [
-    "available_languages",
-    "has_language",
-    "language_count",
-    "get_language",
-    "get_parser",
-    "detect_language",
-    "detect_language_from_path",
-    "detect_language_from_extension",
-    "detect_language_from_content",
-    "get_highlights_query",
-    "get_injections_query",
-    "get_locals_query",
-    "process",
-    "init",
-    "configure",
-    "download",
-    "download_all",
-    "manifest_languages",
-    "downloaded_languages",
-    "clean_cache",
-    "cache_dir",
+  "available_languages",
+  "has_language",
+  "language_count",
+  "get_language",
+  "get_parser",
+  "detect_language",
+  "detect_language_from_path",
+  "detect_language_from_extension",
+  "detect_language_from_content",
+  "get_highlights_query",
+  "get_injections_query",
+  "get_locals_query",
+  "process",
+  "init",
+  "configure",
+  "download",
+  "download_all",
+  "manifest_languages",
+  "downloaded_languages",
+  "clean_cache",
+  "cache_dir",
 ]
 
 [crates.lint.python]
@@ -383,8 +383,8 @@ before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg cargo build --relea
 [crates.test.swift]
 precondition = "command -v swift >/dev/null 2>&1"
 before = [
-    "TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg cargo build --release -p ts-pack-core-swift",
-    "bash scripts/setup-swift-bridge.sh",
+  "TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg cargo build --release -p ts-pack-core-swift",
+  "bash scripts/setup-swift-bridge.sh",
 ]
 command = "cd packages/swift && swift test"
 e2e = "cd packages/swift && swift test"
@@ -431,8 +431,8 @@ result_var = "result"
 returns_result = true
 streaming = false
 args = [
-    { name = "source", field = "source_code", type = "string" },
-    { name = "config", field = "config", type = "json_object" },
+  { name = "source", field = "source_code", type = "string" },
+  { name = "config", field = "config", type = "json_object" },
 ]
 
 [crates.e2e.call.overrides.rust]

@@ -52,21 +52,21 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2.0.2
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.4.0
 
       - name: Install tree-sitter CLI
         run: npm install -g tree-sitter-cli
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           enable-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.14"
 
@@ -74,7 +74,7 @@ jobs:
         run: uv sync --no-install-project
 
       - name: Cache parsers
-        uses: actions/cache@v5
+        uses: actions/cache@v5.0.5
         with:
           path: parsers
           key: parsers-${{ hashFiles('sources/language_definitions.json') }}
@@ -87,7 +87,7 @@ jobs:
           uv run --script scripts/clone_vendors.py
 
       - name: Upload parsers
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1.0.1
         with:
           name: language-parsers
           path: parsers
@@ -105,10 +105,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -155,7 +155,7 @@ jobs:
 
       - name: Upload CLI binary (artifact)
         if: success()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.1.0.1
         with:
           name: cli-${{ matrix.os }}-${{ github.sha }}
           path: target/release/ts-pack

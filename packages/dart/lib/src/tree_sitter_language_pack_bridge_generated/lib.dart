@@ -180,7 +180,7 @@ Future<PlatformInt64> download({required List<String> names}) =>
 /// Returns an error if the manifest cannot be fetched or the bundle download fails.
 Future<PlatformInt64> downloadAll() => RustLib.instance.api.crateDownloadAll();
 
-/// Return all language names available in the remote manifest (304).
+/// Return all language names available in the remote manifest (305).
 ///
 /// Fetches (and caches) the remote manifest to discover the full list of
 /// downloadable languages. Use `downloaded_languages` to list what is
@@ -372,8 +372,12 @@ abstract class TreeCursor implements RustOpaqueInterface {
   Future<Node> node();
 }
 
+/// A byte range — start (inclusive) to end (exclusive).
 class ByteRange {
+  /// Inclusive start byte offset.
   final PlatformInt64 start;
+
+  /// Exclusive end byte offset.
   final PlatformInt64 end;
 
   const ByteRange({required this.start, required this.end});
@@ -390,6 +394,7 @@ class ByteRange {
           end == other.end;
 }
 
+/// Metadata for a single chunk of source code.
 class ChunkContext {
   final String language;
   final PlatformInt64 chunkIndex;
@@ -441,6 +446,7 @@ class ChunkContext {
           hasErrorNodes == other.hasErrorNodes;
 }
 
+/// A chunk of source code with rich metadata.
 class CodeChunk {
   final String content;
   final PlatformInt64 startByte;
@@ -480,6 +486,7 @@ class CodeChunk {
           metadata == other.metadata;
 }
 
+/// A comment extracted from source code.
 class CommentInfo {
   final String text;
   final CommentKind kind;
@@ -508,8 +515,13 @@ class CommentInfo {
           associatedNode == other.associatedNode;
 }
 
+/// The kind of a comment found in source code.
+///
+/// Distinguishes between single-line comments, block (multi-line) comments,
+/// and documentation comments.
 enum CommentKind { line, block, doc }
 
+/// A diagnostic (syntax error, missing node, etc.) from parsing.
 class Diagnostic {
   final String message;
   final DiagnosticSeverity severity;
@@ -534,8 +546,13 @@ class Diagnostic {
           span == other.span;
 }
 
+/// Severity level of a diagnostic produced during parsing.
+///
+/// Used to classify parse errors, warnings, and informational messages
+/// found in the syntax tree.
 enum DiagnosticSeverity { error, warning, info }
 
+/// A section within a docstring (e.g., Args, Returns, Raises).
 class DocSection {
   final String kind;
   final String? name;
@@ -570,6 +587,7 @@ sealed class DocstringFormat with _$DocstringFormat {
       DocstringFormat_Other;
 }
 
+/// A docstring extracted from source code.
 class DocstringInfo {
   final String text;
   final DocstringFormat format;
@@ -605,6 +623,7 @@ class DocstringInfo {
           parsedSections == other.parsedSections;
 }
 
+/// An export statement extracted from source code.
 class ExportInfo {
   final String name;
   final ExportKind kind;
@@ -629,8 +648,12 @@ class ExportInfo {
           span == other.span;
 }
 
+/// The kind of an export statement found in source code.
+///
+/// Covers named exports, default exports, and re-exports from other modules.
 enum ExportKind { named, default_, reExport }
 
+/// Aggregate metrics for a source file.
 class FileMetrics {
   final PlatformInt64 totalLines;
   final PlatformInt64 codeLines;
@@ -678,6 +701,7 @@ class FileMetrics {
           maxDepth == other.maxDepth;
 }
 
+/// An import statement extracted from source code.
 class ImportInfo {
   final String source;
   final List<String> items;
@@ -713,9 +737,35 @@ class ImportInfo {
           span == other.span;
 }
 
+/// Configuration for the tree-sitter language pack.
+///
+/// Controls cache directory and which languages to pre-download.
+/// Can be loaded from a TOML file, constructed programmatically,
+/// or passed as a dict/object from language bindings.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::PackConfig;
+///
+/// let config = PackConfig {
+///     cache_dir: None,
+///     languages: Some(vec!["python".to_string(), "rust".to_string()]),
+///     groups: None,
+/// };
+/// ```
 class PackConfig {
+  /// Override default cache directory.
+  ///
+  /// Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
   final String? cacheDir;
+
+  /// Languages to pre-download on init.
+  ///
+  /// Each entry is a language name (e.g. `"python"`, `"rust"`).
   final List<String>? languages;
+
+  /// Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).
   final List<String>? groups;
 
   const PackConfig({this.cacheDir, this.languages, this.groups});
@@ -733,8 +783,12 @@ class PackConfig {
           groups == other.groups;
 }
 
+/// A source position — row + column, zero-indexed.
 class Point {
+  /// Zero-indexed row number.
   final PlatformInt64 row;
+
+  /// Zero-indexed column number, in UTF-16 code units.
   final PlatformInt64 column;
 
   const Point({required this.row, required this.column});
@@ -751,15 +805,50 @@ class Point {
           column == other.column;
 }
 
+/// Configuration for the `process()` function.
+///
+/// Controls which analysis features are enabled and whether chunking is performed.
+///
+/// # Examples
+///
+/// ```
+/// use tree_sitter_language_pack::ProcessConfig;
+///
+/// // Defaults: structure + imports + exports enabled
+/// let config = ProcessConfig::new("python");
+///
+/// // With chunking
+/// let config = ProcessConfig::new("python").with_chunking(1000);
+///
+/// // Everything enabled
+/// let config = ProcessConfig::new("python").all();
+/// ```
 class ProcessConfig {
+  /// Language name (required).
   final String language;
+
+  /// Extract structural items (functions, classes, etc.). Default: true.
   final bool structure;
+
+  /// Extract import statements. Default: true.
   final bool imports;
+
+  /// Extract export statements. Default: true.
   final bool exports;
+
+  /// Extract comments. Default: false.
   final bool comments;
+
+  /// Extract docstrings. Default: false.
   final bool docstrings;
+
+  /// Extract symbol definitions. Default: false.
   final bool symbols;
+
+  /// Include parse diagnostics. Default: false.
   final bool diagnostics;
+
+  /// Maximum chunk size in bytes. `None` disables chunking.
   final PlatformInt64? chunkMaxSize;
 
   const ProcessConfig({
@@ -802,6 +891,24 @@ class ProcessConfig {
           chunkMaxSize == other.chunkMaxSize;
 }
 
+/// Complete analysis result from processing a source file.
+///
+/// Contains metrics, structural analysis, imports/exports, comments,
+/// docstrings, symbols, diagnostics, and optionally chunked code segments.
+/// Fields are populated based on the `ProcessConfig` flags.
+///
+/// # Fields
+///
+/// - `language` - The language used for parsing
+/// - `metrics` - Always computed: line counts, byte sizes, error counts
+/// - `structure` - Functions, classes, structs (when `config.structure = true`)
+/// - `imports` - Import statements (when `config.imports = true`)
+/// - `exports` - Export statements (when `config.exports = true`)
+/// - `comments` - Comments (when `config.comments = true`)
+/// - `docstrings` - Docstrings (when `config.docstrings = true`)
+/// - `symbols` - Symbol definitions (when `config.symbols = true`)
+/// - `diagnostics` - Parse errors (when `config.diagnostics = true`)
+/// - `chunks` - Chunked code segments (when `config.chunk_max_size` is set)
 class ProcessResult {
   final String language;
   final FileMetrics metrics;
@@ -857,6 +964,10 @@ class ProcessResult {
           chunks == other.chunks;
 }
 
+/// Byte and line/column range in source code.
+///
+/// Represents both byte offsets (for slicing) and human-readable line/column
+/// positions (for display and diagnostics).
 class Span {
   final PlatformInt64 startByte;
   final PlatformInt64 endByte;
@@ -896,6 +1007,7 @@ class Span {
           endColumn == other.endColumn;
 }
 
+/// A structural item (function, class, struct, etc.) in source code.
 class StructureItem {
   final StructureKind kind;
   final String? name;
@@ -965,6 +1077,7 @@ sealed class StructureKind with _$StructureKind {
       StructureKind_Other;
 }
 
+/// A symbol (variable, function, type, etc.) extracted from source code.
 class SymbolInfo {
   final String name;
   final SymbolKind kind;

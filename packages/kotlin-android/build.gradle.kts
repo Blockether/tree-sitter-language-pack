@@ -75,7 +75,7 @@ publishing {
             }
             groupId = "dev.kreuzberg.tslp.android"
             artifactId = "tree-sitter-language-pack-android"
-            version = "0.0.0"
+            version = "1.8.1"
         }
     }
 }

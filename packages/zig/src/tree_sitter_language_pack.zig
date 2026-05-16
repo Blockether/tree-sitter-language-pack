@@ -190,20 +190,31 @@ pub const ChunkContext = struct {
 /// Can be loaded from a TOML file, constructed programmatically,
 /// or passed as a dict/object from language bindings.
 pub const PackConfig = struct {
+    /// Override default cache directory.
+    ///
+    /// Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
     cache_dir: ?[]const u8,
+    /// Languages to pre-download on init.
+    ///
+    /// Each entry is a language name (e.g. `"python"`, `"rust"`).
     languages: ?[]const []const u8,
+    /// Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).
     groups: ?[]const []const u8,
 };
 
 /// A source position — row + column, zero-indexed.
 pub const Point = struct {
+    /// Zero-indexed row number.
     row: u64,
+    /// Zero-indexed column number, in UTF-16 code units.
     column: u64,
 };
 
 /// A byte range — start (inclusive) to end (exclusive).
 pub const ByteRange = struct {
+    /// Inclusive start byte offset.
     start: u64,
+    /// Exclusive end byte offset.
     end: u64,
 };
 
@@ -211,14 +222,23 @@ pub const ByteRange = struct {
 ///
 /// Controls which analysis features are enabled and whether chunking is performed.
 pub const ProcessConfig = struct {
+    /// Language name (required).
     language: []const u8,
+    /// Extract structural items (functions, classes, etc.). Default: true.
     structure: bool,
+    /// Extract import statements. Default: true.
     imports: bool,
+    /// Extract export statements. Default: true.
     exports: bool,
+    /// Extract comments. Default: false.
     comments: bool,
+    /// Extract docstrings. Default: false.
     docstrings: bool,
+    /// Extract symbol definitions. Default: false.
     symbols: bool,
+    /// Include parse diagnostics. Default: false.
     diagnostics: bool,
+    /// Maximum chunk size in bytes. `null` disables chunking.
     chunk_max_size: ?u64,
 };
 
