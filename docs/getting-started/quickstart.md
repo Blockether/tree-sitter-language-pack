@@ -45,33 +45,63 @@ Parsers download automatically on first use. For **production, CI, Docker, or of
 
 === "CLI"
 
-    ```bash
-    ts-pack download python javascript rust go
-    ```
+    --8<-- "snippets/cli/download.md"
 
 === "Python"
 
-    ```python
-    from tree_sitter_language_pack import download
-
-    download(["python", "javascript", "rust", "go"])
-    ```
+    --8<-- "snippets/python/download.md"
 
 === "Node.js"
 
-    ```typescript
-    import { download } from "@kreuzberg/tree-sitter-language-pack";
+    --8<-- "snippets/typescript/download.md"
 
-    await download(["python", "javascript", "rust", "go"]);
-    ```
+=== "Ruby"
+
+    --8<-- "snippets/ruby/download.md"
+
+=== "PHP"
+
+    --8<-- "snippets/php/download.md"
+
+=== "Go"
+
+    --8<-- "snippets/go/download.md"
+
+=== "Java"
+
+    --8<-- "snippets/java/download.md"
+
+=== "C#"
+
+    --8<-- "snippets/csharp/download.md"
+
+=== "Elixir"
+
+    --8<-- "snippets/elixir/download.md"
+
+=== "Dart"
+
+    --8<-- "snippets/dart/download.md"
+
+=== "Swift"
+
+    --8<-- "snippets/swift/download.md"
+
+=== "Zig"
+
+    --8<-- "snippets/zig/download.md"
+
+=== "Kotlin (Android)"
+
+    --8<-- "snippets/kotlin-android/download.md"
+
+=== "WebAssembly"
+
+    --8<-- "snippets/wasm/download.md"
 
 === "Rust"
 
-    ```rust
-    use tree_sitter_language_pack::download;
-
-    download(&["python", "javascript", "rust", "go"])?;
-    ```
+    --8<-- "snippets/rust/download.md"
 
 ### All 306 languages
 
@@ -201,82 +231,65 @@ Then download everything declared in the config:
 
 Build a concrete syntax tree from source code.
 
+=== "CLI"
+
+    --8<-- "snippets/cli/quickstart.md"
+
 === "Python"
 
-    ```python
-    from tree_sitter_language_pack import get_parser
-
-    parser = get_parser("python")
-
-    source = b"""
-    def greet(name: str) -> str:
-        return f"Hello, {name}!"
-
-    result = greet("world")
-    """
-
-    tree = parser.parse(source)
-    root = tree.root_node
-
-    print(root.type)           # module
-    print(root.child_count)    # 2
-    print(root.sexp()[:120])   # S-expression preview
-    ```
+    --8<-- "snippets/python/quickstart.md"
 
 === "Node.js"
 
-    ```typescript
-    import { parseString, treeRootNodeType, treeRootChildCount } from "@kreuzberg/tree-sitter-language-pack";
+    --8<-- "snippets/typescript/quickstart.md"
 
-    const source = `
-    function greet(name) {
-      return \`Hello, \${name}!\`;
-    }
-    greet("world");
-    `;
+=== "Ruby"
 
-    const tree = parseString("javascript", source);
+    --8<-- "snippets/ruby/quickstart.md"
 
-    console.log(treeRootNodeType(tree));       // program
-    console.log(treeRootChildCount(tree));     // 2
-    ```
+=== "PHP"
+
+    --8<-- "snippets/php/quickstart.md"
+
+=== "Go"
+
+    --8<-- "snippets/go/quickstart.md"
+
+=== "Java"
+
+    --8<-- "snippets/java/quickstart.md"
+
+=== "C#"
+
+    --8<-- "snippets/csharp/quickstart.md"
+
+=== "Elixir"
+
+    --8<-- "snippets/elixir/quickstart.md"
+
+=== "Dart"
+
+    --8<-- "snippets/dart/quickstart.md"
+
+=== "Swift"
+
+    --8<-- "snippets/swift/quickstart.md"
+
+=== "Zig"
+
+    --8<-- "snippets/zig/quickstart.md"
+
+=== "Kotlin (Android)"
+
+    --8<-- "snippets/kotlin-android/quickstart.md"
+
+=== "WebAssembly"
+
+    --8<-- "snippets/wasm/quickstart.md"
 
 === "Rust"
 
-    ```rust
-    use tree_sitter_language_pack::get_parser;
-
-    fn main() -> anyhow::Result<()> {
-        let mut parser = get_parser("rust")?;
-
-        let source = r#"
-    fn greet(name: &str) -> String {
-        format!("Hello, {}!", name)
-    }
-    "#;
-
-        let tree = parser.parse(source, None).unwrap();
-        let root = tree.root_node();
-
-        println!("{}", root.kind());        // source_file
-        println!("{}", root.child_count()); // 1
-        println!("{}", root.to_sexp());
-        Ok(())
-    }
-    ```
-
-=== "CLI"
-
-    ```bash
-    # Parse a file and display the syntax tree
-    ts-pack parse src/main.py
-
-    # Output as JSON
-    ts-pack parse src/main.py --format json
-
-    # Parse inline code via stdin
-    echo "def hello(): pass" | ts-pack parse --language python
-    ```
+    --8<-- "snippets/rust/quickstart.md"
 
 ---
 
@@ -284,119 +297,65 @@ Build a concrete syntax tree from source code.
 
 Go beyond the raw syntax tree. Extract functions, classes, imports, docstrings, and more with `process`.
 
+=== "CLI"
+
+    --8<-- "snippets/cli/process.md"
+
 === "Python"
 
-    ```python
-    from tree_sitter_language_pack import process, ProcessConfig
-
-    source = """
-    import os
-    from pathlib import Path
-
-    def read_file(path: str) -> str:
-        \"\"\"Read and return the contents of a file.\"\"\"
-        return Path(path).read_text()
-
-    class FileManager:
-        def __init__(self, base_dir: str):
-            self.base_dir = base_dir
-
-        def get(self, name: str) -> str:
-            return read_file(os.path.join(self.base_dir, name))
-    """
-
-    config = ProcessConfig(
-        language="python",
-        structure=True,   # functions and classes
-        imports=True,     # import statements
-        comments=True,    # inline comments
-        docstrings=True,  # docstring extraction
-    )
-    result = process(source, config)
-
-    print(f"Imports:   {[i['name'] for i in result['imports']]}")
-    print(f"Symbols:   {[s['name'] for s in result['structure']]}")
-    print(f"Docstring: {result['structure'][0]['docstring']}")
-    ```
+    --8<-- "snippets/python/process.md"
 
 === "Node.js"
 
-    ```typescript
-    import { process } from "@kreuzberg/tree-sitter-language-pack";
+    --8<-- "snippets/typescript/process.md"
 
-    const source = `
-    import fs from "fs";
-    import { join } from "path";
+=== "Ruby"
 
-    /**
-     * Read and return the contents of a file.
-     */
-    function readFile(path: string): string {
-      return fs.readFileSync(path, "utf8");
-    }
+    --8<-- "snippets/ruby/process.md"
 
-    class FileManager {
-      constructor(private baseDir: string) {}
+=== "PHP"
 
-      get(name: string): string {
-        return readFile(join(this.baseDir, name));
-      }
-    }
-    `;
+    --8<-- "snippets/php/process.md"
 
-    const result = await process(source, {
-      language: "typescript",
-      structure: true,
-      imports: true,
-      docstrings: true,
-    });
+=== "Go"
 
-    console.log("Imports:", result.imports.map(i => i.name));
-    console.log("Symbols:", result.structure.map(s => s.name));
-    ```
+    --8<-- "snippets/go/process.md"
+
+=== "Java"
+
+    --8<-- "snippets/java/process.md"
+
+=== "C#"
+
+    --8<-- "snippets/csharp/process.md"
+
+=== "Elixir"
+
+    --8<-- "snippets/elixir/process.md"
+
+=== "Dart"
+
+    --8<-- "snippets/dart/process.md"
+
+=== "Swift"
+
+    --8<-- "snippets/swift/process.md"
+
+=== "Zig"
+
+    --8<-- "snippets/zig/process.md"
+
+=== "Kotlin (Android)"
+
+    --8<-- "snippets/kotlin-android/process.md"
+
+=== "WebAssembly"
+
+    --8<-- "snippets/wasm/process.md"
 
 === "Rust"
 
-    ```rust
-    use tree_sitter_language_pack::{process, ProcessConfig};
-
-    fn main() -> anyhow::Result<()> {
-        let source = r#"
-    use std::fs;
-    use std::path::Path;
-
-    /// Read and return the contents of a file.
-    fn read_file(path: &str) -> String {
-        fs::read_to_string(path).unwrap()
-    }
-
-    struct FileManager {
-        base_dir: String,
-    }
-    "#;
-
-        let mut config = ProcessConfig::new("rust");
-        config.structure = true;
-        config.imports = true;
-        config.docstrings = true;
-
-        let result = process(source, &config)?;
-
-        println!("Imports: {:?}", result.imports.iter().map(|i| &i.name).collect::<Vec<_>>());
-        println!("Symbols: {:?}", result.structure.iter().map(|s| &s.name).collect::<Vec<_>>());
-        Ok(())
-    }
-    ```
-
-=== "CLI"
-
-    ```bash
-    # Full code intelligence on a file
-    ts-pack process src/main.py --structure --imports --docstrings
-
-    # JSON output for piping
-    ts-pack process src/main.py --all | jq '.structure[].name'
-    ```
+    --8<-- "snippets/rust/process.md"
 
 ---
 

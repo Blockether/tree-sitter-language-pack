@@ -5,7 +5,7 @@ use Tree\Sitter\Language\Pack\PackConfig;
 use Tree\Sitter\Language\Pack\TreeSitterLanguagePack;
 
 $config = new PackConfig(
-    cache_dir: null,
+    cacheDir: null,
     languages: ["php", "javascript"],
     groups: null,
 );

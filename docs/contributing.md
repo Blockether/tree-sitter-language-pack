@@ -111,7 +111,7 @@ ts-pack parse example.mylang --language mylang
 
 ### 4. Add test fixtures
 
-Add at least one fixture to `tools/snippet-runner/`:
+Add at least one fixture under `fixtures/` (the e2e suite consumes them) and a runnable snippet under `docs/snippets/<lang>/`:
 
 ```json
 [
@@ -208,7 +208,7 @@ Keep commits **small and focused**. Each commit should represent one logical cha
 
 - [ ] `task test` passes
 - [ ] `task lint` passes (zero warnings)
-- [ ] New language has fixtures in `tools/snippet-runner/`
+- [ ] New language has runnable snippets under `docs/snippets/<lang>/` (validated via `task docs:snippets:check`)
 - [ ] `task generate:e2e && task test:e2e` passes
 - [ ] `task sync-versions` run if any manifest was bumped
 - [ ] PR description explains the change and links related issues

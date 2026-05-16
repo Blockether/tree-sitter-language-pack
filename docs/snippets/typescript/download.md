@@ -7,7 +7,8 @@ import {
 } from "@kreuzberg/tree-sitter-language-pack";
 
 // Pre-download specific languages
-download(["python", "javascript", "rust"]);
+const count = download(["python", "javascript", "rust"]);
+console.log(`Downloaded ${count} languages`);
 
 // Or initialize with config
 init({ languages: ["python", "go"], cacheDir: "/tmp/parsers" });

@@ -122,7 +122,7 @@ ts-pack list --filter script    # languages whose name contains "script"
 
 Show details about a specific language.
 
-```bash
+```text title="Usage"
 ts-pack info <LANGUAGE>
 ```
 
@@ -275,7 +275,7 @@ After init, run `ts-pack download` to fetch the listed parsers.
 
 Generate shell completion scripts.
 
-```bash
+```text title="Usage"
 ts-pack completions <SHELL>
 ```
 

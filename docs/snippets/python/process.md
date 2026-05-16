@@ -22,9 +22,9 @@ class FileReader:
         self.base_dir = base_dir
 ''', config)
 
-for item in result["structure"]:
-    print(f"{item['kind']}: {item['name']}")
+for item in result.structure:
+    print(f"{item.kind}: {item.name}")
 
-for imp in result["imports"]:
-    print(f"import: {imp}")
+for imp in result.imports:
+    print(f"import: {imp.source}")
 ```

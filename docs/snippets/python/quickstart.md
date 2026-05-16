@@ -7,6 +7,6 @@ result = tslp.process(
     tslp.ProcessConfig(language="python", structure=True, imports=True),
 )
 
-print(f"Language: {result['language']}")
-print(f"Functions: {len(result['structure'])}")
+print(f"Language: {result.language}")
+print(f"Functions: {len(result.structure)}")
 ```

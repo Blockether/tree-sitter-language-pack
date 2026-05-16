@@ -33,7 +33,6 @@ The Cargo workspace contains the following crates:
 | `crates/ts-pack-core-php`  | PHP extension (ext-php-rs)                    |
 | `crates/ts-pack-core-wasm` | WebAssembly bindings (wasm-bindgen)           |
 | `crates/ts-pack-core-ffi`  | C-compatible FFI library (cbindgen)           |
-| `tools/snippet-runner`     | Test suite runner                             |
 
 Language-specific packages live under `packages/`: `python/`, `typescript/`, `ruby/`, `elixir/`, `php/`, `go/`, `java/`, `csharp/`, and `wasm/`.
 

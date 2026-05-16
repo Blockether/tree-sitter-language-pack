@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"log"
 
-	tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
+	"github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
 func main() {
-	parser, err := tslp.GetParser("go")
+	parser, err := tspack.GetParser("go")
 	if err != nil {
 		log.Fatal(err)
 	}
