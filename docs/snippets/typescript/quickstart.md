@@ -8,5 +8,5 @@ const result = process("function hello() { console.log('world'); }", {
 });
 
 console.log(`Language: ${result.language}`);
-console.log(`Functions: ${result.structure.length}`);
+console.log(`Functions: ${result.structure?.length ?? 0}`);
 ```

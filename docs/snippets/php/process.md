@@ -13,7 +13,7 @@ $config = new ProcessConfig(
     docstrings: false,
     symbols: false,
     diagnostics: false,
-    chunk_max_size: null,
+    chunkMaxSize: null,
 );
 
 $result = TreeSitterLanguagePack::process(
@@ -22,7 +22,7 @@ $result = TreeSitterLanguagePack::process(
 );
 
 echo "Language: " . $result->language . "\n";
-foreach ($result->getStructure() as $item) {
-    echo $item->kind . ": " . ($item->name ?? "(anonymous)") . "\n";
+foreach ($result->structure as $item) {
+    echo $item->kind->value . ": " . ($item->name ?? "(anonymous)") . "\n";
 }
 ```

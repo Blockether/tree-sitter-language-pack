@@ -9,7 +9,8 @@ fn main() -> anyhow::Result<()> {
     let result = process("def hello(): pass\ndef world(): pass", &config)?;
 
     for item in &result.structure {
-        println!("{}: {}", item.kind, item.name);
+        // item.kind implements Debug (not Display); item.name is Option<String>
+        println!("{:?}: {}", item.kind, item.name.as_deref().unwrap_or("<unnamed>"));
     }
     for chunk in &result.chunks {
         println!("chunk: lines {}-{}", chunk.start_line, chunk.end_line);

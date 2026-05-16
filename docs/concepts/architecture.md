@@ -135,11 +135,14 @@ tree-sitter-language-pack/
 │   └── wasm/               # WebAssembly npm package
 ├── sources/
 │   └── language_definitions.json  # Grammar source registry
-├── scripts/
-│   └── generate_readme.py  # README sync tooling
-└── tools/
-    └── snippet-runner/     # Test suite runner
+└── scripts/
+    └── generate_readme.py  # README sync tooling
 ```
+
+Documentation snippets under `docs/snippets/` are discovered, validated, and
+audited by `alef snippets` (see `task docs:snippets:check`). The legacy
+`tools/snippet-runner` Rust crate was retired in favour of this shared
+capability.
 
 ---
 

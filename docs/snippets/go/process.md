@@ -5,14 +5,18 @@ import (
 	"fmt"
 	"log"
 
-	tslp "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
+	"github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
 )
 
 func main() {
-	config := tslp.ProcessConfig{Language: "go"}
-	result, err := tslp.Process(
+	config := tspack.NewProcessConfig(
+		tspack.WithProcessConfigLanguage("go"),
+		tspack.WithProcessConfigStructure(true),
+		tspack.WithProcessConfigImports(true),
+	)
+	result, err := tspack.Process(
 		"package main\nimport \"fmt\"\nfunc hello() { fmt.Println(\"hi\") }",
-		config,
+		*config,
 	)
 	if err != nil {
 		log.Fatal(err)

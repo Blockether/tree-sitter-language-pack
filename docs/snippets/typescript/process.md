@@ -17,7 +17,9 @@ export class ConfigManager {
   { language: "typescript", structure: true, imports: true, exports: true, comments: true },
 );
 
-for (const item of result.structure) {
-  console.log(`${item.kind}: ${item.name}`);
+if (result.structure) {
+  for (const item of result.structure) {
+    console.log(`${item.kind}: ${item.name}`);
+  }
 }
 ```

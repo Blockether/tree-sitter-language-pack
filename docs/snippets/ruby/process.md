@@ -9,15 +9,19 @@ config = TreeSitterLanguagePack::ProcessConfig.new(
 
 result = TreeSitterLanguagePack.process(
   "require 'json'\ndef parse(data)\n  JSON.parse(data)\nend",
-  config,
+  config
 )
 
 puts "Language: #{result.language}"
-result.structure.each do |item|
-  puts "#{item.kind}: #{item.name}"
+if result.structure
+  result.structure.each do |item|
+    puts "#{item.kind}: #{item.name}"
+  end
 end
 
-result.imports.each do |imp|
-  puts "import: #{imp.source}"
+if result.imports
+  result.imports.each do |imp|
+    puts "import: #{imp.source}"
+  end
 end
 ```

@@ -25,3 +25,32 @@ tasks:
     desc: Lint prose with textlint
     cmds:
       - npx textlint 'docs/**/*.md'
+
+  # Snippet roots scanned by validate. Reference docs (docs/reference/api-*.md)
+  # are alef-generated signature declarations that aren't standalone-runnable;
+  # they are excluded from validation but discoverable via `snippets:list`.
+  snippets:list:
+    desc: List all documentation snippets discovered by alef
+    cmds:
+      - alef snippets list
+
+  snippets:audit:
+    desc: Audit snippet and markdown structure (unknown fence languages, missing tags)
+    cmds:
+      - alef snippets audit
+
+  snippets:gaps:
+    desc: Report snippet reference and language-variant gaps
+    cmds:
+      - alef snippets gaps
+
+  snippets:validate:
+    desc: Validate all documentation snippets compile / parse cleanly
+    cmds:
+      - alef snippets validate -s docs/snippets -s docs/getting-started -s docs/guides -s docs/concepts -s README.md
+
+  snippets:check:
+    desc: Run snippet QA — gaps + validate (audit is informational; run separately)
+    cmds:
+      - alef snippets gaps
+      - alef snippets validate -s docs/snippets -s docs/getting-started -s docs/guides -s docs/concepts -s README.md
