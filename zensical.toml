@@ -9,60 +9,60 @@ edit_uri = "edit/main/docs/"
 copyright = "Copyright &copy; 2024-2026 Kreuzberg, inc."
 extra_css = ["css/extra.css"]
 nav = [
-    { "Home" = "index.md" },
+  { "Home" = "index.md" },
 
-    { "Get Started" = [
-        { "Installation" = "getting-started/installation.md" },
-        { "Quick Start" = "getting-started/quickstart.md" },
-    ] },
+  { "Get Started" = [
+    { "Installation" = "getting-started/installation.md" },
+    { "Quick Start" = "getting-started/quickstart.md" },
+  ] },
 
-    { "Guides" = [
-        { "Core" = [
-            { "Parsing Code" = "guides/parsing.md" },
-            { "Code Intelligence" = "guides/intelligence.md" },
-            { "Chunking for LLMs" = "guides/chunking.md" },
-            { "Configuration" = "guides/configuration.md" },
-            { "Extraction Queries" = "guides/extraction.md" },
-        ] },
-        { "CLI" = "guides/cli.md" },
-        { "Deployment" = [
-            { "Docker" = "guides/docker.md" },
-            { "Building from Source" = "guides/building.md" },
-            { "Performance & Benchmarks" = "guides/performance.md" },
-        ] },
+  { "Guides" = [
+    { "Core" = [
+      { "Parsing Code" = "guides/parsing.md" },
+      { "Code Intelligence" = "guides/intelligence.md" },
+      { "Chunking for LLMs" = "guides/chunking.md" },
+      { "Configuration" = "guides/configuration.md" },
+      { "Extraction Queries" = "guides/extraction.md" },
     ] },
+    { "CLI" = "guides/cli.md" },
+    { "Deployment" = [
+      { "Docker" = "guides/docker.md" },
+      { "Building from Source" = "guides/building.md" },
+      { "Performance & Benchmarks" = "guides/performance.md" },
+    ] },
+  ] },
 
-    { "Concepts" = [
-        { "Architecture" = "concepts/architecture.md" },
-        { "Download Model" = "concepts/download-model.md" },
-        { "Code Intelligence" = "concepts/code-intelligence.md" },
-    ] },
+  { "Concepts" = [
+    { "Architecture" = "concepts/architecture.md" },
+    { "Download Model" = "concepts/download-model.md" },
+    { "Code Intelligence" = "concepts/code-intelligence.md" },
+  ] },
 
-    { "Reference" = [
-        { "API" = [
-            { "Python" = "reference/api-python.md" },
-            { "TypeScript / Node.js" = "reference/api-typescript.md" },
-            { "Rust" = "reference/api-rust.md" },
-            { "Go" = "reference/api-go.md" },
-            { "Java" = "reference/api-java.md" },
-            { "C#" = "reference/api-csharp.md" },
-            { "Ruby" = "reference/api-ruby.md" },
-            { "PHP" = "reference/api-php.md" },
-            { "Elixir" = "reference/api-elixir.md" },
-            { "WebAssembly" = "reference/api-wasm.md" },
-            { "C / FFI" = "reference/api-c.md" },
-        ] },
-        { "Languages" = "languages.md" },
-        { "Types" = "reference/types.md" },
-        { "Errors" = "reference/errors.md" },
-        { "Configuration" = "reference/configuration.md" },
+  { "Reference" = [
+    { "API" = [
+      { "Python" = "reference/api-python.md" },
+      { "TypeScript / Node.js" = "reference/api-typescript.md" },
+      { "Rust" = "reference/api-rust.md" },
+      { "Go" = "reference/api-go.md" },
+      { "Java" = "reference/api-java.md" },
+      { "C#" = "reference/api-csharp.md" },
+      { "Ruby" = "reference/api-ruby.md" },
+      { "PHP" = "reference/api-php.md" },
+      { "Elixir" = "reference/api-elixir.md" },
+      { "WebAssembly" = "reference/api-wasm.md" },
+      { "C / FFI" = "reference/api-c.md" },
     ] },
+    { "Languages" = "languages.md" },
+    { "Types" = "reference/types.md" },
+    { "Errors" = "reference/errors.md" },
+    { "Configuration" = "reference/configuration.md" },
+  ] },
 
-    { "More" = [
-        { "Contributing" = "contributing.md" },
-        { "CI / CD" = "contributing/ci.md" },
-        { "Changelog" = "CHANGELOG.md" },
-    ] },
+  { "More" = [
+    { "Contributing" = "contributing.md" },
+    { "CI / CD" = "contributing/ci.md" },
+    { "Changelog" = "CHANGELOG.md" },
+  ] },
 ]
 
 [project.theme]
@@ -71,25 +71,25 @@ custom_dir = "docs/overrides"
 logo = "assets/logo.svg"
 favicon = "assets/favicon.ico"
 features = [
-    "content.code.copy",
-    "content.code.annotate",
-    "content.tabs.link",
-    "navigation.instant",
-    "navigation.instant.progress",
-    "navigation.path",
-    "navigation.prune",
-    "navigation.indexes",
-    "navigation.sections",
-    "navigation.tabs",
-    "navigation.tabs.sticky",
-    "navigation.tracking",
-    "navigation.top",
-    "search.highlight",
-    "search.share",
-    "search.suggest",
-    "toc.follow",
-    "toc.integrate",
-    "announce.dismiss",
+  "content.code.copy",
+  "content.code.annotate",
+  "content.tabs.link",
+  "navigation.instant",
+  "navigation.instant.progress",
+  "navigation.path",
+  "navigation.prune",
+  "navigation.indexes",
+  "navigation.sections",
+  "navigation.tabs",
+  "navigation.tabs.sticky",
+  "navigation.tracking",
+  "navigation.top",
+  "search.highlight",
+  "search.share",
+  "search.suggest",
+  "toc.follow",
+  "toc.integrate",
+  "announce.dismiss",
 ]
 language = "en"
 
@@ -152,7 +152,7 @@ check_paths = true
 
 [project.markdown_extensions.pymdownx.superfences]
 custom_fences = [
-    { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
 ]
 
 [project.markdown_extensions.pymdownx.tabbed]

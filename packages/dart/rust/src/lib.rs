@@ -14,6 +14,10 @@ mod frb_generated;
 pub use flutter_rust_bridge::DartFnFuture;
 use flutter_rust_bridge::frb;
 
+/// Byte and line/column range in source code.
+///
+/// Represents both byte offsets (for slicing) and human-readable line/column
+/// positions (for display and diagnostics).
 #[frb(mirror(Span))]
 pub struct Span {
     pub start_byte: i64,
@@ -24,6 +28,24 @@ pub struct Span {
     pub end_column: i64,
 }
 
+/// Complete analysis result from processing a source file.
+///
+/// Contains metrics, structural analysis, imports/exports, comments,
+/// docstrings, symbols, diagnostics, and optionally chunked code segments.
+/// Fields are populated based on the `ProcessConfig` flags.
+///
+/// # Fields
+///
+/// - `language` - The language used for parsing
+/// - `metrics` - Always computed: line counts, byte sizes, error counts
+/// - `structure` - Functions, classes, structs (when `config.structure = true`)
+/// - `imports` - Import statements (when `config.imports = true`)
+/// - `exports` - Export statements (when `config.exports = true`)
+/// - `comments` - Comments (when `config.comments = true`)
+/// - `docstrings` - Docstrings (when `config.docstrings = true`)
+/// - `symbols` - Symbol definitions (when `config.symbols = true`)
+/// - `diagnostics` - Parse errors (when `config.diagnostics = true`)
+/// - `chunks` - Chunked code segments (when `config.chunk_max_size` is set)
 #[frb(mirror(ProcessResult))]
 pub struct ProcessResult {
     pub language: String,
@@ -38,6 +60,7 @@ pub struct ProcessResult {
     pub chunks: Vec<CodeChunk>,
 }
 
+/// Aggregate metrics for a source file.
 #[frb(mirror(FileMetrics))]
 pub struct FileMetrics {
     pub total_lines: i64,
@@ -50,6 +73,7 @@ pub struct FileMetrics {
     pub max_depth: i64,
 }
 
+/// A structural item (function, class, struct, etc.) in source code.
 #[frb(mirror(StructureItem))]
 pub struct StructureItem {
     pub kind: StructureKind,
@@ -63,6 +87,7 @@ pub struct StructureItem {
     pub body_span: Option<Span>,
 }
 
+/// A comment extracted from source code.
 #[frb(mirror(CommentInfo))]
 pub struct CommentInfo {
     pub text: String,
@@ -71,6 +96,7 @@ pub struct CommentInfo {
     pub associated_node: Option<String>,
 }
 
+/// A docstring extracted from source code.
 #[frb(mirror(DocstringInfo))]
 pub struct DocstringInfo {
     pub text: String,
@@ -80,6 +106,7 @@ pub struct DocstringInfo {
     pub parsed_sections: Vec<DocSection>,
 }
 
+/// A section within a docstring (e.g., Args, Returns, Raises).
 #[frb(mirror(DocSection))]
 pub struct DocSection {
     pub kind: String,
@@ -87,6 +114,7 @@ pub struct DocSection {
     pub description: String,
 }
 
+/// An import statement extracted from source code.
 #[frb(mirror(ImportInfo))]
 pub struct ImportInfo {
     pub source: String,
@@ -96,6 +124,7 @@ pub struct ImportInfo {
     pub span: Span,
 }
 
+/// An export statement extracted from source code.
 #[frb(mirror(ExportInfo))]
 pub struct ExportInfo {
     pub name: String,
@@ -103,6 +132,7 @@ pub struct ExportInfo {
     pub span: Span,
 }
 
+/// A symbol (variable, function, type, etc.) extracted from source code.
 #[frb(mirror(SymbolInfo))]
 pub struct SymbolInfo {
     pub name: String,
@@ -112,6 +142,7 @@ pub struct SymbolInfo {
     pub doc: Option<String>,
 }
 
+/// A diagnostic (syntax error, missing node, etc.) from parsing.
 #[frb(mirror(Diagnostic))]
 pub struct Diagnostic {
     pub message: String,
@@ -119,6 +150,7 @@ pub struct Diagnostic {
     pub span: Span,
 }
 
+/// A chunk of source code with rich metadata.
 #[frb(mirror(CodeChunk))]
 pub struct CodeChunk {
     pub content: String,
@@ -129,6 +161,7 @@ pub struct CodeChunk {
     pub metadata: ChunkContext,
 }
 
+/// Metadata for a single chunk of source code.
 #[frb(mirror(ChunkContext))]
 pub struct ChunkContext {
     pub language: String,
@@ -142,25 +175,68 @@ pub struct ChunkContext {
     pub has_error_nodes: bool,
 }
 
+/// Configuration for the tree-sitter language pack.
+///
+/// Controls cache directory and which languages to pre-download.
+/// Can be loaded from a TOML file, constructed programmatically,
+/// or passed as a dict/object from language bindings.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::PackConfig;
+///
+/// let config = PackConfig {
+///     cache_dir: None,
+///     languages: Some(vec!["python".to_string(), "rust".to_string()]),
+///     groups: None,
+/// };
+/// ```
 #[frb(mirror(PackConfig))]
 pub struct PackConfig {
+    /// Override default cache directory.
+    ///
+    /// Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
     pub cache_dir: Option<String>,
+    /// Languages to pre-download on init.
+    ///
+    /// Each entry is a language name (e.g. `"python"`, `"rust"`).
     pub languages: Option<Vec<String>>,
+    /// Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).
     pub groups: Option<Vec<String>>,
 }
 
+/// A source position — row + column, zero-indexed.
 #[frb(mirror(Point))]
 pub struct Point {
+    /// Zero-indexed row number.
     pub row: i64,
+    /// Zero-indexed column number, in UTF-16 code units.
     pub column: i64,
 }
 
+/// A byte range — start (inclusive) to end (exclusive).
 #[frb(mirror(ByteRange))]
 pub struct ByteRange {
+    /// Inclusive start byte offset.
     pub start: i64,
+    /// Exclusive end byte offset.
     pub end: i64,
 }
 
+/// A tree-sitter parser configured for one language at a time.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::Parser;
+///
+/// let mut parser = Parser::new();
+/// parser.set_language("python")?;
+/// let tree = parser.parse("def hello(): pass").expect("parse failed");
+/// assert_eq!(tree.root_node().kind(), "module");
+/// # Ok::<(), tree_sitter_language_pack::Error>(())
+/// ```
 #[frb(opaque)]
 pub struct Parser {
     pub(crate) inner: tree_sitter_language_pack::Parser,
@@ -178,6 +254,7 @@ impl From<Parser> for tree_sitter_language_pack::Parser {
     }
 }
 
+/// A parsed syntax tree. Cheap to clone (refcount bump).
 #[frb(opaque)]
 pub struct Tree {
     pub(crate) inner: tree_sitter_language_pack::Tree,
@@ -195,6 +272,10 @@ impl From<Tree> for tree_sitter_language_pack::Tree {
     }
 }
 
+/// A single syntax node within a [`Tree`].
+///
+/// Nodes hold a strong reference to their parent tree so they remain valid
+/// regardless of how the tree is moved or stored at the FFI boundary.
 #[frb(opaque)]
 pub struct Node {
     pub(crate) inner: tree_sitter_language_pack::Node,
@@ -212,6 +293,7 @@ impl From<Node> for tree_sitter_language_pack::Node {
     }
 }
 
+/// A cursor for traversing a [`Tree`].
 #[frb(opaque)]
 pub struct TreeCursor {
     pub(crate) inner: tree_sitter_language_pack::TreeCursor,
@@ -229,19 +311,66 @@ impl From<TreeCursor> for tree_sitter_language_pack::TreeCursor {
     }
 }
 
+/// Configuration for the `process()` function.
+///
+/// Controls which analysis features are enabled and whether chunking is performed.
+///
+/// # Examples
+///
+/// ```
+/// use tree_sitter_language_pack::ProcessConfig;
+///
+/// // Defaults: structure + imports + exports enabled
+/// let config = ProcessConfig::new("python");
+///
+/// // With chunking
+/// let config = ProcessConfig::new("python").with_chunking(1000);
+///
+/// // Everything enabled
+/// let config = ProcessConfig::new("python").all();
+/// ```
 #[frb(mirror(ProcessConfig))]
 pub struct ProcessConfig {
+    /// Language name (required).
     pub language: String,
+    /// Extract structural items (functions, classes, etc.). Default: true.
     pub structure: bool,
+    /// Extract import statements. Default: true.
     pub imports: bool,
+    /// Extract export statements. Default: true.
     pub exports: bool,
+    /// Extract comments. Default: false.
     pub comments: bool,
+    /// Extract docstrings. Default: false.
     pub docstrings: bool,
+    /// Extract symbol definitions. Default: false.
     pub symbols: bool,
+    /// Include parse diagnostics. Default: false.
     pub diagnostics: bool,
+    /// Maximum chunk size in bytes. `None` disables chunking.
     pub chunk_max_size: Option<i64>,
 }
 
+/// Thread-safe registry of tree-sitter language parsers.
+///
+/// Manages both statically compiled and dynamically loaded language grammars.
+/// Use [`LanguageRegistry::new()`] for the default registry, or access the
+/// global instance via the module-level convenience functions
+/// (`get_language`, `available_languages`, etc.).
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::{LanguageRegistry, ProcessConfig};
+///
+/// let registry = LanguageRegistry::new();
+/// let langs = registry.available_languages();
+/// println!("Available: {:?}", langs);
+///
+/// let config = ProcessConfig::new("python").all();
+/// let result = registry.process("def hello(): pass", &config).unwrap();
+/// println!("Structure: {:?}", result.structure);
+/// ```
 #[frb(opaque)]
 pub struct LanguageRegistry {
     pub(crate) inner: tree_sitter_language_pack::LanguageRegistry,
@@ -259,6 +388,7 @@ impl From<LanguageRegistry> for tree_sitter_language_pack::LanguageRegistry {
     }
 }
 
+/// Manages downloading and caching of pre-built parser shared libraries.
 #[frb(opaque)]
 pub struct DownloadManager {
     pub(crate) inner: tree_sitter_language_pack::DownloadManager,
@@ -480,6 +610,11 @@ impl DownloadManager {
     }
 }
 
+/// The kind of structural item found in source code.
+///
+/// Categorizes top-level and nested declarations such as functions, classes,
+/// structs, enums, traits, and more. Use [`Other`](StructureKind::Other) for
+/// language-specific constructs that do not fit a standard category.
 #[frb(mirror(StructureKind))]
 pub enum StructureKind {
     Function,
@@ -495,6 +630,10 @@ pub enum StructureKind {
     Other { field0: String },
 }
 
+/// The kind of a comment found in source code.
+///
+/// Distinguishes between single-line comments, block (multi-line) comments,
+/// and documentation comments.
 #[frb(mirror(CommentKind))]
 pub enum CommentKind {
     Line,
@@ -502,6 +641,10 @@ pub enum CommentKind {
     Doc,
 }
 
+/// The format of a docstring extracted from source code.
+///
+/// Identifies the docstring convention used, which varies by language
+/// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 #[frb(mirror(DocstringFormat))]
 pub enum DocstringFormat {
     PythonTripleQuote,
@@ -512,6 +655,9 @@ pub enum DocstringFormat {
     Other { field0: String },
 }
 
+/// The kind of an export statement found in source code.
+///
+/// Covers named exports, default exports, and re-exports from other modules.
 #[frb(mirror(ExportKind))]
 pub enum ExportKind {
     Named,
@@ -519,6 +665,10 @@ pub enum ExportKind {
     ReExport,
 }
 
+/// The kind of a symbol definition found in source code.
+///
+/// Categorizes symbol definitions such as variables, constants, functions,
+/// classes, types, interfaces, enums, and modules.
 #[frb(mirror(SymbolKind))]
 pub enum SymbolKind {
     Variable,
@@ -532,6 +682,10 @@ pub enum SymbolKind {
     Other { field0: String },
 }
 
+/// Severity level of a diagnostic produced during parsing.
+///
+/// Used to classify parse errors, warnings, and informational messages
+/// found in the syntax tree.
 #[frb(mirror(DiagnosticSeverity))]
 pub enum DiagnosticSeverity {
     Error,

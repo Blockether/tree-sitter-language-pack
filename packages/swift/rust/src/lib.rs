@@ -249,12 +249,16 @@ mod ffi {
 
     extern "Rust" {
         type Point;
+        #[swift_bridge(init)]
+        fn new(row: usize, column: usize) -> Point;
         fn row(&self) -> usize;
         fn column(&self) -> usize;
     }
 
     extern "Rust" {
         type ByteRange;
+        #[swift_bridge(init)]
+        fn new(start: usize, end: usize) -> ByteRange;
         fn start(&self) -> usize;
         fn end(&self) -> usize;
     }
@@ -504,14 +508,14 @@ impl Span {
         end_line: usize,
         end_column: usize,
     ) -> Span {
-        let mut __target: tree_sitter_language_pack::Span = ::std::default::Default::default();
-        __target.start_byte = start_byte;
-        __target.end_byte = end_byte;
-        __target.start_line = start_line;
-        __target.start_column = start_column;
-        __target.end_line = end_line;
-        __target.end_column = end_column;
-        Span(__target)
+        Span(tree_sitter_language_pack::Span {
+            start_byte,
+            end_byte,
+            start_line,
+            start_column,
+            end_line,
+            end_column,
+        })
     }
     pub fn start_byte(&self) -> usize {
         ::serde_json::to_value(&self.0.start_byte)
@@ -634,16 +638,16 @@ impl FileMetrics {
         error_count: usize,
         max_depth: usize,
     ) -> FileMetrics {
-        let mut __target: tree_sitter_language_pack::FileMetrics = ::std::default::Default::default();
-        __target.total_lines = total_lines;
-        __target.code_lines = code_lines;
-        __target.comment_lines = comment_lines;
-        __target.blank_lines = blank_lines;
-        __target.total_bytes = total_bytes;
-        __target.node_count = node_count;
-        __target.error_count = error_count;
-        __target.max_depth = max_depth;
-        FileMetrics(__target)
+        FileMetrics(tree_sitter_language_pack::FileMetrics {
+            total_lines,
+            code_lines,
+            comment_lines,
+            blank_lines,
+            total_bytes,
+            node_count,
+            error_count,
+            max_depth,
+        })
     }
     pub fn total_lines(&self) -> usize {
         ::serde_json::to_value(&self.0.total_lines)
@@ -1235,6 +1239,9 @@ impl PackConfig {
 
 pub struct Point(pub tree_sitter_language_pack::Point);
 impl Point {
+    pub fn new(row: usize, column: usize) -> Point {
+        Point(tree_sitter_language_pack::Point { row, column })
+    }
     pub fn row(&self) -> usize {
         ::serde_json::to_value(&self.0.row)
             .ok()
@@ -1251,6 +1258,9 @@ impl Point {
 
 pub struct ByteRange(pub tree_sitter_language_pack::ByteRange);
 impl ByteRange {
+    pub fn new(start: usize, end: usize) -> ByteRange {
+        ByteRange(tree_sitter_language_pack::ByteRange { start, end })
+    }
     pub fn start(&self) -> usize {
         ::serde_json::to_value(&self.0.start)
             .ok()

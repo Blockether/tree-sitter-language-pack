@@ -12,7 +12,20 @@ import java.nio.file.Path
  * or passed as a dict/object from language bindings.
  */
 data class PackConfig(
+    /**
+     * Override default cache directory.
+     *
+     * Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+     */
     val cacheDir: Path?,
+    /**
+     * Languages to pre-download on init.
+     *
+     * Each entry is a language name (e.g. `"python"`, `"rust"`).
+     */
     val languages: List<String>?,
+    /**
+     * Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).
+     */
     val groups: List<String>?,
 )
