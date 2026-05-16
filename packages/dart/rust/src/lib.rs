@@ -259,27 +259,6 @@ impl From<LanguageRegistry> for tree_sitter_language_pack::LanguageRegistry {
     }
 }
 
-#[frb(mirror(ParserManifest))]
-pub struct ParserManifest {
-    pub version: String,
-    pub platforms: std::collections::HashMap<String, PlatformBundle>,
-    pub languages: std::collections::HashMap<String, LanguageInfo>,
-    pub groups: std::collections::HashMap<String, Vec<String>>,
-}
-
-#[frb(mirror(PlatformBundle))]
-pub struct PlatformBundle {
-    pub url: String,
-    pub sha256: String,
-    pub size: i64,
-}
-
-#[frb(mirror(LanguageInfo))]
-pub struct LanguageInfo {
-    pub group: String,
-    pub size: i64,
-}
-
 #[frb(opaque)]
 pub struct DownloadManager {
     pub(crate) inner: tree_sitter_language_pack::DownloadManager,
@@ -353,10 +332,6 @@ impl Node {
     #[frb]
     pub fn kind(&self) -> String {
         self.inner.kind()
-    }
-    #[frb]
-    pub fn kind_id(&self) -> i64 {
-        (|v| v as i64)(self.inner.kind_id())
     }
     #[frb]
     pub fn start_byte(&self) -> i64 {
@@ -456,11 +431,6 @@ impl TreeCursor {
 }
 
 impl LanguageRegistry {
-    // Method `with_libs_dir` is a static/associated function and is not yet bridged through FRB — skipped.
-    #[frb]
-    pub fn add_extra_libs_dir(&self, dir: String) -> () {
-        self.inner.add_extra_libs_dir(::std::path::PathBuf::from(dir))
-    }
     #[frb]
     pub fn get_language(&self, name: String) -> Result<Language, String> {
         self.inner
@@ -493,35 +463,9 @@ impl LanguageRegistry {
 impl DownloadManager {
     // Method `new` is a static/associated function and is not yet bridged through FRB — skipped.
     // Method `with_cache_dir` is a static/associated function and is not yet bridged through FRB — skipped.
-    // Method `default_cache_dir` is a static/associated function and is not yet bridged through FRB — skipped.
-    #[frb]
-    pub fn cache_dir(&self) -> String {
-        (|v: &::std::path::Path| v.to_string_lossy().to_string())(self.inner.cache_dir())
-    }
     #[frb]
     pub fn installed_languages(&self) -> Vec<String> {
         self.inner.installed_languages()
-    }
-    #[frb]
-    pub fn ensure_languages(&self, names: Vec<String>) -> Result<(), String> {
-        self.inner
-            .ensure_languages(&names.iter().map(|s| s.as_str()).collect::<Vec<_>>())
-            .map_err(|e| e.to_string())
-    }
-    #[frb]
-    pub fn ensure_group(&self, group: String) -> Result<(), String> {
-        self.inner.ensure_group(&group).map_err(|e| e.to_string())
-    }
-    #[frb]
-    pub fn lib_path(&self, name: String) -> String {
-        (|v: ::std::path::PathBuf| v.to_string_lossy().to_string())(self.inner.lib_path(&name))
-    }
-    #[frb]
-    pub fn fetch_manifest(&self) -> Result<ParserManifest, String> {
-        self.inner
-            .fetch_manifest()
-            .map(|v| ParserManifest::from(v))
-            .map_err(|e| e.to_string())
     }
     #[frb]
     pub fn download_all_best_effort(&self) -> Result<i64, String> {
@@ -804,44 +748,6 @@ impl From<tree_sitter_language_pack::ProcessConfig> for ProcessConfig {
             symbols: v.symbols as _,
             diagnostics: v.diagnostics as _,
             chunk_max_size: v.chunk_max_size.map(|x| x as _),
-        }
-    }
-}
-
-impl From<tree_sitter_language_pack::download::ParserManifest> for ParserManifest {
-    fn from(v: tree_sitter_language_pack::download::ParserManifest) -> Self {
-        ParserManifest {
-            version: v.version.into(),
-            platforms: v
-                .platforms
-                .into_iter()
-                .map(|(k, v)| (k.into(), PlatformBundle::from(v)))
-                .collect(),
-            languages: v
-                .languages
-                .into_iter()
-                .map(|(k, v)| (k.into(), LanguageInfo::from(v)))
-                .collect(),
-            groups: v.groups.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
-        }
-    }
-}
-
-impl From<tree_sitter_language_pack::download::PlatformBundle> for PlatformBundle {
-    fn from(v: tree_sitter_language_pack::download::PlatformBundle) -> Self {
-        PlatformBundle {
-            url: v.url.into(),
-            sha256: v.sha256.into(),
-            size: v.size as _,
-        }
-    }
-}
-
-impl From<tree_sitter_language_pack::download::LanguageInfo> for LanguageInfo {
-    fn from(v: tree_sitter_language_pack::download::LanguageInfo) -> Self {
-        LanguageInfo {
-            group: v.group.into(),
-            size: v.size as _,
         }
     }
 }
@@ -1328,26 +1234,5 @@ pub fn create_byte_range_from_json(json: String) -> Result<ByteRange, String> {
 pub fn create_process_config_from_json(json: String) -> Result<ProcessConfig, String> {
     serde_json::from_str::<tree_sitter_language_pack::ProcessConfig>(&json)
         .map(ProcessConfig::from)
-        .map_err(|e| e.to_string())
-}
-
-#[frb]
-pub fn create_parser_manifest_from_json(json: String) -> Result<ParserManifest, String> {
-    serde_json::from_str::<tree_sitter_language_pack::download::ParserManifest>(&json)
-        .map(ParserManifest::from)
-        .map_err(|e| e.to_string())
-}
-
-#[frb]
-pub fn create_platform_bundle_from_json(json: String) -> Result<PlatformBundle, String> {
-    serde_json::from_str::<tree_sitter_language_pack::download::PlatformBundle>(&json)
-        .map(PlatformBundle::from)
-        .map_err(|e| e.to_string())
-}
-
-#[frb]
-pub fn create_language_info_from_json(json: String) -> Result<LanguageInfo, String> {
-    serde_json::from_str::<tree_sitter_language_pack::download::LanguageInfo>(&json)
-        .map(LanguageInfo::from)
         .map_err(|e| e.to_string())
 }

@@ -14,5 +14,5 @@ import java.nio.file.Path
 data class PackConfig(
     val cacheDir: Path?,
     val languages: List<String>?,
-    val groups: List<String>?
+    val groups: List<String>?,
 )

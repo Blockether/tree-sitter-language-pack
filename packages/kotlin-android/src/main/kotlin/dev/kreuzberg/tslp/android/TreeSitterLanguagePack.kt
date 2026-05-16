@@ -2,26 +2,58 @@
 
 package dev.kreuzberg.tslp.android
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 object TreeSitterLanguagePack {
+    private val mapper = jacksonObjectMapper()
+
     fun detectLanguageFromExtension(ext: String): String? = TreeSitterLanguagePackBridge.nativeDetectLanguageFromExtension(ext)
+
     fun detectLanguageFromPath(path: String): String? = TreeSitterLanguagePackBridge.nativeDetectLanguageFromPath(path)
+
     fun detectLanguageFromContent(content: String): String? = TreeSitterLanguagePackBridge.nativeDetectLanguageFromContent(content)
+
     fun getHighlightsQuery(language: String): String? = TreeSitterLanguagePackBridge.nativeGetHighlightsQuery(language)
+
     fun getInjectionsQuery(language: String): String? = TreeSitterLanguagePackBridge.nativeGetInjectionsQuery(language)
+
     fun getLocalsQuery(language: String): String? = TreeSitterLanguagePackBridge.nativeGetLocalsQuery(language)
-    fun getLanguage(name: String): String = TreeSitterLanguagePackBridge.nativeGetLanguage(name)
-    fun getParser(name: String): String = TreeSitterLanguagePackBridge.nativeGetParser(name)
+
+    fun getLanguage(name: String): Language = Language(TreeSitterLanguagePackBridge.nativeGetLanguage(name))
+
+    fun getParser(name: String): Parser = Parser(TreeSitterLanguagePackBridge.nativeGetParser(name))
+
     fun detectLanguage(path: String): String? = TreeSitterLanguagePackBridge.nativeDetectLanguage(path)
+
     fun availableLanguages(): String = TreeSitterLanguagePackBridge.nativeAvailableLanguages()
+
     fun hasLanguage(name: String): Boolean = TreeSitterLanguagePackBridge.nativeHasLanguage(name)
+
     fun languageCount(): Long = TreeSitterLanguagePackBridge.nativeLanguageCount()
-    fun process(source: String, config: String): String = TreeSitterLanguagePackBridge.nativeProcess(source, config)
-    fun init(config: String): Unit = TreeSitterLanguagePackBridge.nativeInit(config)
-    fun configure(config: String): Unit = TreeSitterLanguagePackBridge.nativeConfigure(config)
+
+    fun process(source: String, config: ProcessConfig): ProcessResult {
+        val resultJson = TreeSitterLanguagePackBridge.nativeProcess(source, mapper.writeValueAsString(config))
+        return mapper.readValue(resultJson, ProcessResult::class.java)
+    }
+
+    suspend fun processAsync(source: String, config: ProcessConfig): ProcessResult =
+        withContext(Dispatchers.IO) { process(source, config) }
+
+    fun init(config: PackConfig): Unit = TreeSitterLanguagePackBridge.nativeInit(mapper.writeValueAsString(config))
+
+    fun configure(config: PackConfig): Unit = TreeSitterLanguagePackBridge.nativeConfigure(mapper.writeValueAsString(config))
+
     fun download(names: String): Long = TreeSitterLanguagePackBridge.nativeDownload(names)
+
     fun downloadAll(): Long = TreeSitterLanguagePackBridge.nativeDownloadAll()
+
     fun manifestLanguages(): String = TreeSitterLanguagePackBridge.nativeManifestLanguages()
+
     fun downloadedLanguages(): String = TreeSitterLanguagePackBridge.nativeDownloadedLanguages()
+
     fun cleanCache(): Unit = TreeSitterLanguagePackBridge.nativeCleanCache()
+
     fun cacheDir(): String = TreeSitterLanguagePackBridge.nativeCacheDir()
 }

@@ -8,5 +8,5 @@ package dev.kreuzberg.tslp.android
 data class Diagnostic(
     val message: String,
     val severity: DiagnosticSeverity,
-    val span: Span
+    val span: Span,
 )

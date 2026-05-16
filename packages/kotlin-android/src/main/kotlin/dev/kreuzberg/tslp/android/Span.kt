@@ -14,5 +14,5 @@ data class Span(
     val startLine: Long,
     val startColumn: Long,
     val endLine: Long,
-    val endColumn: Long
+    val endColumn: Long,
 )

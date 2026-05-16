@@ -8,5 +8,5 @@ package dev.kreuzberg.tslp.android
 data class DocSection(
     val kind: String,
     val name: String?,
-    val description: String
+    val description: String,
 )

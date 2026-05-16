@@ -10,5 +10,5 @@ data class ImportInfo(
     val items: List<String>,
     val alias: String?,
     val isWildcard: Boolean,
-    val span: Span
+    val span: Span,
 )

@@ -255,7 +255,10 @@ class TreeSitterLanguagePackBridge {
   /// println!("Structures: {}", result.structure.len());
   /// ```
   /// throws Error on failure
-  static Future<ProcessResult> process(String source, ProcessConfig config) async {
+  static Future<ProcessResult> process(
+    String source,
+    ProcessConfig config,
+  ) async {
     return await rust_bridge.process(source: source, config: config);
   }
 
@@ -448,5 +451,4 @@ class TreeSitterLanguagePackBridge {
   static Future<String> cacheDir() async {
     return await rust_bridge.cacheDir();
   }
-
 }

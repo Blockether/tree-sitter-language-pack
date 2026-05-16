@@ -35,7 +35,7 @@ inline fn _first_error(comptime E: type) E {
 /// Covers language lookup failures, parse errors, query errors, and I/O issues.
 /// Feature-gated variants are included when `config`, `download`, or related
 /// features are enabled.
-pub const Error = error {
+pub const Error = error{
     LanguageNotFound,
     DynamicLoad,
     NullLanguagePointer,
@@ -46,6 +46,7 @@ pub const Error = error {
     QueryError,
     InvalidRange,
     Io,
+    OutOfMemory,
 };
 
 /// Byte and line/column range in source code.
@@ -221,25 +222,6 @@ pub const ProcessConfig = struct {
     chunk_max_size: ?u64,
 };
 
-/// Manifest describing available parser downloads for a specific version.
-pub const ParserManifest = struct {
-    version: [:0]const u8,
-    platforms: std.StringHashMap(PlatformBundle),
-    languages: std.StringHashMap(LanguageInfo),
-    groups: std.StringHashMap([]const [:0]const u8),
-};
-
-pub const PlatformBundle = struct {
-    url: [:0]const u8,
-    sha256: [:0]const u8,
-    size: u64,
-};
-
-pub const LanguageInfo = struct {
-    group: [:0]const u8,
-    size: u64,
-};
-
 /// The kind of structural item found in source code.
 ///
 /// Categorizes top-level and nested declarations such as functions, classes,
@@ -275,7 +257,7 @@ pub const CommentKind = enum {
 /// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 pub const DocstringFormat = union(enum) {
     python_triple_quote: void,
-    j_s_doc: void,
+    js_doc: void,
     rustdoc: void,
     go_doc: void,
     java_doc: void,
@@ -321,8 +303,7 @@ pub const DiagnosticSeverity = enum {
 ///
 /// Returns `null` for unrecognized extensions. The match is case-insensitive.
 pub fn detect_language_from_extension(ext: []const u8) error{OutOfMemory}!?[]u8 {
-    const ext_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{ext}, 0);
+    const ext_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{ext}, 0);
     defer std.heap.c_allocator.free(ext_z);
     const _result = c.ts_pack_detect_language_from_extension(ext_z);
     return blk: {
@@ -339,8 +320,7 @@ pub fn detect_language_from_extension(ext: []const u8) error{OutOfMemory}!?[]u8 
 /// Extracts the file extension and looks it up. Returns `null` if the
 /// path has no extension or the extension is not recognized.
 pub fn detect_language_from_path(path: []const u8) error{OutOfMemory}!?[]u8 {
-    const path_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{path}, 0);
+    const path_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{path}, 0);
     defer std.heap.c_allocator.free(path_z);
     const _result = c.ts_pack_detect_language_from_path(path_z);
     return blk: {
@@ -368,8 +348,7 @@ pub fn detect_language_from_path(path: []const u8) error{OutOfMemory}!?[]u8 {
 /// Returns `null` when content does not start with `#!`, the shebang is
 /// malformed, or the interpreter is not recognised.
 pub fn detect_language_from_content(content: []const u8) error{OutOfMemory}!?[]u8 {
-    const content_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{content}, 0);
+    const content_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{content}, 0);
     defer std.heap.c_allocator.free(content_z);
     const _result = c.ts_pack_detect_language_from_content(content_z);
     return blk: {
@@ -386,8 +365,7 @@ pub fn detect_language_from_content(content: []const u8) error{OutOfMemory}!?[]u
 /// Returns the contents of `highlights.scm` as a static string, or `null`
 /// if no highlights query is bundled for this language.
 pub fn get_highlights_query(language: []const u8) error{OutOfMemory}!?[]u8 {
-    const language_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{language}, 0);
+    const language_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{language}, 0);
     defer std.heap.c_allocator.free(language_z);
     const _result = c.ts_pack_get_highlights_query(language_z);
     return blk: {
@@ -404,8 +382,7 @@ pub fn get_highlights_query(language: []const u8) error{OutOfMemory}!?[]u8 {
 /// Returns the contents of `injections.scm` as a static string, or `null`
 /// if no injections query is bundled for this language.
 pub fn get_injections_query(language: []const u8) error{OutOfMemory}!?[]u8 {
-    const language_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{language}, 0);
+    const language_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{language}, 0);
     defer std.heap.c_allocator.free(language_z);
     const _result = c.ts_pack_get_injections_query(language_z);
     return blk: {
@@ -422,8 +399,7 @@ pub fn get_injections_query(language: []const u8) error{OutOfMemory}!?[]u8 {
 /// Returns the contents of `locals.scm` as a static string, or `null`
 /// if no locals query is bundled for this language.
 pub fn get_locals_query(language: []const u8) error{OutOfMemory}!?[]u8 {
-    const language_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{language}, 0);
+    const language_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{language}, 0);
     defer std.heap.c_allocator.free(language_z);
     const _result = c.ts_pack_get_locals_query(language_z);
     return blk: {
@@ -445,9 +421,8 @@ pub fn get_locals_query(language: []const u8) error{OutOfMemory}!?[]u8 {
 ///
 /// Returns `Error.LanguageNotFound` if the language is not recognized,
 /// or `Error.Download` if auto-download fails.
-pub fn get_language(name: []const u8) (Error||error{OutOfMemory})!Language {
-    const name_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{name}, 0);
+pub fn get_language(name: []const u8) Error!Language {
+    const name_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{name}, 0);
     defer std.heap.c_allocator.free(name_z);
     const _result = c.ts_pack_get_language(name_z);
     if (c.ts_pack_last_error_code() != 0) {
@@ -465,9 +440,8 @@ pub fn get_language(name: []const u8) (Error||error{OutOfMemory})!Language {
 ///
 /// Returns `Error.LanguageNotFound` if the language is not recognized, or
 /// `Error.ParserSetup` if the language cannot be applied to the parser.
-pub fn get_parser(name: []const u8) (Error||error{OutOfMemory})!Parser {
-    const name_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{name}, 0);
+pub fn get_parser(name: []const u8) Error!Parser {
+    const name_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{name}, 0);
     defer std.heap.c_allocator.free(name_z);
     const _result = c.ts_pack_get_parser(name_z);
     if (c.ts_pack_last_error_code() != 0) {
@@ -480,8 +454,7 @@ pub fn get_parser(name: []const u8) (Error||error{OutOfMemory})!Parser {
 ///
 /// This compatibility alias matches the pre-Alef Python binding API.
 pub fn detect_language(path: []const u8) error{OutOfMemory}!?[]u8 {
-    const path_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{path}, 0);
+    const path_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{path}, 0);
     defer std.heap.c_allocator.free(path_z);
     const _result = c.ts_pack_detect_language(path_z);
     return blk: {
@@ -512,8 +485,7 @@ pub fn available_languages() error{OutOfMemory}![]u8 {
 /// Returns `true` if the language can be loaded (statically compiled,
 /// dynamically available, or a known alias for one of these).
 pub fn has_language(name: []const u8) error{OutOfMemory}!bool {
-    const name_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{name}, 0);
+    const name_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{name}, 0);
     defer std.heap.c_allocator.free(name_z);
     const _result = c.ts_pack_has_language(name_z);
     return _result != 0;
@@ -537,12 +509,10 @@ pub fn language_count() u64 {
 /// **Errors:**
 ///
 /// Returns an error if the language is not found or parsing fails.
-pub fn process(source: []const u8, config: []const u8) (Error||error{OutOfMemory})![]u8 {
-    const source_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{source}, 0);
+pub fn process(source: []const u8, config: []const u8) Error![]u8 {
+    const source_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{source}, 0);
     defer std.heap.c_allocator.free(source_z);
-    const config_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{config}, 0);
+    const config_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{config}, 0);
     defer std.heap.c_allocator.free(config_z);
     const config_handle = c.ts_pack_process_config_from_json(config_z);
     const _result = c.ts_pack_process(source_z, config_handle);
@@ -557,8 +527,7 @@ pub fn process(source: []const u8, config: []const u8) (Error||error{OutOfMemory
         const slice = std.mem.sliceTo(_json_ptr, 0);
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         break :blk owned;
-    }
-;
+    };
 }
 
 /// Initialize the language pack with the given configuration.
@@ -570,9 +539,8 @@ pub fn process(source: []const u8, config: []const u8) (Error||error{OutOfMemory
 /// **Errors:**
 ///
 /// Returns an error if configuration cannot be applied or if downloads fail.
-pub fn init(config: []const u8) (Error||error{OutOfMemory})!void {
-    const config_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{config}, 0);
+pub fn init(config: []const u8) Error!void {
+    const config_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{config}, 0);
     defer std.heap.c_allocator.free(config_z);
     const config_handle = c.ts_pack_pack_config_from_json(config_z);
     _ = c.ts_pack_init(config_handle);
@@ -593,9 +561,8 @@ pub fn init(config: []const u8) (Error||error{OutOfMemory})!void {
 /// **Errors:**
 ///
 /// Returns an error if the lock cannot be acquired.
-pub fn configure(config: []const u8) (Error||error{OutOfMemory})!void {
-    const config_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{config}, 0);
+pub fn configure(config: []const u8) Error!void {
+    const config_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{config}, 0);
     defer std.heap.c_allocator.free(config_z);
     const config_handle = c.ts_pack_pack_config_from_json(config_z);
     _ = c.ts_pack_configure(config_handle);
@@ -615,10 +582,9 @@ pub fn configure(config: []const u8) (Error||error{OutOfMemory})!void {
 ///
 /// Returns an error if any language is not available in the manifest or if
 /// the download fails.
-pub fn download(names: []const u8) (Error||error{OutOfMemory})!u64 {
+pub fn download(names: []const u8) Error!u64 {
     // Vec/Map parameters are passed as JSON strings across the FFI boundary.
-    const names_z = try std.fmt.allocPrintSentinel(
-        std.heap.c_allocator, "{s}", .{names}, 0);
+    const names_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{names}, 0);
     defer std.heap.c_allocator.free(names_z);
     const _result = c.ts_pack_download(names_z);
     if (c.ts_pack_last_error_code() != 0) {
@@ -640,7 +606,7 @@ pub fn download(names: []const u8) (Error||error{OutOfMemory})!u64 {
 /// **Errors:**
 ///
 /// Returns an error if the manifest cannot be fetched or the bundle download fails.
-pub fn download_all() (Error||error{OutOfMemory})!u64 {
+pub fn download_all() Error!u64 {
     const _result = c.ts_pack_download_all();
     if (c.ts_pack_last_error_code() != 0) {
         return _first_error(Error);
@@ -657,7 +623,7 @@ pub fn download_all() (Error||error{OutOfMemory})!u64 {
 /// **Errors:**
 ///
 /// Returns an error if the manifest cannot be fetched.
-pub fn manifest_languages() (Error||error{OutOfMemory})![]u8 {
+pub fn manifest_languages() Error![]u8 {
     const _result = c.ts_pack_manifest_languages();
     if (c.ts_pack_last_error_code() != 0) {
         return _first_error(Error);
@@ -692,7 +658,7 @@ pub fn downloaded_languages() error{OutOfMemory}![]u8 {
 /// **Errors:**
 ///
 /// Returns an error if the cache directory cannot be removed.
-pub fn clean_cache() (Error||error{OutOfMemory})!void {
+pub fn clean_cache() Error!void {
     _ = c.ts_pack_clean_cache();
     if (c.ts_pack_last_error_code() != 0) {
         return _first_error(Error);
@@ -708,7 +674,7 @@ pub fn clean_cache() (Error||error{OutOfMemory})!void {
 /// **Errors:**
 ///
 /// Returns an error if the system cache directory cannot be determined.
-pub fn cache_dir() (Error||error{OutOfMemory})![]u8 {
+pub fn cache_dir() Error![]u8 {
     const _result = c.ts_pack_cache_dir();
     if (c.ts_pack_last_error_code() != 0) {
         return _first_error(Error);
@@ -734,7 +700,7 @@ pub const Parser = struct {
     ///
     /// Returns `Error.LanguageNotFound` if the language is not recognized,
     /// or `Error.ParserSetup` if the language ABI is incompatible.
-    pub fn set_language(self: *Parser, name: []const u8) (Error||error{OutOfMemory})!void {
+    pub fn set_language(self: *Parser, name: []const u8) (Error || error{OutOfMemory})!void {
         const name_z = try std.heap.c_allocator.dupeZ(u8, name);
         defer std.heap.c_allocator.free(name_z);
         _ = c.ts_pack_parser_set_language(@as(*c.TS_PACKParser, @ptrCast(self._handle)), name_z);
@@ -814,12 +780,6 @@ pub const Node = struct {
             c.ts_pack_free_string(_result);
             break :blk owned;
         };
-    }
-
-    /// Return the node's numeric kind ID.
-    pub fn kind_id(self: *Node) u16 {
-        const _result = c.ts_pack_node_kind_id(@as(*c.TS_PACKNode, @ptrCast(self._handle)));
-        return _result;
     }
 
     /// Return the inclusive start byte offset of this node.
@@ -1019,21 +979,6 @@ pub const TreeCursor = struct {
 pub const LanguageRegistry = struct {
     _handle: *anyopaque,
 
-    /// Add an additional directory to search for dynamic libraries.
-    ///
-    /// When `get_language` cannot find a grammar in the
-    /// primary library directory, it searches these extra directories in order.
-    /// Typically used by the download system to register its cache directory.
-    ///
-    /// Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
-    /// mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
-    /// immutable while the directory list is updated.
-    pub fn add_extra_libs_dir(self: *LanguageRegistry, dir: []const u8) error{OutOfMemory}!void {
-        const dir_z = try std.heap.c_allocator.dupeZ(u8, dir);
-        defer std.heap.c_allocator.free(dir_z);
-        c.ts_pack_language_registry_add_extra_libs_dir(@as(*c.TS_PACKLanguageRegistry, @ptrCast(self._handle)), dir_z);
-    }
-
     /// Get a tree-sitter `Language` by name.
     ///
     /// Resolves aliases (e.g., `"shell"` -> `"bash"`, `"makefile"` -> `"make"`),
@@ -1044,7 +989,7 @@ pub const LanguageRegistry = struct {
     ///
     /// Returns `Error.LanguageNotFound` if the name (after alias resolution)
     /// does not match any known grammar.
-    pub fn get_language(self: *LanguageRegistry, name: []const u8) (Error||error{OutOfMemory})!Language {
+    pub fn get_language(self: *LanguageRegistry, name: []const u8) (Error || error{OutOfMemory})!Language {
         const name_z = try std.heap.c_allocator.dupeZ(u8, name);
         defer std.heap.c_allocator.free(name_z);
         const _result = c.ts_pack_language_registry_get_language(@as(*c.TS_PACKLanguageRegistry, @ptrCast(self._handle)), name_z);
@@ -1086,7 +1031,7 @@ pub const LanguageRegistry = struct {
     }
 
     /// Parse source code and extract file intelligence based on config in a single pass.
-    pub fn process(self: *LanguageRegistry, source: []const u8, config: []const u8) (Error||error{OutOfMemory})![]u8 {
+    pub fn process(self: *LanguageRegistry, source: []const u8, config: []const u8) (Error || error{OutOfMemory})![]u8 {
         const source_z = try std.heap.c_allocator.dupeZ(u8, source);
         defer std.heap.c_allocator.free(source_z);
         const config_z = try std.heap.c_allocator.dupeZ(u8, config);
@@ -1117,17 +1062,6 @@ pub const LanguageRegistry = struct {
 pub const DownloadManager = struct {
     _handle: *anyopaque,
 
-    /// Return the path to the libs cache directory.
-    pub fn cache_dir(self: *DownloadManager) error{OutOfMemory}![]u8 {
-        const _result = c.ts_pack_download_manager_cache_dir(@as(*c.TS_PACKDownloadManager, @ptrCast(self._handle)));
-        return blk: {
-            const slice = std.mem.span(_result);
-            const owned = try std.heap.c_allocator.dupe(u8, slice);
-            c.ts_pack_free_string(_result);
-            break :blk owned;
-        };
-    }
-
     /// List languages that are already downloaded and cached.
     pub fn installed_languages(self: *DownloadManager) error{OutOfMemory}![]u8 {
         const _result = c.ts_pack_download_manager_installed_languages(@as(*c.TS_PACKDownloadManager, @ptrCast(self._handle)));
@@ -1135,56 +1069,6 @@ pub const DownloadManager = struct {
             const slice = std.mem.span(_result);
             const owned = try std.heap.c_allocator.dupe(u8, slice);
             c.ts_pack_free_string(_result);
-            break :blk owned;
-        };
-    }
-
-    /// Ensure the specified languages are available in the cache.
-    /// Downloads the platform bundle if any requested languages are missing.
-    pub fn ensure_languages(self: *DownloadManager, names: []const u8) (Error||error{OutOfMemory})!void {
-        const names_z = try std.heap.c_allocator.dupeZ(u8, names);
-        defer std.heap.c_allocator.free(names_z);
-        _ = c.ts_pack_download_manager_ensure_languages(@as(*c.TS_PACKDownloadManager, @ptrCast(self._handle)), names_z);
-        if (c.ts_pack_last_error_code() != 0) {
-            return _first_error(Error);
-        }
-    }
-
-    /// Ensure all languages in a named group are available.
-    pub fn ensure_group(self: *DownloadManager, group: []const u8) (Error||error{OutOfMemory})!void {
-        const group_z = try std.heap.c_allocator.dupeZ(u8, group);
-        defer std.heap.c_allocator.free(group_z);
-        _ = c.ts_pack_download_manager_ensure_group(@as(*c.TS_PACKDownloadManager, @ptrCast(self._handle)), group_z);
-        if (c.ts_pack_last_error_code() != 0) {
-            return _first_error(Error);
-        }
-    }
-
-    /// Get the expected path for a language's shared library in the cache.
-    pub fn lib_path(self: *DownloadManager, name: []const u8) error{OutOfMemory}![]u8 {
-        const name_z = try std.heap.c_allocator.dupeZ(u8, name);
-        defer std.heap.c_allocator.free(name_z);
-        const _result = c.ts_pack_download_manager_lib_path(@as(*c.TS_PACKDownloadManager, @ptrCast(self._handle)), name_z);
-        return blk: {
-            const slice = std.mem.span(_result);
-            const owned = try std.heap.c_allocator.dupe(u8, slice);
-            c.ts_pack_free_string(_result);
-            break :blk owned;
-        };
-    }
-
-    /// Fetch the parser manifest from GitHub Releases.
-    pub fn fetch_manifest(self: *DownloadManager) (Error||error{OutOfMemory})![]u8 {
-        const _result = c.ts_pack_download_manager_fetch_manifest(@as(*c.TS_PACKDownloadManager, @ptrCast(self._handle)));
-        if (c.ts_pack_last_error_code() != 0) {
-            return _first_error(Error);
-        }
-        return blk: {
-            const _json_ptr = c.ts_pack_parser_manifest_to_json(_result);
-            const _json_slice = std.mem.span(_json_ptr);
-            const owned = try std.heap.c_allocator.dupe(u8, _json_slice);
-            c.ts_pack_free_string(_json_ptr);
-            c.ts_pack_parser_manifest_free(_result);
             break :blk owned;
         };
     }
@@ -1197,7 +1081,7 @@ pub const DownloadManager = struct {
     /// are silently ignored rather than returning an error.
     ///
     /// Returns the number of library files extracted (including those already cached).
-    pub fn download_all_best_effort(self: *DownloadManager) (Error||error{OutOfMemory})!u64 {
+    pub fn download_all_best_effort(self: *DownloadManager) (Error || error{OutOfMemory})!u64 {
         const _result = c.ts_pack_download_manager_download_all_best_effort(@as(*c.TS_PACKDownloadManager, @ptrCast(self._handle)));
         if (c.ts_pack_last_error_code() != 0) {
             return _first_error(Error);
@@ -1206,7 +1090,7 @@ pub const DownloadManager = struct {
     }
 
     /// Remove all cached parser libraries.
-    pub fn clean_cache(self: *DownloadManager) (Error||error{OutOfMemory})!void {
+    pub fn clean_cache(self: *DownloadManager) (Error || error{OutOfMemory})!void {
         _ = c.ts_pack_download_manager_clean_cache(@as(*c.TS_PACKDownloadManager, @ptrCast(self._handle)));
         if (c.ts_pack_last_error_code() != 0) {
             return _first_error(Error);

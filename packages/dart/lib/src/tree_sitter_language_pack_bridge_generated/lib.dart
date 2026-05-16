@@ -8,7 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'lib.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 /// Detect language name from a file extension (without leading dot).
 ///
@@ -270,32 +270,13 @@ Future<ByteRange> createByteRangeFromJson({required String json}) =>
 Future<ProcessConfig> createProcessConfigFromJson({required String json}) =>
     RustLib.instance.api.crateCreateProcessConfigFromJson(json: json);
 
-Future<ParserManifest> createParserManifestFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateParserManifestFromJson(json: json);
-
-Future<PlatformBundle> createPlatformBundleFromJson({required String json}) =>
-    RustLib.instance.api.crateCreatePlatformBundleFromJson(json: json);
-
-Future<LanguageInfo> createLanguageInfoFromJson({required String json}) =>
-    RustLib.instance.api.crateCreateLanguageInfoFromJson(json: json);
-
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DownloadManager>>
 abstract class DownloadManager implements RustOpaqueInterface {
-  Future<String> cacheDir();
-
   Future<void> cleanCache();
 
   Future<PlatformInt64> downloadAllBestEffort();
 
-  Future<void> ensureGroup({required String group});
-
-  Future<void> ensureLanguages({required List<String> names});
-
-  Future<ParserManifest> fetchManifest();
-
   Future<List<String>> installedLanguages();
-
-  Future<String> libPath({required String name});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Language>>
@@ -303,8 +284,6 @@ abstract class Language implements RustOpaqueInterface {}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<LanguageRegistry>>
 abstract class LanguageRegistry implements RustOpaqueInterface {
-  Future<void> addExtraLibsDir({required String dir});
-
   Future<List<String>> availableLanguages();
 
   Future<Language> getLanguage({required String name});
@@ -346,8 +325,6 @@ abstract class Node implements RustOpaqueInterface {
   Future<bool> isNamed();
 
   Future<String> kind();
-
-  Future<PlatformInt64> kindId();
 
   Future<Node?> namedChild({required PlatformInt64 index});
 
@@ -736,24 +713,6 @@ class ImportInfo {
           span == other.span;
 }
 
-class LanguageInfo {
-  final String group;
-  final PlatformInt64 size;
-
-  const LanguageInfo({required this.group, required this.size});
-
-  @override
-  int get hashCode => group.hashCode ^ size.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is LanguageInfo &&
-          runtimeType == other.runtimeType &&
-          group == other.group &&
-          size == other.size;
-}
-
 class PackConfig {
   final String? cacheDir;
   final List<String>? languages;
@@ -772,61 +731,6 @@ class PackConfig {
           cacheDir == other.cacheDir &&
           languages == other.languages &&
           groups == other.groups;
-}
-
-class ParserManifest {
-  final String version;
-  final Map<String, PlatformBundle> platforms;
-  final Map<String, LanguageInfo> languages;
-  final Map<String, List<String>> groups;
-
-  const ParserManifest({
-    required this.version,
-    required this.platforms,
-    required this.languages,
-    required this.groups,
-  });
-
-  @override
-  int get hashCode =>
-      version.hashCode ^
-      platforms.hashCode ^
-      languages.hashCode ^
-      groups.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ParserManifest &&
-          runtimeType == other.runtimeType &&
-          version == other.version &&
-          platforms == other.platforms &&
-          languages == other.languages &&
-          groups == other.groups;
-}
-
-class PlatformBundle {
-  final String url;
-  final String sha256;
-  final PlatformInt64 size;
-
-  const PlatformBundle({
-    required this.url,
-    required this.sha256,
-    required this.size,
-  });
-
-  @override
-  int get hashCode => url.hashCode ^ sha256.hashCode ^ size.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PlatformBundle &&
-          runtimeType == other.runtimeType &&
-          url == other.url &&
-          sha256 == other.sha256 &&
-          size == other.size;
 }
 
 class Point {

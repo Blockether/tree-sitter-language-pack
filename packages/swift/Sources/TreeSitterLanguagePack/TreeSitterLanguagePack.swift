@@ -7,7 +7,50 @@ import RustBridge
 ///
 /// Represents both byte offsets (for slicing) and human-readable line/column
 /// positions (for display and diagnostics).
-public typealias Span = RustBridge.Span
+public struct Span: Codable, Sendable, Hashable {
+  public let startByte: UInt
+  public let endByte: UInt
+  public let startLine: UInt
+  public let startColumn: UInt
+  public let endLine: UInt
+  public let endColumn: UInt
+  public init(
+    startByte: UInt, endByte: UInt, startLine: UInt, startColumn: UInt, endLine: UInt,
+    endColumn: UInt
+  ) {
+    self.startByte = startByte
+    self.endByte = endByte
+    self.startLine = startLine
+    self.startColumn = startColumn
+    self.endLine = endLine
+    self.endColumn = endColumn
+  }
+  private enum CodingKeys: String, CodingKey {
+    case startByte = "start_byte"
+    case endByte = "end_byte"
+    case startLine = "start_line"
+    case startColumn = "start_column"
+    case endLine = "end_line"
+    case endColumn = "end_column"
+  }
+}
+
+// MARK: - Internal FFI conversions for Span
+extension Span {
+  init(_ rb: RustBridge.Span) throws {
+    self.startByte = rb.startByte()
+    self.endByte = rb.endByte()
+    self.startLine = rb.startLine()
+    self.startColumn = rb.startColumn()
+    self.endLine = rb.endLine()
+    self.endColumn = rb.endColumn()
+  }
+  func intoRust() throws -> RustBridge.Span {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.spanFromJson(json)
+  }
+}
 
 /// Complete analysis result from processing a source file.
 ///
@@ -27,40 +70,508 @@ public typealias Span = RustBridge.Span
 /// - `symbols` - Symbol definitions (when `config.symbols = true`)
 /// - `diagnostics` - Parse errors (when `config.diagnostics = true`)
 /// - `chunks` - Chunked code segments (when `config.chunk_max_size` is set)
-public typealias ProcessResult = RustBridge.ProcessResult
+public struct ProcessResult: Codable, Sendable, Hashable {
+  public let language: String
+  public let metrics: FileMetrics
+  public let structure: [StructureItem]
+  public let imports: [ImportInfo]
+  public let exports: [ExportInfo]
+  public let comments: [CommentInfo]
+  public let docstrings: [DocstringInfo]
+  public let symbols: [SymbolInfo]
+  public let diagnostics: [Diagnostic]
+  public let chunks: [CodeChunk]
+  public init(
+    language: String, metrics: FileMetrics, structure: [StructureItem], imports: [ImportInfo],
+    exports: [ExportInfo], comments: [CommentInfo], docstrings: [DocstringInfo],
+    symbols: [SymbolInfo], diagnostics: [Diagnostic], chunks: [CodeChunk]
+  ) {
+    self.language = language
+    self.metrics = metrics
+    self.structure = structure
+    self.imports = imports
+    self.exports = exports
+    self.comments = comments
+    self.docstrings = docstrings
+    self.symbols = symbols
+    self.diagnostics = diagnostics
+    self.chunks = chunks
+  }
+}
+
+// MARK: - Internal FFI conversions for ProcessResult
+extension ProcessResult {
+  init(_ rb: RustBridge.ProcessResult) throws {
+    self.language = rb.language().toString()
+    self.metrics = rb.metrics()
+    self.structure = rb.structure()
+    self.imports = rb.imports()
+    self.exports = rb.exports()
+    self.comments = rb.comments()
+    self.docstrings = rb.docstrings()
+    self.symbols = rb.symbols()
+    self.diagnostics = rb.diagnostics()
+    self.chunks = rb.chunks()
+  }
+  func intoRust() throws -> RustBridge.ProcessResult {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.processResultFromJson(json)
+  }
+}
 
 /// Aggregate metrics for a source file.
-public typealias FileMetrics = RustBridge.FileMetrics
+public struct FileMetrics: Codable, Sendable, Hashable {
+  public let totalLines: UInt
+  public let codeLines: UInt
+  public let commentLines: UInt
+  public let blankLines: UInt
+  public let totalBytes: UInt
+  public let nodeCount: UInt
+  public let errorCount: UInt
+  public let maxDepth: UInt
+  public init(
+    totalLines: UInt, codeLines: UInt, commentLines: UInt, blankLines: UInt, totalBytes: UInt,
+    nodeCount: UInt, errorCount: UInt, maxDepth: UInt
+  ) {
+    self.totalLines = totalLines
+    self.codeLines = codeLines
+    self.commentLines = commentLines
+    self.blankLines = blankLines
+    self.totalBytes = totalBytes
+    self.nodeCount = nodeCount
+    self.errorCount = errorCount
+    self.maxDepth = maxDepth
+  }
+  private enum CodingKeys: String, CodingKey {
+    case totalLines = "total_lines"
+    case codeLines = "code_lines"
+    case commentLines = "comment_lines"
+    case blankLines = "blank_lines"
+    case totalBytes = "total_bytes"
+    case nodeCount = "node_count"
+    case errorCount = "error_count"
+    case maxDepth = "max_depth"
+  }
+}
+
+// MARK: - Internal FFI conversions for FileMetrics
+extension FileMetrics {
+  init(_ rb: RustBridge.FileMetrics) throws {
+    self.totalLines = rb.totalLines()
+    self.codeLines = rb.codeLines()
+    self.commentLines = rb.commentLines()
+    self.blankLines = rb.blankLines()
+    self.totalBytes = rb.totalBytes()
+    self.nodeCount = rb.nodeCount()
+    self.errorCount = rb.errorCount()
+    self.maxDepth = rb.maxDepth()
+  }
+  func intoRust() throws -> RustBridge.FileMetrics {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.fileMetricsFromJson(json)
+  }
+}
 
 /// A structural item (function, class, struct, etc.) in source code.
-public typealias StructureItem = RustBridge.StructureItem
+public struct StructureItem: Codable, Sendable, Hashable {
+  public let kind: StructureKind
+  public let name: String?
+  public let visibility: String?
+  public let span: Span
+  public let children: [StructureItem]
+  public let decorators: [String]
+  public let docComment: String?
+  public let signature: String?
+  public let bodySpan: Span?
+  public init(
+    kind: StructureKind, name: String? = nil, visibility: String? = nil, span: Span,
+    children: [StructureItem], decorators: [String], docComment: String? = nil,
+    signature: String? = nil, bodySpan: Span? = nil
+  ) {
+    self.kind = kind
+    self.name = name
+    self.visibility = visibility
+    self.span = span
+    self.children = children
+    self.decorators = decorators
+    self.docComment = docComment
+    self.signature = signature
+    self.bodySpan = bodySpan
+  }
+  private enum CodingKeys: String, CodingKey {
+    case kind = "kind"
+    case name = "name"
+    case visibility = "visibility"
+    case span = "span"
+    case children = "children"
+    case decorators = "decorators"
+    case docComment = "doc_comment"
+    case signature = "signature"
+    case bodySpan = "body_span"
+  }
+}
+
+// MARK: - Internal FFI conversions for StructureItem
+extension StructureItem {
+  init(_ rb: RustBridge.StructureItem) throws {
+    self.kind = rb.kind()
+    self.name = rb.name()?.toString()
+    self.visibility = rb.visibility()?.toString()
+    self.span = rb.span()
+    self.children = rb.children()
+    self.decorators = rb.decorators()
+    self.docComment = rb.docComment()?.toString()
+    self.signature = rb.signature()?.toString()
+    self.bodySpan = rb.bodySpan()
+  }
+  func intoRust() throws -> RustBridge.StructureItem {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.structureItemFromJson(json)
+  }
+}
 
 /// A comment extracted from source code.
-public typealias CommentInfo = RustBridge.CommentInfo
+public struct CommentInfo: Codable, Sendable, Hashable {
+  public let text: String
+  public let kind: CommentKind
+  public let span: Span
+  public let associatedNode: String?
+  public init(text: String, kind: CommentKind, span: Span, associatedNode: String? = nil) {
+    self.text = text
+    self.kind = kind
+    self.span = span
+    self.associatedNode = associatedNode
+  }
+  private enum CodingKeys: String, CodingKey {
+    case text = "text"
+    case kind = "kind"
+    case span = "span"
+    case associatedNode = "associated_node"
+  }
+}
+
+// MARK: - Internal FFI conversions for CommentInfo
+extension CommentInfo {
+  init(_ rb: RustBridge.CommentInfo) throws {
+    self.text = rb.text().toString()
+    self.kind = rb.kind()
+    self.span = rb.span()
+    self.associatedNode = rb.associatedNode()?.toString()
+  }
+  func intoRust() throws -> RustBridge.CommentInfo {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.commentInfoFromJson(json)
+  }
+}
 
 /// A docstring extracted from source code.
-public typealias DocstringInfo = RustBridge.DocstringInfo
+public struct DocstringInfo: Codable, Sendable, Hashable {
+  public let text: String
+  public let format: DocstringFormat
+  public let span: Span
+  public let associatedItem: String?
+  public let parsedSections: [DocSection]
+  public init(
+    text: String, format: DocstringFormat, span: Span, associatedItem: String? = nil,
+    parsedSections: [DocSection]
+  ) {
+    self.text = text
+    self.format = format
+    self.span = span
+    self.associatedItem = associatedItem
+    self.parsedSections = parsedSections
+  }
+  private enum CodingKeys: String, CodingKey {
+    case text = "text"
+    case format = "format"
+    case span = "span"
+    case associatedItem = "associated_item"
+    case parsedSections = "parsed_sections"
+  }
+}
+
+// MARK: - Internal FFI conversions for DocstringInfo
+extension DocstringInfo {
+  init(_ rb: RustBridge.DocstringInfo) throws {
+    self.text = rb.text().toString()
+    self.format = rb.format()
+    self.span = rb.span()
+    self.associatedItem = rb.associatedItem()?.toString()
+    self.parsedSections = rb.parsedSections()
+  }
+  func intoRust() throws -> RustBridge.DocstringInfo {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.docstringInfoFromJson(json)
+  }
+}
 
 /// A section within a docstring (e.g., Args, Returns, Raises).
-public typealias DocSection = RustBridge.DocSection
+public struct DocSection: Codable, Sendable, Hashable {
+  public let kind: String
+  public let name: String?
+  public let description: String
+  public init(kind: String, name: String? = nil, description: String) {
+    self.kind = kind
+    self.name = name
+    self.description = description
+  }
+}
+
+// MARK: - Internal FFI conversions for DocSection
+extension DocSection {
+  init(_ rb: RustBridge.DocSection) throws {
+    self.kind = rb.kind().toString()
+    self.name = rb.name()?.toString()
+    self.description = rb.description().toString()
+  }
+  func intoRust() throws -> RustBridge.DocSection {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.docSectionFromJson(json)
+  }
+}
 
 /// An import statement extracted from source code.
-public typealias ImportInfo = RustBridge.ImportInfo
+public struct ImportInfo: Codable, Sendable, Hashable {
+  public let source: String
+  public let items: [String]
+  public let alias: String?
+  public let isWildcard: Bool
+  public let span: Span
+  public init(source: String, items: [String], alias: String? = nil, isWildcard: Bool, span: Span) {
+    self.source = source
+    self.items = items
+    self.alias = alias
+    self.isWildcard = isWildcard
+    self.span = span
+  }
+  private enum CodingKeys: String, CodingKey {
+    case source = "source"
+    case items = "items"
+    case alias = "alias"
+    case isWildcard = "is_wildcard"
+    case span = "span"
+  }
+}
+
+// MARK: - Internal FFI conversions for ImportInfo
+extension ImportInfo {
+  init(_ rb: RustBridge.ImportInfo) throws {
+    self.source = rb.source().toString()
+    self.items = rb.items()
+    self.alias = rb.alias()?.toString()
+    self.isWildcard = rb.isWildcard()
+    self.span = rb.span()
+  }
+  func intoRust() throws -> RustBridge.ImportInfo {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.importInfoFromJson(json)
+  }
+}
 
 /// An export statement extracted from source code.
-public typealias ExportInfo = RustBridge.ExportInfo
+public struct ExportInfo: Codable, Sendable, Hashable {
+  public let name: String
+  public let kind: ExportKind
+  public let span: Span
+  public init(name: String, kind: ExportKind, span: Span) {
+    self.name = name
+    self.kind = kind
+    self.span = span
+  }
+}
+
+// MARK: - Internal FFI conversions for ExportInfo
+extension ExportInfo {
+  init(_ rb: RustBridge.ExportInfo) throws {
+    self.name = rb.name().toString()
+    self.kind = rb.kind()
+    self.span = rb.span()
+  }
+  func intoRust() throws -> RustBridge.ExportInfo {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.exportInfoFromJson(json)
+  }
+}
 
 /// A symbol (variable, function, type, etc.) extracted from source code.
-public typealias SymbolInfo = RustBridge.SymbolInfo
+public struct SymbolInfo: Codable, Sendable, Hashable {
+  public let name: String
+  public let kind: SymbolKind
+  public let span: Span
+  public let typeAnnotation: String?
+  public let doc: String?
+  public init(
+    name: String, kind: SymbolKind, span: Span, typeAnnotation: String? = nil, doc: String? = nil
+  ) {
+    self.name = name
+    self.kind = kind
+    self.span = span
+    self.typeAnnotation = typeAnnotation
+    self.doc = doc
+  }
+  private enum CodingKeys: String, CodingKey {
+    case name = "name"
+    case kind = "kind"
+    case span = "span"
+    case typeAnnotation = "type_annotation"
+    case doc = "doc"
+  }
+}
+
+// MARK: - Internal FFI conversions for SymbolInfo
+extension SymbolInfo {
+  init(_ rb: RustBridge.SymbolInfo) throws {
+    self.name = rb.name().toString()
+    self.kind = rb.kind()
+    self.span = rb.span()
+    self.typeAnnotation = rb.typeAnnotation()?.toString()
+    self.doc = rb.doc()?.toString()
+  }
+  func intoRust() throws -> RustBridge.SymbolInfo {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.symbolInfoFromJson(json)
+  }
+}
 
 /// A diagnostic (syntax error, missing node, etc.) from parsing.
-public typealias Diagnostic = RustBridge.Diagnostic
+public struct Diagnostic: Codable, Sendable, Hashable {
+  public let message: String
+  public let severity: DiagnosticSeverity
+  public let span: Span
+  public init(message: String, severity: DiagnosticSeverity, span: Span) {
+    self.message = message
+    self.severity = severity
+    self.span = span
+  }
+}
+
+// MARK: - Internal FFI conversions for Diagnostic
+extension Diagnostic {
+  init(_ rb: RustBridge.Diagnostic) throws {
+    self.message = rb.message().toString()
+    self.severity = rb.severity()
+    self.span = rb.span()
+  }
+  func intoRust() throws -> RustBridge.Diagnostic {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.diagnosticFromJson(json)
+  }
+}
 
 /// A chunk of source code with rich metadata.
-public typealias CodeChunk = RustBridge.CodeChunk
+public struct CodeChunk: Codable, Sendable, Hashable {
+  public let content: String
+  public let startByte: UInt
+  public let endByte: UInt
+  public let startLine: UInt
+  public let endLine: UInt
+  public let metadata: ChunkContext
+  public init(
+    content: String, startByte: UInt, endByte: UInt, startLine: UInt, endLine: UInt,
+    metadata: ChunkContext
+  ) {
+    self.content = content
+    self.startByte = startByte
+    self.endByte = endByte
+    self.startLine = startLine
+    self.endLine = endLine
+    self.metadata = metadata
+  }
+  private enum CodingKeys: String, CodingKey {
+    case content = "content"
+    case startByte = "start_byte"
+    case endByte = "end_byte"
+    case startLine = "start_line"
+    case endLine = "end_line"
+    case metadata = "metadata"
+  }
+}
+
+// MARK: - Internal FFI conversions for CodeChunk
+extension CodeChunk {
+  init(_ rb: RustBridge.CodeChunk) throws {
+    self.content = rb.content().toString()
+    self.startByte = rb.startByte()
+    self.endByte = rb.endByte()
+    self.startLine = rb.startLine()
+    self.endLine = rb.endLine()
+    self.metadata = rb.metadata()
+  }
+  func intoRust() throws -> RustBridge.CodeChunk {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.codeChunkFromJson(json)
+  }
+}
 
 /// Metadata for a single chunk of source code.
-public typealias ChunkContext = RustBridge.ChunkContext
+public struct ChunkContext: Codable, Sendable, Hashable {
+  public let language: String
+  public let chunkIndex: UInt
+  public let totalChunks: UInt
+  public let nodeTypes: [String]
+  public let contextPath: [String]
+  public let symbolsDefined: [String]
+  public let comments: [CommentInfo]
+  public let docstrings: [DocstringInfo]
+  public let hasErrorNodes: Bool
+  public init(
+    language: String, chunkIndex: UInt, totalChunks: UInt, nodeTypes: [String],
+    contextPath: [String], symbolsDefined: [String], comments: [CommentInfo],
+    docstrings: [DocstringInfo], hasErrorNodes: Bool
+  ) {
+    self.language = language
+    self.chunkIndex = chunkIndex
+    self.totalChunks = totalChunks
+    self.nodeTypes = nodeTypes
+    self.contextPath = contextPath
+    self.symbolsDefined = symbolsDefined
+    self.comments = comments
+    self.docstrings = docstrings
+    self.hasErrorNodes = hasErrorNodes
+  }
+  private enum CodingKeys: String, CodingKey {
+    case language = "language"
+    case chunkIndex = "chunk_index"
+    case totalChunks = "total_chunks"
+    case nodeTypes = "node_types"
+    case contextPath = "context_path"
+    case symbolsDefined = "symbols_defined"
+    case comments = "comments"
+    case docstrings = "docstrings"
+    case hasErrorNodes = "has_error_nodes"
+  }
+}
+
+// MARK: - Internal FFI conversions for ChunkContext
+extension ChunkContext {
+  init(_ rb: RustBridge.ChunkContext) throws {
+    self.language = rb.language().toString()
+    self.chunkIndex = rb.chunkIndex()
+    self.totalChunks = rb.totalChunks()
+    self.nodeTypes = rb.nodeTypes()
+    self.contextPath = rb.contextPath()
+    self.symbolsDefined = rb.symbolsDefined()
+    self.comments = rb.comments()
+    self.docstrings = rb.docstrings()
+    self.hasErrorNodes = rb.hasErrorNodes()
+  }
+  func intoRust() throws -> RustBridge.ChunkContext {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.chunkContextFromJson(json)
+  }
+}
 
 /// Configuration for the tree-sitter language pack.
 ///
@@ -79,13 +590,81 @@ public typealias ChunkContext = RustBridge.ChunkContext
 ///     groups: None,
 /// };
 /// ```
-public typealias PackConfig = RustBridge.PackConfig
+public struct PackConfig: Codable, Sendable, Hashable {
+  public let cacheDir: URL?
+  public let languages: [String]?
+  public let groups: [String]?
+  public init(cacheDir: URL? = nil, languages: [String]? = nil, groups: [String]? = nil) {
+    self.cacheDir = cacheDir
+    self.languages = languages
+    self.groups = groups
+  }
+  private enum CodingKeys: String, CodingKey {
+    case cacheDir = "cache_dir"
+    case languages = "languages"
+    case groups = "groups"
+  }
+}
+
+// MARK: - Internal FFI conversions for PackConfig
+extension PackConfig {
+  init(_ rb: RustBridge.PackConfig) throws {
+    self.cacheDir = rb.cacheDir()
+    self.languages = rb.languages()
+    self.groups = rb.groups()
+  }
+  func intoRust() throws -> RustBridge.PackConfig {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.packConfigFromJson(json)
+  }
+}
 
 /// A source position — row + column, zero-indexed.
-public typealias Point = RustBridge.Point
+public struct Point: Codable, Sendable, Hashable {
+  public let row: UInt
+  public let column: UInt
+  public init(row: UInt, column: UInt) {
+    self.row = row
+    self.column = column
+  }
+}
+
+// MARK: - Internal FFI conversions for Point
+extension Point {
+  init(_ rb: RustBridge.Point) throws {
+    self.row = rb.row()
+    self.column = rb.column()
+  }
+  func intoRust() throws -> RustBridge.Point {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.pointFromJson(json)
+  }
+}
 
 /// A byte range — start (inclusive) to end (exclusive).
-public typealias ByteRange = RustBridge.ByteRange
+public struct ByteRange: Codable, Sendable, Hashable {
+  public let start: UInt
+  public let end: UInt
+  public init(start: UInt, end: UInt) {
+    self.start = start
+    self.end = end
+  }
+}
+
+// MARK: - Internal FFI conversions for ByteRange
+extension ByteRange {
+  init(_ rb: RustBridge.ByteRange) throws {
+    self.start = rb.start()
+    self.end = rb.end()
+  }
+  func intoRust() throws -> RustBridge.ByteRange {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.byteRangeFromJson(json)
+  }
+}
 
 /// Configuration for the `process()` function.
 ///
@@ -105,14 +684,62 @@ public typealias ByteRange = RustBridge.ByteRange
 /// // Everything enabled
 /// let config = ProcessConfig::new("python").all();
 /// ```
-public typealias ProcessConfig = RustBridge.ProcessConfig
+public struct ProcessConfig: Codable, Sendable, Hashable {
+  public let language: String
+  public let structure: Bool
+  public let imports: Bool
+  public let exports: Bool
+  public let comments: Bool
+  public let docstrings: Bool
+  public let symbols: Bool
+  public let diagnostics: Bool
+  public let chunkMaxSize: UInt?
+  public init(
+    language: String, structure: Bool, imports: Bool, exports: Bool, comments: Bool,
+    docstrings: Bool, symbols: Bool, diagnostics: Bool, chunkMaxSize: UInt? = nil
+  ) {
+    self.language = language
+    self.structure = structure
+    self.imports = imports
+    self.exports = exports
+    self.comments = comments
+    self.docstrings = docstrings
+    self.symbols = symbols
+    self.diagnostics = diagnostics
+    self.chunkMaxSize = chunkMaxSize
+  }
+  private enum CodingKeys: String, CodingKey {
+    case language = "language"
+    case structure = "structure"
+    case imports = "imports"
+    case exports = "exports"
+    case comments = "comments"
+    case docstrings = "docstrings"
+    case symbols = "symbols"
+    case diagnostics = "diagnostics"
+    case chunkMaxSize = "chunk_max_size"
+  }
+}
 
-/// Manifest describing available parser downloads for a specific version.
-public typealias ParserManifest = RustBridge.ParserManifest
-
-public typealias PlatformBundle = RustBridge.PlatformBundle
-
-public typealias LanguageInfo = RustBridge.LanguageInfo
+// MARK: - Internal FFI conversions for ProcessConfig
+extension ProcessConfig {
+  init(_ rb: RustBridge.ProcessConfig) throws {
+    self.language = rb.language().toString()
+    self.structure = rb.structure()
+    self.imports = rb.imports()
+    self.exports = rb.exports()
+    self.comments = rb.comments()
+    self.docstrings = rb.docstrings()
+    self.symbols = rb.symbols()
+    self.diagnostics = rb.diagnostics()
+    self.chunkMaxSize = rb.chunkMaxSize()
+  }
+  func intoRust() throws -> RustBridge.ProcessConfig {
+    let data = try JSONEncoder().encode(self)
+    let json = String(data: data, encoding: .utf8) ?? "{}"
+    return try RustBridge.processConfigFromJson(json)
+  }
+}
 
 public typealias Language = RustBridge.Language
 
@@ -122,17 +749,17 @@ public typealias Language = RustBridge.Language
 /// structs, enums, traits, and more. Use [`Other`](StructureKind::Other) for
 /// language-specific constructs that do not fit a standard category.
 public enum StructureKind {
-    case function
-    case method
-    case class_
-    case struct_
-    case interface
-    case enum_
-    case module
-    case trait
-    case impl
-    case namespace
-    case other(field0: String)
+  case function
+  case method
+  case `class`
+  case `struct`
+  case interface
+  case `enum`
+  case module
+  case trait
+  case impl
+  case namespace
+  case other(field0: String)
 }
 
 /// The kind of a comment found in source code.
@@ -140,9 +767,9 @@ public enum StructureKind {
 /// Distinguishes between single-line comments, block (multi-line) comments,
 /// and documentation comments.
 public enum CommentKind {
-    case line
-    case block
-    case doc
+  case line
+  case block
+  case doc
 }
 
 /// The format of a docstring extracted from source code.
@@ -150,21 +777,21 @@ public enum CommentKind {
 /// Identifies the docstring convention used, which varies by language
 /// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 public enum DocstringFormat {
-    case pythonTripleQuote
-    case jsDoc
-    case rustdoc
-    case goDoc
-    case javaDoc
-    case other(field0: String)
+  case pythonTripleQuote
+  case jsDoc
+  case rustdoc
+  case goDoc
+  case javaDoc
+  case other(field0: String)
 }
 
 /// The kind of an export statement found in source code.
 ///
 /// Covers named exports, default exports, and re-exports from other modules.
 public enum ExportKind {
-    case named
-    case default_
-    case reExport
+  case named
+  case `default`
+  case reExport
 }
 
 /// The kind of a symbol definition found in source code.
@@ -172,15 +799,15 @@ public enum ExportKind {
 /// Categorizes symbol definitions such as variables, constants, functions,
 /// classes, types, interfaces, enums, and modules.
 public enum SymbolKind {
-    case variable
-    case constant
-    case function
-    case class_
-    case type
-    case interface
-    case enum_
-    case module
-    case other(field0: String)
+  case variable
+  case constant
+  case function
+  case `class`
+  case type
+  case interface
+  case `enum`
+  case module
+  case other(field0: String)
 }
 
 /// Severity level of a diagnostic produced during parsing.
@@ -188,9 +815,9 @@ public enum SymbolKind {
 /// Used to classify parse errors, warnings, and informational messages
 /// found in the syntax tree.
 public enum DiagnosticSeverity {
-    case error
-    case warning
-    case info
+  case error
+  case warning
+  case info
 }
 
 /// Errors that can occur when using the tree-sitter language pack.
@@ -199,30 +826,34 @@ public enum DiagnosticSeverity {
 /// Feature-gated variants are included when `config`, `download`, or related
 /// features are enabled.
 public enum TreeSitterLanguagePackError: Swift.Error {
-    case languageNotFound(message: String, field0: String)
-    case dynamicLoad(message: String, field0: String)
-    case nullLanguagePointer(message: String, field0: String)
-    case parserSetup(message: String, field0: String)
-    case lockPoisoned(message: String, field0: String)
-    case config(message: String, field0: String)
-    case parseFailed
-    case queryError(message: String, field0: String)
-    case invalidRange(message: String, field0: String)
-    case io(message: String, field0: String)
+  case languageNotFound(message: String, field0: String)
+  case dynamicLoad(message: String, field0: String)
+  case nullLanguagePointer(message: String, field0: String)
+  case parserSetup(message: String, field0: String)
+  case lockPoisoned(message: String, field0: String)
+  case config(message: String, field0: String)
+  case parseFailed
+  case queryError(message: String, field0: String)
+  case invalidRange(message: String, field0: String)
+  case io(message: String, field0: String)
 }
 
 // MARK: - From-JSON Helpers
-// Public wrappers forwarding RustBridge's swift_bridge-generated
-// `{TypeName}FromJson` helpers into this module's namespace.
+// Public helpers that decode JSON into first-class Swift types.
+// First-class struct types (Codable) use JSONDecoder directly.
+// Opaque RustBridge types forward to RustBridge.
 
 public func packConfigFromJson(_ json: String) throws -> PackConfig {
-    return try RustBridge.packConfigFromJson(json)
+  let data = json.data(using: .utf8) ?? Data()
+  return try JSONDecoder().decode(PackConfig.self, from: data)
 }
 
 public func pointFromJson(_ json: String) throws -> Point {
-    return try RustBridge.pointFromJson(json)
+  let data = json.data(using: .utf8) ?? Data()
+  return try JSONDecoder().decode(Point.self, from: data)
 }
 
 public func processConfigFromJson(_ json: String) throws -> ProcessConfig {
-    return try RustBridge.processConfigFromJson(json)
+  let data = json.data(using: .utf8) ?? Data()
+  return try JSONDecoder().decode(ProcessConfig.self, from: data)
 }

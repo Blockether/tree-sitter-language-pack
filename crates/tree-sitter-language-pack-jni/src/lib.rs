@@ -46,6 +46,24 @@ fn throw_jni_error(env: &mut JNIEnv, msg: &str) {
     let _ = env.throw_new(ERROR_CLASS, msg);
 }
 
+fn run_or_throw<T, F>(env: &mut JNIEnv, f: F) -> Option<T>
+where
+    F: FnOnce() -> T + std::panic::UnwindSafe,
+{
+    match std::panic::catch_unwind(f) {
+        Ok(v) => Some(v),
+        Err(payload) => {
+            let msg = payload
+                .downcast_ref::<String>()
+                .cloned()
+                .or_else(|| payload.downcast_ref::<&str>().map(|s| (*s).to_string()))
+                .unwrap_or_else(|| "panic in native code".to_string());
+            throw_jni_error(env, &format!("native panic: {msg}"));
+            None
+        }
+    }
+}
+
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeDetectLanguageFromExtension(
     mut env: JNIEnv,
@@ -60,7 +78,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         }
     };
     let v = core_crate::detect_language_from_extension(&ext);
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -78,7 +102,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         }
     };
     let v = core_crate::detect_language_from_path(&path);
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -96,7 +126,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         }
     };
     let v = core_crate::detect_language_from_content(&content);
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -114,7 +150,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         }
     };
     let v = core_crate::get_highlights_query(&language);
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -132,7 +174,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         }
     };
     let v = core_crate::get_injections_query(&language);
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -150,7 +198,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         }
     };
     let v = core_crate::get_locals_query(&language);
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -214,7 +268,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         }
     };
     let v = core_crate::detect_language(&path);
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -224,7 +284,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     _class: JClass,
 ) -> jstring {
     let v = core_crate::available_languages();
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -242,7 +308,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         }
     };
     let v = core_crate::has_language(&name);
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -252,7 +324,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     _class: JClass,
 ) -> jstring {
     let v = core_crate::language_count();
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -291,7 +369,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
             std::ptr::null_mut()
         }
         Ok(v) => {
-            let s = serde_json::to_string(&v).unwrap_or_default();
+            let s = match serde_json::to_string(&v) {
+                Ok(s) => s,
+                Err(e) => {
+                    throw_jni_error(&mut env, &format!("serialize: {e}"));
+                    return std::ptr::null_mut();
+                }
+            };
             string_to_jstring(&mut env, &s)
         }
     }
@@ -384,7 +468,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
             std::ptr::null_mut()
         }
         Ok(v) => {
-            let s = serde_json::to_string(&v).unwrap_or_default();
+            let s = match serde_json::to_string(&v) {
+                Ok(s) => s,
+                Err(e) => {
+                    throw_jni_error(&mut env, &format!("serialize: {e}"));
+                    return std::ptr::null_mut();
+                }
+            };
             string_to_jstring(&mut env, &s)
         }
     }
@@ -402,7 +492,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
             std::ptr::null_mut()
         }
         Ok(v) => {
-            let s = serde_json::to_string(&v).unwrap_or_default();
+            let s = match serde_json::to_string(&v) {
+                Ok(s) => s,
+                Err(e) => {
+                    throw_jni_error(&mut env, &format!("serialize: {e}"));
+                    return std::ptr::null_mut();
+                }
+            };
             string_to_jstring(&mut env, &s)
         }
     }
@@ -420,7 +516,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
             std::ptr::null_mut()
         }
         Ok(v) => {
-            let s = serde_json::to_string(&v).unwrap_or_default();
+            let s = match serde_json::to_string(&v) {
+                Ok(s) => s,
+                Err(e) => {
+                    throw_jni_error(&mut env, &format!("serialize: {e}"));
+                    return std::ptr::null_mut();
+                }
+            };
             string_to_jstring(&mut env, &s)
         }
     }
@@ -432,7 +534,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     _class: JClass,
 ) -> jstring {
     let v = core_crate::downloaded_languages();
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -463,7 +571,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
             std::ptr::null_mut()
         }
         Ok(v) => {
-            let s = serde_json::to_string(&v).unwrap_or_default();
+            let s = match serde_json::to_string(&v) {
+                Ok(s) => s,
+                Err(e) => {
+                    throw_jni_error(&mut env, &format!("serialize: {e}"));
+                    return std::ptr::null_mut();
+                }
+            };
             string_to_jstring(&mut env, &s)
         }
     }
@@ -654,22 +768,14 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // ensures the handle outlives this call.
     let client: &core_crate::Node = unsafe { &*(handle as *const core_crate::Node) };
     let v = client.kind();
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeNodeKindId(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-) -> jni::sys::jshort {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: &core_crate::Node = unsafe { &*(handle as *const core_crate::Node) };
-    let v = client.kind_id();
-    v as jni::sys::jshort
 }
 
 #[unsafe(no_mangle)]
@@ -711,7 +817,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // ensures the handle outlives this call.
     let client: &core_crate::Node = unsafe { &*(handle as *const core_crate::Node) };
     let v = client.byte_range();
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -726,7 +838,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // ensures the handle outlives this call.
     let client: &core_crate::Node = unsafe { &*(handle as *const core_crate::Node) };
     let v = client.start_position();
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -741,7 +859,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // ensures the handle outlives this call.
     let client: &core_crate::Node = unsafe { &*(handle as *const core_crate::Node) };
     let v = client.end_position();
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -964,7 +1088,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // ensures the handle outlives this call.
     let client: &core_crate::Node = unsafe { &*(handle as *const core_crate::Node) };
     let v = client.to_sexp();
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -1065,7 +1195,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // ensures the handle outlives this call.
     let client: &core_crate::TreeCursor = unsafe { &*(handle as *const core_crate::TreeCursor) };
     let v = client.field_name();
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -1083,28 +1219,6 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     unsafe {
         let _ = Box::from_raw(handle as *mut core_crate::TreeCursor);
     }
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeLanguageRegistryAddExtraLibsDir(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-    request_json: JString,
-) {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: &core_crate::LanguageRegistry = unsafe { &*(handle as *const core_crate::LanguageRegistry) };
-    let req_str = match jstring_to_string(&mut env, request_json) {
-        Ok(s) => s,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
-            return ();
-        }
-    };
-    let dir = std::path::PathBuf::from(req_str);
-    let v = client.add_extra_libs_dir(dir);
 }
 
 #[unsafe(no_mangle)]
@@ -1150,7 +1264,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // ensures the handle outlives this call.
     let client: &core_crate::LanguageRegistry = unsafe { &*(handle as *const core_crate::LanguageRegistry) };
     let v = client.available_languages();
-    let s = serde_json::to_string(&v).unwrap_or_default();
+    let s = match serde_json::to_string(&v) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
+            return std::ptr::null_mut();
+        }
+    };
     string_to_jstring(&mut env, &s)
 }
 
@@ -1246,7 +1366,13 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
             std::ptr::null_mut()
         }
         Ok(v) => {
-            let s = serde_json::to_string(&v).unwrap_or_default();
+            let s = match serde_json::to_string(&v) {
+                Ok(s) => s,
+                Err(e) => {
+                    throw_jni_error(&mut env, &format!("serialize: {e}"));
+                    return std::ptr::null_mut();
+                }
+            };
             string_to_jstring(&mut env, &s)
         }
     }
@@ -1269,21 +1395,6 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeDownloadManagerCacheDir(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-) -> jstring {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: &core_crate::DownloadManager = unsafe { &*(handle as *const core_crate::DownloadManager) };
-    let v = client.cache_dir();
-    let s = serde_json::to_string(&v).unwrap_or_default();
-    string_to_jstring(&mut env, &s)
-}
-
-#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeDownloadManagerInstalledLanguages(
     mut env: JNIEnv,
     _class: JClass,
@@ -1294,127 +1405,14 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // ensures the handle outlives this call.
     let client: &core_crate::DownloadManager = unsafe { &*(handle as *const core_crate::DownloadManager) };
     let v = client.installed_languages();
-    let s = serde_json::to_string(&v).unwrap_or_default();
-    string_to_jstring(&mut env, &s)
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeDownloadManagerEnsureLanguages(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-    request_json: JString,
-) {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: &core_crate::DownloadManager = unsafe { &*(handle as *const core_crate::DownloadManager) };
-    let req_str = match jstring_to_string(&mut env, request_json) {
+    let s = match serde_json::to_string(&v) {
         Ok(s) => s,
         Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
-            return ();
-        }
-    };
-    let names_vec: Vec<String> = match serde_json::from_str(&req_str) {
-        Ok(v) => v,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("request deserialize: {e}"));
-            return ();
-        }
-    };
-    let names = names_vec.clone();
-    let names_refs: Vec<&str> = names_vec.iter().map(String::as_str).collect();
-    let result = client.ensure_languages(&names_refs);
-    match result {
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
-            ()
-        }
-        Ok(v) => {}
-    }
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeDownloadManagerEnsureGroup(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-    request_json: JString,
-) {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: &core_crate::DownloadManager = unsafe { &*(handle as *const core_crate::DownloadManager) };
-    let req_str = match jstring_to_string(&mut env, request_json) {
-        Ok(s) => s,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
-            return ();
-        }
-    };
-    let group: String = match serde_json::from_str(&req_str) {
-        Ok(s) => s,
-        Err(_) => req_str,
-    };
-    let result = client.ensure_group(&group);
-    match result {
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
-            ()
-        }
-        Ok(v) => {}
-    }
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeDownloadManagerLibPath(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-    request_json: JString,
-) -> jstring {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: &core_crate::DownloadManager = unsafe { &*(handle as *const core_crate::DownloadManager) };
-    let req_str = match jstring_to_string(&mut env, request_json) {
-        Ok(s) => s,
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
+            throw_jni_error(&mut env, &format!("serialize: {e}"));
             return std::ptr::null_mut();
         }
     };
-    let name: String = match serde_json::from_str(&req_str) {
-        Ok(s) => s,
-        Err(_) => req_str,
-    };
-    let v = client.lib_path(&name);
-    let s = serde_json::to_string(&v).unwrap_or_default();
     string_to_jstring(&mut env, &s)
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeDownloadManagerFetchManifest(
-    mut env: JNIEnv,
-    _class: JClass,
-    handle: jlong,
-) -> jstring {
-    // SAFETY: handle was allocated by the matching constructor shim and remains
-    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
-    // ensures the handle outlives this call.
-    let client: &core_crate::DownloadManager = unsafe { &*(handle as *const core_crate::DownloadManager) };
-    let result = client.fetch_manifest();
-    match result {
-        Err(e) => {
-            throw_jni_error(&mut env, &format!("{e}"));
-            std::ptr::null_mut()
-        }
-        Ok(v) => {
-            let s = serde_json::to_string(&v).unwrap_or_default();
-            string_to_jstring(&mut env, &s)
-        }
-    }
 }
 
 #[unsafe(no_mangle)]

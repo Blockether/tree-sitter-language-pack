@@ -7,5 +7,5 @@ package dev.kreuzberg.tslp.android
  */
 data class Point(
     val row: Long,
-    val column: Long
+    val column: Long,
 )

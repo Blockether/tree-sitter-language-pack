@@ -2,8 +2,11 @@
 
 package dev.kreuzberg.tslp.android
 
+@Suppress("TooManyFunctions")
 object TreeSitterLanguagePackBridge {
-    init { System.loadLibrary("ts_pack_jni") }
+    init {
+        System.loadLibrary("ts_pack_jni")
+    }
 
     external fun nativeDetectLanguageFromExtension(ext: String): String?
 
@@ -49,56 +52,93 @@ object TreeSitterLanguagePackBridge {
 
     // JNI external funs for client instance methods.
     external fun nativeParserSetLanguage(handle: Long, requestJson: String)
+
     external fun nativeParserParse(handle: Long, requestJson: String): String?
+
     external fun nativeParserParseBytes(handle: Long, requestJson: String): String?
+
     external fun nativeParserReset(handle: Long)
+
     external fun nativeFreeParser(handle: Long)
+
     external fun nativeTreeRootNode(handle: Long): String
+
     external fun nativeTreeWalk(handle: Long): String
+
     external fun nativeFreeTree(handle: Long)
+
     external fun nativeNodeClone(handle: Long): String
+
     external fun nativeNodeKind(handle: Long): String
-    external fun nativeNodeKindId(handle: Long): Short
+
     external fun nativeNodeStartByte(handle: Long): Long
+
     external fun nativeNodeEndByte(handle: Long): Long
+
     external fun nativeNodeByteRange(handle: Long): String
+
     external fun nativeNodeStartPosition(handle: Long): String
+
     external fun nativeNodeEndPosition(handle: Long): String
+
     external fun nativeNodeIsNamed(handle: Long): Boolean
+
     external fun nativeNodeIsError(handle: Long): Boolean
+
     external fun nativeNodeIsMissing(handle: Long): Boolean
+
     external fun nativeNodeIsExtra(handle: Long): Boolean
+
     external fun nativeNodeHasError(handle: Long): Boolean
+
     external fun nativeNodeParent(handle: Long): String?
+
     external fun nativeNodeChild(handle: Long, requestJson: String): String?
+
     external fun nativeNodeChildCount(handle: Long): Long
+
     external fun nativeNodeNamedChild(handle: Long, requestJson: String): String?
+
     external fun nativeNodeNamedChildCount(handle: Long): Long
+
     external fun nativeNodeChildByFieldName(handle: Long, requestJson: String): String?
+
     external fun nativeNodeToSexp(handle: Long): String
+
     external fun nativeNodeWalk(handle: Long): String
+
     external fun nativeFreeNode(handle: Long)
+
     external fun nativeTreeCursorNode(handle: Long): String
+
     external fun nativeTreeCursorGotoFirstChild(handle: Long): Boolean
+
     external fun nativeTreeCursorGotoParent(handle: Long): Boolean
+
     external fun nativeTreeCursorGotoNextSibling(handle: Long): Boolean
+
     external fun nativeTreeCursorFieldName(handle: Long): String?
+
     external fun nativeFreeTreeCursor(handle: Long)
-    external fun nativeLanguageRegistryAddExtraLibsDir(handle: Long, requestJson: String)
+
     external fun nativeLanguageRegistryGetLanguage(handle: Long, requestJson: String): String
+
     external fun nativeLanguageRegistryAvailableLanguages(handle: Long): String
+
     external fun nativeLanguageRegistryHasLanguage(handle: Long, requestJson: String): Boolean
+
     external fun nativeLanguageRegistryLanguageCount(handle: Long): Long
+
     external fun nativeLanguageRegistryProcess(handle: Long, requestJson: String): String
+
     external fun nativeFreeLanguageRegistry(handle: Long)
-    external fun nativeDownloadManagerCacheDir(handle: Long): Long
+
     external fun nativeDownloadManagerInstalledLanguages(handle: Long): String
-    external fun nativeDownloadManagerEnsureLanguages(handle: Long, requestJson: String)
-    external fun nativeDownloadManagerEnsureGroup(handle: Long, requestJson: String)
-    external fun nativeDownloadManagerLibPath(handle: Long, requestJson: String): Long
-    external fun nativeDownloadManagerFetchManifest(handle: Long): String
+
     external fun nativeDownloadManagerDownloadAllBestEffort(handle: Long): Long
+
     external fun nativeDownloadManagerCleanCache(handle: Long)
+
     external fun nativeFreeDownloadManager(handle: Long)
 
     // Destructor external funs for opaque handle types.

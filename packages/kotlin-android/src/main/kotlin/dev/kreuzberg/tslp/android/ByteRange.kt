@@ -7,5 +7,5 @@ package dev.kreuzberg.tslp.android
  */
 data class ByteRange(
     val start: Long,
-    val end: Long
+    val end: Long,
 )

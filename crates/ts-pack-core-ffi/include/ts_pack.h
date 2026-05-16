@@ -26,13 +26,10 @@ typedef struct TS_PACKExportKind TS_PACKExportKind;
 typedef struct TS_PACKFileMetrics TS_PACKFileMetrics;
 typedef struct TS_PACKImportInfo TS_PACKImportInfo;
 typedef struct TS_PACKLanguage TS_PACKLanguage;
-typedef struct TS_PACKLanguageInfo TS_PACKLanguageInfo;
 typedef struct TS_PACKLanguageRegistry TS_PACKLanguageRegistry;
 typedef struct TS_PACKNode TS_PACKNode;
 typedef struct TS_PACKPackConfig TS_PACKPackConfig;
 typedef struct TS_PACKParser TS_PACKParser;
-typedef struct TS_PACKParserManifest TS_PACKParserManifest;
-typedef struct TS_PACKPlatformBundle TS_PACKPlatformBundle;
 typedef struct TS_PACKPoint TS_PACKPoint;
 typedef struct TS_PACKProcessConfig TS_PACKProcessConfig;
 typedef struct TS_PACKProcessResult TS_PACKProcessResult;
@@ -964,51 +961,6 @@ char *ts_pack_pack_config_languages(const TS_PACKPackConfig *ptr);
 char *ts_pack_pack_config_groups(const TS_PACKPackConfig *ptr);
 
 /**
- * Load configuration from a TOML file.
- *
- * # Errors
- *
- * Returns an error if the file cannot be read or the TOML is invalid.
- *
- * # Example
- *
- * ```no_run
- * use std::path::Path;
- * use tree_sitter_language_pack::PackConfig;
- *
- * let config = PackConfig::from_toml_file(Path::new("language-pack.toml")).unwrap();
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TS_PACKPackConfig *ts_pack_pack_config_from_toml_file(const char *path);
-
-/**
- * Discover configuration by searching for `language-pack.toml` in:
- *
- * 1. Current directory and up to 10 parent directories
- * 2. `$XDG_CONFIG_HOME/tree-sitter-language-pack/config.toml`
- * 3. `~/.config/tree-sitter-language-pack/config.toml`
- *
- * Returns `None` if no configuration file is found.
- *
- * # Example
- *
- * ```no_run
- * use tree_sitter_language_pack::PackConfig;
- *
- * if let Some(config) = PackConfig::discover() {
- *     println!("Found config with {:?} languages", config.languages);
- * }
- * ```
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TS_PACKPackConfig *ts_pack_pack_config_discover(void);
-
-/**
  * Create a `Point` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
@@ -1194,14 +1146,6 @@ TS_PACKNode *ts_pack_node_clone(const TS_PACKNode *this_);
  * Returned pointers must be freed with the appropriate free function.
  */
 char *ts_pack_node_kind(const TS_PACKNode *this_);
-
-/**
- * Return the node's numeric kind ID.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-uint16_t ts_pack_node_kind_id(const TS_PACKNode *this_);
 
 /**
  * Return the inclusive start byte offset of this node.
@@ -1522,34 +1466,6 @@ TS_PACKProcessConfig *ts_pack_process_config_minimal(TS_PACKProcessConfig *this_
 void ts_pack_language_registry_free(TS_PACKLanguageRegistry *ptr);
 
 /**
- * Create a registry with a custom directory for dynamic libraries.
- *
- * Overrides the default build-time library directory. Useful when
- * dynamic grammar shared libraries are stored in a non-standard location.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TS_PACKLanguageRegistry *ts_pack_language_registry_with_libs_dir(const char *libs_dir);
-
-/**
- * Add an additional directory to search for dynamic libraries.
- *
- * When [`get_language`](Self::get_language) cannot find a grammar in the
- * primary library directory, it searches these extra directories in order.
- * Typically used by the download system to register its cache directory.
- *
- * Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
- * mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
- * immutable while the directory list is updated.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-void ts_pack_language_registry_add_extra_libs_dir(const TS_PACKLanguageRegistry *this_,
-                                                  const char *dir);
-
-/**
  * Get a tree-sitter [`Language`] by name.
  *
  * Resolves aliases (e.g., `"shell"` -> `"bash"`, `"makefile"` -> `"make"`),
@@ -1616,138 +1532,6 @@ TS_PACKProcessResult *ts_pack_language_registry_process(const TS_PACKLanguageReg
 TS_PACKLanguageRegistry *ts_pack_language_registry_default(void);
 
 /**
- * Create a `ParserManifest` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_parser_manifest_free`.
- */
-TS_PACKParserManifest *ts_pack_parser_manifest_from_json(const char *json);
-
-/**
- * Serialize a `ParserManifest` to a JSON string. Returns null on failure.
- * # Safety
- * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_parser_manifest_to_json(const TS_PACKParserManifest *ptr);
-
-/**
- * Free a `ParserManifest` handle.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void ts_pack_parser_manifest_free(TS_PACKParserManifest *ptr);
-
-/**
- * Get the `version` field from a `ParserManifest`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_parser_manifest_version(const TS_PACKParserManifest *ptr);
-
-/**
- * Get the `platforms` field from a `ParserManifest`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_parser_manifest_platforms(const TS_PACKParserManifest *ptr);
-
-/**
- * Get the `languages` field from a `ParserManifest`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_parser_manifest_languages(const TS_PACKParserManifest *ptr);
-
-/**
- * Get the `groups` field from a `ParserManifest`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_parser_manifest_groups(const TS_PACKParserManifest *ptr);
-
-/**
- * Create a `PlatformBundle` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_platform_bundle_free`.
- */
-TS_PACKPlatformBundle *ts_pack_platform_bundle_from_json(const char *json);
-
-/**
- * Serialize a `PlatformBundle` to a JSON string. Returns null on failure.
- * # Safety
- * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_platform_bundle_to_json(const TS_PACKPlatformBundle *ptr);
-
-/**
- * Free a `PlatformBundle` handle.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void ts_pack_platform_bundle_free(TS_PACKPlatformBundle *ptr);
-
-/**
- * Get the `url` field from a `PlatformBundle`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_platform_bundle_url(const TS_PACKPlatformBundle *ptr);
-
-/**
- * Get the `sha256` field from a `PlatformBundle`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_platform_bundle_sha256(const TS_PACKPlatformBundle *ptr);
-
-/**
- * Get the `size` field from a `PlatformBundle`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uint64_t ts_pack_platform_bundle_size(const TS_PACKPlatformBundle *ptr);
-
-/**
- * Create a `LanguageInfo` from a JSON string. Returns null on failure.
- * # Safety
- * JSON string must be valid UTF-8 and null-terminated.
- * Returned handle must be freed with `ts_pack_language_info_free`.
- */
-TS_PACKLanguageInfo *ts_pack_language_info_from_json(const char *json);
-
-/**
- * Serialize a `LanguageInfo` to a JSON string. Returns null on failure.
- * # Safety
- * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
- * The returned string must be freed with `ts_pack_free_string`.
- */
-char *ts_pack_language_info_to_json(const TS_PACKLanguageInfo *ptr);
-
-/**
- * Free a `LanguageInfo` handle.
- * # Safety
- * Pointer must have been returned by this library, or be null.
- */
-void ts_pack_language_info_free(TS_PACKLanguageInfo *ptr);
-
-/**
- * Get the `group` field from a `LanguageInfo`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-char *ts_pack_language_info_group(const TS_PACKLanguageInfo *ptr);
-
-/**
- * Get the `size` field from a `LanguageInfo`.
- * # Safety
- * Pointer must be a valid handle returned by this library.
- */
-uint64_t ts_pack_language_info_size(const TS_PACKLanguageInfo *ptr);
-
-/**
  * Free a `DownloadManager` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.
@@ -1772,64 +1556,12 @@ TS_PACKDownloadManager *ts_pack_download_manager_with_cache_dir(const char *vers
                                                                 const char *cache_dir);
 
 /**
- * Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-char *ts_pack_download_manager_default_cache_dir(const char *version);
-
-/**
- * Return the path to the libs cache directory.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-char *ts_pack_download_manager_cache_dir(const TS_PACKDownloadManager *this_);
-
-/**
  * List languages that are already downloaded and cached.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
  * Returned pointers must be freed with the appropriate free function.
  */
 char *ts_pack_download_manager_installed_languages(const TS_PACKDownloadManager *this_);
-
-/**
- * Ensure the specified languages are available in the cache.
- * Downloads the platform bundle if any requested languages are missing.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t ts_pack_download_manager_ensure_languages(const TS_PACKDownloadManager *this_,
-                                                  const char *names);
-
-/**
- * Ensure all languages in a named group are available.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-int32_t ts_pack_download_manager_ensure_group(const TS_PACKDownloadManager *this_,
-                                              const char *group);
-
-/**
- * Get the expected path for a language's shared library in the cache.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-char *ts_pack_download_manager_lib_path(const TS_PACKDownloadManager *this_,
-                                        const char *name);
-
-/**
- * Fetch the parser manifest from GitHub Releases.
- * # Safety
- * Caller must ensure all pointer arguments are valid or null.
- * Returned pointers must be freed with the appropriate free function.
- */
-TS_PACKParserManifest *ts_pack_download_manager_fetch_manifest(const TS_PACKDownloadManager *this_);
 
 /**
  * Download the platform bundle and extract every library file it contains.

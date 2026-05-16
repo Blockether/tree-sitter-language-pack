@@ -14,5 +14,5 @@ data class StructureItem(
     val decorators: List<String>,
     val docComment: String?,
     val signature: String?,
-    val bodySpan: Span?
+    val bodySpan: Span?,
 )

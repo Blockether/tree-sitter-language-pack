@@ -1,6 +1,22 @@
 [workspace]
-alef_version = "0.16.7"
-languages = ["python", "node", "ruby", "php", "ffi", "go", "java", "csharp", "elixir", "wasm", "dart", "kotlin_android", "swift", "zig", "jni"]
+alef_version = "0.16.14"
+languages = [
+    "python",
+    "node",
+    "ruby",
+    "php",
+    "ffi",
+    "go",
+    "java",
+    "csharp",
+    "elixir",
+    "wasm",
+    "dart",
+    "kotlin_android",
+    "swift",
+    "zig",
+    "jni",
+]
 
 [workspace.opaque_types]
 Language = "tree_sitter_language_pack::Language"
@@ -360,7 +376,10 @@ before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg,wolfram cargo build
 
 [crates.test.swift]
 precondition = "command -v swift >/dev/null 2>&1"
-before = ["TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-swift", "bash scripts/setup-swift-bridge.sh"]
+before = [
+    "TSLP_LINK_MODE=static TSLP_LANGUAGES=mojo,nim,norg,wolfram cargo build --release -p ts-pack-core-swift",
+    "bash scripts/setup-swift-bridge.sh",
+]
 command = "cd packages/swift && swift test"
 e2e = "cd packages/swift && swift test"
 

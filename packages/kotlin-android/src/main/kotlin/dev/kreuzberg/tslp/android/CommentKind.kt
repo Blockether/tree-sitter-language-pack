@@ -11,5 +11,5 @@ package dev.kreuzberg.tslp.android
 enum class CommentKind {
     LINE,
     BLOCK,
-    DOC;
+    DOC,
 }

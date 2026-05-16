@@ -14,5 +14,5 @@ data class ChunkContext(
     val symbolsDefined: List<String>,
     val comments: List<CommentInfo>,
     val docstrings: List<DocstringInfo>,
-    val hasErrorNodes: Boolean
+    val hasErrorNodes: Boolean,
 )

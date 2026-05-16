@@ -16,5 +16,5 @@ data class ProcessConfig(
     val docstrings: Boolean,
     val symbols: Boolean,
     val diagnostics: Boolean,
-    val chunkMaxSize: Long?
+    val chunkMaxSize: Long?,
 )
