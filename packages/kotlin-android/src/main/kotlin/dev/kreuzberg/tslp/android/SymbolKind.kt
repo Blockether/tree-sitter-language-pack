@@ -10,14 +10,22 @@ package dev.kreuzberg.tslp.android
  */
 sealed class SymbolKind {
     object Variable : SymbolKind()
+
     object Constant : SymbolKind()
+
     object Function : SymbolKind()
+
     object Class : SymbolKind()
+
     object Type : SymbolKind()
+
     object Interface : SymbolKind()
+
     object Enum : SymbolKind()
+
     object Module : SymbolKind()
+
     data class Other(
-        val field0: String
+        val value: String,
     ) : SymbolKind()
 }

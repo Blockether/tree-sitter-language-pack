@@ -11,31 +11,40 @@ package dev.kreuzberg.tslp.android
  */
 sealed class Error(message: String) : Exception(message) {
     data class LanguageNotFound(
-        val field0: String
-    ) : Error("Language '{0}' not found")
+        val field0: String,
+    ) : Error("Language '$field0' not found")
+
     data class DynamicLoad(
-        val field0: String
-    ) : Error("Dynamic library load error: {0}")
+        val field0: String,
+    ) : Error("Dynamic library load error: $field0")
+
     data class NullLanguagePointer(
-        val field0: String
-    ) : Error("Language function returned null pointer for '{0}'")
+        val field0: String,
+    ) : Error("Language function returned null pointer for '$field0'")
+
     data class ParserSetup(
-        val field0: String
-    ) : Error("Failed to set parser language: {0}")
+        val field0: String,
+    ) : Error("Failed to set parser language: $field0")
+
     data class LockPoisoned(
-        val field0: String
-    ) : Error("Registry lock poisoned: {0}")
+        val field0: String,
+    ) : Error("Registry lock poisoned: $field0")
+
     data class Config(
-        val field0: String
-    ) : Error("Configuration error: {0}")
+        val field0: String,
+    ) : Error("Configuration error: $field0")
+
     object ParseFailed : Error("Parse failed: parsing returned no tree")
+
     data class QueryError(
-        val field0: String
-    ) : Error("Query error: {0}")
+        val field0: String,
+    ) : Error("Query error: $field0")
+
     data class InvalidRange(
-        val field0: String
-    ) : Error("Invalid byte range: {0}")
+        val field0: String,
+    ) : Error("Invalid byte range: $field0")
+
     data class Io(
-        val field0: String
-    ) : Error("IO error: {0}")
+        val field0: String,
+    ) : Error("IO error: $field0")
 }

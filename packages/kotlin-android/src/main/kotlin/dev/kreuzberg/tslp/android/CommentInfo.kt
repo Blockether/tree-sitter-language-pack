@@ -9,5 +9,5 @@ data class CommentInfo(
     val text: String,
     val kind: CommentKind,
     val span: Span,
-    val associatedNode: String?
+    val associatedNode: String?,
 )

@@ -19,5 +19,5 @@ data class ProcessResult(
     val docstrings: List<DocstringInfo>,
     val symbols: List<SymbolInfo>,
     val diagnostics: List<Diagnostic>,
-    val chunks: List<CodeChunk>
+    val chunks: List<CodeChunk>,
 )

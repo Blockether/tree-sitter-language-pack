@@ -10,11 +10,16 @@ package dev.kreuzberg.tslp.android
  */
 sealed class DocstringFormat {
     object PythonTripleQuote : DocstringFormat()
+
     object JSDoc : DocstringFormat()
+
     object Rustdoc : DocstringFormat()
+
     object GoDoc : DocstringFormat()
+
     object JavaDoc : DocstringFormat()
+
     data class Other(
-        val field0: String
+        val value: String,
     ) : DocstringFormat()
 }

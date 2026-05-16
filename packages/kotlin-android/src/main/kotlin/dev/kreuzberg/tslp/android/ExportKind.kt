@@ -10,5 +10,5 @@ package dev.kreuzberg.tslp.android
 enum class ExportKind {
     NAMED,
     DEFAULT,
-    RE_EXPORT;
+    RE_EXPORT,
 }

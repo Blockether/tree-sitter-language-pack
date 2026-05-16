@@ -294,8 +294,6 @@ mod ffi {
         fn node_clone(client: &Node) -> Node;
         #[swift_bridge(swift_name = "nodeKind")]
         fn node_kind(client: &Node) -> String;
-        #[swift_bridge(swift_name = "nodeKindId")]
-        fn node_kind_id(client: &Node) -> u16;
         #[swift_bridge(swift_name = "nodeStartByte")]
         fn node_start_byte(client: &Node) -> usize;
         #[swift_bridge(swift_name = "nodeEndByte")]
@@ -381,8 +379,6 @@ mod ffi {
     }
 
     extern "Rust" {
-        #[swift_bridge(swift_name = "languageRegistryAddExtraLibsDir")]
-        fn language_registry_add_extra_libs_dir(client: &LanguageRegistry, dir: String) -> ();
         #[swift_bridge(swift_name = "languageRegistryGetLanguage")]
         fn language_registry_get_language(client: &LanguageRegistry, name: String) -> Result<Language, String>;
         #[swift_bridge(swift_name = "languageRegistryAvailableLanguages")]
@@ -400,43 +396,12 @@ mod ffi {
     }
 
     extern "Rust" {
-        type ParserManifest;
-        fn version(&self) -> String;
-        fn platforms(&self) -> String;
-        fn languages(&self) -> String;
-        fn groups(&self) -> String;
-    }
-
-    extern "Rust" {
-        type PlatformBundle;
-        fn url(&self) -> String;
-        fn sha256(&self) -> String;
-        fn size(&self) -> u64;
-    }
-
-    extern "Rust" {
-        type LanguageInfo;
-        fn group(&self) -> String;
-        fn size(&self) -> u64;
-    }
-
-    extern "Rust" {
         type DownloadManager;
     }
 
     extern "Rust" {
-        #[swift_bridge(swift_name = "downloadManagerCacheDir")]
-        fn download_manager_cache_dir(client: &DownloadManager) -> String;
         #[swift_bridge(swift_name = "downloadManagerInstalledLanguages")]
         fn download_manager_installed_languages(client: &DownloadManager) -> Vec<String>;
-        #[swift_bridge(swift_name = "downloadManagerEnsureLanguages")]
-        fn download_manager_ensure_languages(client: &DownloadManager, names: Vec<String>) -> Result<(), String>;
-        #[swift_bridge(swift_name = "downloadManagerEnsureGroup")]
-        fn download_manager_ensure_group(client: &DownloadManager, group: String) -> Result<(), String>;
-        #[swift_bridge(swift_name = "downloadManagerLibPath")]
-        fn download_manager_lib_path(client: &DownloadManager, name: String) -> String;
-        #[swift_bridge(swift_name = "downloadManagerFetchManifest")]
-        fn download_manager_fetch_manifest(client: &DownloadManager) -> Result<ParserManifest, String>;
         #[swift_bridge(swift_name = "downloadManagerDownloadAllBestEffort")]
         fn download_manager_download_all_best_effort(client: &DownloadManager) -> Result<usize, String>;
         #[swift_bridge(swift_name = "downloadManagerCleanCache")]
@@ -1332,9 +1297,6 @@ pub fn node_clone(client: &Node) -> Node {
 pub fn node_kind(client: &Node) -> String {
     client.0.kind().to_string()
 }
-pub fn node_kind_id(client: &Node) -> u16 {
-    client.0.kind_id()
-}
 pub fn node_start_byte(client: &Node) -> usize {
     client.0.start_byte()
 }
@@ -1493,9 +1455,6 @@ impl ProcessConfig {
 
 pub struct LanguageRegistry(pub tree_sitter_language_pack::LanguageRegistry);
 
-pub fn language_registry_add_extra_libs_dir(client: &LanguageRegistry, dir: String) -> () {
-    client.0.add_extra_libs_dir(::std::path::PathBuf::from(dir))
-}
 pub fn language_registry_get_language(client: &LanguageRegistry, name: String) -> Result<Language, String> {
     client.0.get_language(&name).map_err(|e| e.to_string()).map(Language)
 }
@@ -1520,73 +1479,10 @@ pub fn language_registry_process(
         .map(ProcessResult)
 }
 
-pub struct ParserManifest(pub tree_sitter_language_pack::download::ParserManifest);
-impl ParserManifest {
-    pub fn version(&self) -> String {
-        self.0.version.clone()
-    }
-    pub fn platforms(&self) -> String {
-        serde_json::to_string(&self.0.platforms).expect("serializable platforms")
-    }
-    pub fn languages(&self) -> String {
-        serde_json::to_string(&self.0.languages).expect("serializable languages")
-    }
-    pub fn groups(&self) -> String {
-        serde_json::to_string(&self.0.groups).expect("serializable groups")
-    }
-}
-
-pub struct PlatformBundle(pub tree_sitter_language_pack::download::PlatformBundle);
-impl PlatformBundle {
-    pub fn url(&self) -> String {
-        self.0.url.clone()
-    }
-    pub fn sha256(&self) -> String {
-        self.0.sha256.clone()
-    }
-    pub fn size(&self) -> u64 {
-        ::serde_json::to_value(&self.0.size)
-            .ok()
-            .and_then(|j| ::serde_json::from_value(j).ok())
-            .unwrap_or_default()
-    }
-}
-
-pub struct LanguageInfo(pub tree_sitter_language_pack::download::LanguageInfo);
-impl LanguageInfo {
-    pub fn group(&self) -> String {
-        self.0.group.clone()
-    }
-    pub fn size(&self) -> u64 {
-        ::serde_json::to_value(&self.0.size)
-            .ok()
-            .and_then(|j| ::serde_json::from_value(j).ok())
-            .unwrap_or_default()
-    }
-}
-
 pub struct DownloadManager(pub tree_sitter_language_pack::DownloadManager);
 
-pub fn download_manager_cache_dir(client: &DownloadManager) -> String {
-    client.0.cache_dir().to_string_lossy().into_owned()
-}
 pub fn download_manager_installed_languages(client: &DownloadManager) -> Vec<String> {
     client.0.installed_languages()
-}
-pub fn download_manager_ensure_languages(client: &DownloadManager, names: Vec<String>) -> Result<(), String> {
-    client
-        .0
-        .ensure_languages(&names.iter().map(|s| s.as_str()).collect::<Vec<_>>())
-        .map_err(|e| e.to_string())
-}
-pub fn download_manager_ensure_group(client: &DownloadManager, group: String) -> Result<(), String> {
-    client.0.ensure_group(&group).map_err(|e| e.to_string())
-}
-pub fn download_manager_lib_path(client: &DownloadManager, name: String) -> String {
-    client.0.lib_path(&name).to_string_lossy().into_owned()
-}
-pub fn download_manager_fetch_manifest(client: &DownloadManager) -> Result<ParserManifest, String> {
-    client.0.fetch_manifest().map_err(|e| e.to_string()).map(ParserManifest)
 }
 pub fn download_manager_download_all_best_effort(client: &DownloadManager) -> Result<usize, String> {
     client.0.download_all_best_effort().map_err(|e| e.to_string())

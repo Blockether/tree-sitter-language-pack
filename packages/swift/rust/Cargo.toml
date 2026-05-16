@@ -18,12 +18,16 @@ ignored = ["async-trait", "serde"]
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-tree_sitter_language_pack = { path = "../../../crates/ts-pack-core", features = ["serde", "config", "download"], package = "tree-sitter-language-pack" }
 async-trait = "0.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tokio = { version = "1", features = ["rt", "macros"] }
 swift-bridge = "0.1.59"
+tokio = { version = "1", features = ["rt", "macros"] }
+tree_sitter_language_pack = { path = "../../../crates/ts-pack-core", features = [
+    "serde",
+    "config",
+    "download",
+], package = "tree-sitter-language-pack" }
 
 [build-dependencies]
 swift-bridge-build = "0.1.59"

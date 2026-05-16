@@ -1,6 +1,7 @@
 ---
 title: "C# API Reference"
 ---
+
 ## C# API Reference <span class="version-badge">v1.8.1</span>
 
 ### Functions
@@ -16,11 +17,12 @@ Returns `null` for unrecognized extensions. The match is case-insensitive.
 ```csharp
 public static string? DetectLanguageFromExtension(string ext)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Ext` | `string` | Yes | The ext |
+| Name  | Type     | Required | Description |
+| ----- | -------- | -------- | ----------- |
+| `Ext` | `string` | Yes      | The ext     |
 
 **Returns:** `string?`
 
@@ -38,11 +40,12 @@ path has no extension or the extension is not recognized.
 ```csharp
 public static string? DetectLanguageFromPath(string path)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Path` | `string` | Yes | Path to the file |
+| Name   | Type     | Required | Description      |
+| ------ | -------- | -------- | ---------------- |
+| `Path` | `string` | Yes      | Path to the file |
 
 **Returns:** `string?`
 
@@ -56,6 +59,7 @@ Inspects only the first line of `content`. If it begins with `#!`, the
 interpreter name is extracted and mapped to a language name.
 
 Handles common patterns:
+
 - `#!/usr/bin/env python3` → `"python"`
 - `#!/bin/bash` → `"bash"`
 - `#!/usr/bin/env node` → `"javascript"`
@@ -71,11 +75,12 @@ malformed, or the interpreter is not recognised.
 ```csharp
 public static string? DetectLanguageFromContent(string content)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Content` | `string` | Yes | The content to process |
+| Name      | Type     | Required | Description            |
+| --------- | -------- | -------- | ---------------------- |
+| `Content` | `string` | Yes      | The content to process |
 
 **Returns:** `string?`
 
@@ -93,11 +98,12 @@ if no highlights query is bundled for this language.
 ```csharp
 public static string? GetHighlightsQuery(string language)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Language` | `string` | Yes | The language |
+| Name       | Type     | Required | Description  |
+| ---------- | -------- | -------- | ------------ |
+| `Language` | `string` | Yes      | The language |
 
 **Returns:** `string?`
 
@@ -115,11 +121,12 @@ if no injections query is bundled for this language.
 ```csharp
 public static string? GetInjectionsQuery(string language)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Language` | `string` | Yes | The language |
+| Name       | Type     | Required | Description  |
+| ---------- | -------- | -------- | ------------ |
+| `Language` | `string` | Yes      | The language |
 
 **Returns:** `string?`
 
@@ -137,11 +144,12 @@ if no locals query is bundled for this language.
 ```csharp
 public static string? GetLocalsQuery(string language)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Language` | `string` | Yes | The language |
+| Name       | Type     | Required | Description  |
+| ---------- | -------- | -------- | ------------ |
+| `Language` | `string` | Yes      | The language |
 
 **Returns:** `string?`
 
@@ -165,11 +173,12 @@ or `Error.Download` if auto-download fails.
 ```csharp
 public static Language GetLanguage(string name)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Name` | `string` | Yes | The name |
+| Name   | Type     | Required | Description |
+| ------ | -------- | -------- | ----------- |
+| `Name` | `string` | Yes      | The name    |
 
 **Returns:** `Language`
 **Errors:** Throws `Error`.
@@ -193,11 +202,12 @@ Returns `Error.LanguageNotFound` if the language is not recognized, or
 ```csharp
 public static Parser GetParser(string name)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Name` | `string` | Yes | The name |
+| Name   | Type     | Required | Description |
+| ------ | -------- | -------- | ----------- |
+| `Name` | `string` | Yes      | The name    |
 
 **Returns:** `Parser`
 **Errors:** Throws `Error`.
@@ -215,11 +225,12 @@ This compatibility alias matches the pre-Alef Python binding API.
 ```csharp
 public static string? DetectLanguage(string path)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Path` | `string` | Yes | Path to the file |
+| Name   | Type     | Required | Description      |
+| ------ | -------- | -------- | ---------------- |
+| `Path` | `string` | Yes      | Path to the file |
 
 **Returns:** `string?`
 
@@ -237,6 +248,7 @@ plus any configured aliases.
 ```csharp
 public static List<string> AvailableLanguages()
 ```
+
 **Returns:** `List<string>`
 
 ---
@@ -253,11 +265,12 @@ dynamically available, or a known alias for one of these).
 ```csharp
 public static bool HasLanguage(string name)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Name` | `string` | Yes | The name |
+| Name   | Type     | Required | Description |
+| ------ | -------- | -------- | ----------- |
+| `Name` | `string` | Yes      | The name    |
 
 **Returns:** `bool`
 
@@ -275,6 +288,7 @@ and aliases.
 ```csharp
 public static nuint LanguageCount()
 ```
+
 **Returns:** `nuint`
 
 ---
@@ -296,12 +310,13 @@ Returns an error if the language is not found or parsing fails.
 ```csharp
 public static ProcessResult Process(string source, ProcessConfig config)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Source` | `string` | Yes | The source |
-| `Config` | `ProcessConfig` | Yes | The configuration options |
+| Name     | Type            | Required | Description               |
+| -------- | --------------- | -------- | ------------------------- |
+| `Source` | `string`        | Yes      | The source                |
+| `Config` | `ProcessConfig` | Yes      | The configuration options |
 
 **Returns:** `ProcessResult`
 **Errors:** Throws `Error`.
@@ -325,11 +340,12 @@ Returns an error if configuration cannot be applied or if downloads fail.
 ```csharp
 public static void Init(PackConfig config)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Config` | `PackConfig` | Yes | The configuration options |
+| Name     | Type         | Required | Description               |
+| -------- | ------------ | -------- | ------------------------- |
+| `Config` | `PackConfig` | Yes      | The configuration options |
 
 **Returns:** `void`
 **Errors:** Throws `Error`.
@@ -354,11 +370,12 @@ Returns an error if the lock cannot be acquired.
 ```csharp
 public static void Configure(PackConfig config)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Config` | `PackConfig` | Yes | The configuration options |
+| Name     | Type         | Required | Description               |
+| -------- | ------------ | -------- | ------------------------- |
+| `Config` | `PackConfig` | Yes      | The configuration options |
 
 **Returns:** `void`
 **Errors:** Throws `Error`.
@@ -382,11 +399,12 @@ the download fails.
 ```csharp
 public static nuint Download(List<string> names)
 ```
+
 **Parameters:**
 
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `Names` | `List<string>` | Yes | The names |
+| Name    | Type           | Required | Description |
+| ------- | -------------- | -------- | ----------- |
+| `Names` | `List<string>` | Yes      | The names   |
 
 **Returns:** `nuint`
 **Errors:** Throws `Error`.
@@ -414,6 +432,7 @@ Returns an error if the manifest cannot be fetched or the bundle download fails.
 ```csharp
 public static nuint DownloadAll()
 ```
+
 **Returns:** `nuint`
 **Errors:** Throws `Error`.
 
@@ -436,6 +455,7 @@ Returns an error if the manifest cannot be fetched.
 ```csharp
 public static List<string> ManifestLanguages()
 ```
+
 **Returns:** `List<string>`
 **Errors:** Throws `Error`.
 
@@ -453,6 +473,7 @@ cache directory does not exist or cannot be read.
 ```csharp
 public static List<string> DownloadedLanguages()
 ```
+
 **Returns:** `List<string>`
 
 ---
@@ -473,6 +494,7 @@ Returns an error if the cache directory cannot be removed.
 ```csharp
 public static void CleanCache()
 ```
+
 **Returns:** `void`
 **Errors:** Throws `Error`.
 
@@ -494,6 +516,7 @@ Returns an error if the system cache directory cannot be determined.
 ```csharp
 public static string CacheDir()
 ```
+
 **Returns:** `string`
 **Errors:** Throws `Error`.
 
@@ -505,11 +528,10 @@ public static string CacheDir()
 
 A byte range — start (inclusive) to end (exclusive).
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Start` | `nuint` | — | Inclusive start byte offset. |
-| `End` | `nuint` | — | Exclusive end byte offset. |
-
+| Field   | Type    | Default | Description                  |
+| ------- | ------- | ------- | ---------------------------- |
+| `Start` | `nuint` | —       | Inclusive start byte offset. |
+| `End`   | `nuint` | —       | Exclusive end byte offset.   |
 
 ---
 
@@ -517,18 +539,17 @@ A byte range — start (inclusive) to end (exclusive).
 
 Metadata for a single chunk of source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Language` | `string` | — | Language |
-| `ChunkIndex` | `nuint` | — | Chunk index |
-| `TotalChunks` | `nuint` | — | Total chunks |
-| `NodeTypes` | `List<string>` | `new List<string>()` | Node types |
-| `ContextPath` | `List<string>` | `new List<string>()` | Context path |
-| `SymbolsDefined` | `List<string>` | `new List<string>()` | Symbols defined |
-| `Comments` | `List<CommentInfo>` | `new List<CommentInfo>()` | Comments |
-| `Docstrings` | `List<DocstringInfo>` | `new List<DocstringInfo>()` | Docstrings |
-| `HasErrorNodes` | `bool` | — | Whether error nodes |
-
+| Field            | Type                  | Default                     | Description         |
+| ---------------- | --------------------- | --------------------------- | ------------------- |
+| `Language`       | `string`              | —                           | Language            |
+| `ChunkIndex`     | `nuint`               | —                           | Chunk index         |
+| `TotalChunks`    | `nuint`               | —                           | Total chunks        |
+| `NodeTypes`      | `List<string>`        | `new List<string>()`        | Node types          |
+| `ContextPath`    | `List<string>`        | `new List<string>()`        | Context path        |
+| `SymbolsDefined` | `List<string>`        | `new List<string>()`        | Symbols defined     |
+| `Comments`       | `List<CommentInfo>`   | `new List<CommentInfo>()`   | Comments            |
+| `Docstrings`     | `List<DocstringInfo>` | `new List<DocstringInfo>()` | Docstrings          |
+| `HasErrorNodes`  | `bool`                | —                           | Whether error nodes |
 
 ---
 
@@ -536,15 +557,14 @@ Metadata for a single chunk of source code.
 
 A chunk of source code with rich metadata.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Content` | `string` | — | The extracted text content |
-| `StartByte` | `nuint` | — | Start byte |
-| `EndByte` | `nuint` | — | End byte |
-| `StartLine` | `nuint` | — | Start line |
-| `EndLine` | `nuint` | — | End line |
-| `Metadata` | `ChunkContext` | — | Document metadata |
-
+| Field       | Type           | Default | Description                |
+| ----------- | -------------- | ------- | -------------------------- |
+| `Content`   | `string`       | —       | The extracted text content |
+| `StartByte` | `nuint`        | —       | Start byte                 |
+| `EndByte`   | `nuint`        | —       | End byte                   |
+| `StartLine` | `nuint`        | —       | Start line                 |
+| `EndLine`   | `nuint`        | —       | End line                   |
+| `Metadata`  | `ChunkContext` | —       | Document metadata          |
 
 ---
 
@@ -552,13 +572,12 @@ A chunk of source code with rich metadata.
 
 A comment extracted from source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Text` | `string` | — | Text |
-| `Kind` | `CommentKind` | `CommentKind.Line` | Kind (comment kind) |
-| `Span` | `Span` | — | Span (span) |
-| `AssociatedNode` | `string?` | `null` | Associated node |
-
+| Field            | Type          | Default            | Description         |
+| ---------------- | ------------- | ------------------ | ------------------- |
+| `Text`           | `string`      | —                  | Text                |
+| `Kind`           | `CommentKind` | `CommentKind.Line` | Kind (comment kind) |
+| `Span`           | `Span`        | —                  | Span (span)         |
+| `AssociatedNode` | `string?`     | `null`             | Associated node     |
 
 ---
 
@@ -566,12 +585,11 @@ A comment extracted from source code.
 
 A diagnostic (syntax error, missing node, etc.) from parsing.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Message` | `string` | — | Message |
+| Field      | Type                 | Default                    | Description                    |
+| ---------- | -------------------- | -------------------------- | ------------------------------ |
+| `Message`  | `string`             | —                          | Message                        |
 | `Severity` | `DiagnosticSeverity` | `DiagnosticSeverity.Error` | Severity (diagnostic severity) |
-| `Span` | `Span` | — | Span (span) |
-
+| `Span`     | `Span`               | —                          | Span (span)                    |
 
 ---
 
@@ -579,12 +597,11 @@ A diagnostic (syntax error, missing node, etc.) from parsing.
 
 A section within a docstring (e.g., Args, Returns, Raises).
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Kind` | `string` | — | Kind |
-| `Name` | `string?` | `null` | The name |
-| `Description` | `string` | — | Human-readable description |
-
+| Field         | Type      | Default | Description                |
+| ------------- | --------- | ------- | -------------------------- |
+| `Kind`        | `string`  | —       | Kind                       |
+| `Name`        | `string?` | `null`  | The name                   |
+| `Description` | `string`  | —       | Human-readable description |
 
 ---
 
@@ -592,14 +609,13 @@ A section within a docstring (e.g., Args, Returns, Raises).
 
 A docstring extracted from source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Text` | `string` | — | Text |
-| `Format` | `DocstringFormat` | `DocstringFormat.PythonTripleQuote` | Format (docstring format) |
-| `Span` | `Span` | — | Span (span) |
-| `AssociatedItem` | `string?` | `null` | Associated item |
-| `ParsedSections` | `List<DocSection>` | `new List<DocSection>()` | Parsed sections |
-
+| Field            | Type               | Default                             | Description               |
+| ---------------- | ------------------ | ----------------------------------- | ------------------------- |
+| `Text`           | `string`           | —                                   | Text                      |
+| `Format`         | `DocstringFormat`  | `DocstringFormat.PythonTripleQuote` | Format (docstring format) |
+| `Span`           | `Span`             | —                                   | Span (span)               |
+| `AssociatedItem` | `string?`          | `null`                              | Associated item           |
+| `ParsedSections` | `List<DocSection>` | `new List<DocSection>()`            | Parsed sections           |
 
 ---
 
@@ -618,6 +634,7 @@ Create a new download manager for the given version.
 ```csharp
 public DownloadManager New(string version)
 ```
+
 ###### WithCacheDir()
 
 Create a download manager with a custom cache directory.
@@ -627,6 +644,7 @@ Create a download manager with a custom cache directory.
 ```csharp
 public DownloadManager WithCacheDir(string version, string cacheDir)
 ```
+
 ###### DefaultCacheDir()
 
 Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
@@ -636,6 +654,7 @@ Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
 ```csharp
 public string DefaultCacheDir(string version)
 ```
+
 ###### CacheDir()
 
 Return the path to the libs cache directory.
@@ -645,6 +664,7 @@ Return the path to the libs cache directory.
 ```csharp
 public string CacheDir()
 ```
+
 ###### InstalledLanguages()
 
 List languages that are already downloaded and cached.
@@ -654,6 +674,7 @@ List languages that are already downloaded and cached.
 ```csharp
 public List<string> InstalledLanguages()
 ```
+
 ###### EnsureLanguages()
 
 Ensure the specified languages are available in the cache.
@@ -664,6 +685,7 @@ Downloads the platform bundle if any requested languages are missing.
 ```csharp
 public void EnsureLanguages(List<string> names)
 ```
+
 ###### EnsureGroup()
 
 Ensure all languages in a named group are available.
@@ -673,6 +695,7 @@ Ensure all languages in a named group are available.
 ```csharp
 public void EnsureGroup(string group)
 ```
+
 ###### LibPath()
 
 Get the expected path for a language's shared library in the cache.
@@ -682,6 +705,7 @@ Get the expected path for a language's shared library in the cache.
 ```csharp
 public string LibPath(string name)
 ```
+
 ###### FetchManifest()
 
 Fetch the parser manifest from GitHub Releases.
@@ -691,6 +715,7 @@ Fetch the parser manifest from GitHub Releases.
 ```csharp
 public ParserManifest FetchManifest()
 ```
+
 ###### DownloadAllBestEffort()
 
 Download the platform bundle and extract every library file it contains.
@@ -707,6 +732,7 @@ Returns the number of library files extracted (including those already cached).
 ```csharp
 public nuint DownloadAllBestEffort()
 ```
+
 ###### CleanCache()
 
 Remove all cached parser libraries.
@@ -723,12 +749,11 @@ public void CleanCache()
 
 An export statement extracted from source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Name` | `string` | — | The name |
+| Field  | Type         | Default            | Description        |
+| ------ | ------------ | ------------------ | ------------------ |
+| `Name` | `string`     | —                  | The name           |
 | `Kind` | `ExportKind` | `ExportKind.Named` | Kind (export kind) |
-| `Span` | `Span` | — | Span (span) |
-
+| `Span` | `Span`       | —                  | Span (span)        |
 
 ---
 
@@ -736,17 +761,16 @@ An export statement extracted from source code.
 
 Aggregate metrics for a source file.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `TotalLines` | `nuint` | — | Total lines |
-| `CodeLines` | `nuint` | — | Code lines |
-| `CommentLines` | `nuint` | — | Comment lines |
-| `BlankLines` | `nuint` | — | Blank lines |
-| `TotalBytes` | `nuint` | — | Total bytes |
-| `NodeCount` | `nuint` | — | Number of nodes |
-| `ErrorCount` | `nuint` | — | Number of errors |
-| `MaxDepth` | `nuint` | — | Maximum depth |
-
+| Field          | Type    | Default | Description      |
+| -------------- | ------- | ------- | ---------------- |
+| `TotalLines`   | `nuint` | —       | Total lines      |
+| `CodeLines`    | `nuint` | —       | Code lines       |
+| `CommentLines` | `nuint` | —       | Comment lines    |
+| `BlankLines`   | `nuint` | —       | Blank lines      |
+| `TotalBytes`   | `nuint` | —       | Total bytes      |
+| `NodeCount`    | `nuint` | —       | Number of nodes  |
+| `ErrorCount`   | `nuint` | —       | Number of errors |
+| `MaxDepth`     | `nuint` | —       | Maximum depth    |
 
 ---
 
@@ -754,29 +778,26 @@ Aggregate metrics for a source file.
 
 An import statement extracted from source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Source` | `string` | — | Source |
-| `Items` | `List<string>` | `new List<string>()` | Items |
-| `Alias` | `string?` | `null` | Alias |
-| `IsWildcard` | `bool` | — | Whether wildcard |
-| `Span` | `Span` | — | Span (span) |
-
+| Field        | Type           | Default              | Description      |
+| ------------ | -------------- | -------------------- | ---------------- |
+| `Source`     | `string`       | —                    | Source           |
+| `Items`      | `List<string>` | `new List<string>()` | Items            |
+| `Alias`      | `string?`      | `null`               | Alias            |
+| `IsWildcard` | `bool`         | —                    | Whether wildcard |
+| `Span`       | `Span`         | —                    | Span (span)      |
 
 ---
 
 #### Language
 
-
 ---
 
 #### LanguageInfo
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Group` | `string` | — | Group |
-| `Size` | `ulong` | — | Size in bytes |
-
+| Field   | Type     | Default | Description   |
+| ------- | -------- | ------- | ------------- |
+| `Group` | `string` | —       | Group         |
+| `Size`  | `ulong`  | —       | Size in bytes |
 
 ---
 
@@ -803,6 +824,7 @@ dynamic grammar shared libraries are stored in a non-standard location.
 ```csharp
 public LanguageRegistry WithLibsDir(string libsDir)
 ```
+
 ###### AddExtraLibsDir()
 
 Add an additional directory to search for dynamic libraries.
@@ -820,6 +842,7 @@ immutable while the directory list is updated.
 ```csharp
 public void AddExtraLibsDir(string dir)
 ```
+
 ###### GetLanguage()
 
 Get a tree-sitter `Language` by name.
@@ -838,6 +861,7 @@ does not match any known grammar.
 ```csharp
 public Language GetLanguage(string name)
 ```
+
 ###### AvailableLanguages()
 
 List all available language names, sorted and deduplicated.
@@ -850,6 +874,7 @@ Includes statically compiled languages, dynamically loadable languages
 ```csharp
 public List<string> AvailableLanguages()
 ```
+
 ###### HasLanguage()
 
 Check whether a language is available by name or alias.
@@ -862,6 +887,7 @@ table or from a dynamic library on disk.
 ```csharp
 public bool HasLanguage(string name)
 ```
+
 ###### LanguageCount()
 
 Return the total number of available languages (including aliases).
@@ -871,6 +897,7 @@ Return the total number of available languages (including aliases).
 ```csharp
 public nuint LanguageCount()
 ```
+
 ###### Process()
 
 Parse source code and extract file intelligence based on config in a single pass.
@@ -880,6 +907,7 @@ Parse source code and extract file intelligence based on config in a single pass
 ```csharp
 public ProcessResult Process(string source, ProcessConfig config)
 ```
+
 ###### CreateDefault()
 
 **Signature:**
@@ -906,6 +934,7 @@ regardless of how the tree is moved or stored at the FFI boundary.
 ```csharp
 public Node Clone()
 ```
+
 ###### Kind()
 
 Return the node's kind name (e.g. `"function_definition"`).
@@ -915,6 +944,7 @@ Return the node's kind name (e.g. `"function_definition"`).
 ```csharp
 public string Kind()
 ```
+
 ###### KindId()
 
 Return the node's numeric kind ID.
@@ -924,6 +954,7 @@ Return the node's numeric kind ID.
 ```csharp
 public ushort KindId()
 ```
+
 ###### StartByte()
 
 Return the inclusive start byte offset of this node.
@@ -933,6 +964,7 @@ Return the inclusive start byte offset of this node.
 ```csharp
 public nuint StartByte()
 ```
+
 ###### EndByte()
 
 Return the exclusive end byte offset of this node.
@@ -942,6 +974,7 @@ Return the exclusive end byte offset of this node.
 ```csharp
 public nuint EndByte()
 ```
+
 ###### ByteRange()
 
 Return the node's byte range as a `ByteRange`.
@@ -954,6 +987,7 @@ text accessor.
 ```csharp
 public ByteRange ByteRange()
 ```
+
 ###### StartPosition()
 
 Return the start `Point` (row, column).
@@ -963,6 +997,7 @@ Return the start `Point` (row, column).
 ```csharp
 public Point StartPosition()
 ```
+
 ###### EndPosition()
 
 Return the end `Point` (row, column).
@@ -972,6 +1007,7 @@ Return the end `Point` (row, column).
 ```csharp
 public Point EndPosition()
 ```
+
 ###### IsNamed()
 
 True when this node is named (not punctuation/whitespace).
@@ -981,6 +1017,7 @@ True when this node is named (not punctuation/whitespace).
 ```csharp
 public bool IsNamed()
 ```
+
 ###### IsError()
 
 True when this is an error node.
@@ -990,6 +1027,7 @@ True when this is an error node.
 ```csharp
 public bool IsError()
 ```
+
 ###### IsMissing()
 
 True when this is a missing-token node.
@@ -999,6 +1037,7 @@ True when this is a missing-token node.
 ```csharp
 public bool IsMissing()
 ```
+
 ###### IsExtra()
 
 True when this is an "extra" node (e.g. a comment).
@@ -1008,6 +1047,7 @@ True when this is an "extra" node (e.g. a comment).
 ```csharp
 public bool IsExtra()
 ```
+
 ###### HasError()
 
 True when this node or any descendant is an error.
@@ -1017,6 +1057,7 @@ True when this node or any descendant is an error.
 ```csharp
 public bool HasError()
 ```
+
 ###### Parent()
 
 Return this node's parent, if any.
@@ -1026,6 +1067,7 @@ Return this node's parent, if any.
 ```csharp
 public Node? Parent()
 ```
+
 ###### Child()
 
 Return the i-th child of this node, if any.
@@ -1035,6 +1077,7 @@ Return the i-th child of this node, if any.
 ```csharp
 public Node? Child(uint index)
 ```
+
 ###### ChildCount()
 
 Total number of children (including unnamed).
@@ -1044,6 +1087,7 @@ Total number of children (including unnamed).
 ```csharp
 public nuint ChildCount()
 ```
+
 ###### NamedChild()
 
 Return the i-th named child of this node, if any.
@@ -1053,6 +1097,7 @@ Return the i-th named child of this node, if any.
 ```csharp
 public Node? NamedChild(uint index)
 ```
+
 ###### NamedChildCount()
 
 Number of named children of this node.
@@ -1062,6 +1107,7 @@ Number of named children of this node.
 ```csharp
 public nuint NamedChildCount()
 ```
+
 ###### ChildByFieldName()
 
 Look up a child by its grammar-defined field name.
@@ -1071,6 +1117,7 @@ Look up a child by its grammar-defined field name.
 ```csharp
 public Node? ChildByFieldName(string name)
 ```
+
 ###### ToSexp()
 
 Return the S-expression form of this node's subtree.
@@ -1080,6 +1127,7 @@ Return the S-expression form of this node's subtree.
 ```csharp
 public string ToSexp()
 ```
+
 ###### Walk()
 
 Return a `TreeCursor` positioned at this node.
@@ -1100,11 +1148,11 @@ Controls cache directory and which languages to pre-download.
 Can be loaded from a TOML file, constructed programmatically,
 or passed as a dict/object from language bindings.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `CacheDir` | `string?` | `null` | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
-| `Languages` | `List<string>?` | `new List<string>()` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`). |
-| `Groups` | `List<string>?` | `new List<string>()` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). |
+| Field       | Type            | Default              | Description                                                                                      |
+| ----------- | --------------- | -------------------- | ------------------------------------------------------------------------------------------------ |
+| `CacheDir`  | `string?`       | `null`               | Override default cache directory. Default: `~/.cache/tree-sitter-language-pack/v{version}/libs/` |
+| `Languages` | `List<string>?` | `new List<string>()` | Languages to pre-download on init. Each entry is a language name (e.g. `"python"`, `"rust"`).    |
+| `Groups`    | `List<string>?` | `new List<string>()` | Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`).                      |
 
 ##### Methods
 
@@ -1121,6 +1169,7 @@ Returns an error if the file cannot be read or the TOML is invalid.
 ```csharp
 public PackConfig FromTomlFile(string path)
 ```
+
 ###### Discover()
 
 Discover configuration by searching for `language-pack.toml` in:
@@ -1162,6 +1211,7 @@ or `Error.ParserSetup` if the language ABI is incompatible.
 ```csharp
 public void SetLanguage(string name)
 ```
+
 ###### Parse()
 
 Parse a UTF-8 source string. Returns `null` if parsing was cancelled
@@ -1172,6 +1222,7 @@ or no language is set.
 ```csharp
 public Tree? Parse(string source)
 ```
+
 ###### ParseBytes()
 
 Parse a raw byte slice. Returns `null` if parsing was cancelled or
@@ -1182,6 +1233,7 @@ no language is set.
 ```csharp
 public Tree? ParseBytes(byte[] source)
 ```
+
 ###### Reset()
 
 Reset internal state. The next call to `parse` will
@@ -1192,6 +1244,7 @@ not be incremental.
 ```csharp
 public void Reset()
 ```
+
 ###### CreateDefault()
 
 **Signature:**
@@ -1206,24 +1259,22 @@ public Parser CreateDefault()
 
 Manifest describing available parser downloads for a specific version.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Version` | `string` | — | Version string |
-| `Platforms` | `Dictionary<string, PlatformBundle>` | — | Platforms |
-| `Languages` | `Dictionary<string, LanguageInfo>` | — | Languages |
-| `Groups` | `Dictionary<string, List<string>>` | — | Groups |
-
+| Field       | Type                                 | Default | Description    |
+| ----------- | ------------------------------------ | ------- | -------------- |
+| `Version`   | `string`                             | —       | Version string |
+| `Platforms` | `Dictionary<string, PlatformBundle>` | —       | Platforms      |
+| `Languages` | `Dictionary<string, LanguageInfo>`   | —       | Languages      |
+| `Groups`    | `Dictionary<string, List<string>>`   | —       | Groups         |
 
 ---
 
 #### PlatformBundle
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Url` | `string` | — | Url |
-| `Sha256` | `string` | — | Sha256 |
-| `Size` | `ulong` | — | Size in bytes |
-
+| Field    | Type     | Default | Description   |
+| -------- | -------- | ------- | ------------- |
+| `Url`    | `string` | —       | Url           |
+| `Sha256` | `string` | —       | Sha256        |
+| `Size`   | `ulong`  | —       | Size in bytes |
 
 ---
 
@@ -1231,10 +1282,10 @@ Manifest describing available parser downloads for a specific version.
 
 A source position — row + column, zero-indexed.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Row` | `nuint` | — | Zero-indexed row number. |
-| `Column` | `nuint` | — | Zero-indexed column number, in UTF-16 code units. |
+| Field    | Type    | Default | Description                                       |
+| -------- | ------- | ------- | ------------------------------------------------- |
+| `Row`    | `nuint` | —       | Zero-indexed row number.                          |
+| `Column` | `nuint` | —       | Zero-indexed column number, in UTF-16 code units. |
 
 ##### Methods
 
@@ -1254,17 +1305,17 @@ Configuration for the `process()` function.
 
 Controls which analysis features are enabled and whether chunking is performed.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Language` | `string` | — | Language name (required). |
-| `Structure` | `bool` | `true` | Extract structural items (functions, classes, etc.). Default: true. |
-| `Imports` | `bool` | `true` | Extract import statements. Default: true. |
-| `Exports` | `bool` | `true` | Extract export statements. Default: true. |
-| `Comments` | `bool` | `false` | Extract comments. Default: false. |
-| `Docstrings` | `bool` | `false` | Extract docstrings. Default: false. |
-| `Symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
-| `Diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
-| `ChunkMaxSize` | `nuint?` | `null` | Maximum chunk size in bytes. `null` disables chunking. |
+| Field          | Type     | Default | Description                                                         |
+| -------------- | -------- | ------- | ------------------------------------------------------------------- |
+| `Language`     | `string` | —       | Language name (required).                                           |
+| `Structure`    | `bool`   | `true`  | Extract structural items (functions, classes, etc.). Default: true. |
+| `Imports`      | `bool`   | `true`  | Extract import statements. Default: true.                           |
+| `Exports`      | `bool`   | `true`  | Extract export statements. Default: true.                           |
+| `Comments`     | `bool`   | `false` | Extract comments. Default: false.                                   |
+| `Docstrings`   | `bool`   | `false` | Extract docstrings. Default: false.                                 |
+| `Symbols`      | `bool`   | `false` | Extract symbol definitions. Default: false.                         |
+| `Diagnostics`  | `bool`   | `false` | Include parse diagnostics. Default: false.                          |
+| `ChunkMaxSize` | `nuint?` | `null`  | Maximum chunk size in bytes. `null` disables chunking.              |
 
 ##### Methods
 
@@ -1275,6 +1326,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 ```csharp
 public ProcessConfig CreateDefault()
 ```
+
 ###### WithChunking()
 
 Enable chunking with the given maximum chunk size in bytes.
@@ -1284,6 +1336,7 @@ Enable chunking with the given maximum chunk size in bytes.
 ```csharp
 public ProcessConfig WithChunking(nuint maxSize)
 ```
+
 ###### All()
 
 Enable all analysis features.
@@ -1293,6 +1346,7 @@ Enable all analysis features.
 ```csharp
 public ProcessConfig All()
 ```
+
 ###### Minimal()
 
 Disable all analysis features (only metrics computed).
@@ -1313,19 +1367,18 @@ Contains metrics, structural analysis, imports/exports, comments,
 docstrings, symbols, diagnostics, and optionally chunked code segments.
 Fields are populated based on the `ProcessConfig` flags.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Language` | `string` | — | Language |
-| `Metrics` | `FileMetrics` | — | Metrics (file metrics) |
-| `Structure` | `List<StructureItem>` | `new List<StructureItem>()` | Structure |
-| `Imports` | `List<ImportInfo>` | `new List<ImportInfo>()` | Imports |
-| `Exports` | `List<ExportInfo>` | `new List<ExportInfo>()` | Exports |
-| `Comments` | `List<CommentInfo>` | `new List<CommentInfo>()` | Comments |
-| `Docstrings` | `List<DocstringInfo>` | `new List<DocstringInfo>()` | Docstrings |
-| `Symbols` | `List<SymbolInfo>` | `new List<SymbolInfo>()` | Symbols |
-| `Diagnostics` | `List<Diagnostic>` | `new List<Diagnostic>()` | Diagnostics |
-| `Chunks` | `List<CodeChunk>` | `new List<CodeChunk>()` | Text chunks for chunking/embedding |
-
+| Field         | Type                  | Default                     | Description                        |
+| ------------- | --------------------- | --------------------------- | ---------------------------------- |
+| `Language`    | `string`              | —                           | Language                           |
+| `Metrics`     | `FileMetrics`         | —                           | Metrics (file metrics)             |
+| `Structure`   | `List<StructureItem>` | `new List<StructureItem>()` | Structure                          |
+| `Imports`     | `List<ImportInfo>`    | `new List<ImportInfo>()`    | Imports                            |
+| `Exports`     | `List<ExportInfo>`    | `new List<ExportInfo>()`    | Exports                            |
+| `Comments`    | `List<CommentInfo>`   | `new List<CommentInfo>()`   | Comments                           |
+| `Docstrings`  | `List<DocstringInfo>` | `new List<DocstringInfo>()` | Docstrings                         |
+| `Symbols`     | `List<SymbolInfo>`    | `new List<SymbolInfo>()`    | Symbols                            |
+| `Diagnostics` | `List<Diagnostic>`    | `new List<Diagnostic>()`    | Diagnostics                        |
+| `Chunks`      | `List<CodeChunk>`     | `new List<CodeChunk>()`     | Text chunks for chunking/embedding |
 
 ---
 
@@ -1336,15 +1389,14 @@ Byte and line/column range in source code.
 Represents both byte offsets (for slicing) and human-readable line/column
 positions (for display and diagnostics).
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `StartByte` | `nuint` | — | Start byte |
-| `EndByte` | `nuint` | — | End byte |
-| `StartLine` | `nuint` | — | Start line |
-| `StartColumn` | `nuint` | — | Start column |
-| `EndLine` | `nuint` | — | End line |
-| `EndColumn` | `nuint` | — | End column |
-
+| Field         | Type    | Default | Description  |
+| ------------- | ------- | ------- | ------------ |
+| `StartByte`   | `nuint` | —       | Start byte   |
+| `EndByte`     | `nuint` | —       | End byte     |
+| `StartLine`   | `nuint` | —       | Start line   |
+| `StartColumn` | `nuint` | —       | Start column |
+| `EndLine`     | `nuint` | —       | End line     |
+| `EndColumn`   | `nuint` | —       | End column   |
 
 ---
 
@@ -1352,18 +1404,17 @@ positions (for display and diagnostics).
 
 A structural item (function, class, struct, etc.) in source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Kind` | `StructureKind` | `StructureKind.Function` | Kind (structure kind) |
-| `Name` | `string?` | `null` | The name |
-| `Visibility` | `string?` | `null` | Visibility |
-| `Span` | `Span` | — | Span (span) |
-| `Children` | `List<StructureItem>` | `new List<StructureItem>()` | Children |
-| `Decorators` | `List<string>` | `new List<string>()` | Decorators |
-| `DocComment` | `string?` | `null` | Doc comment |
-| `Signature` | `string?` | `null` | Signature |
-| `BodySpan` | `Span?` | `null` | Body span (span) |
-
+| Field        | Type                  | Default                     | Description           |
+| ------------ | --------------------- | --------------------------- | --------------------- |
+| `Kind`       | `StructureKind`       | `StructureKind.Function`    | Kind (structure kind) |
+| `Name`       | `string?`             | `null`                      | The name              |
+| `Visibility` | `string?`             | `null`                      | Visibility            |
+| `Span`       | `Span`                | —                           | Span (span)           |
+| `Children`   | `List<StructureItem>` | `new List<StructureItem>()` | Children              |
+| `Decorators` | `List<string>`        | `new List<string>()`        | Decorators            |
+| `DocComment` | `string?`             | `null`                      | Doc comment           |
+| `Signature`  | `string?`             | `null`                      | Signature             |
+| `BodySpan`   | `Span?`               | `null`                      | Body span (span)      |
 
 ---
 
@@ -1371,14 +1422,13 @@ A structural item (function, class, struct, etc.) in source code.
 
 A symbol (variable, function, type, etc.) extracted from source code.
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `Name` | `string` | — | The name |
-| `Kind` | `SymbolKind` | `SymbolKind.Variable` | Kind (symbol kind) |
-| `Span` | `Span` | — | Span (span) |
-| `TypeAnnotation` | `string?` | `null` | Type annotation |
-| `Doc` | `string?` | `null` | Doc |
-
+| Field            | Type         | Default               | Description        |
+| ---------------- | ------------ | --------------------- | ------------------ |
+| `Name`           | `string`     | —                     | The name           |
+| `Kind`           | `SymbolKind` | `SymbolKind.Variable` | Kind (symbol kind) |
+| `Span`           | `Span`       | —                     | Span (span)        |
+| `TypeAnnotation` | `string?`    | `null`                | Type annotation    |
+| `Doc`            | `string?`    | `null`                | Doc                |
 
 ---
 
@@ -1397,6 +1447,7 @@ Return the root `Node` of this tree.
 ```csharp
 public Node RootNode()
 ```
+
 ###### Walk()
 
 Return a `TreeCursor` positioned at the root.
@@ -1424,6 +1475,7 @@ Return the `Node` at the cursor's current position.
 ```csharp
 public Node Node()
 ```
+
 ###### GotoFirstChild()
 
 Move the cursor to the first child of the current node.
@@ -1434,6 +1486,7 @@ Returns `true` if a child existed.
 ```csharp
 public bool GotoFirstChild()
 ```
+
 ###### GotoParent()
 
 Move the cursor to the parent of the current node.
@@ -1444,6 +1497,7 @@ Returns `true` if a parent existed.
 ```csharp
 public bool GotoParent()
 ```
+
 ###### GotoNextSibling()
 
 Move the cursor to the next sibling of the current node.
@@ -1454,6 +1508,7 @@ Returns `true` if a sibling existed.
 ```csharp
 public bool GotoNextSibling()
 ```
+
 ###### FieldName()
 
 Return the field name for the current node, if any.
@@ -1476,20 +1531,19 @@ Categorizes top-level and nested declarations such as functions, classes,
 structs, enums, traits, and more. Use `Other` for
 language-specific constructs that do not fit a standard category.
 
-| Value | Description |
-|-------|-------------|
-| `Function` | Function |
-| `Method` | Method |
-| `Class` | Class |
-| `Struct` | Struct |
-| `Interface` | Interface |
-| `Enum` | Enum |
-| `Module` | Module |
-| `Trait` | Trait |
-| `Impl` | Impl |
-| `Namespace` | Namespace |
-| `Other` | Other — Fields: `0`: `string` |
-
+| Value       | Description                   |
+| ----------- | ----------------------------- |
+| `Function`  | Function                      |
+| `Method`    | Method                        |
+| `Class`     | Class                         |
+| `Struct`    | Struct                        |
+| `Interface` | Interface                     |
+| `Enum`      | Enum                          |
+| `Module`    | Module                        |
+| `Trait`     | Trait                         |
+| `Impl`      | Impl                          |
+| `Namespace` | Namespace                     |
+| `Other`     | Other — Fields: `0`: `string` |
 
 ---
 
@@ -1500,12 +1554,11 @@ The kind of a comment found in source code.
 Distinguishes between single-line comments, block (multi-line) comments,
 and documentation comments.
 
-| Value | Description |
-|-------|-------------|
-| `Line` | Line |
-| `Block` | Block |
-| `Doc` | Doc |
-
+| Value   | Description |
+| ------- | ----------- |
+| `Line`  | Line        |
+| `Block` | Block       |
+| `Doc`   | Doc         |
 
 ---
 
@@ -1516,15 +1569,14 @@ The format of a docstring extracted from source code.
 Identifies the docstring convention used, which varies by language
 (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 
-| Value | Description |
-|-------|-------------|
-| `PythonTripleQuote` | Python triple quote |
-| `JsDoc` | J s doc |
-| `Rustdoc` | Rustdoc |
-| `GoDoc` | Go doc |
-| `JavaDoc` | Java doc |
-| `Other` | Other — Fields: `0`: `string` |
-
+| Value               | Description                   |
+| ------------------- | ----------------------------- |
+| `PythonTripleQuote` | Python triple quote           |
+| `JsDoc`             | J s doc                       |
+| `Rustdoc`           | Rustdoc                       |
+| `GoDoc`             | Go doc                        |
+| `JavaDoc`           | Java doc                      |
+| `Other`             | Other — Fields: `0`: `string` |
 
 ---
 
@@ -1534,12 +1586,11 @@ The kind of an export statement found in source code.
 
 Covers named exports, default exports, and re-exports from other modules.
 
-| Value | Description |
-|-------|-------------|
-| `Named` | Named |
-| `Default` | Default |
-| `ReExport` | Re export |
-
+| Value      | Description |
+| ---------- | ----------- |
+| `Named`    | Named       |
+| `Default`  | Default     |
+| `ReExport` | Re export   |
 
 ---
 
@@ -1550,18 +1601,17 @@ The kind of a symbol definition found in source code.
 Categorizes symbol definitions such as variables, constants, functions,
 classes, types, interfaces, enums, and modules.
 
-| Value | Description |
-|-------|-------------|
-| `Variable` | Variable |
-| `Constant` | Constant |
-| `Function` | Function |
-| `Class` | Class |
-| `Type` | Type |
-| `Interface` | Interface |
-| `Enum` | Enum |
-| `Module` | Module |
-| `Other` | Other — Fields: `0`: `string` |
-
+| Value       | Description                   |
+| ----------- | ----------------------------- |
+| `Variable`  | Variable                      |
+| `Constant`  | Constant                      |
+| `Function`  | Function                      |
+| `Class`     | Class                         |
+| `Type`      | Type                          |
+| `Interface` | Interface                     |
+| `Enum`      | Enum                          |
+| `Module`    | Module                        |
+| `Other`     | Other — Fields: `0`: `string` |
 
 ---
 
@@ -1572,12 +1622,11 @@ Severity level of a diagnostic produced during parsing.
 Used to classify parse errors, warnings, and informational messages
 found in the syntax tree.
 
-| Value | Description |
-|-------|-------------|
-| `Error` | Error |
-| `Warning` | Warning |
-| `Info` | Info |
-
+| Value     | Description |
+| --------- | ----------- |
+| `Error`   | Error       |
+| `Warning` | Warning     |
+| `Info`    | Info        |
 
 ---
 
@@ -1591,18 +1640,17 @@ Covers language lookup failures, parse errors, query errors, and I/O issues.
 Feature-gated variants are included when `config`, `download`, or related
 features are enabled.
 
-| Variant | Description |
-|---------|-------------|
-| `LanguageNotFound` | Language '{0}' not found |
-| `DynamicLoad` | Dynamic library load error: {0} |
+| Variant               | Description                                       |
+| --------------------- | ------------------------------------------------- |
+| `LanguageNotFound`    | Language '{0}' not found                          |
+| `DynamicLoad`         | Dynamic library load error: {0}                   |
 | `NullLanguagePointer` | Language function returned null pointer for '{0}' |
-| `ParserSetup` | Failed to set parser language: {0} |
-| `LockPoisoned` | Registry lock poisoned: {0} |
-| `Config` | Configuration error: {0} |
-| `ParseFailed` | Parse failed: parsing returned no tree |
-| `QueryError` | Query error: {0} |
-| `InvalidRange` | Invalid byte range: {0} |
-| `Io` | IO error: {0} |
-
+| `ParserSetup`         | Failed to set parser language: {0}                |
+| `LockPoisoned`        | Registry lock poisoned: {0}                       |
+| `Config`              | Configuration error: {0}                          |
+| `ParseFailed`         | Parse failed: parsing returned no tree            |
+| `QueryError`          | Query error: {0}                                  |
+| `InvalidRange`        | Invalid byte range: {0}                           |
+| `Io`                  | IO error: {0}                                     |
 
 ---

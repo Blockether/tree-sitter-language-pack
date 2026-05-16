@@ -131,19 +131,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  Map<String, LanguageInfo> dco_decode_Map_String_language_info_None(
-    dynamic raw,
-  );
-
-  @protected
-  Map<String, List<String>> dco_decode_Map_String_list_String_None(dynamic raw);
-
-  @protected
-  Map<String, PlatformBundle> dco_decode_Map_String_platform_bundle_None(
-    dynamic raw,
-  );
-
-  @protected
   DownloadManager
   dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDownloadManager(
     dynamic raw,
@@ -264,9 +251,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ImportInfo dco_decode_import_info(dynamic raw);
 
   @protected
-  LanguageInfo dco_decode_language_info(dynamic raw);
-
-  @protected
   List<String> dco_decode_list_String(dynamic raw);
 
   @protected
@@ -295,21 +279,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
-
-  @protected
-  List<(String, LanguageInfo)> dco_decode_list_record_string_language_info(
-    dynamic raw,
-  );
-
-  @protected
-  List<(String, List<String>)> dco_decode_list_record_string_list_string(
-    dynamic raw,
-  );
-
-  @protected
-  List<(String, PlatformBundle)> dco_decode_list_record_string_platform_bundle(
-    dynamic raw,
-  );
 
   @protected
   List<StructureItem> dco_decode_list_structure_item(dynamic raw);
@@ -345,12 +314,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PackConfig dco_decode_pack_config(dynamic raw);
 
   @protected
-  ParserManifest dco_decode_parser_manifest(dynamic raw);
-
-  @protected
-  PlatformBundle dco_decode_platform_bundle(dynamic raw);
-
-  @protected
   Point dco_decode_point(dynamic raw);
 
   @protected
@@ -358,17 +321,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ProcessResult dco_decode_process_result(dynamic raw);
-
-  @protected
-  (String, LanguageInfo) dco_decode_record_string_language_info(dynamic raw);
-
-  @protected
-  (String, List<String>) dco_decode_record_string_list_string(dynamic raw);
-
-  @protected
-  (String, PlatformBundle) dco_decode_record_string_platform_bundle(
-    dynamic raw,
-  );
 
   @protected
   Span dco_decode_span(dynamic raw);
@@ -475,21 +427,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   TreeCursor
   sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTreeCursor(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  Map<String, LanguageInfo> sse_decode_Map_String_language_info_None(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  Map<String, List<String>> sse_decode_Map_String_list_String_None(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  Map<String, PlatformBundle> sse_decode_Map_String_platform_bundle_None(
     SseDeserializer deserializer,
   );
 
@@ -618,9 +555,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ImportInfo sse_decode_import_info(SseDeserializer deserializer);
 
   @protected
-  LanguageInfo sse_decode_language_info(SseDeserializer deserializer);
-
-  @protected
   List<String> sse_decode_list_String(SseDeserializer deserializer);
 
   @protected
@@ -651,21 +585,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
-
-  @protected
-  List<(String, LanguageInfo)> sse_decode_list_record_string_language_info(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  List<(String, List<String>)> sse_decode_list_record_string_list_string(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  List<(String, PlatformBundle)> sse_decode_list_record_string_platform_bundle(
-    SseDeserializer deserializer,
-  );
 
   @protected
   List<StructureItem> sse_decode_list_structure_item(
@@ -703,12 +622,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PackConfig sse_decode_pack_config(SseDeserializer deserializer);
 
   @protected
-  ParserManifest sse_decode_parser_manifest(SseDeserializer deserializer);
-
-  @protected
-  PlatformBundle sse_decode_platform_bundle(SseDeserializer deserializer);
-
-  @protected
   Point sse_decode_point(SseDeserializer deserializer);
 
   @protected
@@ -716,21 +629,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ProcessResult sse_decode_process_result(SseDeserializer deserializer);
-
-  @protected
-  (String, LanguageInfo) sse_decode_record_string_language_info(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  (String, List<String>) sse_decode_record_string_list_string(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  (String, PlatformBundle) sse_decode_record_string_platform_bundle(
-    SseDeserializer deserializer,
-  );
 
   @protected
   Span sse_decode_span(SseDeserializer deserializer);
@@ -851,24 +749,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
   sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTreeCursor(
     TreeCursor self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_Map_String_language_info_None(
-    Map<String, LanguageInfo> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_Map_String_list_String_None(
-    Map<String, List<String>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_Map_String_platform_bundle_None(
-    Map<String, PlatformBundle> self,
     SseSerializer serializer,
   );
 
@@ -1017,9 +897,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_import_info(ImportInfo self, SseSerializer serializer);
 
   @protected
-  void sse_encode_language_info(LanguageInfo self, SseSerializer serializer);
-
-  @protected
   void sse_encode_list_String(List<String> self, SseSerializer serializer);
 
   @protected
@@ -1074,24 +951,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_list_record_string_language_info(
-    List<(String, LanguageInfo)> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_record_string_list_string(
-    List<(String, List<String>)> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_record_string_platform_bundle(
-    List<(String, PlatformBundle)> self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_list_structure_item(
     List<StructureItem> self,
     SseSerializer serializer,
@@ -1136,18 +995,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_pack_config(PackConfig self, SseSerializer serializer);
 
   @protected
-  void sse_encode_parser_manifest(
-    ParserManifest self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_platform_bundle(
-    PlatformBundle self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_point(Point self, SseSerializer serializer);
 
   @protected
@@ -1155,24 +1002,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_process_result(ProcessResult self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_record_string_language_info(
-    (String, LanguageInfo) self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_record_string_list_string(
-    (String, List<String>) self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_record_string_platform_bundle(
-    (String, PlatformBundle) self,
-    SseSerializer serializer,
-  );
 
   @protected
   void sse_encode_span(Span self, SseSerializer serializer);

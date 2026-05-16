@@ -11,16 +11,26 @@ package dev.kreuzberg.tslp.android
  */
 sealed class StructureKind {
     object Function : StructureKind()
+
     object Method : StructureKind()
+
     object Class : StructureKind()
+
     object Struct : StructureKind()
+
     object Interface : StructureKind()
+
     object Enum : StructureKind()
+
     object Module : StructureKind()
+
     object Trait : StructureKind()
+
     object Impl : StructureKind()
+
     object Namespace : StructureKind()
+
     data class Other(
-        val field0: String
+        val value: String,
     ) : StructureKind()
 }
