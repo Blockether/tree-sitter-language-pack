@@ -28,6 +28,7 @@ pub struct Point {
 
 impl Point {
     /// Construct a [`Point`] from row and column.
+    #[cfg_attr(alef, alef(skip))]
     #[must_use]
     pub fn new(row: usize, column: usize) -> Self {
         Self { row, column }
@@ -183,6 +184,7 @@ impl Node {
     }
 
     /// Return the node's numeric kind ID.
+    #[cfg_attr(alef, alef(skip))]
     #[must_use]
     pub fn kind_id(&self) -> u16 {
         self.raw.kind_id()

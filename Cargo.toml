@@ -70,6 +70,7 @@ duplicated_attributes = "allow"
 
 [workspace.lints.rust]
 unsafe_code = "deny"
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(alef)'] }
 
 [profile.release]
 lto = "thin"

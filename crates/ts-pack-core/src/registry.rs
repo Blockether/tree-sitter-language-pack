@@ -321,6 +321,7 @@ impl LanguageRegistry {
     ///
     /// Overrides the default build-time library directory. Useful when
     /// dynamic grammar shared libraries are stored in a non-standard location.
+    #[cfg_attr(alef, alef(skip))]
     #[cfg(feature = "dynamic-loading")]
     pub fn with_libs_dir(libs_dir: PathBuf) -> Self {
         let mut reg = Self::new();
@@ -337,6 +338,7 @@ impl LanguageRegistry {
     /// Takes `&self` (not `&mut self`) because `extra_lib_dirs` uses interior
     /// mutability via an `Arc<RwLock<...>>`, so the outer registry can remain
     /// immutable while the directory list is updated.
+    #[cfg_attr(alef, alef(skip))]
     #[cfg(feature = "dynamic-loading")]
     pub fn add_extra_libs_dir(&self, dir: PathBuf) {
         if let Ok(mut dirs) = self.extra_lib_dirs.write()

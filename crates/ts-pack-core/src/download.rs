@@ -16,6 +16,7 @@ const CACHE_REMOVE_RETRIES: usize = 5;
 const CACHE_REMOVE_RETRY_DELAY: Duration = Duration::from_millis(10);
 
 /// Manifest describing available parser downloads for a specific version.
+#[cfg_attr(alef, alef(skip))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ParserManifest {
     pub version: String,
@@ -24,6 +25,7 @@ pub struct ParserManifest {
     pub groups: HashMap<String, Vec<String>>,
 }
 
+#[cfg_attr(alef, alef(skip))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlatformBundle {
     pub url: String,
@@ -31,6 +33,7 @@ pub struct PlatformBundle {
     pub size: u64,
 }
 
+#[cfg_attr(alef, alef(skip))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LanguageInfo {
     pub group: String,
@@ -65,6 +68,7 @@ impl DownloadManager {
     }
 
     /// Default cache directory: `~/.cache/tree-sitter-language-pack/v{version}/libs/`
+    #[cfg_attr(alef, alef(skip))]
     pub fn default_cache_dir(version: &str) -> Result<PathBuf, Error> {
         let base = dirs::cache_dir()
             .ok_or_else(|| Error::Download("Could not determine system cache directory".to_string()))?;
@@ -75,6 +79,7 @@ impl DownloadManager {
     }
 
     /// Return the path to the libs cache directory.
+    #[cfg_attr(alef, alef(skip))]
     pub fn cache_dir(&self) -> &Path {
         &self.cache_dir
     }
@@ -114,6 +119,7 @@ impl DownloadManager {
 
     /// Ensure the specified languages are available in the cache.
     /// Downloads the platform bundle if any requested languages are missing.
+    #[cfg_attr(alef, alef(skip))]
     pub fn ensure_languages(&self, names: &[&str]) -> Result<(), Error> {
         let missing: Vec<&str> = names.iter().filter(|name| !self.is_cached(name)).copied().collect();
 
@@ -161,6 +167,7 @@ impl DownloadManager {
     }
 
     /// Ensure all languages in a named group are available.
+    #[cfg_attr(alef, alef(skip))]
     pub fn ensure_group(&self, group: &str) -> Result<(), Error> {
         {
             let mut guard = self.manifest.lock().unwrap();
@@ -191,6 +198,7 @@ impl DownloadManager {
     }
 
     /// Get the expected path for a language's shared library in the cache.
+    #[cfg_attr(alef, alef(skip))]
     pub fn lib_path(&self, name: &str) -> PathBuf {
         let lib_name = format!("tree_sitter_{}", crate::registry::c_symbol_for(name));
         let (prefix, ext) = if cfg!(target_os = "macos") {
@@ -204,6 +212,7 @@ impl DownloadManager {
     }
 
     /// Fetch the parser manifest from GitHub Releases.
+    #[cfg_attr(alef, alef(skip))]
     pub fn fetch_manifest(&self) -> Result<ParserManifest, Error> {
         self.fetch_manifest_inner()
     }

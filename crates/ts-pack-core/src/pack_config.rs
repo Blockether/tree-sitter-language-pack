@@ -55,6 +55,7 @@ impl PackConfig {
     ///
     /// let config = PackConfig::from_toml_file(Path::new("language-pack.toml")).unwrap();
     /// ```
+    #[cfg_attr(alef, alef(skip))]
     #[cfg(feature = "config")]
     pub fn from_toml_file(path: &std::path::Path) -> Result<Self, crate::error::Error> {
         let content = std::fs::read_to_string(path)?;
@@ -79,6 +80,7 @@ impl PackConfig {
     ///     println!("Found config with {:?} languages", config.languages);
     /// }
     /// ```
+    #[cfg_attr(alef, alef(skip))]
     #[cfg(feature = "config")]
     pub fn discover() -> Option<Self> {
         // Search CWD upward
