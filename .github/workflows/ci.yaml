@@ -85,10 +85,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.4.0.4.0.4.0
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: "22"
 
@@ -101,7 +101,7 @@ jobs:
           enable-cache: true
 
       - name: Setup Python
-        uses: actions/setup-python@v6.2.0.2.0
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.14"
 
@@ -109,7 +109,7 @@ jobs:
         run: uv sync --no-install-project
 
       - name: Cache parsers
-        uses: actions/cache@v5.0.5.0.5
+        uses: actions/cache@v5.0.5
         with:
           path: parsers
           key: parsers-${{ hashFiles('sources/language_definitions.json') }}
@@ -122,7 +122,7 @@ jobs:
           uv run --script scripts/clone_vendors.py
 
       - name: Upload parsers
-        uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: language-parsers
           path: parsers
@@ -138,7 +138,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       # --- Task runner ---
       - name: Install Task
@@ -165,7 +165,7 @@ jobs:
 
       # --- Go ---
       - name: Setup Go
-        uses: actions/setup-go@v6.4.0.4.0
+        uses: actions/setup-go@v6.4.0
         with:
           go-version: "1.26"
           cache-dependency-path: packages/go/go.sum
@@ -177,7 +177,7 @@ jobs:
 
       # --- Java ---
       - name: Setup Java
-        uses: actions/setup-java@v5.2.0.2.0
+        uses: actions/setup-java@v5.2.0
         with:
           distribution: "temurin"
           java-version: "25"
@@ -188,7 +188,7 @@ jobs:
 
       # --- Ruby ---
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.307.0.307.0
+        uses: ruby/setup-ruby@v1.307.0
         with:
           ruby-version: "3.4"
           bundler-cache: true
@@ -229,10 +229,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -308,7 +308,7 @@ jobs:
       docker: ${{ steps.filter.outputs.docker }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Detect changes
         uses: dorny/paths-filter@v4.0.1
@@ -394,10 +394,10 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -442,10 +442,10 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -461,7 +461,7 @@ jobs:
         run: cargo build --release -p ts-pack-core-ffi
 
       - name: Upload FFI artifacts
-        uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: ffi-${{ matrix.os }}
           path: |
@@ -499,10 +499,10 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -521,7 +521,7 @@ jobs:
         run: maturin build --release --manifest-path crates/ts-pack-core-py/Cargo.toml --out dist
 
       - name: Upload wheel
-        uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: wheel-${{ matrix.platform }}
           path: dist/*.whl
@@ -560,15 +560,15 @@ jobs:
       TSLP_LANGUAGES: "all"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Setup Python
-        uses: actions/setup-python@v6.2.0.2.0
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Download wheel
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: wheel-${{ matrix.platform }}
           path: dist
@@ -612,10 +612,10 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -628,7 +628,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.4.0.4.0.4.0
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: "22"
 
@@ -640,7 +640,7 @@ jobs:
         run: napi build --release --platform --target ${{ matrix.target }}
 
       - name: Upload native module
-        uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: node-${{ matrix.platform }}
           path: crates/ts-pack-core-node/*.node
@@ -671,7 +671,7 @@ jobs:
             platform: macos-arm64
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Setup Node.js workspace
         uses: kreuzberg-dev/actions/setup-node-workspace@v1
@@ -679,7 +679,7 @@ jobs:
           node-version: "22"
 
       - name: Download native module
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: node-${{ matrix.platform }}
           path: crates/ts-pack-core-node/
@@ -712,10 +712,10 @@ jobs:
       TSLP_LANGUAGES: "all"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -755,7 +755,7 @@ jobs:
           done
 
       - name: Upload WASM artifacts
-        uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: wasm-pkg
           path: |
@@ -772,7 +772,7 @@ jobs:
           PROJECT_ROOT: ${{ github.workspace }}
 
       - name: Upload WASM Node.js artifacts
-        uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: wasm-node-pkg
           path: |
@@ -798,16 +798,16 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download WASM Node.js artifacts
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: wasm-node-pkg
           path: crates/ts-pack-core-wasm/pkg/
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.4.0.4.0.4.0
+        uses: actions/setup-node@v6.4.0
         with:
           node-version: "22"
 
@@ -838,16 +838,16 @@ jobs:
       PROJECT_ROOT: ${{ github.workspace }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
 
       - name: Download FFI artifacts
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: ffi-ubuntu-latest
           path: ffi-artifacts
@@ -868,7 +868,7 @@ jobs:
             || (echo "ERROR: module path in go.mod is wrong" && exit 1)
 
       - name: Setup Go
-        uses: actions/setup-go@v6.4.0.4.0
+        uses: actions/setup-go@v6.4.0
         with:
           go-version: "1.26"
           cache-dependency-path: packages/go/go.sum
@@ -922,16 +922,16 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
 
       - name: Download FFI artifacts
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: ffi-ubuntu-latest
           path: ffi-artifacts
@@ -944,7 +944,7 @@ jobs:
           cp -r ffi-artifacts/crates/ts-pack-core-ffi/include/* crates/ts-pack-core-ffi/include/ 2>/dev/null || true
 
       - name: Setup Java
-        uses: actions/setup-java@v5.2.0.2.0
+        uses: actions/setup-java@v5.2.0
         with:
           distribution: "temurin"
           java-version: "25"
@@ -962,7 +962,7 @@ jobs:
 
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: java-unit-reports
           path: packages/java/target/surefire-reports
@@ -989,7 +989,7 @@ jobs:
 
       - name: Upload E2E test reports
         if: always()
-        uses: actions/upload-artifact@v7.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: java-e2e-reports
           path: e2e/java/target/surefire-reports
@@ -1022,10 +1022,10 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -1090,10 +1090,10 @@ jobs:
       TSLP_LANGUAGES: "all"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -1106,7 +1106,7 @@ jobs:
           install-llvm-cov: "false"
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1.307.0.307.0
+        uses: ruby/setup-ruby@v1.307.0
         with:
           ruby-version: "3.4"
 
@@ -1153,10 +1153,10 @@ jobs:
       TSLP_LANGUAGES: "all"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -1248,10 +1248,10 @@ jobs:
       TSLP_LANGUAGES: "all"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers
@@ -1274,7 +1274,7 @@ jobs:
         uses: kreuzberg-dev/actions/install-task@v1
 
       - name: Cache Elixir dependencies
-        uses: actions/cache@v5.0.5.0.5
+        uses: actions/cache@v5.0.5
         with:
           path: |
             packages/elixir/deps
@@ -1344,10 +1344,10 @@ jobs:
       LD_LIBRARY_PATH: ${{ github.workspace }}/target/release
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
-        uses: actions/download-artifact@v8.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1.0.1
+        uses: actions/download-artifact@v8.0.1
         with:
           name: language-parsers
           path: parsers

@@ -57,7 +57,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Setup Node.js
         uses: actions/setup-node@v6.4.0
@@ -117,7 +117,7 @@ jobs:
       TSLP_LINK_MODE: static
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2.0.2
+        uses: actions/checkout@v6.0.2
 
       - name: Download parsers
         uses: actions/download-artifact@v8.0.1

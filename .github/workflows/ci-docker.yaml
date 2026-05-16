@@ -123,7 +123,7 @@ jobs:
           file ts-pack
 
       - name: Upload binary artifact
-        uses: actions/upload-artifact@v7.0.1.0.1
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: ts-pack-linux-x86_64-musl
           path: dist/ts-pack-linux-x86_64-musl.tar.gz
@@ -135,7 +135,7 @@ jobs:
           ls -lh dist/ts-pack-docker-image.tar.gz
 
       - name: Upload Docker image artifact
-        uses: actions/upload-artifact@v7.0.1.0.1
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: ts-pack-docker-image
           path: dist/ts-pack-docker-image.tar.gz
