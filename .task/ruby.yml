@@ -8,10 +8,20 @@ tasks:
       - bundle install
 
   update:
-    desc: Update Ruby dependencies to latest versions
+    desc: Update Ruby dependencies within current major versions (non-breaking)
     dir: packages/ruby
     cmds:
-      - echo "Updating Ruby dependencies to latest versions..."
+      - echo "Updating Ruby dependencies (within-major)..."
+      - bundle update --conservative
+      - echo "Checking for remaining outdated dependencies..."
+      - bundle outdated || true
+
+  upgrade:
+    desc: Upgrade Ruby dependencies to latest versions allowed by Gemfile (cross-major)
+    dir: packages/ruby
+    cmds:
+      - echo "Upgrading Ruby dependencies (cross-major within Gemfile ranges)..."
+      - cmd: echo "Note - true cross-major requires manual Gemfile edits"
       - bundle update --all --conservative=false
       - echo "Checking for remaining outdated dependencies..."
       - bundle outdated || true

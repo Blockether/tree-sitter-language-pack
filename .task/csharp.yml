@@ -77,10 +77,20 @@ tasks:
       - dotnet build {{.CS_PROJ}} -c Release -warnaserror
 
   update:
-    desc: Update C# dependencies to latest versions (including major versions)
+    desc: Update C# dependencies within current major versions (non-breaking)
     dir: packages/csharp
     cmds:
-      - echo "Updating C# dependencies to latest versions..."
+      - echo "Updating C# dependencies (within-major)..."
+      - dotnet tool install --global dotnet-outdated-tool || dotnet tool update --global dotnet-outdated-tool
+      - dotnet outdated {{.CS_PROJ}} --upgrade --version-lock Major
+      - echo "Checking remaining outdated packages..."
+      - dotnet list {{.CS_PROJ}} package --outdated || true
+
+  upgrade:
+    desc: Upgrade C# dependencies to latest versions (cross-major / breaking)
+    dir: packages/csharp
+    cmds:
+      - echo "Upgrading C# dependencies (cross-major)..."
       - dotnet tool install --global dotnet-outdated-tool || dotnet tool update --global dotnet-outdated-tool
       - dotnet outdated {{.CS_PROJ}} --upgrade
       - echo "Checking remaining outdated packages..."

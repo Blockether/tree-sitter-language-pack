@@ -78,6 +78,24 @@ tasks:
     cmds:
       - rm -rf zig-cache zig-out .zig-cache
 
+  update:
+    desc: Refresh Zig dependencies within build.zig.zon constraints (non-breaking)
+    dir: packages/zig
+    preconditions:
+      - sh: command -v zig >/dev/null 2>&1
+    cmds:
+      - echo "Refreshing Zig dependencies (within constraints in build.zig.zon)..."
+      - zig build --fetch
+
+  upgrade:
+    desc: Upgrade Zig dependencies (no native cross-major flow — manual edits required)
+    dir: packages/zig
+    preconditions:
+      - sh: command -v zig >/dev/null 2>&1
+    cmds:
+      - cmd: echo "Note - Zig has no native cross-major upgrade flow; edit build.zig.zon hashes/URLs manually"
+      - zig build --fetch
+
   e2e:test:
     desc: Run Zig e2e tests against the Rust FFI shared library
     preconditions:
