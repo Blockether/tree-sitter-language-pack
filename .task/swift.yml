@@ -81,6 +81,26 @@ tasks:
         ignore_error: true
       - rm -rf .build
 
+  update:
+    desc: Update Swift package dependencies within current major versions (non-breaking)
+    dir: packages/swift
+    preconditions:
+      - sh: command -v swift >/dev/null 2>&1
+    cmds:
+      - echo "Updating Swift package dependencies (within-major)..."
+      - cmd: echo "Note - SwiftPM resolves within Package.swift version ranges; cross-major requires manual edits"
+      - swift package update
+
+  upgrade:
+    desc: Upgrade Swift package dependencies (cross-major requires manual Package.swift edits)
+    dir: packages/swift
+    preconditions:
+      - sh: command -v swift >/dev/null 2>&1
+    cmds:
+      - echo "Upgrading Swift package dependencies..."
+      - cmd: echo "Note - SwiftPM has no native cross-major flow; edit Package.swift ranges manually for true major upgrades"
+      - swift package update
+
   e2e:test:
     desc: Run Swift e2e tests
     preconditions:

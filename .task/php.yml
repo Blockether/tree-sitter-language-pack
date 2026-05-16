@@ -65,14 +65,26 @@ tasks:
       - rm -rf crates/ts-pack-core-php/vendor crates/ts-pack-core-php/target
 
   update:
-    desc: Update PHP dependencies to latest versions (including major versions)
+    desc: Update PHP dependencies within current major versions (non-breaking)
     cmds:
-      - echo "Updating root composer.json dependencies..."
+      - echo "Updating root composer.json dependencies (within-major)..."
+      - composer update --with || true
+      - echo "Updating packages/php dependencies (within-major)..."
+      - cd packages/php && composer update --with
+      - cd packages/php && echo "Checking remaining outdated dependencies..." && composer outdated --direct || true
+      - echo "Updating e2e/php dependencies (within-major)..."
+      - cd e2e/php && composer update --with || true
+      - cd e2e/php && echo "Checking remaining outdated dependencies..." && composer outdated --direct || true
+
+  upgrade:
+    desc: Upgrade PHP dependencies to latest versions (cross-major / breaking)
+    cmds:
+      - echo "Upgrading root composer.json dependencies (cross-major)..."
       - composer update --with-all-dependencies || true
-      - echo "Updating packages/php dependencies to latest versions..."
+      - echo "Upgrading packages/php dependencies (cross-major)..."
       - cd packages/php && composer update --with-all-dependencies
       - cd packages/php && echo "Checking remaining outdated dependencies..." && composer outdated --direct || true
-      - echo "Updating e2e/php dependencies to latest versions..."
+      - echo "Upgrading e2e/php dependencies (cross-major)..."
       - cd e2e/php && composer update --with-all-dependencies || true
       - cd e2e/php && echo "Checking remaining outdated dependencies..." && composer outdated --direct || true
 

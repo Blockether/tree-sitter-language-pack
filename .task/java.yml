@@ -60,15 +60,28 @@ tasks:
       - mvn com.spotify.fmt:fmt-maven-plugin:check
 
   update:
-    desc: Update Java dependencies and plugins (stable releases only)
+    desc: Update Java dependencies within current major versions (non-breaking)
     dir: packages/java
     vars:
       RULES_URI: "file:///${PWD}/maven-version-rules.xml"
     cmds:
-      - echo "Updating Java dependencies and plugins (stable releases only)..."
-      - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:use-latest-releases -DprocessDependencies=true -DprocessParent=false -DgenerateBackupPoms=false
-      - echo "Updating plugin versions in properties..."
-      - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:update-properties -DgenerateBackupPoms=false || true
+      - echo "Updating Java dependencies (within-major, stable releases only)..."
+      - mvn -DallowSnapshots=false -DallowMajorUpdates=false -Dmaven.version.rules={{.RULES_URI}} versions:use-next-versions -DprocessDependencies=true -DprocessParent=false -DgenerateBackupPoms=false
+      - echo "Updating plugin versions in properties (within-major)..."
+      - mvn -DallowSnapshots=false -DallowMajorUpdates=false -Dmaven.version.rules={{.RULES_URI}} versions:update-properties -DgenerateBackupPoms=false || true
+      - echo "Displaying remaining updates..."
+      - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:display-dependency-updates
+
+  upgrade:
+    desc: Upgrade Java dependencies to latest versions (cross-major / breaking)
+    dir: packages/java
+    vars:
+      RULES_URI: "file:///${PWD}/maven-version-rules.xml"
+    cmds:
+      - echo "Upgrading Java dependencies (cross-major, stable releases only)..."
+      - mvn -DallowSnapshots=false -DallowMajorUpdates=true -Dmaven.version.rules={{.RULES_URI}} versions:use-latest-releases -DprocessDependencies=true -DprocessParent=false -DgenerateBackupPoms=false
+      - echo "Upgrading plugin versions in properties (cross-major)..."
+      - mvn -DallowSnapshots=false -DallowMajorUpdates=true -Dmaven.version.rules={{.RULES_URI}} versions:update-properties -DgenerateBackupPoms=false || true
       - echo "Displaying final dependency updates..."
       - mvn -DallowSnapshots=false -Dmaven.version.rules={{.RULES_URI}} versions:display-dependency-updates
       - echo "Displaying final plugin updates..."

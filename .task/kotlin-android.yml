@@ -68,3 +68,23 @@ tasks:
       - cmd: gradle clean --no-daemon
         ignore_error: true
       - rm -rf build .gradle
+
+  update:
+    desc: Report kotlin-android dependency updates within current major versions (non-breaking)
+    dir: packages/kotlin-android
+    preconditions:
+      - sh: command -v gradle >/dev/null 2>&1
+    cmds:
+      - echo "Reporting kotlin-android dependency updates (within-major)..."
+      - cmd: echo "Note - Gradle has no built-in apply-updates; this reports current vs available stable versions"
+      - gradle dependencyUpdates -Drevision=release --no-daemon || true
+
+  upgrade:
+    desc: Report kotlin-android dependency updates including cross-major (breaking)
+    dir: packages/kotlin-android
+    preconditions:
+      - sh: command -v gradle >/dev/null 2>&1
+    cmds:
+      - echo "Reporting kotlin-android dependency updates (cross-major)..."
+      - cmd: echo "Note - Gradle reports candidates; edit build.gradle(.kts) versions manually"
+      - gradle dependencyUpdates -Drevision=latest.release --no-daemon || true

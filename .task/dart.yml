@@ -87,6 +87,24 @@ tasks:
     cmds:
       - rm -rf .dart_tool build pubspec.lock
 
+  update:
+    desc: Update Dart dependencies within current major versions (non-breaking)
+    dir: packages/dart
+    preconditions:
+      - sh: command -v dart >/dev/null 2>&1
+    cmds:
+      - echo "Updating Dart dependencies (within-major)..."
+      - dart pub upgrade
+
+  upgrade:
+    desc: Upgrade Dart dependencies to latest versions (cross-major / breaking)
+    dir: packages/dart
+    preconditions:
+      - sh: command -v dart >/dev/null 2>&1
+    cmds:
+      - echo "Upgrading Dart dependencies (cross-major)..."
+      - dart pub upgrade --major-versions
+
   e2e:test:
     desc: Run Dart e2e tests
     preconditions:

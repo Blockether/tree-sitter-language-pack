@@ -106,12 +106,22 @@ tasks:
       - cargo doc --workspace --no-deps --exclude ts-pack-ruby --open
 
   update:
-    desc: Update Rust dependencies
+    desc: Update Rust dependencies within current major versions (non-breaking)
     cmds:
-      - echo "Updating Rust dependencies (workspace)..."
+      - echo "Updating Rust dependencies workspace (within-major)..."
+      - cargo upgrade
+      - cargo update
+      - echo "Updating Rust dependencies e2e (within-major)..."
+      - cargo upgrade --manifest-path e2e/rust/Cargo.toml
+      - cargo update --manifest-path e2e/rust/Cargo.toml
+
+  upgrade:
+    desc: Upgrade Rust dependencies to latest versions (cross-major / breaking)
+    cmds:
+      - echo "Upgrading Rust dependencies workspace (cross-major)..."
       - cargo upgrade --incompatible
       - cargo update
-      - echo "Updating Rust dependencies (e2e)..."
+      - echo "Upgrading Rust dependencies e2e (cross-major)..."
       - cargo upgrade --incompatible --manifest-path e2e/rust/Cargo.toml
       - cargo update --manifest-path e2e/rust/Cargo.toml
 
