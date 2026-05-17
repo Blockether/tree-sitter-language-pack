@@ -2787,6 +2787,7 @@ version = "1.8.1"
 dependencies = [
  "clap",
  "clap_complete",
+ "libc",
  "serde_json",
  "tree-sitter-language-pack",
 ]

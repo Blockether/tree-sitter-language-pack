@@ -20,5 +20,8 @@ tree-sitter-language-pack = { path = "../ts-pack-core", version = "1.8.1", featu
     "serde",
 ] }
 
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
 [lints]
 workspace = true
