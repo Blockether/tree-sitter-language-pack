@@ -818,7 +818,7 @@
   "lean": {
     "extensions": ["lean"],
     "repo": "https://github.com/Julian/tree-sitter-lean",
-    "rev": "efe6b87145608d12f5996bd7f0cf6095a0e82261"
+    "rev": "11b8592003e1d9885145f0c6c919f6f8bfdf564e"
   },
   "ledger": {
     "extensions": ["ldg", "ledger", "journal"],
