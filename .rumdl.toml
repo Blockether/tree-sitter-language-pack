@@ -2,7 +2,7 @@
 # https://github.com/rvben/rumdl
 
 respect-gitignore = true
-exclude = ["node_modules", "target", "dist", "vendor", "parsers", "e2e"]
+exclude = ["node_modules", "target", "dist", "vendor", "parsers", "e2e", "docs/reference"]
 
 # MD012: Multiple consecutive blank lines
 # MD013: Line length (tables/code can be long)
