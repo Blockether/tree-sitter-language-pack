@@ -2455,7 +2455,7 @@ jobs:
         with:
           package-dir: packages/dart/rust
           crate-name: tree-sitter-language-pack-dart
-      - uses: actions/upload-artifact@v8
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: dart-package
           path: packages/dart
@@ -2498,7 +2498,7 @@ jobs:
         with:
           crate-name: tree-sitter-language-pack-swift
           artifact-name: TreeSitterLanguagePackSwift
-      - uses: actions/upload-artifact@v8
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: swift-artifactbundle
           path: ${{ steps.bundle.outputs.bundle-zip }}
@@ -2521,7 +2521,7 @@ jobs:
         with:
           package-dir: packages/swift
           crate-name: tree-sitter-language-pack-swift
-      - uses: actions/upload-artifact@v8
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: swift-package
           path: packages/swift
@@ -2618,7 +2618,7 @@ jobs:
           lib-name: ts_pack_jni
           abi: ${{ matrix.abi }}
           target: ${{ matrix.target }}
-      - uses: actions/upload-artifact@v8
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: kotlin-android-${{ matrix.abi }}
           path: dist/android-natives/${{ matrix.abi }}/
