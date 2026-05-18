@@ -170,11 +170,8 @@ repos:
         # size to avoid blocking unrelated commits.
         args: ["--minimum-tokens=250"]
   # Alef: polyglot binding generation and version sync
-  # NOTE: v0.16.42/43 Publish runs still have 0 assets — pinned to v0.16.40
-  # (v0.16.41 has platform tarballs but bumping requires a full regen, deferred
-  # to a separate commit). prek autoupdate will keep trying to bump.
   - repo: https://github.com/kreuzberg-dev/alef
-    rev: v0.16.40
+    rev: v0.16.43
     hooks:
       - id: alef-verify
       - id: alef-sync-versions
