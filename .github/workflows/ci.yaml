@@ -516,7 +516,12 @@ jobs:
         run: pip install maturin
 
       - name: Build wheel
-        run: maturin build --release --manifest-path crates/ts-pack-core-py/Cargo.toml --features extension-module --out dist
+        # Run from packages/python so maturin picks up pyproject.toml's
+        # [tool.maturin] config (manifest-path, features, python-packages).
+        # Mirrors publish.yaml — without this the wheel ships only the .so
+        # and is not importable.
+        working-directory: packages/python
+        run: maturin build --release --out ../../dist
 
       - name: Upload wheel
         uses: actions/upload-artifact@v7.0.1
@@ -774,10 +779,10 @@ jobs:
         with:
           name: wasm-node-pkg
           path: |
-            crates/ts-pack-core-wasm/pkg/*.wasm
-            crates/ts-pack-core-wasm/pkg/*.js
-            crates/ts-pack-core-wasm/pkg/*.ts
-            crates/ts-pack-core-wasm/pkg/package.json
+            crates/ts-pack-core-wasm/pkg/nodejs/*.wasm
+            crates/ts-pack-core-wasm/pkg/nodejs/*.js
+            crates/ts-pack-core-wasm/pkg/nodejs/*.ts
+            crates/ts-pack-core-wasm/pkg/nodejs/package.json
           retention-days: 7
 
   # ---------------------------------------------------------------------------
@@ -802,7 +807,7 @@ jobs:
         uses: actions/download-artifact@v8.0.1
         with:
           name: wasm-node-pkg
-          path: crates/ts-pack-core-wasm/pkg/
+          path: crates/ts-pack-core-wasm/pkg/nodejs/
 
       - name: Setup Node.js
         uses: actions/setup-node@v6.4.0
