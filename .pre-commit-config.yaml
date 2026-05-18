@@ -52,7 +52,7 @@ repos:
 
   # Node/TS/WASM: oxlint
   - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-    rev: v1.1.10
+    rev: v1.1.11
     hooks:
       - id: cargo-sort
         args: [-w]
@@ -170,6 +170,8 @@ repos:
         # size to avoid blocking unrelated commits.
         args: ["--minimum-tokens=250"]
   # Alef: polyglot binding generation and version sync
+  # NOTE: v0.16.41/42/43 Publish runs still have 0 assets — pinned to v0.16.40
+  # until the upstream queue drains. prek autoupdate will keep trying to bump.
   - repo: https://github.com/kreuzberg-dev/alef
     rev: v0.16.40
     hooks:
