@@ -12,6 +12,7 @@
 #![allow(dead_code)]
 #![allow(clippy::let_unit_value)]
 #![allow(clippy::unused_unit)]
+#![allow(clippy::let_and_return)]
 
 use futures_util::StreamExt;
 use futures_util::stream::BoxStream;
@@ -993,8 +994,8 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
     // ensures the handle outlives this call.
     let client: &core_crate::Node = unsafe { &*(handle as *const core_crate::Node) };
-
-    client.is_named()
+    let v = client.is_named();
+    v
 }
 
 #[unsafe(no_mangle)]
@@ -1010,8 +1011,8 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
     // ensures the handle outlives this call.
     let client: &core_crate::Node = unsafe { &*(handle as *const core_crate::Node) };
-
-    client.is_error()
+    let v = client.is_error();
+    v
 }
 
 #[unsafe(no_mangle)]
@@ -1027,8 +1028,8 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
     // ensures the handle outlives this call.
     let client: &core_crate::Node = unsafe { &*(handle as *const core_crate::Node) };
-
-    client.is_missing()
+    let v = client.is_missing();
+    v
 }
 
 #[unsafe(no_mangle)]
@@ -1044,8 +1045,8 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
     // ensures the handle outlives this call.
     let client: &core_crate::Node = unsafe { &*(handle as *const core_crate::Node) };
-
-    client.is_extra()
+    let v = client.is_extra();
+    v
 }
 
 #[unsafe(no_mangle)]
@@ -1061,8 +1062,8 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
     // ensures the handle outlives this call.
     let client: &core_crate::Node = unsafe { &*(handle as *const core_crate::Node) };
-
-    client.has_error()
+    let v = client.has_error();
+    v
 }
 
 #[unsafe(no_mangle)]
@@ -1308,8 +1309,8 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
     // ensures the handle outlives this call.
     let client: &mut core_crate::TreeCursor = unsafe { &mut *(handle as *mut core_crate::TreeCursor) };
-
-    client.goto_first_child()
+    let v = client.goto_first_child();
+    v
 }
 
 #[unsafe(no_mangle)]
@@ -1325,8 +1326,8 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
     // ensures the handle outlives this call.
     let client: &mut core_crate::TreeCursor = unsafe { &mut *(handle as *mut core_crate::TreeCursor) };
-
-    client.goto_parent()
+    let v = client.goto_parent();
+    v
 }
 
 #[unsafe(no_mangle)]
@@ -1342,8 +1343,8 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
     // ensures the handle outlives this call.
     let client: &mut core_crate::TreeCursor = unsafe { &mut *(handle as *mut core_crate::TreeCursor) };
-
-    client.goto_next_sibling()
+    let v = client.goto_next_sibling();
+    v
 }
 
 #[unsafe(no_mangle)]
@@ -1470,8 +1471,8 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         Ok(s) => s,
         Err(_) => req_str,
     };
-
-    client.has_language(&name)
+    let v = client.has_language(&name);
+    v
 }
 
 #[unsafe(no_mangle)]

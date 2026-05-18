@@ -6,9 +6,12 @@
     "ktlint:standard:spacing-between-declarations-with-annotations",
     "ktlint:standard:when-entry-bracing",
     "ktlint:standard:blank-line-between-when-conditions",
+    "ktlint:standard:blank-line-before-declaration",
     "ktlint:standard:chain-method-continuation",
     "ktlint:standard:annotation",
     "ktlint:standard:max-line-length",
+    "ktlint:standard:no-semi",
+    "ktlint:standard:statement-wrapping",
     "MaxLineLength",
     "TooManyFunctions",
     "FunctionParameterNaming",
@@ -32,7 +35,6 @@ object TreeSitterLanguagePack {
      * Returns `null` for unrecognized extensions. The match is case-insensitive.
      */
     fun detectLanguageFromExtension(ext: String): String? = TreeSitterLanguagePackBridge.nativeDetectLanguageFromExtension(ext)
-
     /**
      * Detect language name from a file path.
      *
@@ -40,7 +42,6 @@ object TreeSitterLanguagePack {
      * path has no extension or the extension is not recognized.
      */
     fun detectLanguageFromPath(path: String): String? = TreeSitterLanguagePackBridge.nativeDetectLanguageFromPath(path)
-
     /**
      * Detect language name from file content using the shebang line (`#!`).
      *
@@ -59,7 +60,6 @@ object TreeSitterLanguagePack {
      * malformed, or the interpreter is not recognised.
      */
     fun detectLanguageFromContent(content: String): String? = TreeSitterLanguagePackBridge.nativeDetectLanguageFromContent(content)
-
     /**
      * Get the highlights query for a language, if bundled.
      *
@@ -67,7 +67,6 @@ object TreeSitterLanguagePack {
      * if no highlights query is bundled for this language.
      */
     fun getHighlightsQuery(language: String): String? = TreeSitterLanguagePackBridge.nativeGetHighlightsQuery(language)
-
     /**
      * Get the injections query for a language, if bundled.
      *
@@ -75,7 +74,6 @@ object TreeSitterLanguagePack {
      * if no injections query is bundled for this language.
      */
     fun getInjectionsQuery(language: String): String? = TreeSitterLanguagePackBridge.nativeGetInjectionsQuery(language)
-
     /**
      * Get the locals query for a language, if bundled.
      *
@@ -83,7 +81,6 @@ object TreeSitterLanguagePack {
      * if no locals query is bundled for this language.
      */
     fun getLocalsQuery(language: String): String? = TreeSitterLanguagePackBridge.nativeGetLocalsQuery(language)
-
     /**
      * Get a tree-sitter `Language` by name using the global registry.
      *
@@ -97,7 +94,6 @@ object TreeSitterLanguagePack {
      * or `Error.Download` if auto-download fails.
      */
     fun getLanguage(name: String): Language = Language(TreeSitterLanguagePackBridge.nativeGetLanguage(name))
-
     /**
      * Get a `Parser` pre-configured for the given language.
      *
@@ -110,14 +106,12 @@ object TreeSitterLanguagePack {
      * `Error.ParserSetup` if the language cannot be applied to the parser.
      */
     fun getParser(name: String): Parser = Parser(TreeSitterLanguagePackBridge.nativeGetParser(name))
-
     /**
      * Detect language name from a file path or extension.
      *
      * This compatibility alias matches the pre-Alef Python binding API.
      */
     fun detectLanguage(path: String): String? = TreeSitterLanguagePackBridge.nativeDetectLanguage(path)
-
     /**
      * List all available language names (sorted, deduplicated, includes aliases).
      *
@@ -145,7 +139,6 @@ object TreeSitterLanguagePack {
      * dynamically available, or a known alias for one of these).
      */
     fun hasLanguage(name: String): Boolean = TreeSitterLanguagePackBridge.nativeHasLanguage(name)
-
     /**
      * Return the number of available languages.
      *
@@ -153,7 +146,6 @@ object TreeSitterLanguagePack {
      * and aliases.
      */
     fun languageCount(): Long = TreeSitterLanguagePackBridge.nativeLanguageCount()
-
     /**
      * Process source code and extract file intelligence using the global registry.
      *
@@ -196,7 +188,6 @@ object TreeSitterLanguagePack {
      * Returns an error if configuration cannot be applied or if downloads fail.
      */
     fun init(config: PackConfig): Unit = TreeSitterLanguagePackBridge.nativeInit(mapper.writeValueAsString(config))
-
     /**
      * Apply download configuration without downloading anything.
      *
@@ -210,7 +201,6 @@ object TreeSitterLanguagePack {
      * Returns an error if the lock cannot be acquired.
      */
     fun configure(config: PackConfig): Unit = TreeSitterLanguagePackBridge.nativeConfigure(mapper.writeValueAsString(config))
-
     /**
      * Download specific languages to the local cache.
      *
@@ -223,7 +213,6 @@ object TreeSitterLanguagePack {
      * the download fails.
      */
     fun download(names: List<String>): Long = TreeSitterLanguagePackBridge.nativeDownload(mapper.writeValueAsString(names))
-
     /**
      * Download all available languages from the remote manifest.
      *
@@ -240,7 +229,6 @@ object TreeSitterLanguagePack {
      * Returns an error if the manifest cannot be fetched or the bundle download fails.
      */
     fun downloadAll(): Long = TreeSitterLanguagePackBridge.nativeDownloadAll()
-
     /**
      * Return all language names available in the remote manifest (305).
      *
@@ -302,7 +290,6 @@ object TreeSitterLanguagePack {
      * Returns an error if the cache directory cannot be removed.
      */
     fun cleanCache(): Unit = TreeSitterLanguagePackBridge.nativeCleanCache()
-
     /**
      * Return the effective cache directory path.
      *

@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.16.40"
+alef_version = "0.16.43"
 languages = [
   "python",
   "node",
@@ -304,7 +304,7 @@ format = "cd packages/ruby && bundle exec rubocop -a ."
 [crates.lint.go]
 precondition = "command -v golangci-lint >/dev/null 2>&1"
 before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg cargo build --release -p ts-pack-core-ffi"
-format = "cd packages/go && gofmt -w ./..."
+format = "cd packages/go && gofmt -w ."
 check = "cd packages/go && golangci-lint run ./..."
 
 [crates.lint.elixir]
