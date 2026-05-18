@@ -1089,6 +1089,10 @@ jobs:
       - name: Generate Elixir E2E tests
         run: task elixir:e2e:generate
 
+      - name: Install Elixir E2E dependencies
+        working-directory: e2e/elixir
+        run: mix deps.get
+
       - name: Run Elixir E2E tests
         run: task elixir:e2e:test
         env:
