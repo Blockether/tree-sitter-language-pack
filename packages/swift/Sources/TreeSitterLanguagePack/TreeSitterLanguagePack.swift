@@ -418,11 +418,6 @@ public func packConfigFromJson(_ json: String) throws -> PackConfig {
     return try RustBridge.packConfigFromJson(json)
 }
 
-public func pointFromJson(_ json: String) throws -> Point {
-    let data = json.data(using: .utf8) ?? Data()
-    return try JSONDecoder().decode(Point.self, from: data)
-}
-
 public func processConfigFromJson(_ json: String) throws -> ProcessConfig {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(ProcessConfig.self, from: data)

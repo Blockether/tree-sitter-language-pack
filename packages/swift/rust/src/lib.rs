@@ -510,8 +510,6 @@ mod ffi {
 
         #[swift_bridge(swift_name = "packConfigFromJson")]
         fn pack_config_from_json(json: String) -> Result<PackConfig, String>;
-        #[swift_bridge(swift_name = "pointFromJson")]
-        fn point_from_json(json: String) -> Result<Point, String>;
         #[swift_bridge(swift_name = "processConfigFromJson")]
         fn process_config_from_json(json: String) -> Result<ProcessConfig, String>;
     }
@@ -1844,12 +1842,6 @@ pub fn cache_dir() -> Result<String, String> {
 pub fn pack_config_from_json(json: String) -> Result<PackConfig, String> {
     serde_json::from_str::<tree_sitter_language_pack::PackConfig>(&json)
         .map(PackConfig)
-        .map_err(|e| e.to_string())
-}
-
-pub fn point_from_json(json: String) -> Result<Point, String> {
-    serde_json::from_str::<tree_sitter_language_pack::Point>(&json)
-        .map(Point)
         .map_err(|e| e.to_string())
 }
 
