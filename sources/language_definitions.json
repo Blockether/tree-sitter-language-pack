@@ -631,10 +631,9 @@
     "rev": "eed7ddf6a66b596906aa8ca3d40521b8278adc6f"
   },
   "haskell": {
-    "branch": "master",
     "extensions": ["hs"],
     "repo": "https://github.com/tree-sitter/tree-sitter-haskell",
-    "rev": "0975ef72fc3c47b530309ca93937d7d143523628"
+    "rev": "c30d812bc90827f1a54106a25bc9a6307f5cdcec"
   },
   "haxe": {
     "extensions": ["hx"],
