@@ -1178,12 +1178,6 @@ uintptr_t ts_pack_point_row(const TS_PACKPoint *ptr);
 uintptr_t ts_pack_point_column(const TS_PACKPoint *ptr);
 
 /**
- * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
- * freed with the appropriate free function.
- */
-TS_PACKPoint *ts_pack_point_from(const TS_PACKPoint *p);
-
-/**
  * Create a `ByteRange` from a JSON string. Returns null on failure.
  * # Safety
  * JSON string must be valid UTF-8 and null-terminated.
