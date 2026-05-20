@@ -1168,16 +1168,6 @@ A source position — row + column, zero-indexed.
 | `Row`    | `nuint` | —       | Zero-indexed row number.                          |
 | `Column` | `nuint` | —       | Zero-indexed column number, in UTF-16 code units. |
 
-##### Methods
-
-###### From()
-
-**Signature:**
-
-```csharp
-public Point From(Point p)
-```
-
 ---
 
 #### ProcessConfig

@@ -2841,6 +2841,7 @@ dependencies = [
 name = "ts-pack-core-wasm"
 version = "1.8.1"
 dependencies = [
+ "futures",
  "futures-util",
  "getrandom 0.3.4",
  "getrandom 0.4.2",

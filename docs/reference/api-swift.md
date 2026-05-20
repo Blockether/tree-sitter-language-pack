@@ -1168,16 +1168,6 @@ A source position — row + column, zero-indexed.
 | `row`    | `UInt64` | —       | Zero-indexed row number.                          |
 | `column` | `UInt64` | —       | Zero-indexed column number, in UTF-16 code units. |
 
-##### Methods
-
-###### from()
-
-**Signature:**
-
-```swift
-public static func from(p: Point) -> Point
-```
-
 ---
 
 #### ProcessConfig

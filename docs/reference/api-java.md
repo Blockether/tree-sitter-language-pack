@@ -1168,16 +1168,6 @@ A source position — row + column, zero-indexed.
 | `row`    | `long` | —       | Zero-indexed row number.                          |
 | `column` | `long` | —       | Zero-indexed column number, in UTF-16 code units. |
 
-##### Methods
-
-###### from()
-
-**Signature:**
-
-```java
-public static Point from(Point p)
-```
-
 ---
 
 #### ProcessConfig

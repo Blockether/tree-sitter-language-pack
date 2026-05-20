@@ -1189,17 +1189,6 @@ A source position — row + column, zero-indexed.
 | `row`    | `Long` | —       | Zero-indexed row number.                          |
 | `column` | `Long` | —       | Zero-indexed column number, in UTF-16 code units. |
 
-##### Methods
-
-###### from()
-
-**Signature:**
-
-```kotlin
-@JvmStatic
-fun from(p: Point): Point
-```
-
 ---
 
 #### ProcessConfig

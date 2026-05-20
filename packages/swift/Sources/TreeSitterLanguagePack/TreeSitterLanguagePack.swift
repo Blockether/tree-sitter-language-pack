@@ -121,7 +121,37 @@ internal extension FileMetrics {
 public typealias StructureItem = RustBridge.StructureItem
 
 /// A comment extracted from source code.
-public typealias CommentInfo = RustBridge.CommentInfo
+public struct CommentInfo: Codable, Sendable, Hashable {
+    public let text: String
+    public let kind: CommentKind
+    public let span: Span
+    public let associatedNode: String?
+    public init(text: String, kind: CommentKind, span: Span, associatedNode: String? = nil) {
+        self.text = text
+        self.kind = kind
+        self.span = span
+        self.associatedNode = associatedNode
+    }
+    private enum CodingKeys: String, CodingKey {
+        case text = "text"
+        case kind = "kind"
+        case span = "span"
+        case associatedNode = "associated_node"
+    }
+}
+
+// MARK: - Internal FFI conversions for CommentInfo
+internal extension CommentInfo {
+    init(_ rb: RustBridge.CommentInfo) throws {
+        self.text = rb.text().toString()
+        self.kind = CommentKind(rawValue: rb.kind().toString()) ?? { fatalError("Unknown CommentKind: \(rb.kind().toString())") }()
+        self.span = try Span(rb.span())
+        self.associatedNode = rb.associated_node()?.toString()
+    }
+    func intoRust() throws -> RustBridge.CommentInfo {
+        return RustBridge.CommentInfo(self.text, try self.kind.intoRust(), try self.span.intoRust(), self.associatedNode)
+    }
+}
 
 /// A docstring extracted from source code.
 public typealias DocstringInfo = RustBridge.DocstringInfo
@@ -151,16 +181,94 @@ internal extension DocSection {
 }
 
 /// An import statement extracted from source code.
-public typealias ImportInfo = RustBridge.ImportInfo
+public struct ImportInfo: Codable, Sendable, Hashable {
+    public let source: String
+    public let items: [String]
+    public let alias: String?
+    public let isWildcard: Bool
+    public let span: Span
+    public init(source: String, items: [String], alias: String? = nil, isWildcard: Bool, span: Span) {
+        self.source = source
+        self.items = items
+        self.alias = alias
+        self.isWildcard = isWildcard
+        self.span = span
+    }
+    private enum CodingKeys: String, CodingKey {
+        case source = "source"
+        case items = "items"
+        case alias = "alias"
+        case isWildcard = "is_wildcard"
+        case span = "span"
+    }
+}
+
+// MARK: - Internal FFI conversions for ImportInfo
+internal extension ImportInfo {
+    init(_ rb: RustBridge.ImportInfo) throws {
+        self.source = rb.source().toString()
+        self.items = rb.items().map { $0.toString() }
+        self.alias = rb.alias()?.toString()
+        self.isWildcard = rb.is_wildcard()
+        self.span = try Span(rb.span())
+    }
+    func intoRust() throws -> RustBridge.ImportInfo {
+        let __items = RustVec<String>()
+        for __elem in self.items { __items.push(value: __elem) }
+        return RustBridge.ImportInfo(self.source, __items, self.alias, self.isWildcard, try self.span.intoRust())
+    }
+}
 
 /// An export statement extracted from source code.
-public typealias ExportInfo = RustBridge.ExportInfo
+public struct ExportInfo: Codable, Sendable, Hashable {
+    public let name: String
+    public let kind: ExportKind
+    public let span: Span
+    public init(name: String, kind: ExportKind, span: Span) {
+        self.name = name
+        self.kind = kind
+        self.span = span
+    }
+}
+
+// MARK: - Internal FFI conversions for ExportInfo
+internal extension ExportInfo {
+    init(_ rb: RustBridge.ExportInfo) throws {
+        self.name = rb.name().toString()
+        self.kind = ExportKind(rawValue: rb.kind().toString()) ?? { fatalError("Unknown ExportKind: \(rb.kind().toString())") }()
+        self.span = try Span(rb.span())
+    }
+    func intoRust() throws -> RustBridge.ExportInfo {
+        return RustBridge.ExportInfo(self.name, try self.kind.intoRust(), try self.span.intoRust())
+    }
+}
 
 /// A symbol (variable, function, type, etc.) extracted from source code.
 public typealias SymbolInfo = RustBridge.SymbolInfo
 
 /// A diagnostic (syntax error, missing node, etc.) from parsing.
-public typealias Diagnostic = RustBridge.Diagnostic
+public struct Diagnostic: Codable, Sendable, Hashable {
+    public let message: String
+    public let severity: DiagnosticSeverity
+    public let span: Span
+    public init(message: String, severity: DiagnosticSeverity, span: Span) {
+        self.message = message
+        self.severity = severity
+        self.span = span
+    }
+}
+
+// MARK: - Internal FFI conversions for Diagnostic
+internal extension Diagnostic {
+    init(_ rb: RustBridge.Diagnostic) throws {
+        self.message = rb.message().toString()
+        self.severity = DiagnosticSeverity(rawValue: rb.severity().toString()) ?? { fatalError("Unknown DiagnosticSeverity: \(rb.severity().toString())") }()
+        self.span = try Span(rb.span())
+    }
+    func intoRust() throws -> RustBridge.Diagnostic {
+        return RustBridge.Diagnostic(self.message, try self.severity.intoRust(), try self.span.intoRust())
+    }
+}
 
 /// A chunk of source code with rich metadata.
 public typealias CodeChunk = RustBridge.CodeChunk
@@ -337,10 +445,10 @@ public enum StructureKind {
 ///
 /// Distinguishes between single-line comments, block (multi-line) comments,
 /// and documentation comments.
-public enum CommentKind {
-    case line
-    case block
-    case doc
+public enum CommentKind: String, Codable, Sendable, Hashable {
+    case line = "Line"
+    case block = "Block"
+    case doc = "Doc"
 }
 
 /// The format of a docstring extracted from source code.
@@ -359,10 +467,10 @@ public enum DocstringFormat {
 /// The kind of an export statement found in source code.
 ///
 /// Covers named exports, default exports, and re-exports from other modules.
-public enum ExportKind {
-    case named
-    case `default`
-    case reExport
+public enum ExportKind: String, Codable, Sendable, Hashable {
+    case named = "Named"
+    case `default` = "Default"
+    case reExport = "ReExport"
 }
 
 /// The kind of a symbol definition found in source code.
@@ -385,10 +493,10 @@ public enum SymbolKind {
 ///
 /// Used to classify parse errors, warnings, and informational messages
 /// found in the syntax tree.
-public enum DiagnosticSeverity {
-    case error
-    case warning
-    case info
+public enum DiagnosticSeverity: String, Codable, Sendable, Hashable {
+    case error = "Error"
+    case warning = "Warning"
+    case info = "Info"
 }
 
 /// Errors that can occur when using the tree-sitter language pack.
@@ -421,4 +529,470 @@ public func packConfigFromJson(_ json: String) throws -> PackConfig {
 public func processConfigFromJson(_ json: String) throws -> ProcessConfig {
     let data = json.data(using: .utf8) ?? Data()
     return try JSONDecoder().decode(ProcessConfig.self, from: data)
+}
+
+// MARK: - Free-function Forwarders
+// Re-export every public free function on the source Rust crate as a
+// top-level `public func` on the host module so consumers do not need to
+// `import RustBridge` directly. Forwarders take Swift-native parameter
+// types and convert to the swift-bridge runtime types internally.
+
+/// Detect language name from a file extension (without leading dot).
+///
+/// Returns `None` for unrecognized extensions. The match is case-insensitive.
+///
+/// ```
+/// use tree_sitter_language_pack::detect_language_from_extension;
+/// assert_eq!(detect_language_from_extension("py"), Some("python"));
+/// assert_eq!(detect_language_from_extension("RS"), Some("rust"));
+/// assert_eq!(detect_language_from_extension("xyz"), None);
+/// ```
+public func detectLanguageFromExtension(ext: String) -> String? {
+    return RustBridge.detectLanguageFromExtension(ext)
+}
+
+/// Detect language name from a file path.
+///
+/// Extracts the file extension and looks it up. Returns `None` if the
+/// path has no extension or the extension is not recognized.
+///
+/// ```
+/// use tree_sitter_language_pack::detect_language_from_path;
+/// assert_eq!(detect_language_from_path("src/main.rs"), Some("rust"));
+/// assert_eq!(detect_language_from_path("README.md"), Some("markdown"));
+/// assert_eq!(detect_language_from_path("Makefile"), None);
+/// ```
+public func detectLanguageFromPath(path: String) -> String? {
+    return RustBridge.detectLanguageFromPath(path)
+}
+
+/// Detect language name from file content using the shebang line (`#!`).
+///
+/// Inspects only the first line of `content`. If it begins with `#!`, the
+/// interpreter name is extracted and mapped to a language name.
+///
+/// Handles common patterns:
+/// - `#!/usr/bin/env python3` → `"python"`
+/// - `#!/bin/bash` → `"bash"`
+/// - `#!/usr/bin/env node` → `"javascript"`
+///
+/// The `-S` flag accepted by some `env` implementations is skipped automatically.
+/// Version suffixes (e.g. `python3.11`, `ruby3.2`) are stripped before matching.
+///
+/// Returns `None` when content does not start with `#!`, the shebang is
+/// malformed, or the interpreter is not recognised.
+///
+/// ```
+/// use tree_sitter_language_pack::detect_language_from_content;
+/// assert_eq!(detect_language_from_content("#!/usr/bin/env python3\npass"), Some("python"));
+/// assert_eq!(detect_language_from_content("#!/bin/bash\necho hi"), Some("bash"));
+/// assert_eq!(detect_language_from_content("no shebang here"), None);
+/// ```
+public func detectLanguageFromContent(content: String) -> String? {
+    return RustBridge.detectLanguageFromContent(content)
+}
+
+/// Get the highlights query for a language, if bundled.
+///
+/// Returns the contents of `highlights.scm` as a static string, or `None`
+/// if no highlights query is bundled for this language.
+///
+/// # Example
+///
+/// ```
+/// use tree_sitter_language_pack::get_highlights_query;
+///
+/// // Returns Some(...) for languages with bundled queries
+/// let query = get_highlights_query("python");
+/// // Returns None for languages without bundled highlights queries
+/// let missing = get_highlights_query("nonexistent_lang");
+/// assert!(missing.is_none());
+/// ```
+public func getHighlightsQuery(language: String) -> String? {
+    return RustBridge.getHighlightsQuery(language)
+}
+
+/// Get the injections query for a language, if bundled.
+///
+/// Returns the contents of `injections.scm` as a static string, or `None`
+/// if no injections query is bundled for this language.
+///
+/// # Example
+///
+/// ```
+/// use tree_sitter_language_pack::get_injections_query;
+///
+/// let query = get_injections_query("markdown");
+/// // Returns None for languages without bundled injections queries
+/// let missing = get_injections_query("nonexistent_lang");
+/// assert!(missing.is_none());
+/// ```
+public func getInjectionsQuery(language: String) -> String? {
+    return RustBridge.getInjectionsQuery(language)
+}
+
+/// Get the locals query for a language, if bundled.
+///
+/// Returns the contents of `locals.scm` as a static string, or `None`
+/// if no locals query is bundled for this language.
+///
+/// # Example
+///
+/// ```
+/// use tree_sitter_language_pack::get_locals_query;
+///
+/// let query = get_locals_query("python");
+/// // Returns None for languages without bundled locals queries
+/// let missing = get_locals_query("nonexistent_lang");
+/// assert!(missing.is_none());
+/// ```
+public func getLocalsQuery(language: String) -> String? {
+    return RustBridge.getLocalsQuery(language)
+}
+
+/// Get a tree-sitter [`Language`] by name using the global registry.
+///
+/// Resolves language aliases (e.g., `"shell"` maps to `"bash"`).
+/// When the `download` feature is enabled (default), automatically downloads
+/// the parser from GitHub releases if not found locally.
+///
+/// # Errors
+///
+/// Returns [`Error::LanguageNotFound`] if the language is not recognized,
+/// or [`Error::Download`] if auto-download fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::{get_language, Parser};
+///
+/// let _lang = get_language("python")?;
+/// let mut parser = Parser::new();
+/// parser.set_language("python")?;
+/// let tree = parser.parse("x = 1").expect("parse failed");
+/// assert_eq!(tree.root_node().kind(), "module");
+/// # Ok::<(), tree_sitter_language_pack::Error>(())
+/// ```
+public func getLanguage(name: String) throws -> Language {
+    return try RustBridge.getLanguage(name)
+}
+
+/// Get a [`Parser`] pre-configured for the given language.
+///
+/// This is a convenience function that calls [`get_language`] and configures
+/// a new parser in one step.
+///
+/// # Errors
+///
+/// Returns [`Error::LanguageNotFound`] if the language is not recognized, or
+/// [`Error::ParserSetup`] if the language cannot be applied to the parser.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::get_parser;
+///
+/// let mut parser = get_parser("rust")?;
+/// let tree = parser.parse("fn main() {}").expect("parse failed");
+/// assert!(!tree.root_node().has_error());
+/// # Ok::<(), tree_sitter_language_pack::Error>(())
+/// ```
+public func getParser(name: String) throws -> Parser {
+    return try RustBridge.getParser(name)
+}
+
+/// Detect language name from a file path or extension.
+///
+/// This compatibility alias matches the pre-Alef Python binding API.
+public func detectLanguage(path: String) -> String? {
+    return RustBridge.detectLanguage(path)
+}
+
+/// List all available language names (sorted, deduplicated, includes aliases).
+///
+/// Returns names of both statically compiled and dynamically loadable languages,
+/// plus any configured aliases.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::available_languages;
+///
+/// let langs = available_languages();
+/// for name in &langs {
+///     println!("{}", name);
+/// }
+/// ```
+public func availableLanguages() -> [String] {
+    return RustBridge.availableLanguages().map { $0.toString() }
+}
+
+/// Check if a language is available by name or alias.
+///
+/// Returns `true` if the language can be loaded (statically compiled,
+/// dynamically available, or a known alias for one of these).
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::has_language;
+///
+/// assert!(has_language("python"));
+/// assert!(has_language("shell")); // alias for "bash"
+/// assert!(!has_language("nonexistent_language"));
+/// ```
+public func hasLanguage(name: String) -> Bool {
+    return RustBridge.hasLanguage(name)
+}
+
+/// Return the number of available languages.
+///
+/// Includes statically compiled languages, dynamically loadable languages,
+/// and aliases.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::language_count;
+///
+/// let count = language_count();
+/// println!("{} languages available", count);
+/// ```
+public func languageCount() -> UInt {
+    return RustBridge.languageCount()
+}
+
+/// Process source code and extract file intelligence using the global registry.
+///
+/// Parses the source with tree-sitter and extracts metrics, structure, imports,
+/// exports, comments, docstrings, symbols, diagnostics, and/or chunks based on
+/// the flags set in [`ProcessConfig`].
+///
+/// # Errors
+///
+/// Returns an error if the language is not found or parsing fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::{ProcessConfig, process};
+///
+/// let config = ProcessConfig::new("python").all();
+/// let result = process("def hello(): pass", &config).unwrap();
+/// println!("Language: {}", result.language);
+/// println!("Lines: {}", result.metrics.total_lines);
+/// println!("Structures: {}", result.structure.len());
+/// ```
+public func process(source: String, config: ProcessConfig) throws -> ProcessResult {
+    return try RustBridge.process(source, config)
+}
+
+/// Initialize the language pack with the given configuration.
+///
+/// Applies any custom cache directory, then downloads all languages and groups
+/// specified in the config. This is the recommended entry point when you want
+/// to pre-warm the cache before use.
+///
+/// # Errors
+///
+/// Returns an error if configuration cannot be applied or if downloads fail.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::{PackConfig, init};
+///
+/// let config = PackConfig {
+///     cache_dir: None,
+///     languages: Some(vec!["python".to_string(), "rust".to_string()]),
+///     groups: None,
+/// };
+/// init(&config).unwrap();
+/// ```
+public func init_(config: PackConfig) throws {
+    return try RustBridge.init_(config)
+}
+
+/// Apply download configuration without downloading anything.
+///
+/// Use this to set a custom cache directory before the first call to
+/// [`get_language`] or any download function. Changing the cache dir
+/// after languages have been registered has no effect on already-loaded
+/// languages.
+///
+/// # Errors
+///
+/// Returns an error if the lock cannot be acquired.
+///
+/// # Example
+///
+/// ```no_run
+/// use std::path::PathBuf;
+/// use tree_sitter_language_pack::{PackConfig, configure};
+///
+/// let config = PackConfig {
+///     cache_dir: Some(PathBuf::from("/tmp/my-parsers")),
+///     languages: None,
+///     groups: None,
+/// };
+/// configure(&config).unwrap();
+/// ```
+public func configure(config: PackConfig) throws {
+    return try RustBridge.configure(config)
+}
+
+/// Download specific languages to the local cache.
+///
+/// Returns the number of requested languages available after the call. Already
+/// compiled or cached languages are included in the count.
+///
+/// # Errors
+///
+/// Returns an error if any language is not available in the manifest or if
+/// the download fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::download;
+///
+/// let count = download(&["python", "rust", "typescript"]).unwrap();
+/// println!("Ensured {} languages", count);
+/// ```
+public func download(names: [String]) throws -> UInt {
+    let _rb_names: RustVec<RustString> = { let v = RustVec<RustString>(); for s in names { v.push(value: RustString(s)) }; return v }()
+    return try RustBridge.download(_rb_names)
+}
+
+/// Download all available languages from the remote manifest.
+///
+/// Downloads the platform bundle and extracts every library it contains.
+/// Languages that appear in the manifest but are absent from the bundle
+/// (e.g. grammars that failed to compile at release time) are silently
+/// skipped — they are not treated as an error.
+///
+/// Returns the total number of languages now available (statically compiled
+/// plus downloaded and cached).
+///
+/// # Errors
+///
+/// Returns an error if the manifest cannot be fetched or the bundle download fails.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::download_all;
+///
+/// let count = download_all().unwrap();
+/// println!("{} languages available", count);
+/// ```
+public func downloadAll() throws -> UInt {
+    return try RustBridge.downloadAll()
+}
+
+/// Download every language in a named group (e.g. `"web"`, `"data"`).
+///
+/// Groups are defined in the remote manifest and let you ensure a curated
+/// set of related grammars in one call instead of listing each name to
+/// [`download`]. Already-cached languages are skipped.
+///
+/// Returns the total number of languages now available (statically compiled
+/// plus downloaded and cached).
+///
+/// # Errors
+///
+/// Returns an error if the manifest cannot be fetched, the group is unknown,
+/// or any constituent language fails to download.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::download_group;
+///
+/// let count = download_group("web").unwrap();
+/// println!("{} languages available", count);
+/// ```
+public func downloadGroup(name: String) throws -> UInt {
+    return try RustBridge.downloadGroup(name)
+}
+
+/// Return all language names available in the remote manifest (305).
+///
+/// Fetches (and caches) the remote manifest to discover the full list of
+/// downloadable languages. Use [`downloaded_languages`] to list what is
+/// already cached locally.
+///
+/// # Errors
+///
+/// Returns an error if the manifest cannot be fetched.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::manifest_languages;
+///
+/// let langs = manifest_languages().unwrap();
+/// println!("{} languages available for download", langs.len());
+/// ```
+public func manifestLanguages() throws -> [String] {
+    return try RustBridge.manifestLanguages().map { $0.toString() }
+}
+
+/// Return languages that are already downloaded and cached locally.
+///
+/// Does not perform any network requests. Returns an empty list if the
+/// cache directory does not exist or cannot be read.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::downloaded_languages;
+///
+/// let langs = downloaded_languages();
+/// println!("{} languages already cached", langs.len());
+/// ```
+public func downloadedLanguages() -> [String] {
+    return RustBridge.downloadedLanguages().map { $0.toString() }
+}
+
+/// Delete all cached parser shared libraries.
+///
+/// Resets the cache registration so the next call to [`get_language`] or
+/// a download function will re-register the (now empty) cache directory.
+///
+/// # Errors
+///
+/// Returns an error if the cache directory cannot be removed.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::clean_cache;
+///
+/// clean_cache().unwrap();
+/// println!("Cache cleared");
+/// ```
+public func cleanCache() throws {
+    return try RustBridge.cleanCache()
+}
+
+/// Return the effective cache directory path.
+///
+/// This is either the custom path set via [`configure`] / [`init`] or the
+/// default: `~/.cache/tree-sitter-language-pack/v{version}/libs/`.
+///
+/// # Errors
+///
+/// Returns an error if the system cache directory cannot be determined.
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::cache_dir;
+///
+/// let dir = cache_dir().unwrap();
+/// println!("Cache directory: {dir}");
+/// ```
+public func cacheDir() throws -> String {
+    return try RustBridge.cacheDir()
 }

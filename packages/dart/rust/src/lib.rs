@@ -697,6 +697,25 @@ pub enum DiagnosticSeverity {
     Info,
 }
 
+/// Errors that can occur when using the tree-sitter language pack.
+///
+/// Covers language lookup failures, parse errors, query errors, and I/O issues.
+/// Feature-gated variants are included when `config`, `download`, or related
+/// features are enabled.
+#[frb(mirror(Error))]
+pub enum Error {
+    LanguageNotFound { field0: String },
+    DynamicLoad { field0: String },
+    NullLanguagePointer { field0: String },
+    ParserSetup { field0: String },
+    LockPoisoned { field0: String },
+    Config { field0: String },
+    ParseFailed,
+    QueryError { field0: String },
+    InvalidRange { field0: String },
+    Io { field0: String },
+}
+
 // From<SourceT> conversions for bridge return types.
 
 impl From<tree_sitter_language_pack::Span> for Span {
