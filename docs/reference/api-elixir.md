@@ -1190,16 +1190,6 @@ A source position — row + column, zero-indexed.
 | `row`    | `integer()` | —       | Zero-indexed row number.                          |
 | `column` | `integer()` | —       | Zero-indexed column number, in UTF-16 code units. |
 
-##### Functions
-
-###### from()
-
-**Signature:**
-
-```elixir
-def from(p)
-```
-
 ---
 
 #### ProcessConfig

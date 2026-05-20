@@ -1168,16 +1168,6 @@ A source position — row + column, zero-indexed.
 | `row`    | `number` | —       | Zero-indexed row number.                          |
 | `column` | `number` | —       | Zero-indexed column number, in UTF-16 code units. |
 
-##### Methods
-
-###### from()
-
-**Signature:**
-
-```typescript
-static from(p: Point): Point
-```
-
 ---
 
 #### ProcessConfig

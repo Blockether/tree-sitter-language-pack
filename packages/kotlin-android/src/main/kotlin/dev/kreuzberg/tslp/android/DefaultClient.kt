@@ -18,13 +18,12 @@ import com.fasterxml.jackson.core.type.TypeReference
 @Suppress("TooManyFunctions")
 class Parser internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {
-        private val MAPPER =
-            com.fasterxml.jackson.databind
-                .ObjectMapper()
+        private val MAPPER = com.fasterxml.jackson.databind
+            .ObjectMapper()
             .registerModule(
                 com.fasterxml.jackson.datatype.jdk8
                 .Jdk8Module()
-                    ).findAndRegisterModules()
+            ).findAndRegisterModules()
             .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
     }
 
@@ -70,13 +69,12 @@ class Parser internal constructor(internal val handle: Long) : AutoCloseable {
 @Suppress("TooManyFunctions")
 class Tree internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {
-        private val MAPPER =
-            com.fasterxml.jackson.databind
-                .ObjectMapper()
+        private val MAPPER = com.fasterxml.jackson.databind
+            .ObjectMapper()
             .registerModule(
                 com.fasterxml.jackson.datatype.jdk8
                 .Jdk8Module()
-                    ).findAndRegisterModules()
+            ).findAndRegisterModules()
             .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
     }
 
@@ -101,13 +99,12 @@ class Tree internal constructor(internal val handle: Long) : AutoCloseable {
 @Suppress("TooManyFunctions")
 class Node internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {
-        private val MAPPER =
-            com.fasterxml.jackson.databind
-                .ObjectMapper()
+        private val MAPPER = com.fasterxml.jackson.databind
+            .ObjectMapper()
             .registerModule(
                 com.fasterxml.jackson.datatype.jdk8
                 .Jdk8Module()
-                    ).findAndRegisterModules()
+            ).findAndRegisterModules()
             .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
     }
 
@@ -240,13 +237,12 @@ class Node internal constructor(internal val handle: Long) : AutoCloseable {
 @Suppress("TooManyFunctions")
 class TreeCursor internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {
-        private val MAPPER =
-            com.fasterxml.jackson.databind
-                .ObjectMapper()
+        private val MAPPER = com.fasterxml.jackson.databind
+            .ObjectMapper()
             .registerModule(
                 com.fasterxml.jackson.datatype.jdk8
                 .Jdk8Module()
-                    ).findAndRegisterModules()
+            ).findAndRegisterModules()
             .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
     }
 
@@ -288,13 +284,12 @@ class TreeCursor internal constructor(internal val handle: Long) : AutoCloseable
 @Suppress("TooManyFunctions")
 class LanguageRegistry internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {
-        private val MAPPER =
-            com.fasterxml.jackson.databind
-                .ObjectMapper()
+        private val MAPPER = com.fasterxml.jackson.databind
+            .ObjectMapper()
             .registerModule(
                 com.fasterxml.jackson.datatype.jdk8
                 .Jdk8Module()
-                    ).findAndRegisterModules()
+            ).findAndRegisterModules()
             .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
     }
 
@@ -337,13 +332,10 @@ class LanguageRegistry internal constructor(internal val handle: Long) : AutoClo
 
     // Parse source code and extract file intelligence based on config in a single pass.
     fun process(source: String, config: ProcessConfig): ProcessResult {
-        val responseJson =
-            TreeSitterLanguagePackBridge.nativeLanguageRegistryProcess(
-                handle,
-                MAPPER.writeValueAsString(
-                    mapOf("source" to source, "config" to config)
-                        )
-                    )
+        val responseJson = TreeSitterLanguagePackBridge.nativeLanguageRegistryProcess(
+            handle,
+            MAPPER.writeValueAsString(mapOf("source" to source, "config" to config))
+        )
         return MAPPER.readValue(responseJson, ProcessResult::class.java)
     }
 
@@ -356,13 +348,12 @@ class LanguageRegistry internal constructor(internal val handle: Long) : AutoClo
 @Suppress("TooManyFunctions")
 class DownloadManager internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {
-        private val MAPPER =
-            com.fasterxml.jackson.databind
-                .ObjectMapper()
+        private val MAPPER = com.fasterxml.jackson.databind
+            .ObjectMapper()
             .registerModule(
                 com.fasterxml.jackson.datatype.jdk8
                 .Jdk8Module()
-                    ).findAndRegisterModules()
+            ).findAndRegisterModules()
             .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
     }
 

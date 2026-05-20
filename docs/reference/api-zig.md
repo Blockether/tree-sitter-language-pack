@@ -1168,16 +1168,6 @@ A source position — row + column, zero-indexed.
 | `row`    | `u64` | —       | Zero-indexed row number.                          |
 | `column` | `u64` | —       | Zero-indexed column number, in UTF-16 code units. |
 
-##### Methods
-
-###### from()
-
-**Signature:**
-
-```zig
-pub fn from(p: Point) Point
-```
-
 ---
 
 #### ProcessConfig

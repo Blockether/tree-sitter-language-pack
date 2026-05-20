@@ -1168,16 +1168,6 @@ A source position — row + column, zero-indexed.
 | `row`    | `uintptr_t` | —       | Zero-indexed row number.                          |
 | `column` | `uintptr_t` | —       | Zero-indexed column number, in UTF-16 code units. |
 
-##### Methods
-
-###### ts_pack_from()
-
-**Signature:**
-
-```c
-TsPackPoint ts_pack_from(TsPackPoint p);
-```
-
 ---
 
 #### TsPackProcessConfig

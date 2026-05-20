@@ -1168,16 +1168,6 @@ A source position — row + column, zero-indexed.
 | `row`    | `int` | —       | Zero-indexed row number.                          |
 | `column` | `int` | —       | Zero-indexed column number, in UTF-16 code units. |
 
-##### Methods
-
-###### from()
-
-**Signature:**
-
-```php
-public static function from(Point $p): Point
-```
-
 ---
 
 #### ProcessConfig

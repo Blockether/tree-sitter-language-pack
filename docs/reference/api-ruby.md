@@ -1168,16 +1168,6 @@ A source position — row + column, zero-indexed.
 | `row`    | `Integer` | —       | Zero-indexed row number.                          |
 | `column` | `Integer` | —       | Zero-indexed column number, in UTF-16 code units. |
 
-##### Methods
-
-###### from()
-
-**Signature:**
-
-```ruby
-def self.from(p)
-```
-
 ---
 
 #### ProcessConfig

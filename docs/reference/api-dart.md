@@ -1168,16 +1168,6 @@ A source position — row + column, zero-indexed.
 | `row`    | `int` | —       | Zero-indexed row number.                          |
 | `column` | `int` | —       | Zero-indexed column number, in UTF-16 code units. |
 
-##### Methods
-
-###### from()
-
-**Signature:**
-
-```dart
-static Point from(Point p)
-```
-
 ---
 
 #### ProcessConfig

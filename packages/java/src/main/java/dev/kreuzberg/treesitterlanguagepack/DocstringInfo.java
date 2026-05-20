@@ -5,15 +5,17 @@
 // Issues & docs: https://github.com/kreuzberg-dev/alef
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.List;
 import java.util.Optional;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import org.jspecify.annotations.Nullable;
 
-/** A docstring extracted from source code. */
+/**
+ * A docstring extracted from source code.
+ */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = DocstringInfo.Builder.class)
 public record DocstringInfo(
@@ -21,92 +23,92 @@ public record DocstringInfo(
     DocstringFormat format,
     Span span,
     @Nullable @JsonProperty("associated_item") String associatedItem,
-    @JsonProperty("parsed_sections") List<DocSection> parsedSections) {
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  /**
-   * Parse a {@code DocstringInfo} from a JSON string.
-   *
-   * @param json JSON serialisation matching the Rust-side field names (snake_case).
-   * @throws TreeSitterLanguagePackRsException if the JSON cannot be deserialised.
-   */
-  public static DocstringInfo fromJson(String json) throws TreeSitterLanguagePackRsException {
-    try {
-      return new com.fasterxml.jackson.databind.ObjectMapper()
-          .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-          .findAndRegisterModules()
-          .setPropertyNamingStrategy(
-              com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-          .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-          .configure(
-              com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
-          .readValue(json, DocstringInfo.class);
-    } catch (Exception e) {
-      throw new TreeSitterLanguagePackRsException(
-          "Failed to parse DocstringInfo from JSON: " + e.getMessage(), e);
-    }
-  }
-
-  // CPD-OFF
-  @JsonPOJOBuilder(withPrefix = "with")
-  public static final class Builder {
-
-    @JsonProperty("text")
-    private String text = "";
-
-    @JsonProperty("format")
-    private DocstringFormat format = null;
-
-    @JsonProperty("span")
-    private Span span = null;
-
-    @JsonProperty("associated_item")
-    private Optional<String> associatedItem = Optional.empty();
-
-    @JsonProperty("parsed_sections")
-    private List<DocSection> parsedSections = List.of();
-
-    /** Sets the text field. */
-    @JsonProperty("text")
-    public Builder withText(final String value) {
-      this.text = value;
-      return this;
+    @JsonProperty("parsed_sections") List<DocSection> parsedSections
+) {
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the format field. */
-    @JsonProperty("format")
-    public Builder withFormat(final DocstringFormat value) {
-      this.format = value;
-      return this;
+    /**
+     * Parse a {@code DocstringInfo} from a JSON string.
+     *
+     * @param json JSON serialisation matching the Rust-side field names (snake_case).
+     * @throws TreeSitterLanguagePackRsException if the JSON cannot be deserialised.
+     */
+    public static DocstringInfo fromJson(String json) throws TreeSitterLanguagePackRsException {
+        try {
+            return new com.fasterxml.jackson.databind.ObjectMapper()
+                .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
+                .findAndRegisterModules()
+                .setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
+                .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+                .configure(com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true)
+                .readValue(json, DocstringInfo.class);
+        } catch (Exception e) {
+            throw new TreeSitterLanguagePackRsException("Failed to parse DocstringInfo from JSON: " + e.getMessage(), e);
+        }
     }
 
-    /** Sets the span field. */
-    @JsonProperty("span")
-    public Builder withSpan(final Span value) {
-      this.span = value;
-      return this;
-    }
+    // CPD-OFF
+    @JsonPOJOBuilder(withPrefix = "with")
+    public static final class Builder {
 
-    /** Sets the associatedItem field. */
-    @JsonProperty("associated_item")
-    public Builder withAssociatedItem(final Optional<String> value) {
-      this.associatedItem = value;
-      return this;
-    }
+        @JsonProperty("text")
+        private String text = "";
+        @JsonProperty("format")
+        private DocstringFormat format = null;
+        @JsonProperty("span")
+        private Span span = null;
+        @JsonProperty("associated_item")
+        private Optional<String> associatedItem = Optional.empty();
+        @JsonProperty("parsed_sections")
+        private List<DocSection> parsedSections = List.of();
 
-    /** Sets the parsedSections field. */
-    @JsonProperty("parsed_sections")
-    public Builder withParsedSections(final List<DocSection> value) {
-      this.parsedSections = value;
-      return this;
-    }
+        /** Sets the text field. */
+        @JsonProperty("text")
+        public Builder withText(final String value) {
+            this.text = value;
+            return this;
+        }
 
-    /** Builds the DocstringInfo instance. */
-    public DocstringInfo build() {
-      return new DocstringInfo(text, format, span, associatedItem.orElse(null), parsedSections);
+        /** Sets the format field. */
+        @JsonProperty("format")
+        public Builder withFormat(final DocstringFormat value) {
+            this.format = value;
+            return this;
+        }
+
+        /** Sets the span field. */
+        @JsonProperty("span")
+        public Builder withSpan(final Span value) {
+            this.span = value;
+            return this;
+        }
+
+        /** Sets the associatedItem field. */
+        @JsonProperty("associated_item")
+        public Builder withAssociatedItem(final Optional<String> value) {
+            this.associatedItem = value;
+            return this;
+        }
+
+        /** Sets the parsedSections field. */
+        @JsonProperty("parsed_sections")
+        public Builder withParsedSections(final List<DocSection> value) {
+            this.parsedSections = value;
+            return this;
+        }
+
+        /** Builds the DocstringInfo instance. */
+        public DocstringInfo build() {
+            return new DocstringInfo(
+                text,
+                format,
+                span,
+                associatedItem.orElse(null),
+                parsedSections
+            );
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }
