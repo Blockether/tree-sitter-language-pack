@@ -36,12 +36,12 @@ public struct Span: Codable, Sendable, Hashable {
 // MARK: - Internal FFI conversions for Span
 internal extension Span {
     init(_ rb: RustBridge.SpanRef) throws {
-        self.startByte = rb.start_byte()
-        self.endByte = rb.end_byte()
-        self.startLine = rb.start_line()
-        self.startColumn = rb.start_column()
-        self.endLine = rb.end_line()
-        self.endColumn = rb.end_column()
+        self.startByte = rb.startByte()
+        self.endByte = rb.endByte()
+        self.startLine = rb.startLine()
+        self.startColumn = rb.startColumn()
+        self.endLine = rb.endLine()
+        self.endColumn = rb.endColumn()
     }
     func intoRust() throws -> RustBridge.Span {
         return RustBridge.Span(self.startByte, self.endByte, self.startLine, self.startColumn, self.endLine, self.endColumn)
@@ -103,14 +103,14 @@ public struct FileMetrics: Codable, Sendable, Hashable {
 // MARK: - Internal FFI conversions for FileMetrics
 internal extension FileMetrics {
     init(_ rb: RustBridge.FileMetricsRef) throws {
-        self.totalLines = rb.total_lines()
-        self.codeLines = rb.code_lines()
-        self.commentLines = rb.comment_lines()
-        self.blankLines = rb.blank_lines()
-        self.totalBytes = rb.total_bytes()
-        self.nodeCount = rb.node_count()
-        self.errorCount = rb.error_count()
-        self.maxDepth = rb.max_depth()
+        self.totalLines = rb.totalLines()
+        self.codeLines = rb.codeLines()
+        self.commentLines = rb.commentLines()
+        self.blankLines = rb.blankLines()
+        self.totalBytes = rb.totalBytes()
+        self.nodeCount = rb.nodeCount()
+        self.errorCount = rb.errorCount()
+        self.maxDepth = rb.maxDepth()
     }
     func intoRust() throws -> RustBridge.FileMetrics {
         return RustBridge.FileMetrics(self.totalLines, self.codeLines, self.commentLines, self.blankLines, self.totalBytes, self.nodeCount, self.errorCount, self.maxDepth)
@@ -146,10 +146,10 @@ internal extension CommentInfo {
         self.text = rb.text().toString()
         self.kind = CommentKind(rawValue: rb.kind().toString()) ?? { fatalError("Unknown CommentKind: \(rb.kind().toString())") }()
         self.span = try Span(rb.span())
-        self.associatedNode = rb.associated_node()?.toString()
+        self.associatedNode = rb.associatedNode()?.toString()
     }
     func intoRust() throws -> RustBridge.CommentInfo {
-        return RustBridge.CommentInfo(self.text, try self.kind.intoRust(), try self.span.intoRust(), self.associatedNode)
+        return RustBridge.CommentInfo(RustString(self.text), try self.kind.intoRust(), try self.span.intoRust(), self.associatedNode.map(RustString.init))
     }
 }
 
@@ -176,7 +176,7 @@ internal extension DocSection {
         self.description = rb.description().toString()
     }
     func intoRust() throws -> RustBridge.DocSection {
-        return RustBridge.DocSection(self.kind, self.name, self.description)
+        return RustBridge.DocSection(RustString(self.kind), self.name.map(RustString.init), RustString(self.description))
     }
 }
 
@@ -209,13 +209,13 @@ internal extension ImportInfo {
         self.source = rb.source().toString()
         self.items = rb.items().map { $0.as_str().toString() }
         self.alias = rb.alias()?.toString()
-        self.isWildcard = rb.is_wildcard()
+        self.isWildcard = rb.isWildcard()
         self.span = try Span(rb.span())
     }
     func intoRust() throws -> RustBridge.ImportInfo {
         let __items = RustVec<RustString>()
         for __elem in self.items { __items.push(value: RustString(__elem)) }
-        return RustBridge.ImportInfo(self.source, __items, self.alias, self.isWildcard, try self.span.intoRust())
+        return RustBridge.ImportInfo(RustString(self.source), __items, self.alias.map(RustString.init), self.isWildcard, try self.span.intoRust())
     }
 }
 
@@ -239,7 +239,7 @@ internal extension ExportInfo {
         self.span = try Span(rb.span())
     }
     func intoRust() throws -> RustBridge.ExportInfo {
-        return RustBridge.ExportInfo(self.name, try self.kind.intoRust(), try self.span.intoRust())
+        return RustBridge.ExportInfo(RustString(self.name), try self.kind.intoRust(), try self.span.intoRust())
     }
 }
 
@@ -266,7 +266,7 @@ internal extension Diagnostic {
         self.span = try Span(rb.span())
     }
     func intoRust() throws -> RustBridge.Diagnostic {
-        return RustBridge.Diagnostic(self.message, try self.severity.intoRust(), try self.span.intoRust())
+        return RustBridge.Diagnostic(RustString(self.message), try self.severity.intoRust(), try self.span.intoRust())
     }
 }
 
@@ -413,10 +413,10 @@ internal extension ProcessConfig {
         self.docstrings = rb.docstrings()
         self.symbols = rb.symbols()
         self.diagnostics = rb.diagnostics()
-        self.chunkMaxSize = rb.chunk_max_size()
+        self.chunkMaxSize = rb.chunkMaxSize()
     }
     func intoRust() throws -> RustBridge.ProcessConfig {
-        return RustBridge.ProcessConfig(self.language, self.structure, self.imports, self.exports, self.comments, self.docstrings, self.symbols, self.diagnostics, self.chunkMaxSize)
+        return RustBridge.ProcessConfig(RustString(self.language), self.structure, self.imports, self.exports, self.comments, self.docstrings, self.symbols, self.diagnostics, self.chunkMaxSize)
     }
 }
 
