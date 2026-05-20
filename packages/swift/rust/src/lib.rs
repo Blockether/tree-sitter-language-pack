@@ -44,11 +44,17 @@ mod ffi {
             end_line: usize,
             end_column: usize,
         ) -> Span;
+        #[swift_bridge(swift_name = "startByte")]
         fn start_byte(&self) -> usize;
+        #[swift_bridge(swift_name = "endByte")]
         fn end_byte(&self) -> usize;
+        #[swift_bridge(swift_name = "startLine")]
         fn start_line(&self) -> usize;
+        #[swift_bridge(swift_name = "startColumn")]
         fn start_column(&self) -> usize;
+        #[swift_bridge(swift_name = "endLine")]
         fn end_line(&self) -> usize;
+        #[swift_bridge(swift_name = "endColumn")]
         fn end_column(&self) -> usize;
     }
 
@@ -92,13 +98,21 @@ mod ffi {
             error_count: usize,
             max_depth: usize,
         ) -> FileMetrics;
+        #[swift_bridge(swift_name = "totalLines")]
         fn total_lines(&self) -> usize;
+        #[swift_bridge(swift_name = "codeLines")]
         fn code_lines(&self) -> usize;
+        #[swift_bridge(swift_name = "commentLines")]
         fn comment_lines(&self) -> usize;
+        #[swift_bridge(swift_name = "blankLines")]
         fn blank_lines(&self) -> usize;
+        #[swift_bridge(swift_name = "totalBytes")]
         fn total_bytes(&self) -> usize;
+        #[swift_bridge(swift_name = "nodeCount")]
         fn node_count(&self) -> usize;
+        #[swift_bridge(swift_name = "errorCount")]
         fn error_count(&self) -> usize;
+        #[swift_bridge(swift_name = "maxDepth")]
         fn max_depth(&self) -> usize;
     }
 
@@ -122,8 +136,10 @@ mod ffi {
         fn span(&self) -> Span;
         fn children(&self) -> Vec<StructureItem>;
         fn decorators(&self) -> Vec<String>;
+        #[swift_bridge(swift_name = "docComment")]
         fn doc_comment(&self) -> Option<String>;
         fn signature(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "bodySpan")]
         fn body_span(&self) -> Option<Span>;
     }
 
@@ -134,6 +150,7 @@ mod ffi {
         fn text(&self) -> String;
         fn kind(&self) -> String;
         fn span(&self) -> Span;
+        #[swift_bridge(swift_name = "associatedNode")]
         fn associated_node(&self) -> Option<String>;
     }
 
@@ -150,7 +167,9 @@ mod ffi {
         fn text(&self) -> String;
         fn format(&self) -> String;
         fn span(&self) -> Span;
+        #[swift_bridge(swift_name = "associatedItem")]
         fn associated_item(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "parsedSections")]
         fn parsed_sections(&self) -> Vec<DocSection>;
     }
 
@@ -170,6 +189,7 @@ mod ffi {
         fn source(&self) -> String;
         fn items(&self) -> Vec<String>;
         fn alias(&self) -> Option<String>;
+        #[swift_bridge(swift_name = "isWildcard")]
         fn is_wildcard(&self) -> bool;
         fn span(&self) -> Span;
     }
@@ -196,6 +216,7 @@ mod ffi {
         fn name(&self) -> String;
         fn kind(&self) -> String;
         fn span(&self) -> Span;
+        #[swift_bridge(swift_name = "typeAnnotation")]
         fn type_annotation(&self) -> Option<String>;
         fn doc(&self) -> Option<String>;
     }
@@ -221,9 +242,13 @@ mod ffi {
             metadata: ChunkContext,
         ) -> CodeChunk;
         fn content(&self) -> String;
+        #[swift_bridge(swift_name = "startByte")]
         fn start_byte(&self) -> usize;
+        #[swift_bridge(swift_name = "endByte")]
         fn end_byte(&self) -> usize;
+        #[swift_bridge(swift_name = "startLine")]
         fn start_line(&self) -> usize;
+        #[swift_bridge(swift_name = "endLine")]
         fn end_line(&self) -> usize;
         fn metadata(&self) -> ChunkContext;
     }
@@ -243,13 +268,19 @@ mod ffi {
             has_error_nodes: bool,
         ) -> ChunkContext;
         fn language(&self) -> String;
+        #[swift_bridge(swift_name = "chunkIndex")]
         fn chunk_index(&self) -> usize;
+        #[swift_bridge(swift_name = "totalChunks")]
         fn total_chunks(&self) -> usize;
+        #[swift_bridge(swift_name = "nodeTypes")]
         fn node_types(&self) -> Vec<String>;
+        #[swift_bridge(swift_name = "contextPath")]
         fn context_path(&self) -> Vec<String>;
+        #[swift_bridge(swift_name = "symbolsDefined")]
         fn symbols_defined(&self) -> Vec<String>;
         fn comments(&self) -> Vec<CommentInfo>;
         fn docstrings(&self) -> Vec<DocstringInfo>;
+        #[swift_bridge(swift_name = "hasErrorNodes")]
         fn has_error_nodes(&self) -> bool;
     }
 
@@ -257,6 +288,7 @@ mod ffi {
         type PackConfig;
         #[swift_bridge(init)]
         fn new(cache_dir: Option<String>, languages: Option<Vec<String>>, groups: Option<Vec<String>>) -> PackConfig;
+        #[swift_bridge(swift_name = "cacheDir")]
         fn cache_dir(&self) -> Option<String>;
         fn languages(&self) -> Option<Vec<String>>;
         fn groups(&self) -> Option<Vec<String>>;
@@ -392,6 +424,7 @@ mod ffi {
         fn docstrings(&self) -> bool;
         fn symbols(&self) -> bool;
         fn diagnostics(&self) -> bool;
+        #[swift_bridge(swift_name = "chunkMaxSize")]
         fn chunk_max_size(&self) -> Option<usize>;
     }
 
@@ -512,6 +545,54 @@ mod ffi {
         fn pack_config_from_json(json: String) -> Result<PackConfig, String>;
         #[swift_bridge(swift_name = "processConfigFromJson")]
         fn process_config_from_json(json: String) -> Result<ProcessConfig, String>;
+    }
+    extern "Rust" {
+
+        #[swift_bridge(swift_name = "spanFromJson")]
+        fn span_from_json(json: String) -> Result<Span, String>;
+        #[swift_bridge(swift_name = "processResultFromJson")]
+        fn process_result_from_json(json: String) -> Result<ProcessResult, String>;
+        #[swift_bridge(swift_name = "fileMetricsFromJson")]
+        fn file_metrics_from_json(json: String) -> Result<FileMetrics, String>;
+        #[swift_bridge(swift_name = "structureItemFromJson")]
+        fn structure_item_from_json(json: String) -> Result<StructureItem, String>;
+        #[swift_bridge(swift_name = "commentInfoFromJson")]
+        fn comment_info_from_json(json: String) -> Result<CommentInfo, String>;
+        #[swift_bridge(swift_name = "docstringInfoFromJson")]
+        fn docstring_info_from_json(json: String) -> Result<DocstringInfo, String>;
+        #[swift_bridge(swift_name = "docSectionFromJson")]
+        fn doc_section_from_json(json: String) -> Result<DocSection, String>;
+        #[swift_bridge(swift_name = "importInfoFromJson")]
+        fn import_info_from_json(json: String) -> Result<ImportInfo, String>;
+        #[swift_bridge(swift_name = "exportInfoFromJson")]
+        fn export_info_from_json(json: String) -> Result<ExportInfo, String>;
+        #[swift_bridge(swift_name = "symbolInfoFromJson")]
+        fn symbol_info_from_json(json: String) -> Result<SymbolInfo, String>;
+        #[swift_bridge(swift_name = "diagnosticFromJson")]
+        fn diagnostic_from_json(json: String) -> Result<Diagnostic, String>;
+        #[swift_bridge(swift_name = "codeChunkFromJson")]
+        fn code_chunk_from_json(json: String) -> Result<CodeChunk, String>;
+        #[swift_bridge(swift_name = "chunkContextFromJson")]
+        fn chunk_context_from_json(json: String) -> Result<ChunkContext, String>;
+        #[swift_bridge(swift_name = "pointFromJson")]
+        fn point_from_json(json: String) -> Result<Point, String>;
+        #[swift_bridge(swift_name = "byteRangeFromJson")]
+        fn byte_range_from_json(json: String) -> Result<ByteRange, String>;
+    }
+    extern "Rust" {
+
+        #[swift_bridge(swift_name = "structureKindFromJson")]
+        fn structure_kind_from_json(json: String) -> Result<StructureKind, String>;
+        #[swift_bridge(swift_name = "commentKindFromJson")]
+        fn comment_kind_from_json(json: String) -> Result<CommentKind, String>;
+        #[swift_bridge(swift_name = "docstringFormatFromJson")]
+        fn docstring_format_from_json(json: String) -> Result<DocstringFormat, String>;
+        #[swift_bridge(swift_name = "exportKindFromJson")]
+        fn export_kind_from_json(json: String) -> Result<ExportKind, String>;
+        #[swift_bridge(swift_name = "symbolKindFromJson")]
+        fn symbol_kind_from_json(json: String) -> Result<SymbolKind, String>;
+        #[swift_bridge(swift_name = "diagnosticSeverityFromJson")]
+        fn diagnostic_severity_from_json(json: String) -> Result<DiagnosticSeverity, String>;
     }
 }
 
@@ -1844,9 +1925,113 @@ pub fn pack_config_from_json(json: String) -> Result<PackConfig, String> {
         .map(PackConfig)
         .map_err(|e| e.to_string())
 }
-
 pub fn process_config_from_json(json: String) -> Result<ProcessConfig, String> {
     serde_json::from_str::<tree_sitter_language_pack::ProcessConfig>(&json)
         .map(ProcessConfig)
+        .map_err(|e| e.to_string())
+}
+pub fn span_from_json(json: String) -> Result<Span, String> {
+    serde_json::from_str::<tree_sitter_language_pack::Span>(&json)
+        .map(Span)
+        .map_err(|e| e.to_string())
+}
+pub fn process_result_from_json(json: String) -> Result<ProcessResult, String> {
+    serde_json::from_str::<tree_sitter_language_pack::ProcessResult>(&json)
+        .map(ProcessResult)
+        .map_err(|e| e.to_string())
+}
+pub fn file_metrics_from_json(json: String) -> Result<FileMetrics, String> {
+    serde_json::from_str::<tree_sitter_language_pack::FileMetrics>(&json)
+        .map(FileMetrics)
+        .map_err(|e| e.to_string())
+}
+pub fn structure_item_from_json(json: String) -> Result<StructureItem, String> {
+    serde_json::from_str::<tree_sitter_language_pack::StructureItem>(&json)
+        .map(StructureItem)
+        .map_err(|e| e.to_string())
+}
+pub fn comment_info_from_json(json: String) -> Result<CommentInfo, String> {
+    serde_json::from_str::<tree_sitter_language_pack::CommentInfo>(&json)
+        .map(CommentInfo)
+        .map_err(|e| e.to_string())
+}
+pub fn docstring_info_from_json(json: String) -> Result<DocstringInfo, String> {
+    serde_json::from_str::<tree_sitter_language_pack::DocstringInfo>(&json)
+        .map(DocstringInfo)
+        .map_err(|e| e.to_string())
+}
+pub fn doc_section_from_json(json: String) -> Result<DocSection, String> {
+    serde_json::from_str::<tree_sitter_language_pack::DocSection>(&json)
+        .map(DocSection)
+        .map_err(|e| e.to_string())
+}
+pub fn import_info_from_json(json: String) -> Result<ImportInfo, String> {
+    serde_json::from_str::<tree_sitter_language_pack::ImportInfo>(&json)
+        .map(ImportInfo)
+        .map_err(|e| e.to_string())
+}
+pub fn export_info_from_json(json: String) -> Result<ExportInfo, String> {
+    serde_json::from_str::<tree_sitter_language_pack::ExportInfo>(&json)
+        .map(ExportInfo)
+        .map_err(|e| e.to_string())
+}
+pub fn symbol_info_from_json(json: String) -> Result<SymbolInfo, String> {
+    serde_json::from_str::<tree_sitter_language_pack::SymbolInfo>(&json)
+        .map(SymbolInfo)
+        .map_err(|e| e.to_string())
+}
+pub fn diagnostic_from_json(json: String) -> Result<Diagnostic, String> {
+    serde_json::from_str::<tree_sitter_language_pack::Diagnostic>(&json)
+        .map(Diagnostic)
+        .map_err(|e| e.to_string())
+}
+pub fn code_chunk_from_json(json: String) -> Result<CodeChunk, String> {
+    serde_json::from_str::<tree_sitter_language_pack::CodeChunk>(&json)
+        .map(CodeChunk)
+        .map_err(|e| e.to_string())
+}
+pub fn chunk_context_from_json(json: String) -> Result<ChunkContext, String> {
+    serde_json::from_str::<tree_sitter_language_pack::ChunkContext>(&json)
+        .map(ChunkContext)
+        .map_err(|e| e.to_string())
+}
+pub fn point_from_json(json: String) -> Result<Point, String> {
+    serde_json::from_str::<tree_sitter_language_pack::Point>(&json)
+        .map(Point)
+        .map_err(|e| e.to_string())
+}
+pub fn byte_range_from_json(json: String) -> Result<ByteRange, String> {
+    serde_json::from_str::<tree_sitter_language_pack::ByteRange>(&json)
+        .map(ByteRange)
+        .map_err(|e| e.to_string())
+}
+pub fn structure_kind_from_json(json: String) -> Result<StructureKind, String> {
+    serde_json::from_str::<tree_sitter_language_pack::StructureKind>(&json)
+        .map(StructureKind::from)
+        .map_err(|e| e.to_string())
+}
+pub fn comment_kind_from_json(json: String) -> Result<CommentKind, String> {
+    serde_json::from_str::<tree_sitter_language_pack::CommentKind>(&json)
+        .map(CommentKind::from)
+        .map_err(|e| e.to_string())
+}
+pub fn docstring_format_from_json(json: String) -> Result<DocstringFormat, String> {
+    serde_json::from_str::<tree_sitter_language_pack::DocstringFormat>(&json)
+        .map(DocstringFormat::from)
+        .map_err(|e| e.to_string())
+}
+pub fn export_kind_from_json(json: String) -> Result<ExportKind, String> {
+    serde_json::from_str::<tree_sitter_language_pack::ExportKind>(&json)
+        .map(ExportKind::from)
+        .map_err(|e| e.to_string())
+}
+pub fn symbol_kind_from_json(json: String) -> Result<SymbolKind, String> {
+    serde_json::from_str::<tree_sitter_language_pack::SymbolKind>(&json)
+        .map(SymbolKind::from)
+        .map_err(|e| e.to_string())
+}
+pub fn diagnostic_severity_from_json(json: String) -> Result<DiagnosticSeverity, String> {
+    serde_json::from_str::<tree_sitter_language_pack::DiagnosticSeverity>(&json)
+        .map(DiagnosticSeverity::from)
         .map_err(|e| e.to_string())
 }
