@@ -99,9 +99,7 @@ composer require kreuzberg/tree-sitter-language-pack
 
 ## Quick Start
 
-
 See the [language guide](https://docs.tree-sitter-language-pack.kreuzberg.dev) for `php`-specific usage.
-
 
 ## Features
 

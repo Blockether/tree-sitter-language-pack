@@ -91,7 +91,6 @@ Pre-compiled tree-sitter grammars for 305 programming languages with Elixir bind
 
 ## Installation
 
-
 Add to `mix.exs`:
 
 ```elixir
@@ -105,9 +104,7 @@ end
 
 ## Quick Start
 
-
 See the [language guide](https://docs.tree-sitter-language-pack.kreuzberg.dev) for `elixir`-specific usage.
-
 
 ## Features
 

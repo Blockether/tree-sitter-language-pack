@@ -96,9 +96,7 @@ Via swift-bridge for macOS, iOS, and Linux with native Swift types and async/awa
 
 ## Quick Start
 
-
 See the [language guide](https://docs.tree-sitter-language-pack.kreuzberg.dev) for `swift`-specific usage.
-
 
 ## Features
 

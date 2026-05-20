@@ -14,7 +14,6 @@ package dev.kreuzberg.tslp.android
 
 import com.fasterxml.jackson.core.type.TypeReference
 
-/** JNI-backed wrapper holding a native `Parser` handle. */
 @Suppress("TooManyFunctions")
 class Parser internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {
@@ -65,7 +64,6 @@ class Parser internal constructor(internal val handle: Long) : AutoCloseable {
     }
 }
 
-/** JNI-backed wrapper holding a native `Tree` handle. */
 @Suppress("TooManyFunctions")
 class Tree internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {
@@ -95,7 +93,6 @@ class Tree internal constructor(internal val handle: Long) : AutoCloseable {
     }
 }
 
-/** JNI-backed wrapper holding a native `Node` handle. */
 @Suppress("TooManyFunctions")
 class Node internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {
@@ -233,7 +230,6 @@ class Node internal constructor(internal val handle: Long) : AutoCloseable {
     }
 }
 
-/** JNI-backed wrapper holding a native `TreeCursor` handle. */
 @Suppress("TooManyFunctions")
 class TreeCursor internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {
@@ -280,7 +276,6 @@ class TreeCursor internal constructor(internal val handle: Long) : AutoCloseable
     }
 }
 
-/** JNI-backed wrapper holding a native `LanguageRegistry` handle. */
 @Suppress("TooManyFunctions")
 class LanguageRegistry internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {
@@ -344,7 +339,6 @@ class LanguageRegistry internal constructor(internal val handle: Long) : AutoClo
     }
 }
 
-/** JNI-backed wrapper holding a native `DownloadManager` handle. */
 @Suppress("TooManyFunctions")
 class DownloadManager internal constructor(internal val handle: Long) : AutoCloseable {
     companion object {

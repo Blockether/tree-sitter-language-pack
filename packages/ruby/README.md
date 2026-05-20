@@ -99,9 +99,7 @@ gem install tree_sitter_language_pack
 
 ## Quick Start
 
-
 See the [language guide](https://docs.tree-sitter-language-pack.kreuzberg.dev) for `ruby`-specific usage.
-
 
 ## Features
 
