@@ -689,7 +689,7 @@ public func diagnosticSeverityFromJson(_ json: String) throws -> DiagnosticSever
 /// assert_eq!(detect_language_from_extension("xyz"), None);
 /// ```
 public func detectLanguageFromExtension(ext: String) -> String? {
-    return RustBridge.detectLanguageFromExtension(ext)
+    return RustBridge.detectLanguageFromExtension(ext)?.toString()
 }
 
 /// Detect language name from a file path.
@@ -704,7 +704,7 @@ public func detectLanguageFromExtension(ext: String) -> String? {
 /// assert_eq!(detect_language_from_path("Makefile"), None);
 /// ```
 public func detectLanguageFromPath(path: String) -> String? {
-    return RustBridge.detectLanguageFromPath(path)
+    return RustBridge.detectLanguageFromPath(path)?.toString()
 }
 
 /// Detect language name from file content using the shebang line (`#!`).
@@ -730,7 +730,7 @@ public func detectLanguageFromPath(path: String) -> String? {
 /// assert_eq!(detect_language_from_content("no shebang here"), None);
 /// ```
 public func detectLanguageFromContent(content: String) -> String? {
-    return RustBridge.detectLanguageFromContent(content)
+    return RustBridge.detectLanguageFromContent(content)?.toString()
 }
 
 /// Get the highlights query for a language, if bundled.
@@ -750,7 +750,7 @@ public func detectLanguageFromContent(content: String) -> String? {
 /// assert!(missing.is_none());
 /// ```
 public func getHighlightsQuery(language: String) -> String? {
-    return RustBridge.getHighlightsQuery(language)
+    return RustBridge.getHighlightsQuery(language)?.toString()
 }
 
 /// Get the injections query for a language, if bundled.
@@ -769,7 +769,7 @@ public func getHighlightsQuery(language: String) -> String? {
 /// assert!(missing.is_none());
 /// ```
 public func getInjectionsQuery(language: String) -> String? {
-    return RustBridge.getInjectionsQuery(language)
+    return RustBridge.getInjectionsQuery(language)?.toString()
 }
 
 /// Get the locals query for a language, if bundled.
@@ -788,7 +788,7 @@ public func getInjectionsQuery(language: String) -> String? {
 /// assert!(missing.is_none());
 /// ```
 public func getLocalsQuery(language: String) -> String? {
-    return RustBridge.getLocalsQuery(language)
+    return RustBridge.getLocalsQuery(language)?.toString()
 }
 
 /// Get a tree-sitter [`Language`] by name using the global registry.
@@ -846,7 +846,7 @@ public func getParser(name: String) throws -> Parser {
 ///
 /// This compatibility alias matches the pre-Alef Python binding API.
 public func detectLanguage(path: String) -> String? {
-    return RustBridge.detectLanguage(path)
+    return RustBridge.detectLanguage(path)?.toString()
 }
 
 /// List all available language names (sorted, deduplicated, includes aliases).
@@ -925,7 +925,8 @@ public func languageCount() -> UInt {
 /// println!("Structures: {}", result.structure.len());
 /// ```
 public func process(source: String, config: ProcessConfig) throws -> ProcessResult {
-    return try RustBridge.process(source, config)
+    let _rb_config = try config.intoRust()
+    return try RustBridge.process(source, _rb_config)
 }
 
 /// Initialize the language pack with the given configuration.

@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.7"
+alef_version = "0.17.10"
 languages = [
   "python",
   "node",
@@ -377,7 +377,7 @@ e2e = "cd e2e/php && php run_tests.php"
 
 [crates.test.java]
 precondition = "command -v mvn >/dev/null 2>&1"
-before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,mojo,nim,norg cargo build --release -p ts-pack-core-ffi && mvn package -f packages/java/pom.xml -DskipTests -B -q"
+before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,rust,javascript,typescript,go,html,css,json,bash,mojo,nim,norg cargo build --release -p ts-pack-core-ffi && mvn package -f packages/java/pom.xml -DskipTests -B -q"
 command = "cd packages/java && mvn test"
 e2e = "cd e2e/java && mvn test -B"
 
@@ -522,6 +522,9 @@ result_is_simple = true
 result_is_option = true
 args = [{ name = "ext", field = "extension", type = "string" }]
 
+[crates.e2e.calls.detect_extension.overrides.go]
+result_is_pointer = false
+
 [crates.e2e.calls.detect_extension.overrides.c]
 function = "ts_pack_detect_language_from_extension"
 raw_c_result_type = "char*"
@@ -533,6 +536,9 @@ result_var = "result"
 result_is_simple = true
 result_is_option = true
 args = [{ name = "path", field = "path", type = "string" }]
+
+[crates.e2e.calls.detect_path.overrides.go]
+result_is_pointer = false
 
 [crates.e2e.calls.detect_path.overrides.c]
 function = "ts_pack_detect_language_from_path"
@@ -546,6 +552,9 @@ result_is_simple = true
 result_is_option = true
 args = [{ name = "content", field = "content", type = "string" }]
 
+[crates.e2e.calls.detect_content.overrides.go]
+result_is_pointer = false
+
 [crates.e2e.calls.detect_content.overrides.c]
 function = "ts_pack_detect_language_from_content"
 raw_c_result_type = "char*"
@@ -556,6 +565,9 @@ module = "tree_sitter_language_pack"
 result_var = "result"
 result_is_simple = true
 args = [{ name = "name", field = "language", type = "string" }]
+
+[crates.e2e.calls.has_language.overrides.go]
+returns_result = false
 
 [crates.e2e.calls.has_language.overrides.c]
 function = "ts_pack_has_language"
@@ -569,6 +581,9 @@ result_is_simple = true
 result_is_array = true
 args = []
 
+[crates.e2e.calls.list_languages.overrides.go]
+result_is_pointer = false
+
 [crates.e2e.calls.list_languages.overrides.c]
 function = "ts_pack_available_languages"
 raw_c_result_type = "char*"
@@ -580,6 +595,9 @@ result_var = "result"
 result_is_simple = true
 result_is_option = true
 args = [{ name = "language", field = "language", type = "string" }]
+
+[crates.e2e.calls.highlights.overrides.go]
+result_is_pointer = false
 
 [crates.e2e.calls.highlights.overrides.c]
 function = "ts_pack_get_highlights_query"
@@ -593,6 +611,9 @@ result_is_simple = true
 result_is_option = true
 args = [{ name = "language", field = "language", type = "string" }]
 
+[crates.e2e.calls.injections.overrides.go]
+result_is_pointer = false
+
 [crates.e2e.calls.injections.overrides.c]
 function = "ts_pack_get_injections_query"
 raw_c_result_type = "char*"
@@ -605,6 +626,9 @@ result_is_simple = true
 result_is_option = true
 args = [{ name = "language", field = "language", type = "string" }]
 
+[crates.e2e.calls.locals.overrides.go]
+result_is_pointer = false
+
 [crates.e2e.calls.locals.overrides.c]
 function = "ts_pack_get_locals_query"
 raw_c_result_type = "char*"
@@ -615,6 +639,9 @@ module = "tree_sitter_language_pack"
 result_var = "result"
 result_is_simple = true
 args = []
+
+[crates.e2e.calls.language_count.overrides.go]
+returns_result = false
 
 [crates.e2e.calls.language_count.overrides.c]
 function = "ts_pack_language_count"
@@ -700,6 +727,10 @@ returns_result = true
 result_is_simple = true
 args = [{ name = "names", field = "languages", type = "json_object", element_type = "String" }]
 
+[crates.e2e.calls.download_languages.overrides.go]
+function = "Download"
+result_is_pointer = false
+
 [crates.e2e.calls.download_languages.overrides.c]
 function = "ts_pack_download"
 raw_c_result_type = "uintptr_t"
@@ -713,6 +744,9 @@ result_is_simple = true
 result_is_array = true
 args = []
 
+[crates.e2e.calls.manifest_languages.overrides.go]
+result_is_pointer = false
+
 [crates.e2e.calls.manifest_languages.overrides.c]
 function = "ts_pack_manifest_languages"
 raw_c_result_type = "char*"
@@ -724,6 +758,9 @@ result_var = "result"
 result_is_simple = true
 result_is_array = true
 args = []
+
+[crates.e2e.calls.downloaded_languages.overrides.go]
+result_is_pointer = false
 
 [crates.e2e.calls.downloaded_languages.overrides.c]
 function = "ts_pack_downloaded_languages"
@@ -748,6 +785,9 @@ result_var = "result"
 returns_result = true
 result_is_simple = true
 args = []
+
+[crates.e2e.calls.cache_dir.overrides.go]
+result_is_pointer = false
 
 [crates.e2e.calls.cache_dir.overrides.c]
 function = "ts_pack_cache_dir"
