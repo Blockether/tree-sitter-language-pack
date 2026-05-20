@@ -96,9 +96,7 @@ Built with flutter_rust_bridge for isolate-safe Future APIs and Flutter-native t
 
 ## Quick Start
 
-
 See the [language guide](https://docs.tree-sitter-language-pack.kreuzberg.dev) for `dart`-specific usage.
-
 
 ## Features
 

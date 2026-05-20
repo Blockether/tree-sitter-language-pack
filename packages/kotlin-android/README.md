@@ -97,9 +97,7 @@ JVM consumers should use the canonical `dev.kreuzberg.treesitterlanguagepack:tre
 
 ## Quick Start
 
-
 See the [language guide](https://docs.tree-sitter-language-pack.kreuzberg.dev) for `kotlin_android`-specific usage.
-
 
 ## Features
 

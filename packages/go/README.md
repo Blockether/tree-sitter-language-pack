@@ -99,9 +99,7 @@ go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go
 
 ## Quick Start
 
-
 See the [language guide](https://docs.tree-sitter-language-pack.kreuzberg.dev) for `go`-specific usage.
-
 
 ## Features
 

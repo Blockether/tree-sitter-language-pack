@@ -99,9 +99,7 @@ dotnet add package TreeSitterLanguagePack
 
 ## Quick Start
 
-
 See the [language guide](https://docs.tree-sitter-language-pack.kreuzberg.dev) for `csharp`-specific usage.
-
 
 ## Features
 

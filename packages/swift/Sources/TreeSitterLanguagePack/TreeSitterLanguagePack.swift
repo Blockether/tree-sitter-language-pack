@@ -427,7 +427,7 @@ public typealias Language = RustBridge.Language
 /// Categorizes top-level and nested declarations such as functions, classes,
 /// structs, enums, traits, and more. Use [`Other`](StructureKind::Other) for
 /// language-specific constructs that do not fit a standard category.
-public enum StructureKind {
+public enum StructureKind: Codable, Sendable, Hashable {
     case function
     case method
     case `class`
@@ -469,7 +469,7 @@ extension CommentKind {
 ///
 /// Identifies the docstring convention used, which varies by language
 /// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
-public enum DocstringFormat {
+public enum DocstringFormat: Codable, Sendable, Hashable {
     case pythonTripleQuote
     case jsDoc
     case rustdoc
@@ -505,7 +505,7 @@ extension ExportKind {
 ///
 /// Categorizes symbol definitions such as variables, constants, functions,
 /// classes, types, interfaces, enums, and modules.
-public enum SymbolKind {
+public enum SymbolKind: Codable, Sendable, Hashable {
     case variable
     case constant
     case function
