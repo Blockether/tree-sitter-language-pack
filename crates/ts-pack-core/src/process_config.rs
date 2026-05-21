@@ -20,6 +20,7 @@ use std::borrow::Cow;
 /// ```
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct ProcessConfig {
     /// Language name (required).
     pub language: Cow<'static, str>,
