@@ -701,6 +701,22 @@ List languages that are already downloaded and cached.
 pub fn installedLanguages(self: *const DownloadManager) []const [:0]const u8
 ```
 
+#### testingExtractLanguages()
+
+Thin public re-export of `extract_languages` gated on the
+`test-internals` feature (or `#[cfg(test)]`).
+
+Integration tests that need to call `extract_languages` directly (e.g.
+the cross-process concurrency test) should use this wrapper so they do
+not bypass the cross-process file lock invisibly. The name makes the
+test-only nature obvious.
+
+**Signature:**
+
+```zig
+pub fn testingExtractLanguages(self: *const DownloadManager, archive_data: []const u8, names: []const [:0]const u8) Error!void
+```
+
 #### downloadAllBestEffort()
 
 Download the platform bundle and extract every library file it contains.
@@ -721,6 +737,13 @@ pub fn downloadAllBestEffort(self: *const DownloadManager) Error!u64
 #### cleanCache()
 
 Remove all cached parser libraries.
+
+Acquires the cross-process lock so `clean_cache` cannot race a concurrent
+downloader (avoids Windows sharing-violation errors against an in-flight
+bundle write). The `.download.lock` file itself is **not** removed — it is
+permanent infrastructure; deleting it could allow a concurrent process that
+already opened the file to continue holding a stale lock handle while a new
+process opens a fresh inode, breaking the mutual-exclusion guarantee.
 
 **Signature:**
 
