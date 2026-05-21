@@ -157,6 +157,16 @@ app_name = "tree_sitter_language_pack"
 [crates.wasm]
 env_shims = ["iswspace", "iswalnum", "towupper", "iswalpha"]
 features = ["serde", "config", "dynamic-loading"]
+# Curated grammar subset that's statically compiled into the wasm32 binary.
+# Mirrors the TSLP_LANGUAGES list used by the publish-wasm CI job so that
+# alef's `[crates.e2e.wasm]` auto-skip path correctly elides fixtures for
+# grammars that aren't present in the wasm bundle.
+languages = [
+  "python", "javascript", "typescript", "tsx", "rust", "go", "java",
+  "c", "cpp", "csharp", "ruby", "php", "html", "css", "json", "yaml",
+  "toml", "markdown", "bash", "sql", "lua", "scala", "kotlin", "swift",
+  "dockerfile", "vue", "svelte", "elixir", "erlang", "haskell", "zig",
+]
 
 [crates.ffi]
 prefix = "ts_pack"
@@ -393,7 +403,11 @@ e2e = "cd e2e/elixir && TREE_SITTER_LANGUAGE_PACK_BUILD=1 mix test"
 
 [crates.test.wasm]
 precondition = "command -v pnpm >/dev/null 2>&1 && command -v wasm-pack >/dev/null 2>&1"
-before = "wasm-pack build crates/ts-pack-core-wasm --target nodejs --release --out-dir pkg/nodejs"
+# Mirror the publish-wasm CI environment: curated grammar subset + reduced
+# LLVM passes so the wasm32 cross-compile completes in reasonable time.
+# Without TSLP_LANGUAGES, all 305 grammars compile statically — abl/parser.c
+# alone is 97MB and hangs clang at -O2 for tens of minutes.
+before = "TSLP_LINK_MODE=static TSLP_LANGUAGES=python,javascript,typescript,tsx,rust,go,java,c,cpp,csharp,ruby,php,html,css,json,yaml,toml,markdown,bash,sql,lua,scala,kotlin,swift,dockerfile,vue,svelte,elixir,erlang,haskell,zig CARGO_PROFILE_RELEASE_LTO=false CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16 wasm-pack build crates/ts-pack-core-wasm --target nodejs --release --out-dir pkg/nodejs"
 e2e = "cd e2e/wasm && pnpm install && pnpm test"
 
 [crates.test.rust]
