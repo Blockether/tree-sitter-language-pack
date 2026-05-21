@@ -31,6 +31,15 @@ public struct Span: Codable, Sendable, Hashable {
         case endLine = "end_line"
         case endColumn = "end_column"
     }
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.startByte = try container.decodeIfPresent(UInt.self, forKey: .startByte) ?? 0
+        self.endByte = try container.decodeIfPresent(UInt.self, forKey: .endByte) ?? 0
+        self.startLine = try container.decodeIfPresent(UInt.self, forKey: .startLine) ?? 0
+        self.startColumn = try container.decodeIfPresent(UInt.self, forKey: .startColumn) ?? 0
+        self.endLine = try container.decodeIfPresent(UInt.self, forKey: .endLine) ?? 0
+        self.endColumn = try container.decodeIfPresent(UInt.self, forKey: .endColumn) ?? 0
+    }
 }
 
 // MARK: - Internal FFI conversions for Span
@@ -98,6 +107,17 @@ public struct FileMetrics: Codable, Sendable, Hashable {
         case errorCount = "error_count"
         case maxDepth = "max_depth"
     }
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.totalLines = try container.decodeIfPresent(UInt.self, forKey: .totalLines) ?? 0
+        self.codeLines = try container.decodeIfPresent(UInt.self, forKey: .codeLines) ?? 0
+        self.commentLines = try container.decodeIfPresent(UInt.self, forKey: .commentLines) ?? 0
+        self.blankLines = try container.decodeIfPresent(UInt.self, forKey: .blankLines) ?? 0
+        self.totalBytes = try container.decodeIfPresent(UInt.self, forKey: .totalBytes) ?? 0
+        self.nodeCount = try container.decodeIfPresent(UInt.self, forKey: .nodeCount) ?? 0
+        self.errorCount = try container.decodeIfPresent(UInt.self, forKey: .errorCount) ?? 0
+        self.maxDepth = try container.decodeIfPresent(UInt.self, forKey: .maxDepth) ?? 0
+    }
 }
 
 // MARK: - Internal FFI conversions for FileMetrics
@@ -138,6 +158,13 @@ public struct CommentInfo: Codable, Sendable, Hashable {
         case span = "span"
         case associatedNode = "associated_node"
     }
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.text = try container.decodeIfPresent(String.self, forKey: .text) ?? ""
+        self.kind = try container.decode(CommentKind.self, forKey: .kind)
+        self.span = try container.decode(Span.self, forKey: .span)
+        self.associatedNode = try container.decodeIfPresent(String.self, forKey: .associatedNode) ?? nil
+    }
 }
 
 // MARK: - Internal FFI conversions for CommentInfo
@@ -165,6 +192,17 @@ public struct DocSection: Codable, Sendable, Hashable {
         self.kind = kind
         self.name = name
         self.description = description
+    }
+    private enum CodingKeys: String, CodingKey {
+        case kind = "kind"
+        case name = "name"
+        case description = "description"
+    }
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.kind = try container.decodeIfPresent(String.self, forKey: .kind) ?? ""
+        self.name = try container.decodeIfPresent(String.self, forKey: .name) ?? nil
+        self.description = try container.decodeIfPresent(String.self, forKey: .description) ?? ""
     }
 }
 
@@ -201,6 +239,14 @@ public struct ImportInfo: Codable, Sendable, Hashable {
         case isWildcard = "is_wildcard"
         case span = "span"
     }
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.source = try container.decodeIfPresent(String.self, forKey: .source) ?? ""
+        self.items = try container.decodeIfPresent([String].self, forKey: .items) ?? []
+        self.alias = try container.decodeIfPresent(String.self, forKey: .alias) ?? nil
+        self.isWildcard = try container.decodeIfPresent(Bool.self, forKey: .isWildcard) ?? false
+        self.span = try container.decode(Span.self, forKey: .span)
+    }
 }
 
 // MARK: - Internal FFI conversions for ImportInfo
@@ -229,6 +275,17 @@ public struct ExportInfo: Codable, Sendable, Hashable {
         self.kind = kind
         self.span = span
     }
+    private enum CodingKeys: String, CodingKey {
+        case name = "name"
+        case kind = "kind"
+        case span = "span"
+    }
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decodeIfPresent(String.self, forKey: .name) ?? ""
+        self.kind = try container.decode(ExportKind.self, forKey: .kind)
+        self.span = try container.decode(Span.self, forKey: .span)
+    }
 }
 
 // MARK: - Internal FFI conversions for ExportInfo
@@ -255,6 +312,17 @@ public struct Diagnostic: Codable, Sendable, Hashable {
         self.message = message
         self.severity = severity
         self.span = span
+    }
+    private enum CodingKeys: String, CodingKey {
+        case message = "message"
+        case severity = "severity"
+        case span = "span"
+    }
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.message = try container.decodeIfPresent(String.self, forKey: .message) ?? ""
+        self.severity = try container.decode(DiagnosticSeverity.self, forKey: .severity)
+        self.span = try container.decode(Span.self, forKey: .span)
     }
 }
 
@@ -399,6 +467,18 @@ public struct ProcessConfig: Codable, Sendable, Hashable {
         case symbols = "symbols"
         case diagnostics = "diagnostics"
         case chunkMaxSize = "chunk_max_size"
+    }
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.language = try container.decodeIfPresent(String.self, forKey: .language) ?? ""
+        self.structure = try container.decodeIfPresent(Bool.self, forKey: .structure) ?? true
+        self.imports = try container.decodeIfPresent(Bool.self, forKey: .imports) ?? true
+        self.exports = try container.decodeIfPresent(Bool.self, forKey: .exports) ?? true
+        self.comments = try container.decodeIfPresent(Bool.self, forKey: .comments) ?? false
+        self.docstrings = try container.decodeIfPresent(Bool.self, forKey: .docstrings) ?? false
+        self.symbols = try container.decodeIfPresent(Bool.self, forKey: .symbols) ?? false
+        self.diagnostics = try container.decodeIfPresent(Bool.self, forKey: .diagnostics) ?? false
+        self.chunkMaxSize = try container.decodeIfPresent(UInt.self, forKey: .chunkMaxSize) ?? nil
     }
 }
 

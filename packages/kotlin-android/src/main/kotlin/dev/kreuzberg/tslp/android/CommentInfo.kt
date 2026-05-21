@@ -24,7 +24,7 @@ package dev.kreuzberg.tslp.android
 /** A comment extracted from source code. */
 data class CommentInfo(
     val text: String,
-    val kind: CommentKind,
-    val span: Span,
-    val associatedNode: String?
+    val kind: CommentKind = CommentKind.LINE,
+    val span: Span = Span(),
+    val associatedNode: String? = null,
 )

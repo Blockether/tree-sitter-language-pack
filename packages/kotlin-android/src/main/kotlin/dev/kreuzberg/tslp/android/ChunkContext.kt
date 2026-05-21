@@ -26,10 +26,10 @@ data class ChunkContext(
     val language: String,
     val chunkIndex: Long,
     val totalChunks: Long,
-    val nodeTypes: List<String>,
-    val contextPath: List<String>,
-    val symbolsDefined: List<String>,
-    val comments: List<CommentInfo>,
-    val docstrings: List<DocstringInfo>,
-    val hasErrorNodes: Boolean
+    val nodeTypes: List<String> = emptyList(),
+    val contextPath: List<String> = emptyList(),
+    val symbolsDefined: List<String> = emptyList(),
+    val comments: List<CommentInfo> = emptyList(),
+    val docstrings: List<DocstringInfo> = emptyList(),
+    val hasErrorNodes: Boolean,
 )

@@ -24,8 +24,8 @@ package dev.kreuzberg.tslp.android
 /** A docstring extracted from source code. */
 data class DocstringInfo(
     val text: String,
-    val format: DocstringFormat,
-    val span: Span,
-    val associatedItem: String?,
-    val parsedSections: List<DocSection>
+    val format: DocstringFormat = DocstringFormat.PYTHON_TRIPLE_QUOTE,
+    val span: Span = Span(),
+    val associatedItem: String? = null,
+    val parsedSections: List<DocSection> = emptyList(),
 )
