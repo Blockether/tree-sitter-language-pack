@@ -30,19 +30,19 @@ data class ProcessConfig(
     /** Language name (required). */
     val language: String,
     /** Extract structural items (functions, classes, etc.). Default: true. */
-    val structure: Boolean,
+    val structure: Boolean = true,
     /** Extract import statements. Default: true. */
-    val imports: Boolean,
+    val imports: Boolean = true,
     /** Extract export statements. Default: true. */
-    val exports: Boolean,
+    val exports: Boolean = true,
     /** Extract comments. Default: false. */
-    val comments: Boolean,
+    val comments: Boolean = false,
     /** Extract docstrings. Default: false. */
-    val docstrings: Boolean,
+    val docstrings: Boolean = false,
     /** Extract symbol definitions. Default: false. */
-    val symbols: Boolean,
+    val symbols: Boolean = false,
     /** Include parse diagnostics. Default: false. */
-    val diagnostics: Boolean,
+    val diagnostics: Boolean = false,
     /** Maximum chunk size in bytes. `null` disables chunking. */
-    val chunkMaxSize: Long?
+    val chunkMaxSize: Long? = null,
 )

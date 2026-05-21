@@ -24,8 +24,8 @@ package dev.kreuzberg.tslp.android
 /** An import statement extracted from source code. */
 data class ImportInfo(
     val source: String,
-    val items: List<String>,
-    val alias: String?,
+    val items: List<String> = emptyList(),
+    val alias: String? = null,
     val isWildcard: Boolean,
-    val span: Span
+    val span: Span = Span(),
 )

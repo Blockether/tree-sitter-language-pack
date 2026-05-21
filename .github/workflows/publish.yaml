@@ -1096,10 +1096,22 @@ jobs:
             exit 1
           fi
           echo "Checking JAR: $JAR"
-          COUNT=$(jar tf "$JAR" | grep -cE '^natives/[^/]+/(lib)?ts_pack_core_ffi\.(so|dll|dylib)$' || true)
-          echo "Native libs found in JAR: $COUNT"
-          if [ "$COUNT" -eq 0 ]; then
-            echo "::error::JAR contains no natives/ entries — native staging failed"
+          ENTRIES=$(jar tf "$JAR" | grep -E '^natives/[^/]+/(lib)?ts_pack_core_ffi\.(so|dll|dylib)$' || true)
+          echo "Native lib entries:"
+          echo "$ENTRIES"
+          # Issue #128: a previous bug staged every lib under `natives/native/`
+          # because the re-stage loop walked one dirname too far. Require each
+          # expected classifier directory to be present individually so the
+          # collapse-to-`native` regression cannot ship again.
+          REQUIRED_CLASSIFIERS="linux-x86_64 linux-arm64 macos-arm64 macos-x86_64 windows-x86_64 windows-aarch64"
+          missing=()
+          for c in $REQUIRED_CLASSIFIERS; do
+            if ! echo "$ENTRIES" | grep -qE "^natives/$c/(lib)?ts_pack_core_ffi\.(so|dll|dylib)$"; then
+              missing+=("$c")
+            fi
+          done
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error::JAR missing natives for classifiers: ${missing[*]}"
             jar tf "$JAR" | grep -E '^natives/' || echo "(no natives/ entries at all)"
             exit 1
           fi
@@ -2193,17 +2205,36 @@ jobs:
         run: |
           ARTIFACTS_DIR="artifacts/java-natives"
           RESOURCES_DIR="packages/java/src/main/resources/natives"
+          REQUIRED_CLASSIFIERS="linux-x86_64 linux-arm64 macos-arm64 macos-x86_64 windows-x86_64 windows-aarch64"
           mkdir -p "$RESOURCES_DIR"
-          # Mirror the build-java-package staging step exactly:
-          # artifact layout is $ARTIFACTS_DIR/java-natives-{label}/{platform}/native/{libfile}
+          # build-java-natives@v1 stages each lib at
+          # `{output-dir}/native/{classifier}/{libfile}` and uploads that tree as
+          # artifact `java-natives-{label}`. download-artifact with
+          # `merge-multiple: false` preserves the artifact-name wrapper, so the
+          # final layout is:
+          #   $ARTIFACTS_DIR/java-natives-{label}/native/{classifier}/{libfile}
+          # The classifier is the lib's immediate parent — one `dirname` up.
           find "$ARTIFACTS_DIR" \( -name '*.so' -o -name '*.dll' -o -name '*.dylib' \) -print0 |
           while IFS= read -r -d '' f; do
-            platform=$(basename "$(dirname "$(dirname "$f")")")
+            platform=$(basename "$(dirname "$f")")
             mkdir -p "$RESOURCES_DIR/$platform"
             cp "$f" "$RESOURCES_DIR/$platform/"
           done
           echo "=== Staged native resources for deploy ==="
           find "$RESOURCES_DIR" -type f | sort
+          # Fail loudly if any required classifier directory is empty — this
+          # caught us on 1.8.1 where natives collapsed under `natives/native/`
+          # because the previous loop used `dirname "$(dirname …)"`.
+          missing=()
+          for c in $REQUIRED_CLASSIFIERS; do
+            if ! ls "$RESOURCES_DIR/$c"/*ts_pack_core_ffi* >/dev/null 2>&1; then
+              missing+=("$c")
+            fi
+          done
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error::missing classifier dirs: ${missing[*]}"
+            exit 1
+          fi
 
       - name: Publish to Maven Central
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}

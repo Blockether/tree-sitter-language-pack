@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.13"
+alef_version = "0.17.17"
 languages = [
   "python",
   "node",
@@ -155,7 +155,14 @@ cargo_crate_name = "ts-pack-core-php"
 app_name = "tree_sitter_language_pack"
 
 [crates.wasm]
-env_shims = ["iswspace", "iswalnum", "towupper", "iswalpha"]
+# C-stdlib symbols imported by tree-sitter external scanners under wasm32.
+# `wasm-objdump -j Import` on the bundle shows these 10 are pulled in by the
+# curated grammar set; alef emits Rust shims for each.
+env_shims = [
+  "iswspace", "iswalnum", "iswalpha", "iswlower", "iswupper", "iswxdigit",
+  "towupper", "towlower",
+  "memchr", "strcmp",
+]
 features = ["serde", "config", "dynamic-loading"]
 # Curated grammar subset that's statically compiled into the wasm32 binary.
 # Mirrors the TSLP_LANGUAGES list used by the publish-wasm CI job so that
@@ -207,6 +214,18 @@ package_name = "TreeSitterLanguagePack"
 
 [crates.zig]
 module_name = "tree_sitter_language_pack"
+# Curated set mirroring the TSLP_LANGUAGES value used by the
+# `[crates.test.zig].before` step. Zig can technically load any grammar via
+# the ts_pack_core_ffi runtime auto-download path (same as Go/C#/Java), but
+# we restrict the zig e2e suite to the statically-compiled set so it runs
+# offline and is not subject to the download-cache race that hits when
+# `zig build test` runs eight test binaries in parallel against a shared
+# `~/.cache/tree-sitter-language-pack/` directory.
+languages = [
+  "python", "rust", "javascript", "typescript", "go", "html", "css",
+  "json", "bash", "c", "cpp", "java", "ruby", "swift", "kotlin",
+  "mojo", "nim", "norg",
+]
 
 [crates.output]
 python = "crates/ts-pack-core-py/src/"
@@ -531,6 +550,12 @@ options_type = "ProcessConfig"
 
 [crates.e2e.call.overrides.swift]
 options_type = "ProcessConfig"
+# swift-bridge opaque struct elements expose differently-named accessors than
+# the generic `as_str()` fallback. Each entry maps a fixture field name to
+# the actual Swift method that returns the comparable string.
+#   - `structure` items expose `kind()` (StructureKind name).
+#   - `imports` items expose `source()` (the imported module path).
+result_field_accessor = { "structure" = "kind", "imports" = "source" }
 
 [crates.e2e.call.overrides.zig]
 options_type = "ProcessConfig"
@@ -606,6 +631,11 @@ args = []
 
 [crates.e2e.calls.list_languages.overrides.go]
 result_is_pointer = false
+
+[crates.e2e.calls.list_languages.overrides.swift]
+# Swift exposes `availableLanguages() -> [String]`; native array elements
+# already have no `asStr()` accessor.
+result_element_is_string = true
 
 [crates.e2e.calls.list_languages.overrides.c]
 function = "ts_pack_available_languages"
@@ -719,6 +749,9 @@ options_type = "PackConfig"
 [crates.e2e.calls.init_pack.overrides.swift]
 options_type = "PackConfig"
 
+[crates.e2e.calls.init_pack.overrides.dart]
+options_type = "PackConfig"
+
 [crates.e2e.calls.configure_pack]
 function = "configure"
 module = "tree_sitter_language_pack"
@@ -741,6 +774,9 @@ options_type = "PackConfig"
 path_fields = ["cache_dir"]
 
 [crates.e2e.calls.configure_pack.overrides.swift]
+options_type = "PackConfig"
+
+[crates.e2e.calls.configure_pack.overrides.dart]
 options_type = "PackConfig"
 
 [crates.e2e.calls.download_languages]
@@ -771,6 +807,12 @@ args = []
 [crates.e2e.calls.manifest_languages.overrides.go]
 result_is_pointer = false
 
+[crates.e2e.calls.manifest_languages.overrides.swift]
+# Swift binding exposes `manifestLanguages() -> [String]` (native Swift array,
+# not opaque `RustVec<RustString>`); iterating elements yields plain Swift
+# `String` which has no `asStr()` method.
+result_element_is_string = true
+
 [crates.e2e.calls.manifest_languages.overrides.c]
 function = "ts_pack_manifest_languages"
 raw_c_result_type = "char*"
@@ -785,6 +827,9 @@ args = []
 
 [crates.e2e.calls.downloaded_languages.overrides.go]
 result_is_pointer = false
+
+[crates.e2e.calls.downloaded_languages.overrides.swift]
+result_element_is_string = true
 
 [crates.e2e.calls.downloaded_languages.overrides.c]
 function = "ts_pack_downloaded_languages"
