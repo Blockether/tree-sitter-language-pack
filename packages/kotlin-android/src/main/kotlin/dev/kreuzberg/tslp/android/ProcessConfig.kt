@@ -28,7 +28,7 @@ package dev.kreuzberg.tslp.android
  */
 data class ProcessConfig(
     /** Language name (required). */
-    val language: String,
+    val language: String = "",
     /** Extract structural items (functions, classes, etc.). Default: true. */
     val structure: Boolean = true,
     /** Extract import statements. Default: true. */
@@ -44,5 +44,5 @@ data class ProcessConfig(
     /** Include parse diagnostics. Default: false. */
     val diagnostics: Boolean = false,
     /** Maximum chunk size in bytes. `null` disables chunking. */
-    val chunkMaxSize: Long? = null,
+    val chunkMaxSize: Long? = null
 )

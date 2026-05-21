@@ -28,10 +28,10 @@ package dev.kreuzberg.tslp.android
  * positions (for display and diagnostics).
  */
 data class Span(
-    val startByte: Long,
-    val endByte: Long,
-    val startLine: Long,
-    val startColumn: Long,
-    val endLine: Long,
-    val endColumn: Long
+    val startByte: Long = 0L,
+    val endByte: Long = 0L,
+    val startLine: Long = 0L,
+    val startColumn: Long = 0L,
+    val endLine: Long = 0L,
+    val endColumn: Long = 0L
 )

@@ -23,10 +23,10 @@ package dev.kreuzberg.tslp.android
 
 /** A chunk of source code with rich metadata. */
 data class CodeChunk(
-    val content: String,
-    val startByte: Long,
-    val endByte: Long,
-    val startLine: Long,
-    val endLine: Long,
-    val metadata: ChunkContext = ChunkContext(),
+    val content: String = "",
+    val startByte: Long = 0L,
+    val endByte: Long = 0L,
+    val startLine: Long = 0L,
+    val endLine: Long = 0L,
+    val metadata: ChunkContext
 )
