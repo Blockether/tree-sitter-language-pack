@@ -23,13 +23,13 @@ package dev.kreuzberg.tslp.android
 
 /** Metadata for a single chunk of source code. */
 data class ChunkContext(
-    val language: String,
-    val chunkIndex: Long,
-    val totalChunks: Long,
+    val language: String = "",
+    val chunkIndex: Long = 0L,
+    val totalChunks: Long = 0L,
     val nodeTypes: List<String> = emptyList(),
     val contextPath: List<String> = emptyList(),
     val symbolsDefined: List<String> = emptyList(),
     val comments: List<CommentInfo> = emptyList(),
     val docstrings: List<DocstringInfo> = emptyList(),
-    val hasErrorNodes: Boolean,
+    val hasErrorNodes: Boolean = false
 )

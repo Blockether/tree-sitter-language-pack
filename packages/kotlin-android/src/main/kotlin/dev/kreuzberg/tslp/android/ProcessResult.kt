@@ -24,13 +24,13 @@ package dev.kreuzberg.tslp.android
 /**
  * Complete analysis result from processing a source file.
  *
- * Contains metrics, structural analysis, imports/exports, comments, docstrings, symbols,
- * diagnostics, and optionally chunked code segments. Fields are populated based on the
- * `ProcessConfig` flags.
+ * Contains metrics, structural analysis, imports/exports, comments,
+ * docstrings, symbols, diagnostics, and optionally chunked code segments.
+ * Fields are populated based on the `ProcessConfig` flags.
  */
 data class ProcessResult(
-    val language: String,
-    val metrics: FileMetrics = FileMetrics(),
+    val language: String = "",
+    val metrics: FileMetrics,
     val structure: List<StructureItem> = emptyList(),
     val imports: List<ImportInfo> = emptyList(),
     val exports: List<ExportInfo> = emptyList(),
@@ -38,5 +38,5 @@ data class ProcessResult(
     val docstrings: List<DocstringInfo> = emptyList(),
     val symbols: List<SymbolInfo> = emptyList(),
     val diagnostics: List<Diagnostic> = emptyList(),
-    val chunks: List<CodeChunk> = emptyList(),
+    val chunks: List<CodeChunk> = emptyList()
 )

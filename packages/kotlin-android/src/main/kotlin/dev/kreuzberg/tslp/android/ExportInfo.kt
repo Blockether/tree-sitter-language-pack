@@ -23,7 +23,7 @@ package dev.kreuzberg.tslp.android
 
 /** An export statement extracted from source code. */
 data class ExportInfo(
-    val name: String,
+    val name: String = "",
     val kind: ExportKind = ExportKind.NAMED,
-    val span: Span = Span(),
+    val span: Span
 )

@@ -26,8 +26,9 @@ import java.nio.file.Path
 /**
  * Configuration for the tree-sitter language pack.
  *
- * Controls cache directory and which languages to pre-download. Can be loaded from a TOML file,
- * constructed programmatically, or passed as a dict/object from language bindings.
+ * Controls cache directory and which languages to pre-download.
+ * Can be loaded from a TOML file, constructed programmatically,
+ * or passed as a dict/object from language bindings.
  */
 data class PackConfig(
     /**
@@ -41,7 +42,7 @@ data class PackConfig(
      *
      * Each entry is a language name (e.g. `"python"`, `"rust"`).
      */
-    val languages: List<String>? = emptyList(),
+    val languages: List<String>? = null,
     /** Language groups to pre-download (e.g. `"web"`, `"systems"`, `"scripting"`). */
-    val groups: List<String>? = emptyList(),
+    val groups: List<String>? = null
 )

@@ -23,12 +23,12 @@ package dev.kreuzberg.tslp.android
 
 /** Aggregate metrics for a source file. */
 data class FileMetrics(
-    val totalLines: Long,
-    val codeLines: Long,
-    val commentLines: Long,
-    val blankLines: Long,
-    val totalBytes: Long,
-    val nodeCount: Long,
-    val errorCount: Long,
-    val maxDepth: Long
+    val totalLines: Long = 0L,
+    val codeLines: Long = 0L,
+    val commentLines: Long = 0L,
+    val blankLines: Long = 0L,
+    val totalBytes: Long = 0L,
+    val nodeCount: Long = 0L,
+    val errorCount: Long = 0L,
+    val maxDepth: Long = 0L
 )

@@ -23,13 +23,13 @@ package dev.kreuzberg.tslp.android
 
 /** A structural item (function, class, struct, etc.) in source code. */
 data class StructureItem(
-    val kind: StructureKind = StructureKind.FUNCTION,
+    val kind: StructureKind,
     val name: String? = null,
     val visibility: String? = null,
-    val span: Span = Span(),
+    val span: Span,
     val children: List<StructureItem> = emptyList(),
     val decorators: List<String> = emptyList(),
     val docComment: String? = null,
     val signature: String? = null,
-    val bodySpan: Span? = Span(),
+    val bodySpan: Span? = null
 )
