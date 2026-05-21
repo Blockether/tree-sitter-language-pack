@@ -703,6 +703,22 @@ List languages that are already downloaded and cached.
 def installed_languages(self) -> list[str]
 ```
 
+#### testing_extract_languages()
+
+Thin public re-export of `extract_languages` gated on the
+`test-internals` feature (or `#[cfg(test)]`).
+
+Integration tests that need to call `extract_languages` directly (e.g.
+the cross-process concurrency test) should use this wrapper so they do
+not bypass the cross-process file lock invisibly. The name makes the
+test-only nature obvious.
+
+**Signature:**
+
+```python
+def testing_extract_languages(self, archive_data: bytes, names: list[str]) -> None
+```
+
 #### download_all_best_effort()
 
 Download the platform bundle and extract every library file it contains.
@@ -723,6 +739,13 @@ def download_all_best_effort(self) -> int
 #### clean_cache()
 
 Remove all cached parser libraries.
+
+Acquires the cross-process lock so `clean_cache` cannot race a concurrent
+downloader (avoids Windows sharing-violation errors against an in-flight
+bundle write). The `.download.lock` file itself is **not** removed — it is
+permanent infrastructure; deleting it could allow a concurrent process that
+already opened the file to continue holding a stale lock handle while a new
+process opens a fresh inode, breaking the mutual-exclusion guarantee.
 
 **Signature:**
 
