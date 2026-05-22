@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## 1.9.0-rc.1 - 2026-05-22
+
+### Added
+
+- Four new language bindings via alef 0.16.6, taking total binding count from 10 to 14:
+  - **Dart / Flutter** — `dart pub add tree_sitter_language_pack`. Built with flutter_rust_bridge for isolate-safe Future APIs.
+  - **Kotlin (Android)** — `dev.kreuzberg.tslp:tslp-android` AAR on Maven Central. JNI-based with per-ABI native libraries (arm64-v8a, armeabi-v7a, x86_64, x86). JVM Kotlin users continue to consume the canonical Java / Panama-FFM package.
+  - **Swift** — `TreeSitterLanguagePack` via SwiftPM. swift-bridge for macOS, iOS, and Linux.
+  - **Zig** — `zig fetch --save <tarball-url>` from GitHub Releases. Direct C FFI via `@cImport`.
+- Two new Rust binding crates: `tree-sitter-language-pack-dart` (FRB bridge) and `tree-sitter-language-pack-swift` (swift-bridge).
+- Hand-written `crates/ts-pack-core-jni` Rust crate exporting `Java_...` JNI symbols for the Kotlin-Android binding (excluded from the default workspace build because it cross-compiles via `cargo ndk`).
+- Per-language CI workflows: `ci-zig.yaml`, `ci-swift.yaml`, `ci-dart.yaml`, plus a combined `ci-mobile.yaml` covering Android cross-compile + iOS cargo check.
+- Publish jobs for pub.dev (`publish-pub`), Swift Package Index (`publish-swift`), Zig (`publish-zig` → GitHub Release tarball), and Maven Central kotlin-android (`publish-kotlin-android`).
+
 ### Fixed
 
 - **Download cache is now safe under concurrent multi-process access.** `DOWNLOAD_CACHE_LOCK` in `crates/ts-pack-core/src/lib.rs` was a `Mutex<()>` — intra-process only — so multi-worker servers (gunicorn / Puma / Node cluster), fan-out build pipelines (`make -j8`, parallel test runners), and the zig e2e suite (`zig build test` spawns eight test binaries in parallel) all raced on the same `~/.cache/tree-sitter-language-pack/v{version}/` directory. Partial `entry.unpack` writes were observable to other workers' `libloading::open`, producing intermittent `LanguageNotFound` / segfaults on first request for an uncached language; N processes could also each redundantly pull the 50MB platform bundle. Cache writes are now atomic (write to `<dest_dir>/.<name>.tmp.<pid>.<seq>` then `fs::rename` — readers see old, new, or nothing, never partial) and the bundle-fetch / extract / clean critical section is serialized across processes with an exclusive `fd-lock` on `<version_cache_dir>/.download.lock`. Double-checked locking preserves the lock-free hot path: steady-state `is_cached` lookups never pay the OS file-lock cost. New `Error::CacheLock(String)` variant surfaces lock-acquisition failures cleanly. Affects every binding (Python, Node.js, Ruby, PHP, Go, Java, C#, Elixir, WASM, Dart, Swift, Zig, Kotlin-Android) because the fix lives entirely in the shared `ts-pack-core` Rust crate. New `fd-lock = "4"` dependency (gated under the `download` feature). Cross-process safety relies on `flock` semantics, which are unreliable on NFS — users with `XDG_CACHE_HOME` on NFS should use a local-FS cache or serialize at the application layer. (`crates/ts-pack-core/src/{download.rs,error.rs}`, `crates/ts-pack-core/Cargo.toml`, `Cargo.toml`, new `crates/ts-pack-core/tests/concurrent_download.rs`)
@@ -37,20 +51,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Split pub.dev publish into a dedicated `publish-pubdev.yaml` workflow triggered by `push: tags: v*`.** pub.dev OIDC trusted publishing rejects tokens from `release` events; only `push` and `workflow_dispatch` events are accepted. The new workflow produces an accepted token. One-time setup required: configure pub.dev → tree_sitter_language_pack package → Admin → Automated publishing with workflow path `.github/workflows/publish-pubdev.yaml`. (`.github/workflows/publish-pubdev.yaml`, `.github/workflows/publish.yaml`)
 - Regenerated all alef-managed surfaces (per-binding READMEs, API reference docs, generated bindings, e2e tests) and the script-managed docs/languages.md + `_supported_languages.py` to reflect the 305-grammar count.
 - `scripts/generate_grammar_table.py` default output path corrected from `docs/supported-languages.md` to the canonical nav-referenced `docs/languages.md`; Taskfile `docs:generate:languages` `generates:` field updated to match.
-
-## 1.9.0
-
-### Added
-
-- Four new language bindings via alef 0.16.6, taking total binding count from 10 to 14:
-  - **Dart / Flutter** — `dart pub add tree_sitter_language_pack`. Built with flutter_rust_bridge for isolate-safe Future APIs.
-  - **Kotlin (Android)** — `dev.kreuzberg.tslp:tslp-android` AAR on Maven Central. JNI-based with per-ABI native libraries (arm64-v8a, armeabi-v7a, x86_64, x86). JVM Kotlin users continue to consume the canonical Java / Panama-FFM package.
-  - **Swift** — `TreeSitterLanguagePack` via SwiftPM. swift-bridge for macOS, iOS, and Linux.
-  - **Zig** — `zig fetch --save <tarball-url>` from GitHub Releases. Direct C FFI via `@cImport`.
-- Two new Rust binding crates: `tree-sitter-language-pack-dart` (FRB bridge) and `tree-sitter-language-pack-swift` (swift-bridge).
-- Hand-written `crates/ts-pack-core-jni` Rust crate exporting `Java_...` JNI symbols for the Kotlin-Android binding (excluded from the default workspace build because it cross-compiles via `cargo ndk`).
-- Per-language CI workflows: `ci-zig.yaml`, `ci-swift.yaml`, `ci-dart.yaml`, plus a combined `ci-mobile.yaml` covering Android cross-compile + iOS cargo check.
-- Publish jobs for pub.dev (`publish-pub`), Swift Package Index (`publish-swift`), Zig (`publish-zig` → GitHub Release tarball), and Maven Central kotlin-android (`publish-kotlin-android`).
 
 ## 1.8.1 - 2026-05-13
 

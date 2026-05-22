@@ -61,7 +61,7 @@ publishing {
             afterEvaluate { from(components["release"]) }
             groupId = "dev.kreuzberg.tslp.android"
             artifactId = "tree-sitter-language-pack-android"
-            version = "1.8.1"
+            version = "1.9.0-rc.1"
         }
     }
 }
