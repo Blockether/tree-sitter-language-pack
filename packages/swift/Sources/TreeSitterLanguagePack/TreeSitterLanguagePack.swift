@@ -1232,3 +1232,18 @@ public func cleanCache() throws {
 public func cacheDir() throws -> String {
     return try RustBridge.cacheDir().toString()
 }
+
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.Parser: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.Tree: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.Node: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.TreeCursor: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.LanguageRegistry: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.DownloadManager: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.Language: @unchecked Sendable {}
