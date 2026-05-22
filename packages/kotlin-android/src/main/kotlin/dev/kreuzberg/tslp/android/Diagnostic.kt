@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.tslp.android
@@ -25,5 +26,5 @@ package dev.kreuzberg.tslp.android
 data class Diagnostic(
     val message: String = "",
     val severity: DiagnosticSeverity = DiagnosticSeverity.ERROR,
-    val span: Span,
+    val span: Span = Span()
 )

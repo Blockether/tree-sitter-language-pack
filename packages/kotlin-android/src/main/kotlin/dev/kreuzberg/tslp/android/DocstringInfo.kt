@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.tslp.android
@@ -25,7 +26,7 @@ package dev.kreuzberg.tslp.android
 data class DocstringInfo(
     val text: String = "",
     val format: DocstringFormat,
-    val span: Span,
+    val span: Span = Span(),
     val associatedItem: String? = null,
-    val parsedSections: List<DocSection> = emptyList(),
+    val parsedSections: List<DocSection> = emptyList()
 )

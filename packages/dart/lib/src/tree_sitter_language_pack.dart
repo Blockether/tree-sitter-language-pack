@@ -285,8 +285,8 @@ class TreeSitterLanguagePackBridge {
   /// init(&config).unwrap();
   /// ```
   /// throws Error on failure
-  static Future<void> init(PackConfig config) async {
-    return await rust_bridge.init(config: config);
+  static Future<void> init([PackConfig? config]) async {
+    return await rust_bridge.init(config: config ?? PackConfig());
   }
 
   /// Apply download configuration without downloading anything.
@@ -314,8 +314,8 @@ class TreeSitterLanguagePackBridge {
   /// configure(&config).unwrap();
   /// ```
   /// throws Error on failure
-  static Future<void> configure(PackConfig config) async {
-    return await rust_bridge.configure(config: config);
+  static Future<void> configure([PackConfig? config]) async {
+    return await rust_bridge.configure(config: config ?? PackConfig());
   }
 
   /// Download specific languages to the local cache.

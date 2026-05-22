@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.17.23"
+alef_version = "0.17.28"
 languages = [
   "python",
   "node",
@@ -159,9 +159,16 @@ app_name = "tree_sitter_language_pack"
 # `wasm-objdump -j Import` on the bundle shows these 10 are pulled in by the
 # curated grammar set; alef emits Rust shims for each.
 env_shims = [
-  "iswspace", "iswalnum", "iswalpha", "iswlower", "iswupper", "iswxdigit",
-  "towupper", "towlower",
-  "memchr", "strcmp",
+  "iswspace",
+  "iswalnum",
+  "iswalpha",
+  "iswlower",
+  "iswupper",
+  "iswxdigit",
+  "towupper",
+  "towlower",
+  "memchr",
+  "strcmp",
 ]
 features = ["serde", "config", "dynamic-loading"]
 # Curated grammar subset that's statically compiled into the wasm32 binary.
@@ -169,10 +176,37 @@ features = ["serde", "config", "dynamic-loading"]
 # alef's `[crates.e2e.wasm]` auto-skip path correctly elides fixtures for
 # grammars that aren't present in the wasm bundle.
 languages = [
-  "python", "javascript", "typescript", "tsx", "rust", "go", "java",
-  "c", "cpp", "csharp", "ruby", "php", "html", "css", "json", "yaml",
-  "toml", "markdown", "bash", "sql", "lua", "scala", "kotlin", "swift",
-  "dockerfile", "vue", "svelte", "elixir", "erlang", "haskell", "zig",
+  "python",
+  "javascript",
+  "typescript",
+  "tsx",
+  "rust",
+  "go",
+  "java",
+  "c",
+  "cpp",
+  "csharp",
+  "ruby",
+  "php",
+  "html",
+  "css",
+  "json",
+  "yaml",
+  "toml",
+  "markdown",
+  "bash",
+  "sql",
+  "lua",
+  "scala",
+  "kotlin",
+  "swift",
+  "dockerfile",
+  "vue",
+  "svelte",
+  "elixir",
+  "erlang",
+  "haskell",
+  "zig",
 ]
 
 [crates.ffi]
@@ -222,9 +256,24 @@ module_name = "tree_sitter_language_pack"
 # `zig build test` runs eight test binaries in parallel against a shared
 # `~/.cache/tree-sitter-language-pack/` directory.
 languages = [
-  "python", "rust", "javascript", "typescript", "go", "html", "css",
-  "json", "bash", "c", "cpp", "java", "ruby", "swift", "kotlin",
-  "mojo", "nim", "norg",
+  "python",
+  "rust",
+  "javascript",
+  "typescript",
+  "go",
+  "html",
+  "css",
+  "json",
+  "bash",
+  "c",
+  "cpp",
+  "java",
+  "ruby",
+  "swift",
+  "kotlin",
+  "mojo",
+  "nim",
+  "norg",
 ]
 
 [crates.output]
