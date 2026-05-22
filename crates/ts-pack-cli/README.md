@@ -2,6 +2,8 @@
 
 # tree-sitter-language-pack — CLI
 
+[![Bindings by alef](https://img.shields.io/badge/bindings%20by-alef%20%D7%90-007ec6)](https://github.com/kreuzberg-dev/alef)
+
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
   <!-- Language Bindings -->  <a href="https://crates.io/crates/tree-sitter-language-pack">
     <img src="https://img.shields.io/crates/v/tree-sitter-language-pack?label=Rust&color=007ec6" alt="Rust">
