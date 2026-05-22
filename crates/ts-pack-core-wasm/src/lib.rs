@@ -23,6 +23,7 @@
 
 use std::sync::Arc;
 use std::sync::Mutex;
+use std::{ffi::c_char, ffi::c_void, ptr};
 use wasm_bindgen::prelude::*;
 
 // WASM environment shims for C scanner interop
@@ -41,6 +42,58 @@ pub extern "C" fn towupper(c: u32) -> u32 {
 #[unsafe(no_mangle)]
 pub extern "C" fn iswalpha(c: u32) -> i32 {
     char::from_u32(c).map_or(0, |ch| ch.is_alphabetic() as i32)
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn iswlower(c: u32) -> i32 {
+    char::from_u32(c).map_or(0, |ch| ch.is_lowercase() as i32)
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn iswupper(c: u32) -> i32 {
+    char::from_u32(c).map_or(0, |ch| ch.is_uppercase() as i32)
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn iswxdigit(c: u32) -> i32 {
+    char::from_u32(c).map_or(0, |ch| ch.is_ascii_hexdigit() as i32)
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn towlower(c: u32) -> u32 {
+    char::from_u32(c).map_or(c, |ch| ch.to_lowercase().next().unwrap_or(ch) as u32)
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn memchr(ptr: *const c_void, byte: i32, len: usize) -> *mut c_void {
+    if ptr.is_null() {
+        return ptr::null_mut();
+    }
+
+    let bytes = unsafe { std::slice::from_raw_parts(ptr.cast::<u8>(), len) };
+    match bytes.iter().position(|candidate| *candidate == byte as u8) {
+        Some(index) => unsafe { ptr.cast::<u8>().add(index).cast_mut().cast::<c_void>() },
+        None => ptr::null_mut(),
+    }
+}
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn strcmp(left: *const c_char, right: *const c_char) -> i32 {
+    if left.is_null() || right.is_null() {
+        return match (left.is_null(), right.is_null()) {
+            (true, true) => 0,
+            (true, false) => -1,
+            (false, true) => 1,
+            (false, false) => unreachable!(),
+        };
+    }
+
+    let mut offset = 0usize;
+    loop {
+        let left_byte = unsafe { *left.add(offset) } as u8;
+        let right_byte = unsafe { *right.add(offset) } as u8;
+        if left_byte != right_byte {
+            return i32::from(left_byte) - i32::from(right_byte);
+        }
+        if left_byte == 0 {
+            return 0;
+        }
+        offset += 1;
+    }
 }
 
 /// Byte and line/column range in source code.
@@ -2497,7 +2550,10 @@ pub fn process(source: String, config: JsValue) -> Result<WasmProcessResult, JsV
     let config_core: tree_sitter_language_pack::ProcessConfig = if config.is_undefined() {
         tree_sitter_language_pack::ProcessConfig::default()
     } else {
-        serde_wasm_bindgen::from_value::<tree_sitter_language_pack::ProcessConfig>(config)
+        let value = serde_wasm_bindgen::from_value::<serde_json::Value>(config)
+            .map_err(|e| JsValue::from_str(&e.to_string()))?;
+        let value = tree_sitter_language_pack::json_utils::camel_to_snake(value);
+        serde_json::from_value::<tree_sitter_language_pack::ProcessConfig>(value)
             .map_err(|e| JsValue::from_str(&e.to_string()))?
     };
     let result =
