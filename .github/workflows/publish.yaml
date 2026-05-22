@@ -67,7 +67,7 @@ jobs:
       release_dart: ${{ steps.meta.outputs.release_dart }}
       release_swift: ${{ steps.meta.outputs.release_swift }}
       release_zig: ${{ steps.meta.outputs.release_zig }}
-      release_kotlin_android: ${{ steps.meta.outputs.release_kotlin_android }}
+      release_kotlin_android: ${{ steps.meta.outputs.release_kotlin }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
@@ -76,7 +76,7 @@ jobs:
         id: meta
         uses: kreuzberg-dev/actions/prepare-release-metadata@v1
         with:
-          available-targets: "crates,python,node,wasm,ruby,go,java,elixir,c-ffi,php,csharp,homebrew,dart,swift,zig,kotlin-android"
+          available-targets: "crates,python,node,wasm,ruby,go,java,elixir,c-ffi,php,csharp,homebrew,dart,swift,zig,kotlin"
 
       # In dry-run we may not yet have the tag pushed; check out the dispatch
       # SHA instead so jobs can still validate the workflow against current
