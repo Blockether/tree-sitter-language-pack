@@ -1712,6 +1712,13 @@ uintptr_t ts_pack_download_manager_download_all_best_effort(const TS_PACKDownloa
 
 /**
  * Remove all cached parser libraries.
+ *
+ * Acquires the cross-process lock so `clean_cache` cannot race a concurrent
+ * downloader (avoids Windows sharing-violation errors against an in-flight
+ * bundle write). The `.download.lock` file itself is **not** removed â it is
+ * permanent infrastructure; deleting it could allow a concurrent process that
+ * already opened the file to continue holding a stale lock handle while a new
+ * process opens a fresh inode, breaking the mutual-exclusion guarantee.
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */

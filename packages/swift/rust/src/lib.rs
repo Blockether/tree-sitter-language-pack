@@ -674,7 +674,7 @@ impl ProcessResult {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&language)
-                .unwrap_or_else(|_| ::serde_json::Value::String(language.clone()));
+                .unwrap_or(::serde_json::Value::String(language.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.language = t;
             }
@@ -912,7 +912,7 @@ impl CommentInfo {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&text)
-                .unwrap_or_else(|_| ::serde_json::Value::String(text.clone()));
+                .unwrap_or(::serde_json::Value::String(text.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.text = t;
             }
@@ -961,7 +961,7 @@ impl DocstringInfo {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&text)
-                .unwrap_or_else(|_| ::serde_json::Value::String(text.clone()));
+                .unwrap_or(::serde_json::Value::String(text.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.text = t;
             }
@@ -1012,7 +1012,7 @@ impl DocSection {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&kind)
-                .unwrap_or_else(|_| ::serde_json::Value::String(kind.clone()));
+                .unwrap_or(::serde_json::Value::String(kind.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.kind = t;
             }
@@ -1033,7 +1033,7 @@ impl DocSection {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&description)
-                .unwrap_or_else(|_| ::serde_json::Value::String(description.clone()));
+                .unwrap_or(::serde_json::Value::String(description.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.description = t;
             }
@@ -1061,7 +1061,7 @@ impl ImportInfo {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&source)
-                .unwrap_or_else(|_| ::serde_json::Value::String(source.clone()));
+                .unwrap_or(::serde_json::Value::String(source.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.source = t;
             }
@@ -1118,7 +1118,7 @@ impl ExportInfo {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&name)
-                .unwrap_or_else(|_| ::serde_json::Value::String(name.clone()));
+                .unwrap_or(::serde_json::Value::String(name.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.name = t;
             }
@@ -1154,7 +1154,7 @@ impl SymbolInfo {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&name)
-                .unwrap_or_else(|_| ::serde_json::Value::String(name.clone()));
+                .unwrap_or(::serde_json::Value::String(name.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.name = t;
             }
@@ -1210,7 +1210,7 @@ impl Diagnostic {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&message)
-                .unwrap_or_else(|_| ::serde_json::Value::String(message.clone()));
+                .unwrap_or(::serde_json::Value::String(message.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.message = t;
             }
@@ -1247,7 +1247,7 @@ impl CodeChunk {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&content)
-                .unwrap_or_else(|_| ::serde_json::Value::String(content.clone()));
+                .unwrap_or(::serde_json::Value::String(content.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.content = t;
             }
@@ -1311,7 +1311,7 @@ impl ChunkContext {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&language)
-                .unwrap_or_else(|_| ::serde_json::Value::String(language.clone()));
+                .unwrap_or(::serde_json::Value::String(language.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.language = t;
             }
@@ -1600,7 +1600,7 @@ impl ProcessConfig {
             // string-like enum fields don't end up empty for inputs that aren't
             // valid JSON tokens (e.g. `tts-1`).
             let __v = ::serde_json::from_str::<::serde_json::Value>(&language)
-                .unwrap_or_else(|_| ::serde_json::Value::String(language.clone()));
+                .unwrap_or(::serde_json::Value::String(language.clone()));
             if let Ok(t) = ::serde_json::from_value(__v) {
                 __target.language = t;
             }

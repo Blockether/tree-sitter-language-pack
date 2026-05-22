@@ -1156,6 +1156,13 @@ pub const DownloadManager = struct {
     }
 
     /// Remove all cached parser libraries.
+    ///
+    /// Acquires the cross-process lock so `clean_cache` cannot race a concurrent
+    /// downloader (avoids Windows sharing-violation errors against an in-flight
+    /// bundle write). The `.download.lock` file itself is **not** removed — it is
+    /// permanent infrastructure; deleting it could allow a concurrent process that
+    /// already opened the file to continue holding a stale lock handle while a new
+    /// process opens a fresh inode, breaking the mutual-exclusion guarantee.
     pub fn clean_cache(self: *DownloadManager) (Error || error{OutOfMemory})!void {
         _ = c.ts_pack_download_manager_clean_cache(@as(*c.TS_PACKDownloadManager, @ptrCast(self._handle)));
         if (c.ts_pack_last_error_code() != 0) {

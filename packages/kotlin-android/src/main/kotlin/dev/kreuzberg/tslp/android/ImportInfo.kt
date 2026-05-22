@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.tslp.android
@@ -27,5 +28,5 @@ data class ImportInfo(
     val items: List<String> = emptyList(),
     val alias: String? = null,
     val isWildcard: Boolean = false,
-    val span: Span,
+    val span: Span = Span()
 )

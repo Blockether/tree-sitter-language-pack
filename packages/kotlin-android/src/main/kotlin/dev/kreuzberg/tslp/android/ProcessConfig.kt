@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.tslp.android
@@ -44,5 +45,5 @@ data class ProcessConfig(
     /** Include parse diagnostics. Default: false. */
     val diagnostics: Boolean = false,
     /** Maximum chunk size in bytes. `null` disables chunking. */
-    val chunkMaxSize: Long? = null,
+    val chunkMaxSize: Long? = null
 )

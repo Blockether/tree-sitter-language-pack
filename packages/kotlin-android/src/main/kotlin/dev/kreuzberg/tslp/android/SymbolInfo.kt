@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.tslp.android
@@ -25,7 +26,7 @@ package dev.kreuzberg.tslp.android
 data class SymbolInfo(
     val name: String = "",
     val kind: SymbolKind,
-    val span: Span,
+    val span: Span = Span(),
     val typeAnnotation: String? = null,
-    val doc: String? = null,
+    val doc: String? = null
 )

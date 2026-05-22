@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.tslp.android
@@ -25,6 +26,6 @@ package dev.kreuzberg.tslp.android
 data class CommentInfo(
     val text: String = "",
     val kind: CommentKind = CommentKind.LINE,
-    val span: Span,
-    val associatedNode: String? = null,
+    val span: Span = Span(),
+    val associatedNode: String? = null
 )

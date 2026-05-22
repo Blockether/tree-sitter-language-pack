@@ -17,6 +17,7 @@
     "FunctionParameterNaming",
     "LongParameterList",
     "CyclomaticComplexMethod",
+    "LongMethod",
 )
 
 package dev.kreuzberg.tslp.android
@@ -26,10 +27,10 @@ data class StructureItem(
     val kind: StructureKind,
     val name: String? = null,
     val visibility: String? = null,
-    val span: Span,
+    val span: Span = Span(),
     val children: List<StructureItem> = emptyList(),
     val decorators: List<String> = emptyList(),
     val docComment: String? = null,
     val signature: String? = null,
-    val bodySpan: Span? = null,
+    val bodySpan: Span? = null
 )
