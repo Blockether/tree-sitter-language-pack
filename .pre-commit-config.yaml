@@ -92,7 +92,7 @@ repos:
         args:
           - -w
           - -i
-          - '2'
+          - "2"
       - id: shellcheck
       - id: clang-format
         args:
