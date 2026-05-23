@@ -1371,6 +1371,10 @@ jobs:
             target: x86_64-pc-windows-msvc
           # windows-aarch64 omitted: ext-php-rs C wrapper compilation fails on
           # Windows ARM64 because PHP SDK headers (mmintrin.h) are X86-only.
+        exclude:
+          - php: "8.5"
+            platform:
+              label: windows-x86_64
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
