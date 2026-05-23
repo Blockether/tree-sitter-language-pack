@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+- **Bump alef to 0.18.0 and regen all bindings, e2e, docs.** Major upstream restructure: workspace renamed `alef-cli` → `alef` (single distributable crate; 28 internal `alef-*` member crates yanked), Node/WASM crate directories renamed (`ts-pack-core-node`, `ts-pack-core-wasm`), and zig/c FFI search paths reorganised. Configuration follow-ups in this repo: `[crates.{node,wasm}.crate_dir]` overrides pin the napi/wasm-pack build to the renamed crate dirs; `napi build --platform --release` produces per-platform `.node` artifacts (fixes "Cannot find module './ts-pack-core-node.darwin-arm64.node'" on Node e2e); zig defaults in `packages/zig/build.zig` switched to `../../target/release` + `../../crates/ts-pack-core-ffi/include`, with `.task/zig.yml` and the `[crates.test.zig]` alef e2e step both passing `-Dffi_path=../../target/release`; C e2e command corrected from `./test_runner` → `./run_tests` and `.task/c.yml` switched from `--lang ffi` → `--lang c`; new `[crates.e2e].result_fields` array + `[crates.e2e.fields_c_types]` map drive alef's namespace-aware field navigation for the C `process_result.metrics → FileMetrics → uintptr_t` accessors. Upstream alef fix in 0.18.0: `namespace_stripped_path` no longer strips path segments when `result_fields` is empty, so legacy bindings (no `result_fields` configured) keep dotted-field paths intact. All 14 language e2e suites pass after regen.
+
 ## 1.9.0-rc.1 - 2026-05-22
 
 ### Added
