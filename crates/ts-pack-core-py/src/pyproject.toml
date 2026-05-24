@@ -98,6 +98,6 @@ overrides = [
     "call-arg",
     "arg-type",
     "return-value",
-    "attr-defined",
+    "attr-defined"
   ] },
 ]
