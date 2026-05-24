@@ -525,6 +525,18 @@ install = "cd crates/ts-pack-core-node && pnpm install"
 precondition = "command -v pnpm >/dev/null 2>&1"
 install = "cd crates/ts-pack-core-wasm && pnpm install"
 
+# Override alef's default Java setup, which resolves `output_dir` to
+# `packages/java/src/main/java/` (the codegen target) and runs
+# `mvn -f .../src/main/java//pom.xml dependency:resolve`. The Maven
+# project root is `packages/java/` — alef <=0.19.1 conflates the two
+# and the wrong `-f` path lets Maven walk the empty src tree until the
+# 600s timeout. Pin the correct path here until the alef-side fix
+# (`package_dir(Java)` exclusion in resolved/lookups.rs) ships.
+[crates.setup.java]
+precondition = "command -v mvn >/dev/null 2>&1"
+install = "mvn -f packages/java/pom.xml dependency:resolve -q"
+timeout_seconds = 600
+
 [crates.publish]
 core_crate = "crates/ts-pack-core"
 
