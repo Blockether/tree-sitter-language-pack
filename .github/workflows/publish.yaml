@@ -1968,8 +1968,6 @@ jobs:
           packages-dir: crates/ts-pack-core-node/npm
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ inputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish main package to npm
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
@@ -1978,8 +1976,6 @@ jobs:
           package-dir: crates/ts-pack-core-node
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           dry-run: ${{ inputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   # ─── Publish WASM to npm ───────────────────────────────────────────
   publish-wasm:
@@ -2041,8 +2037,6 @@ jobs:
           npm-tag: ${{ needs.prepare.outputs.npm_tag }}
           provenance: "true"
           dry-run: ${{ inputs.dry_run }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Wait for npm indexing
         if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
