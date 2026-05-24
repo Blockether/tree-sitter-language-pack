@@ -41,6 +41,7 @@ csharp = "record"
 extra_paths = [
   "crates/ts-pack-core-node/package.json",
   "crates/ts-pack-core-node/npm/*/package.json",
+  "crates/ts-pack-core-py/src/pyproject.toml",
   "packages/ruby/ext/ts_pack_core_rb/native/Cargo.toml",
   "pyproject.toml",
 ]
