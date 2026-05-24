@@ -28,7 +28,9 @@ on:
     types: [publish-release]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.inputs.tag || github.event.release.tag_name || github.run_id }}
+  # Differentiate dry-run dispatches from real publishes so a stuck/failed dry-run
+  # does not block the release event for the same tag (cancel-in-progress: false).
+  group: ${{ github.workflow }}-${{ github.event.inputs.tag || github.event.release.tag_name || github.run_id }}-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true' && 'dryrun' || 'real' }}
   cancel-in-progress: false
 
 env:
