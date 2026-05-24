@@ -5,7 +5,7 @@
 # Issues & docs: https://github.com/kreuzberg-dev/alef
 """Public API for the conversion library.
 
-Version: 1.9.0-rc.3
+Version: 1.9.0-rc.4
 """
 
 from ._native import (
@@ -147,4 +147,4 @@ __all__ = [
     "process",
 ]
 
-__version__ = "1.9.0-rc.3"
+__version__ = "1.9.0-rc.4"
