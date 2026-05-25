@@ -5,14 +5,13 @@ version = "1.9.0-rc.7"
 edition = "2024"
 license = "MIT"
 
-# `ahash`, `async-trait`, `serde`, `serde_json`, and `tokio` are referenced
-# conditionally by alef-emitted code (ahash map shims, async streaming
-# adapters, JSON DTO conversions, runtime spawn). They are listed
-# unconditionally in `[dependencies]` so the manifest is stable across
-# regens, and ignored here so cargo-machete does not flag any subset
-# whose conditional path the current crate config does not exercise.
+# `ahash` is conditionally referenced by alef-emitted code: only when the
+# umbrella crate exposes `AHashMap<Cow<str>, _>` parameters (the conditional
+# `__*_ahash` shim rebuilds). It is listed unconditionally in `[dependencies]`
+# so the manifest is stable across regens, and ignored here so cargo-machete
+# does not flag the downstream (no-ahash-maps) case as unused.
 [package.metadata.cargo-machete]
-ignored = ["ahash", "async-trait", "serde", "serde_json", "tokio"]
+ignored = ["ahash"]
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
@@ -31,7 +30,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 swift-bridge = "0.1.59"
 tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros"] }
-tree_sitter_language_pack = { version = "1.9.0-rc.6", path = "../../../crates/ts-pack-core", features = [
+tree_sitter_language_pack = { version = "1.9.0-rc.7", path = "../../../crates/ts-pack-core", features = [
     "serde",
     "config",
     "download",
