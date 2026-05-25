@@ -36,6 +36,7 @@ checksum = "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75"
 dependencies = [
  "cfg-if",
  "const-random",
+ "getrandom 0.3.4",
  "once_cell",
  "serde",
  "version_check",
@@ -2764,6 +2765,7 @@ dependencies = [
 name = "tree-sitter-language-pack-swift"
 version = "1.9.0-rc.4"
 dependencies = [
+ "ahash",
  "async-trait",
  "serde",
  "serde_json",
@@ -2788,6 +2790,7 @@ dependencies = [
 name = "ts-pack-core-ffi"
 version = "1.9.0-rc.4"
 dependencies = [
+ "ahash",
  "cbindgen",
  "serde_json",
  "tempfile",
