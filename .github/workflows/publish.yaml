@@ -1554,10 +1554,10 @@ jobs:
         run: |
           RUNTIMES_DIR="packages/csharp/TreeSitterLanguagePack/runtimes"
           mkdir -p "$RUNTIMES_DIR"
-          # Each artifact contains {rid}/native/*.{so,dylib,dll}; merge-multiple: true
-          # already flattened them so artifacts/csharp-natives/ holds rid subdirs directly.
+          # Each artifact was uploaded as dist/csharp-ffi/ containing runtimes/{rid}/native/*.{so,dylib,dll}
+          # When downloaded with merge-multiple: true, artifacts/csharp-natives/ preserves the runtimes/ subdirectory
           if [[ -d artifacts/csharp-natives ]]; then
-            cp -r artifacts/csharp-natives/* "$RUNTIMES_DIR/"
+            cp -r artifacts/csharp-natives/runtimes/* "$RUNTIMES_DIR/"
           fi
           echo "=== Staged native runtimes ==="
           find "$RUNTIMES_DIR" -type f | head -20
