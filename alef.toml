@@ -554,11 +554,7 @@ timeout_seconds = 600
 [crates.publish]
 core_crate = "crates/ts-pack-core"
 
-[crates.publish.languages.ruby]
-vendor_mode = "core-only"
-
 [crates.publish.languages.elixir]
-vendor_mode = "core-only"
 nif_versions = ["2.16", "2.17"]
 
 [crates.publish.languages.ffi]
