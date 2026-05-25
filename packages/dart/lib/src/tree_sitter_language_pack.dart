@@ -256,10 +256,25 @@ class TreeSitterLanguagePackBridge {
   /// ```
   /// throws Error on failure
   static Future<ProcessResult> process(
-    String source,
-    ProcessConfig config,
-  ) async {
-    return await rust_bridge.process(source: source, config: config);
+    String source, [
+    ProcessConfig? config,
+  ]) async {
+    return await rust_bridge.process(
+      source: source,
+      config:
+          config ??
+          ProcessConfig(
+            language: '',
+            structure: true,
+            imports: true,
+            exports: true,
+            comments: false,
+            docstrings: false,
+            symbols: false,
+            diagnostics: false,
+            chunkMaxSize: null,
+          ),
+    );
   }
 
   /// Initialize the language pack with the given configuration.
@@ -286,7 +301,9 @@ class TreeSitterLanguagePackBridge {
   /// ```
   /// throws Error on failure
   static Future<void> init([PackConfig? config]) async {
-    return await rust_bridge.init(config: config ?? PackConfig());
+    return await rust_bridge.init(
+      config: config ?? PackConfig(cacheDir: '', languages: [], groups: []),
+    );
   }
 
   /// Apply download configuration without downloading anything.
@@ -315,7 +332,9 @@ class TreeSitterLanguagePackBridge {
   /// ```
   /// throws Error on failure
   static Future<void> configure([PackConfig? config]) async {
-    return await rust_bridge.configure(config: config ?? PackConfig());
+    return await rust_bridge.configure(
+      config: config ?? PackConfig(cacheDir: '', languages: [], groups: []),
+    );
   }
 
   /// Download specific languages to the local cache.

@@ -122,28 +122,23 @@ fn patch_published_loader() {
         }
     }
 
-    if patched != source
-        && let Err(err) = std::fs::write(path, patched)
-    {
-        println!("cargo:warning=failed to write published-loader patch: {err}");
-        return;
-    }
-
-    // Run `dart format` on the patched file so its output is stable across
-    // prek runs (cargo-check + dart-format hooks otherwise loop: FRB regen
-    // emits non-fmt-clean output; the loader patch preserves that;
-    // dart-format then reformats and flags a modification).
-    match std::process::Command::new("dart")
-        .args(["format", FRB_GENERATED_DART])
-        .status()
-    {
-        Ok(s) if s.success() => {}
-        Ok(s) => println!("cargo:warning=dart format on frb_generated.dart exited {s}"),
-        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
-            println!(
-                "cargo:warning=dart not on PATH — skipping post-FRB dart-format. Install dart to keep generated bridge sources fmt-clean."
-            );
+    if patched != source {
+        if let Err(err) = std::fs::write(path, &patched) {
+            println!("cargo:warning=failed to write published-loader patch: {err}");
+            return;
         }
-        Err(err) => println!("cargo:warning=failed to spawn dart format: {err}"),
+        match std::process::Command::new("dart")
+            .args(["format", FRB_GENERATED_DART])
+            .status()
+        {
+            Ok(s) if s.success() => {}
+            Ok(s) => println!("cargo:warning=dart format on {} exited {}", FRB_GENERATED_DART, s),
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+                println!(
+                    "cargo:warning=dart not on PATH — skipping post-patch format. Install Dart SDK to keep generated FRB Dart sources fmt-clean."
+                );
+            }
+            Err(err) => println!("cargo:warning=failed to spawn dart format: {err}"),
+        }
     }
 }
