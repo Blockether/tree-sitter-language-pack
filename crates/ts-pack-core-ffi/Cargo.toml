@@ -9,16 +9,16 @@ keywords = ["tree-sitter", "parser", "syntax", "language-pack"]
 categories = ["text-processing"]
 repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 
-# `serde_json` and `tokio` are emitted unconditionally above so the manifest
-# is stable across regens (and so the C FFI codegen can pull them in when an
-# async / Result-typed function appears in the API surface), but for umbrella
-# crates with no async fns and no JSON-marshalled return types they are
-# genuinely unused. The conditional `async-trait` / `futures-util` deps are
-# similarly flagged when the umbrella has trait-bridge / streaming adapters
-# configured but no actual async-trait / async-stream callsite in the
-# generated FFI shim.
+# `serde_json`, `ahash`, and `tokio` are emitted unconditionally above so the
+# manifest is stable across regens (and so the C FFI codegen can pull them in
+# when an async / Result-typed function appears in the API surface), but for
+# umbrella crates with no async fns and no JSON-marshalled return types they
+# are genuinely unused. The conditional `async-trait` / `futures-util` deps
+# are similarly flagged when the umbrella has trait-bridge / streaming adapters
+# configured but no actual async-trait / async-stream callsite in the generated
+# FFI shim.
 [package.metadata.cargo-machete]
-ignored = ["serde_json", "tokio"]
+ignored = ["ahash", "serde_json", "tokio"]
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
@@ -27,6 +27,7 @@ crate-type = ["cdylib", "staticlib"]
 default = []
 
 [dependencies]
+ahash = "0.8"
 serde_json = "1"
 tokio = { version = "1", features = ["full"] }
 tree-sitter-language-pack = { path = "../ts-pack-core", version = "1.9.0-rc.4", features = ["serde", "config", "download"] }

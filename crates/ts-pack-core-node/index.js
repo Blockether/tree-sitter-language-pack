@@ -37,56 +37,65 @@ function requireOptionalDependency(name) {
 }
 
 const tryLoadBinding = () => {
+  // Local `.node` files are named after `napi.binaryName` (binary file name on disk).
+  // Optional-dep packages are named after `napi.packageName` (npm subpackage names),
+  // which inherits any scope prefix from the parent package.
   const targets = [
     [
       "linux",
       "x64",
       "gnu",
       "./ts-pack-core-node.linux-x64-gnu.node",
-      "ts-pack-core-node-linux-x64-gnu",
+      "@kreuzberg/tree-sitter-language-pack-linux-x64-gnu",
     ],
     [
       "linux",
       "x64",
       "musl",
       "./ts-pack-core-node.linux-x64-musl.node",
-      "ts-pack-core-node-linux-x64-musl",
+      "@kreuzberg/tree-sitter-language-pack-linux-x64-musl",
     ],
     [
       "linux",
       "arm64",
       "gnu",
       "./ts-pack-core-node.linux-arm64-gnu.node",
-      "ts-pack-core-node-linux-arm64-gnu",
+      "@kreuzberg/tree-sitter-language-pack-linux-arm64-gnu",
     ],
     [
       "linux",
       "arm64",
       "musl",
       "./ts-pack-core-node.linux-arm64-musl.node",
-      "ts-pack-core-node-linux-arm64-musl",
+      "@kreuzberg/tree-sitter-language-pack-linux-arm64-musl",
     ],
-    ["darwin", "x64", null, "./ts-pack-core-node.darwin-x64.node", "ts-pack-core-node-darwin-x64"],
+    [
+      "darwin",
+      "x64",
+      null,
+      "./ts-pack-core-node.darwin-x64.node",
+      "@kreuzberg/tree-sitter-language-pack-darwin-x64",
+    ],
     [
       "darwin",
       "arm64",
       null,
       "./ts-pack-core-node.darwin-arm64.node",
-      "ts-pack-core-node-darwin-arm64",
+      "@kreuzberg/tree-sitter-language-pack-darwin-arm64",
     ],
     [
       "win32",
       "x64",
       null,
       "./ts-pack-core-node.win32-x64-msvc.node",
-      "ts-pack-core-node-win32-x64-msvc",
+      "@kreuzberg/tree-sitter-language-pack-win32-x64-msvc",
     ],
     [
       "win32",
       "arm64",
       null,
       "./ts-pack-core-node.win32-arm64-msvc.node",
-      "ts-pack-core-node-win32-arm64-msvc",
+      "@kreuzberg/tree-sitter-language-pack-win32-arm64-msvc",
     ],
   ];
 
