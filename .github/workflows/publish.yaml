@@ -2464,14 +2464,91 @@ jobs:
           fetch-depth: 0
       - uses: kreuzberg-dev/actions/setup-rust@v1
       - uses: kreuzberg-dev/actions/build-dart-package@v1
+        id: build
         with:
           package-dir: packages/dart/rust
           crate-name: tree-sitter-language-pack-dart
+      - name: Bundle native library into package
+        run: |
+          set -euo pipefail
+          lib_path="${{ steps.build.outputs.library-path }}"
+          lib_dir="packages/dart/lib/src/tree_sitter_language_pack_bridge_generated"
+
+          if [[ ! -f "$lib_path" ]]; then
+            echo "Error: built library not found at $lib_path"
+            exit 1
+          fi
+
+          if [[ ! -d "$lib_dir" ]]; then
+            echo "Error: target library directory not found at $lib_dir"
+            exit 1
+          fi
+
+          echo "Copying native library from $lib_path to $lib_dir/"
+          cp "$lib_path" "$lib_dir/"
+
+          # Verify the library was copied successfully
+          if find "$lib_dir" -maxdepth 1 -type f \( -name "*.so" -o -name "*.dylib" -o -name "*.dll" \) -print -quit | grep -q .; then
+            echo "Native library bundled successfully"
+          else
+            echo "Warning: no native library found after copy"
+          fi
       - uses: actions/upload-artifact@v7.0.1
         with:
           name: dart-package
           path: packages/dart
           retention-days: 14
+
+  publish-dart:
+    name: Publish Dart package
+    needs: [prepare, validate-versions, check-registries, build-dart-package]
+    if: |
+      always() &&
+      needs.prepare.outputs.release_dart == 'true' &&
+      needs.build-dart-package.result == 'success' &&
+      (fromJson(needs.check-registries.outputs.results).pub != 'true' || needs.prepare.outputs.force_republish == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Set up Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Download Dart package artifact
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: dart-package
+          path: packages/dart
+
+      - name: Re-check pub.dev before publish
+        if: ${{ !inputs.dry_run }}
+        id: recheck
+        uses: kreuzberg-dev/actions/check-registry@v1
+        with:
+          registry: pub
+          package: tree_sitter_language_pack
+          version: ${{ needs.prepare.outputs.version }}
+
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          {
+            echo "## Pub.dev Dry Run"
+            echo "Package: tree_sitter_language_pack@${{ needs.prepare.outputs.version }}"
+            echo "Would publish to pub.dev with native library bundled"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish package to pub.dev
+        if: ${{ !inputs.dry_run && steps.recheck.outputs.exists != 'true' }}
+        uses: kreuzberg-dev/actions/publish-pub@v1
+        with:
+          package-dir: packages/dart
+          setup-dart: 'false'
+          dry-run: 'false'
 
   # ─── Swift (Swift Package Index via tag) ──────────────────────────
   build-swift-artifactbundle:
