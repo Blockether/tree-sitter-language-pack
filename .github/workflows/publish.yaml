@@ -2795,7 +2795,7 @@ jobs:
   # ─── Kotlin-Android (Maven Central via Gradle) ────────────────────
   build-kotlin-android-natives:
     name: Build kotlin-android natives (${{ matrix.abi }})
-    needs: [prepare, check-registries]
+    needs: [prepare, check-registries, clone-vendors]
     if: ${{ needs.prepare.outputs.release_kotlin_android == 'true' && (fromJson(needs.check-registries.outputs.results).maven-kotlin-android != 'true' || needs.prepare.outputs.force_republish == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -2816,6 +2816,11 @@ jobs:
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           submodules: recursive
+      - name: Download parsers
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: language-parsers
+          path: parsers
       - uses: kreuzberg-dev/actions/setup-rust@v1
         with:
           target: ${{ matrix.target }}
