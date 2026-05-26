@@ -2666,11 +2666,15 @@ jobs:
     needs: [prepare, build-swift-artifactbundle]
     if: ${{ needs.prepare.outputs.release_swift == 'true' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v6.0.2
         with:
           ref: ${{ needs.prepare.outputs.checkout_ref }}
           fetch-depth: 0
+          token: ${{ github.token }}
+          persist-credentials: true
 
       - uses: actions/download-artifact@v8.0.1
         with:
@@ -2751,7 +2755,6 @@ jobs:
           alef publish build --lang ffi --target ${{ matrix.target }}
           alef publish package --lang zig \
             --target ${{ matrix.target }} \
-            --use-alef-package \
             -o dist/zig-ffi
       - uses: actions/upload-artifact@v7.0.1
         with:
