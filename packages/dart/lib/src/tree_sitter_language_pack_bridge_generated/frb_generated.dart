@@ -3,6 +3,8 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'dart:isolate';
+import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -24,11 +26,8 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   ///
   /// Checks in order:
   /// 1. FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR environment variable
-  ///    (allows test harnesses to point to development build paths)
   /// 2. Package-installed location with RID subdirectory (lib/src/native/<rid>/)
-  ///    (for published pub.dev packages with platform-specific bundled native libraries)
-  /// 3. Package-installed location (lib/src/tree_sitter_language_pack_bridge_generated/)
-  ///    (legacy fallback for development or packages without per-platform binaries)
+  /// 3. Package-installed legacy location (lib/src/tree_sitter_language_pack_bridge_generated/)
   /// 4. Returns null (flutter_rust_bridge falls back to its default loader)
   static Future<ExternalLibrary?> _alefResolveExternalLibrary() async {
     try {
@@ -38,8 +37,6 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
         'tree_sitter_language_pack.dll',
       ];
 
-      // Check FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR env var first.
-      // This allows test harnesses to override library location for development.
       final envDir =
           Platform.environment['FRB_DART_LOAD_EXTERNAL_LIBRARY_NATIVE_LIB_DIR'];
       if (envDir != null && envDir.isNotEmpty) {
@@ -54,26 +51,24 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
         }
       }
 
-      // Compute RID (runtime identifier) from platform and architecture.
       String? computeRid() {
         final os = Platform.operatingSystem;
         final version = Platform.version;
-        final archMatch = version.contains('x86_64')
+        final arch = version.contains('x86_64')
             ? 'x64'
             : version.contains('aarch64') || version.contains('arm64')
             ? 'arm64'
             : version.contains('armv7')
             ? 'arm'
             : null;
-        if (archMatch == null) return null;
-
+        if (arch == null) return null;
         switch (os) {
           case 'linux':
-            return 'linux-$archMatch';
+            return 'linux-$arch';
           case 'macos':
-            return 'macos-$archMatch';
+            return 'macos-$arch';
           case 'windows':
-            return 'windows-$archMatch';
+            return 'windows-$arch';
           default:
             return null;
         }
@@ -97,7 +92,6 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
         }
       }
 
-      // Check legacy package-installed location as fallback.
       final packageRoot = await Isolate.resolvePackageUri(
         Uri.parse(
           'package:tree_sitter_language_pack/tree_sitter_language_pack.dart',
