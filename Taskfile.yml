@@ -102,6 +102,11 @@ tasks:
         cmds:
             - task: rust:build:release
 
+    build:bindings:
+        desc: Build all language bindings
+        cmds:
+            - task: alef:build
+
     test:
         desc: Run all tests
         cmds:
@@ -249,6 +254,32 @@ tasks:
         desc: "Package built artifacts into distributable archives"
         cmds:
             - alef publish package -o dist/
+
+    # Alef lifecycle
+    alef:generate:
+        desc: Regenerate all Alef-managed outputs without formatting or building
+        cmds:
+            - alef all --clean --format=false
+
+    alef:verify:
+        desc: Check Alef-generated files are up to date
+        cmds:
+            - alef verify --exit-code
+
+    alef:build:
+        desc: Build all language bindings
+        cmds:
+            - alef build
+
+    alef:sync:
+        desc: Sync version from Cargo.toml to all manifests
+        cmds:
+            - alef sync-versions
+
+    alef:docs:
+        desc: Generate API reference documentation
+        cmds:
+            - alef docs
 
     # E2E aggregator tasks (canonical kreuzberg-dev surface).
     e2e:generate:all:

@@ -18,6 +18,9 @@ languages = [
   "jni",
 ]
 
+[workspace.format]
+enabled = false
+
 [workspace.opaque_types]
 Language = "tree_sitter_language_pack::Language"
 
