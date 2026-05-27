@@ -11,11 +11,11 @@
   <a href="https://pypi.org/project/tree-sitter-language-pack/">
     <img src="https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6" alt="Python">
   </a>
-  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack?label=Node.js&color=007ec6" alt="Node.js">
+  <a href="https://www.npmjs.com/package/@kreuzberg-dev/tree-sitter-language-pack">
+    <img src="https://img.shields.io/npm/v/@kreuzberg-dev/tree-sitter-language-pack?label=Node.js&color=007ec6" alt="Node.js">
   </a>
-  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack-wasm?label=WASM&color=007ec6" alt="WASM">
+  <a href="https://www.npmjs.com/package/@kreuzberg-dev/tree-sitter-language-pack-wasm">
+    <img src="https://img.shields.io/npm/v/@kreuzberg-dev/tree-sitter-language-pack-wasm?label=WASM&color=007ec6" alt="WASM">
   </a>
   <a href="https://central.sonatype.com/artifact/dev.kreuzberg.treesitterlanguagepack/tree-sitter-language-pack">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg.treesitterlanguagepack/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
@@ -26,8 +26,8 @@
   <a href="https://www.nuget.org/packages/TreeSitterLanguagePack/">
     <img src="https://img.shields.io/nuget/v/TreeSitterLanguagePack?label=C%23&color=007ec6" alt="C#">
   </a>
-  <a href="https://packagist.org/packages/kreuzberg/tree-sitter-language-pack">
-    <img src="https://img.shields.io/packagist/v/kreuzberg/tree-sitter-language-pack?label=PHP&color=007ec6" alt="PHP">
+  <a href="https://packagist.org/packages/kreuzberg-dev/tree-sitter-language-pack">
+    <img src="https://img.shields.io/packagist/v/kreuzberg-dev/tree-sitter-language-pack?label=PHP&color=007ec6" alt="PHP">
   </a>
   <a href="https://rubygems.org/gems/tree_sitter_language_pack">
     <img src="https://img.shields.io/gem/v/tree_sitter_language_pack?label=Ruby&color=007ec6" alt="Ruby">
@@ -121,15 +121,15 @@ See [Python README](packages/python/README.md) for full documentation.
 ### Node.js
 
 ```sh
-npm install @kreuzberg/tree-sitter-language-pack
+npm install @kreuzberg-dev/tree-sitter-language-pack
 ```
 
 ```sh
-pnpm add @kreuzberg/tree-sitter-language-pack
+pnpm add @kreuzberg-dev/tree-sitter-language-pack
 ```
 
 ```sh
-yarn add @kreuzberg/tree-sitter-language-pack
+yarn add @kreuzberg-dev/tree-sitter-language-pack
 ```
 
 See [Node.js README](crates/ts-pack-core-node/README.md) for full documentation.
@@ -177,15 +177,15 @@ See [Ruby README](packages/ruby/README.md) for full documentation.
 ### WebAssembly
 
 ```sh
-npm install @kreuzberg/tree-sitter-language-pack-wasm
+npm install @kreuzberg-dev/tree-sitter-language-pack-wasm
 ```
 
 ```sh
-pnpm add @kreuzberg/tree-sitter-language-pack-wasm
+pnpm add @kreuzberg-dev/tree-sitter-language-pack-wasm
 ```
 
 ```sh
-yarn add @kreuzberg/tree-sitter-language-pack-wasm
+yarn add @kreuzberg-dev/tree-sitter-language-pack-wasm
 ```
 
 See [WebAssembly README](crates/ts-pack-core-wasm/README.md) for full documentation.
@@ -193,7 +193,7 @@ See [WebAssembly README](crates/ts-pack-core-wasm/README.md) for full documentat
 ### PHP
 
 ```sh
-composer require kreuzberg/tree-sitter-language-pack
+composer require kreuzberg-dev/tree-sitter-language-pack
 ```
 
 See [PHP README](packages/php/README.md) for full documentation.
