@@ -223,7 +223,7 @@ IO.puts("Functions: #{length(result["structure"])}")
 Composer:
 
 ```bash
-composer require kreuzberg/tree-sitter-language-pack
+composer require kreuzberg-dev/tree-sitter-language-pack
 ```
 
 PHP 8.2+, requires native Rust extension (ext-php-rs).

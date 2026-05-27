@@ -67,7 +67,7 @@ cargo install --path crates/ts-pack-cli
 - **Go**: `go get github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go`
 - **Java**: Maven: add `dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack`
 - **C#**: `dotnet add package TreeSitterLanguagePack`
-- **PHP**: `composer require kreuzberg/tree-sitter-language-pack`
+- **PHP**: `composer require kreuzberg-dev/tree-sitter-language-pack`
 - **Elixir**: Mix: `{:tree_sitter_language_pack, "~> 1.0"}`
 - **WebAssembly**: `npm install @kreuzberg/tree-sitter-language-pack-wasm`
 

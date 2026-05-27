@@ -31,7 +31,7 @@ gem install tree_sitter_language_pack
 {% elif language == "php" %}
 
 ```bash
-composer require kreuzberg/tree-sitter-language-pack
+composer require kreuzberg-dev/tree-sitter-language-pack
 ```
 
 {% elif language == "go" %}

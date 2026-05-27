@@ -271,7 +271,7 @@ composer require mlocati/php-extension-installer
 === "Composer"
 
     ```bash
-    composer require kreuzberg/tree-sitter-language-pack
+    composer require kreuzberg-dev/tree-sitter-language-pack
     ```
 
 === "composer.json"
@@ -280,7 +280,7 @@ composer require mlocati/php-extension-installer
     {
         "require": {
             "mlocati/php-extension-installer": "^2.0",
-            "kreuzberg/tree-sitter-language-pack": "^1.0"
+            "kreuzberg-dev/tree-sitter-language-pack": "^1.0"
         }
     }
     ```

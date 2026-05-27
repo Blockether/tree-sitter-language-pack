@@ -38,9 +38,9 @@
 	<a href="https://www.nuget.org/packages/TreeSitterLanguagePack/">
 		<img src="https://img.shields.io/nuget/v/TreeSitterLanguagePack?label=C%23&color=007ec6" alt="C#" />
 	</a>
-	<a href="https://packagist.org/packages/kreuzberg/tree-sitter-language-pack">
+	<a href="https://packagist.org/packages/kreuzberg-dev/tree-sitter-language-pack">
 		<img
-			src="https://img.shields.io/packagist/v/kreuzberg/tree-sitter-language-pack?label=PHP&color=007ec6"
+			src="https://img.shields.io/packagist/v/kreuzberg-dev/tree-sitter-language-pack?label=PHP&color=007ec6"
 			alt="PHP"
 		/>
 	</a>

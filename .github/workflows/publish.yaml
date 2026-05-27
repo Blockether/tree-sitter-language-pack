@@ -173,7 +173,7 @@ jobs:
                   {
                     "name": "packagist",
                     "registry": "packagist",
-                    "package": "kreuzberg/tree-sitter-language-pack"
+                    "package": "kreuzberg-dev/tree-sitter-language-pack"
                   },
                   {
                     "name": "nuget",
