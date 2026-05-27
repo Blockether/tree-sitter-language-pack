@@ -7,7 +7,12 @@ defmodule TreeSitterLanguagePack.MixProject do
       version: "1.9.0-rc.11",
       elixir: "~> 1.14",
       elixirc_paths: ["lib", Path.expand("../../packages/elixir/native/tree_sitter_language_pack_nif/src", __DIR__)],
-      rustler_crates: [tree_sitter_language_pack_nif: [mode: :release]],
+      rustler_crates: [
+        tree_sitter_language_pack_nif: [
+          mode: :release,
+          targets: ~w(aarch64-apple-darwin aarch64-unknown-linux-gnu x86_64-unknown-linux-gnu x86_64-pc-windows-gnu)
+        ]
+      ],
       description: "Pre-compiled tree-sitter grammars for 305 programming languages",
       package: package(),
       deps: deps()

@@ -1025,6 +1025,9 @@ name = "TreeSitterLanguagePack"
 [crates.e2e.registry.packages.ruby]
 name = "tree_sitter_language_pack"
 
+[crates.e2e.registry.packages.c]
+name = "tree-sitter-language-pack-ffi"
+
 [crates.e2e.registry.packages.wasm]
 name = "@kreuzberg/tree-sitter-language-pack-wasm"
 

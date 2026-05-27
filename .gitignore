@@ -133,6 +133,9 @@ packages/swift/Sources/RustBridge/SwiftBridgeCore.swift
 packages/swift/Sources/RustBridge/tree-sitter-language-pack-swift.swift
 e2e/dart/.dart_tool/
 
+test_apps/c/ffi/
+e2e/c/ffi/
+
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 .agents/agents/c-ffi-specialist.md
 .agents/agents/code-reviewer.md
