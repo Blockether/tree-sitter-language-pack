@@ -9,6 +9,9 @@
     "url": "https://github.com/kreuzberg-dev/tree-sitter-language-pack",
     "directory": "crates/ts-pack-core-wasm"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "files": [
     "pkg",

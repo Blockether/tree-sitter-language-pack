@@ -30,5 +30,5 @@
     "support-nts": true,
     "download-url-method": ["pre-packaged-binary", "composer-default"]
   },
-  "keywords": ["tree-sitter", "parser", "syntax", "language-pack"]
+  "keywords": ["language-pack", "parser", "syntax", "tree-sitter"]
 }
