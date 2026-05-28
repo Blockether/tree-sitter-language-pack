@@ -473,7 +473,7 @@ function downloadGroup(name: string): number
 
 #### manifestLanguages()
 
-Return all language names available in the remote manifest (305).
+Return all language names available in the remote manifest (306).
 
 Fetches (and caches) the remote manifest to discover the full list of
 downloadable languages. Use `downloaded_languages` to list what is

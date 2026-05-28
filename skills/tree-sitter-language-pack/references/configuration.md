@@ -102,7 +102,7 @@ init({"languages": ["python", "javascript", "rust"]})
 # Or download after init
 download(["python", "typescript"])
 
-# Download all 305 languages
+# Download all 306 languages
 download_all()
 ```
 
