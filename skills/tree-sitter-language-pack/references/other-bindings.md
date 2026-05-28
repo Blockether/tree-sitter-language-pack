@@ -302,7 +302,7 @@ console.log(`Functions: ${result.structure.length}`);
 
 ### Key Differences
 
-- Curated subset of languages (not all 305) optimized for browser/edge
+- Curated subset of languages (not all 306) optimized for browser/edge
 - No download API (stubs that throw)
 - Config is JS object, results are JS objects (no JSON conversion needed)
 - Single-threaded (use Web Workers for large files)

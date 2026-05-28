@@ -33,7 +33,7 @@ Arguments:
 
 Options:
 
-- `--all` — Download all 305 available languages
+- `--all` — Download all 306 available languages
 - `--groups <GROUPS>` — Language groups (comma-separated: web, systems, scripting, data, jvm, functional)
 - `--fresh` — Clean cache before downloading
 

@@ -1,7 +1,7 @@
 ---
 name: tree-sitter-language-pack
 description: >-
-  Parse and extract code intelligence from 305+ programming languages using tree-sitter grammars.
+  Parse and extract code intelligence from 306+ programming languages using tree-sitter grammars.
   Provides Rust core with native bindings for Python, Node.js, TypeScript, Ruby, Go, Java, C#, Elixir, PHP, and WebAssembly.
   Use when writing code that parses source code, extracts structure/imports/exports, or analyzes code with syntax-aware chunking.
 license: Elastic-2.0
@@ -13,11 +13,11 @@ metadata:
 
 # Tree-Sitter Language Pack
 
-tree-sitter-language-pack is a polyglot code parsing and analysis library with a high-performance Rust core and bindings for Python, Node.js/TypeScript, Ruby, Go, Java, C#, PHP, Elixir, and WebAssembly. It compiles 305+ tree-sitter grammars into efficient parsers and provides code intelligence extraction: structure (functions, classes), imports, exports, comments, docstrings, diagnostics, and syntax-aware chunking for LLM ingestion.
+tree-sitter-language-pack is a polyglot code parsing and analysis library with a high-performance Rust core and bindings for Python, Node.js/TypeScript, Ruby, Go, Java, C#, PHP, Elixir, and WebAssembly. It compiles 306+ tree-sitter grammars into efficient parsers and provides code intelligence extraction: structure (functions, classes), imports, exports, comments, docstrings, diagnostics, and syntax-aware chunking for LLM ingestion.
 
 Use this skill when writing code that:
 
-- Parses source code in any of 305 supported languages
+- Parses source code in any of 306 supported languages
 - Extracts code structure, imports, exports, and metadata
 - Detects syntax errors and generates diagnostics
 - Chunks code intelligently for LLM context windows
@@ -162,7 +162,7 @@ ts-pack download python javascript typescript rust
 
 | Function                                | Purpose                                       |
 | --------------------------------------- | --------------------------------------------- |
-| `available_languages()`                 | List all 305 supported language names         |
+| `available_languages()`                 | List all 306 supported language names         |
 | `has_language(name)`                    | Check if a language is available              |
 | `language_count()`                      | Return total language count                   |
 | `detect_language(path)`                 | Detect language from file path/extension      |
@@ -197,7 +197,7 @@ ts-pack download python javascript typescript rust
 | `init(config)`           | Initialize pack with pre-downloads and configuration   |
 | `configure(config)`      | Set cache directory without downloading                |
 | `download(names)`        | Download specific languages                            |
-| `download_all()`         | Download all 305 languages                             |
+| `download_all()`         | Download all 306 languages                             |
 | `manifest_languages()`   | Fetch list of available languages from remote manifest |
 | `downloaded_languages()` | List locally cached languages                          |
 | `clean_cache()`          | Delete all cached parsers                              |
