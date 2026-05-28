@@ -6,5 +6,5 @@
 # frozen_string_literal: true
 
 module TreeSitterLanguagePack
-  VERSION = "1.9.0.pre.rc.12"
+  VERSION = "1.9.0.pre.rc.13"
 end
