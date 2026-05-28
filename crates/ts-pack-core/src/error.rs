@@ -45,11 +45,9 @@ pub enum Error {
     #[error("TOML parse error: {0}")]
     Toml(#[from] toml::de::Error),
 
-    #[cfg(feature = "download")]
     #[error("Download error: {0}")]
     Download(String),
 
-    #[cfg(feature = "download")]
     #[error("Checksum mismatch for '{file}': expected {expected}, got {actual}")]
     ChecksumMismatch {
         file: String,
@@ -57,7 +55,6 @@ pub enum Error {
         actual: String,
     },
 
-    #[cfg(feature = "download")]
     #[error("Download cache lock error: {0}")]
     CacheLock(String),
 }
