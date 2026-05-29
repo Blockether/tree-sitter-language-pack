@@ -1518,6 +1518,35 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
 }
 
 #[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeLanguageRegistryHasParser(
+    mut env: EnvUnowned,
+    _class: JClass,
+    handle: jlong,
+    request_json: JString,
+) -> jboolean {
+    // SAFETY: env is a valid EnvUnowned passed by the JVM for this native call frame.
+    let mut __jni_attach_guard = unsafe { jni::AttachGuard::from_unowned(env.as_raw()) };
+    let env = __jni_attach_guard.borrow_env_mut();
+    // SAFETY: handle was allocated by the matching constructor shim and remains
+    // valid until nativeFree is called. The Kotlin AutoCloseable.close() guarantee
+    // ensures the handle outlives this call.
+    let client: &core_crate::LanguageRegistry = unsafe { &*(handle as *const core_crate::LanguageRegistry) };
+    let req_str = match jstring_to_string(env, request_json) {
+        Ok(s) => s,
+        Err(e) => {
+            throw_jni_error(env, &format!("{e}"));
+            return false;
+        }
+    };
+    let name: String = match serde_json::from_str(&req_str) {
+        Ok(s) => s,
+        Err(_) => req_str,
+    };
+    let v = client.has_parser(&name);
+    v
+}
+
+#[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeLanguageRegistryHasLanguage(
     mut env: EnvUnowned,
     _class: JClass,

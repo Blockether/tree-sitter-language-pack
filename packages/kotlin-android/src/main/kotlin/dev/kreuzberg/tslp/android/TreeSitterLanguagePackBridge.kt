@@ -190,6 +190,9 @@ object TreeSitterLanguagePackBridge {
     external fun nativeLanguageRegistryAvailableLanguages(handle: Long): String
 
     @Throws(TreeSitterLanguagePackBridgeException::class)
+    external fun nativeLanguageRegistryHasParser(handle: Long, requestJson: String): Boolean
+
+    @Throws(TreeSitterLanguagePackBridgeException::class)
     external fun nativeLanguageRegistryHasLanguage(handle: Long, requestJson: String): Boolean
 
     @Throws(TreeSitterLanguagePackBridgeException::class)

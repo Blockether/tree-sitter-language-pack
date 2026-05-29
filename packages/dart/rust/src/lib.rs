@@ -577,6 +577,10 @@ impl LanguageRegistry {
         self.inner.available_languages()
     }
     #[frb]
+    pub fn has_parser(&self, name: String) -> bool {
+        self.inner.has_parser(&name)
+    }
+    #[frb]
     pub fn has_language(&self, name: String) -> bool {
         self.inner.has_language(&name)
     }
