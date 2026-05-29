@@ -13,31 +13,6 @@ importers:
       '@napi-rs/cli':
         specifier: ^3.6.2
         version: 3.6.2(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(node-addon-api@8.8.0)
-    optionalDependencies:
-      '@kreuzberg/tree-sitter-language-pack-darwin-arm64':
-        specifier: 1.9.0-rc.16
-        version: 1.9.0-rc.16
-      '@kreuzberg/tree-sitter-language-pack-darwin-x64':
-        specifier: 1.9.0-rc.16
-        version: 1.9.0-rc.16
-      '@kreuzberg/tree-sitter-language-pack-linux-arm64-gnu':
-        specifier: 1.9.0-rc.16
-        version: 1.9.0-rc.16
-      '@kreuzberg/tree-sitter-language-pack-linux-arm64-musl':
-        specifier: 1.9.0-rc.16
-        version: 1.9.0-rc.16
-      '@kreuzberg/tree-sitter-language-pack-linux-x64-gnu':
-        specifier: 1.9.0-rc.16
-        version: 1.9.0-rc.16
-      '@kreuzberg/tree-sitter-language-pack-linux-x64-musl':
-        specifier: 1.9.0-rc.16
-        version: 1.9.0-rc.16
-      '@kreuzberg/tree-sitter-language-pack-win32-arm64-msvc':
-        specifier: 1.9.0-rc.16
-        version: 1.9.0-rc.16
-      '@kreuzberg/tree-sitter-language-pack-win32-x64-msvc':
-        specifier: 1.9.0-rc.16
-        version: 1.9.0-rc.16
 
   e2e/node:
     devDependencies:
@@ -354,58 +329,6 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
-
-  '@kreuzberg/tree-sitter-language-pack-darwin-arm64@1.9.0-rc.16':
-    resolution: {integrity: sha512-b+LOFRsUMRKxvP8iYd8Q7ASnHvo62FF8xjkmPvrAnBhS/+2cK7NYWju6ibsq0Ef6N3atOienkZbxwKR/k7hJ6g==}
-    engines: {node: '>= 18'}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@kreuzberg/tree-sitter-language-pack-darwin-x64@1.9.0-rc.16':
-    resolution: {integrity: sha512-5+101eCk6sLzBJkmuXLMEFi4QDBBCS/N00tzbEhDk9OJLKsX55t3sEtuSkEH2cdcTzS40MDUHFHNqN4GI92ZKQ==}
-    engines: {node: '>= 18'}
-    cpu: [x64]
-    os: [darwin]
-
-  '@kreuzberg/tree-sitter-language-pack-linux-arm64-gnu@1.9.0-rc.16':
-    resolution: {integrity: sha512-cwSiT4NvB8q+XeVSg9Bew/AXwUwY0iHlExgkb5ppW8aLm9O0g2R/9xfZbChvUhaGmAJufasKul0hU9yIegOEtA==}
-    engines: {node: '>= 18'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@kreuzberg/tree-sitter-language-pack-linux-arm64-musl@1.9.0-rc.16':
-    resolution: {integrity: sha512-QcPXd+UM2O/g95pEI7Bwrd9nY+lfwvUv2TTQdz6b41wsbUpWI87DMYtIQwwnI1VJBqKvtx7AuWZcP9CzEIiTDw==}
-    engines: {node: '>= 18'}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-
-  '@kreuzberg/tree-sitter-language-pack-linux-x64-gnu@1.9.0-rc.16':
-    resolution: {integrity: sha512-26FI2BLZFRUJENVpiu5ZTr5LwJ4Ufjis5OMAhAbMKcwtT+FraM8tdR6jsYiMw4BDmTqkCIguXFN+lR1BV63f9g==}
-    engines: {node: '>= 18'}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@kreuzberg/tree-sitter-language-pack-linux-x64-musl@1.9.0-rc.16':
-    resolution: {integrity: sha512-/BL67xQ1mSz5+44tZhtunlM1lA4aUWhCb0SsYLcW0JMZBgF4gDjG0AU5Esxlc0YlQB2wwMFQ68dYDZj9MpV8Lg==}
-    engines: {node: '>= 18'}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-
-  '@kreuzberg/tree-sitter-language-pack-win32-arm64-msvc@1.9.0-rc.16':
-    resolution: {integrity: sha512-yBseceGmbPMO7RvmJmbE5WF8vhztsbA7QWpjKV98qeksCVeosRxaSNH6AQj3ykVQnuB3G7+ZvQbY0ddWb87vOA==}
-    engines: {node: '>= 18'}
-    cpu: [arm64]
-    os: [win32]
-
-  '@kreuzberg/tree-sitter-language-pack-win32-x64-msvc@1.9.0-rc.16':
-    resolution: {integrity: sha512-o39+YtsE1rMWWP22PAqJrlmmU3jWykaS5gTbHI9Nwim8mc0ezxVrLIPnaHdzNBgFlqs+/uiUOpdyuIad9X5yLQ==}
-    engines: {node: '>= 18'}
-    cpu: [x64]
-    os: [win32]
 
   '@napi-rs/cli@3.6.2':
     resolution: {integrity: sha512-jy5rABUh9tbE/vPRzw9kGzGuqZiVslyDQUV8LkvjzqVX/oJMN7g0U1uhtr9L3W1H+iRM/urXHXUf+CE4n8FvLA==}
@@ -1476,30 +1399,6 @@ snapshots:
   '@inquirer/type@4.0.5': {}
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
-
-  '@kreuzberg/tree-sitter-language-pack-darwin-arm64@1.9.0-rc.16':
-    optional: true
-
-  '@kreuzberg/tree-sitter-language-pack-darwin-x64@1.9.0-rc.16':
-    optional: true
-
-  '@kreuzberg/tree-sitter-language-pack-linux-arm64-gnu@1.9.0-rc.16':
-    optional: true
-
-  '@kreuzberg/tree-sitter-language-pack-linux-arm64-musl@1.9.0-rc.16':
-    optional: true
-
-  '@kreuzberg/tree-sitter-language-pack-linux-x64-gnu@1.9.0-rc.16':
-    optional: true
-
-  '@kreuzberg/tree-sitter-language-pack-linux-x64-musl@1.9.0-rc.16':
-    optional: true
-
-  '@kreuzberg/tree-sitter-language-pack-win32-arm64-msvc@1.9.0-rc.16':
-    optional: true
-
-  '@kreuzberg/tree-sitter-language-pack-win32-x64-msvc@1.9.0-rc.16':
-    optional: true
 
   '@napi-rs/cli@3.6.2(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(node-addon-api@8.8.0)':
     dependencies:
