@@ -7,7 +7,14 @@
 """E2e tests for category: error-handling."""
 
 import pytest  # noqa: F401
-from tree_sitter_language_pack import detect_language_from_content, detect_language_from_extension, detect_language_from_path, process, get_language
+from tree_sitter_language_pack import (
+    detect_language_from_content,
+    detect_language_from_extension,
+    detect_language_from_path,
+    process,
+    get_language,
+)
+
 
 def _alef_e2e_text(value: object) -> str:
     return "" if value is None else str(value)
@@ -15,7 +22,11 @@ def _alef_e2e_text(value: object) -> str:
 
 def _alef_e2e_item_texts(item: object) -> tuple[str, ...]:
     raw_items = getattr(item, "items", None)
-    items_text = " ".join(str(value) for value in raw_items) if isinstance(raw_items, list) else ""
+    items_text = (
+        " ".join(str(value) for value in raw_items)
+        if isinstance(raw_items, list)
+        else ""
+    )
     return (
         _alef_e2e_text(item),
         _alef_e2e_text(getattr(item, "kind", None)),
