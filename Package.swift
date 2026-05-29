@@ -24,8 +24,8 @@ let package = Package(
     .binaryTarget(
       name: "RustBridge",
       url:
-        "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v__ALEF_SWIFT_VERSION__/TreeSitterLanguagePack-rs.artifactbundle.zip",
-      checksum: "__ALEF_SWIFT_CHECKSUM__"
+        "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v1.9.0-rc.17/TreeSitterLanguagePack-rs.artifactbundle.zip",
+      checksum: "f2b5c2b4abc3592b6a8e5aea37a50b1029e9f61bbacd9e2b66fc64167e2549cf"
     ),
     .target(
       name: "TreeSitterLanguagePack",
