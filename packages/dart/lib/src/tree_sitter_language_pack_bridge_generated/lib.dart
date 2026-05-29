@@ -308,6 +308,8 @@ abstract class LanguageRegistry implements RustOpaqueInterface {
 
   Future<bool> hasLanguage({required String name});
 
+  Future<bool> hasParser({required String name});
+
   Future<PlatformInt64> languageCount();
 
   Future<ProcessResult> process({

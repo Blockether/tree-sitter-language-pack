@@ -437,6 +437,8 @@ mod ffi {
         fn language_registry_get_language(client: &LanguageRegistry, name: String) -> Result<Language, String>;
         #[swift_bridge(swift_name = "languageRegistryAvailableLanguages")]
         fn language_registry_available_languages(client: &LanguageRegistry) -> Vec<String>;
+        #[swift_bridge(swift_name = "languageRegistryHasParser")]
+        fn language_registry_has_parser(client: &LanguageRegistry, name: String) -> bool;
         #[swift_bridge(swift_name = "languageRegistryHasLanguage")]
         fn language_registry_has_language(client: &LanguageRegistry, name: String) -> bool;
         #[swift_bridge(swift_name = "languageRegistryLanguageCount")]
@@ -1676,6 +1678,9 @@ pub fn language_registry_get_language(client: &LanguageRegistry, name: String) -
 }
 pub fn language_registry_available_languages(client: &LanguageRegistry) -> Vec<String> {
     client.0.available_languages()
+}
+pub fn language_registry_has_parser(client: &LanguageRegistry, name: String) -> bool {
+    client.0.has_parser(&name)
 }
 pub fn language_registry_has_language(client: &LanguageRegistry, name: String) -> bool {
     client.0.has_language(&name)

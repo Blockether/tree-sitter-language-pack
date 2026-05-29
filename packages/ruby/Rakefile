@@ -7,7 +7,7 @@ require "rspec/core/rake_task"
 
 GEMSPEC = Gem::Specification.load(File.expand_path("tree_sitter_language_pack.gemspec", __dir__))
 
-RbSys::ExtensionTask.new("ts_pack_core_rb", GEMSPEC) do |ext|
+RbSys::ExtensionTask.new("ts-pack-core-rb", GEMSPEC) do |ext|
   ext.lib_dir = "lib"
   ext.ext_dir = "ext/ts_pack_core_rb"
   ext.cross_compile = true
