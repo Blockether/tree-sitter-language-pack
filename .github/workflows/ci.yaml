@@ -215,6 +215,13 @@ jobs:
             # --- Prek ---
             - name: Run prek hooks
               uses: j178/prek-action@v2.0.4
+              env:
+                  # cargo-check / cargo-clippy hooks compile ts-pack-core whose build.rs
+                  # downloads parser-sources from the current rc tag URL. Pre-publish
+                  # (this workflow runs before publish.yaml uploads the asset) the URL
+                  # 404s. Skip the download — these hooks only need the workspace to
+                  # type-check, not real grammar tables.
+                  TSLP_OFFLINE: "1"
               with:
                   extra-args: --all-files
 
