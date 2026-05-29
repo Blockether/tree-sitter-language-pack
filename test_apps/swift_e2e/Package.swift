@@ -8,12 +8,12 @@ let package = Package(
         .iOS(.v16),
     ],
     dependencies: [
-        .package(url: "https://github.com/kreuzberg-dev/tree-sitter-language-pack.git", from: "1.9.0-rc.16"),
+        .binaryTarget(name: "TreeSitterLanguagePack", url: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v1.9.0-rc.17/TreeSitterLanguagePack-rs.artifactbundle.zip", checksum: "__ALEF_SWIFT_CHECKSUM__"),
     ],
     targets: [
         .testTarget(
             name: "TreeSitterLanguagePackE2ETests",
-            dependencies: [.product(name: "TreeSitterLanguagePack", package: "tree-sitter-language-pack")]
+            dependencies: [.binaryTarget(name: "TreeSitterLanguagePack")]
         ),
     ]
 )

@@ -676,6 +676,7 @@ bool __swift_bridge__$ProcessConfig$diagnostics(void* self);
 struct __private__OptionUsize __swift_bridge__$ProcessConfig$chunk_max_size(void* self);
 struct __private__ResultPtrAndPtr __swift_bridge__$language_registry_get_language(void* client, void* name);
 void* __swift_bridge__$language_registry_available_languages(void* client);
+bool __swift_bridge__$language_registry_has_parser(void* client, void* name);
 bool __swift_bridge__$language_registry_has_language(void* client, void* name);
 uintptr_t __swift_bridge__$language_registry_language_count(void* client);
 struct __private__ResultPtrAndPtr __swift_bridge__$language_registry_process(void* client, void* source, void* config);

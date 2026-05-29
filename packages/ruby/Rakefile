@@ -5,20 +5,40 @@ Bundler::GemHelper.install_tasks name: "tree_sitter_language_pack"
 require "rb_sys/extensiontask"
 require "rspec/core/rake_task"
 
-GEMSPEC = Gem::Specification.load(File.expand_path("tree_sitter_language_pack.gemspec", __dir__))
+GEM_ROOT = __dir__
+GEMSPEC = Gem::Specification.load(File.expand_path("tree_sitter_language_pack.gemspec", GEM_ROOT))
 
-RbSys::ExtensionTask.new("ts-pack-core-rb", GEMSPEC) do |ext|
-  ext.lib_dir = "lib"
-  ext.ext_dir = "ext/ts_pack_core_rb"
-  ext.cross_compile = true
-  ext.cross_platform = %w[
-    x86_64-linux
-    aarch64-linux
-    x86_64-darwin
-    arm64-darwin
-    x64-mingw32
-    x64-mingw-ucrt
-  ]
+# RbSys::ExtensionTask runs `cargo metadata` from Dir.pwd to look up the
+# native crate. The native binding crate at ext/ts_pack_core_rb/native is excluded
+# from the parent Cargo workspace (so the parent does not pull in rb_sys
+# deps), so the lookup raises PackageNotFoundError when the Rakefile runs
+# from the gem root. Change to the native dir for ExtensionTask initialization
+# to allow cargo metadata to find the standalone Cargo.toml. Pre-declare the
+# Cargo.lock file task with absolute path so rake finds it regardless of CWD.
+EXT_NATIVE_DIR = File.expand_path("ext/ts_pack_core_rb/native", GEM_ROOT)
+
+# Declare file tasks with absolute paths before ExtensionTask defines prerequisites.
+# Since extconf.rb sets ext_dir = "native" (a relative path), rake-compiler will
+# look for source files relative to ext/ts_pack_core_rb/, so we declare those paths.
+file File.join("ext/ts_pack_core_rb", "Cargo.lock") => File.join(EXT_NATIVE_DIR, "Cargo.lock")
+file File.join("ext/ts_pack_core_rb", "Cargo.toml") => File.join(EXT_NATIVE_DIR, "Cargo.toml")
+# Also declare absolute paths for direct access
+file File.join(EXT_NATIVE_DIR, "Cargo.lock")
+file File.join(EXT_NATIVE_DIR, "Cargo.toml")
+
+Dir.chdir(EXT_NATIVE_DIR) do
+  RbSys::ExtensionTask.new("ts-pack-core-rb", GEMSPEC) do |ext|
+    ext.lib_dir = File.expand_path("lib", GEM_ROOT)
+    ext.cross_compile = true
+    ext.cross_platform = %w[
+      x86_64-linux
+      aarch64-linux
+      x86_64-darwin
+      arm64-darwin
+      x64-mingw32
+      x64-mingw-ucrt
+    ]
+  end
 end
 
 RSpec::Core::RakeTask.new(:spec)
