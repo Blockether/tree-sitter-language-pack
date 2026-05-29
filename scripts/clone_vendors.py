@@ -139,8 +139,21 @@ def get_language_definitions() -> tuple[dict[str, LanguageDict], list[str]]:
 # ---------------------------------------------------------------------------
 
 
+def _is_transient_git_error(error_str: str) -> bool:
+    """Check if a git error looks transient and retryable."""
+    transient_patterns = [
+        r"Connection reset",
+        r"early EOF",
+        r"RPC failed",
+        r"sideband",
+        r"invalid index-pack",
+        r"exit code\(128\)",
+    ]
+    return any(re.search(pattern, error_str, re.IGNORECASE) for pattern in transient_patterns)
+
+
 async def clone_repository(repo_url: str, branch: str | None, language_name: str, rev: str | None = None) -> None:
-    """Clone a repository.
+    """Clone a repository with retry on transient network errors.
 
     Args:
         repo_url: The repository URL.
@@ -167,14 +180,29 @@ async def clone_repository(repo_url: str, branch: str | None, language_name: str
     if not rev:
         kwargs["depth"] = 1
 
-    try:
-        repo = await run_sync(partial(Repo.clone_from, **kwargs))  # type: ignore[arg-type]
-        print(f"Cloned {repo_url} successfully")
-        if rev:
-            await run_sync(lambda: repo.git.checkout(rev))
-            print(f"Checked out {rev}")
-    except Exception as e:
-        raise RuntimeError(f"failed to clone repo {repo_url} error: {e}") from e
+    max_attempts = 3
+    backoff_delays = [2, 4, 8]
+
+    for attempt in range(max_attempts):
+        try:
+            repo = await run_sync(partial(Repo.clone_from, **kwargs))  # type: ignore[arg-type]
+            print(f"Cloned {repo_url} successfully")
+            if rev:
+                cloned_repo = repo
+                await run_sync(lambda r=cloned_repo: r.git.checkout(rev))
+                print(f"Checked out {rev}")
+            return
+        except Exception as e:  # noqa: PERF203
+            error_str = str(e)
+            if _is_transient_git_error(error_str) and attempt < max_attempts - 1:
+                delay = backoff_delays[attempt]
+                print(f"[clone_vendors] retry {attempt + 1}/{max_attempts} for {repo_url} after error: {e}", flush=True)
+                await asyncio.sleep(delay)
+                # Clean up failed clone attempt for next retry
+                if clone_target.exists():
+                    await run_sync(rmtree, clone_target)
+            else:
+                raise RuntimeError(f"failed to clone repo {repo_url} error: {e}") from e
 
 
 async def handle_generate(language_name: str, directory: str | None, abi_version: int) -> None:
