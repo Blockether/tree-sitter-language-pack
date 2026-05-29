@@ -158,7 +158,14 @@ repos:
           - id: oxlint
             exclude: ^fixtures/bench/
           - id: oxfmt
-            exclude: ^fixtures/bench/
+            # napi-rs bootstrap shim is re-emitted by alef sync-versions in
+            # 2-space form; oxfmt's tab/single-line auto-format would diverge,
+            # breaking the `git diff --exit-code` check in CI Validate.
+            exclude: |
+                (?x)^(
+                  fixtures/bench/|
+                  crates/ts-pack-core-node/index\.js$
+                )
           - id: rumdl-fmt
           - id: cpd
             args:
