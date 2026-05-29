@@ -33,6 +33,7 @@ repos:
           - id: check-toml
           - id: check-case-conflict
           - id: pyproject-fmt
+            additional_dependencies: ["pyproject-fmt==2.5.0"]
           - id: ruff
             exclude: ^fixtures/bench/
           - id: ruff-format
