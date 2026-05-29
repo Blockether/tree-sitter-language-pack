@@ -202,6 +202,7 @@ jobs:
             - name: Check version sync
               run: |
                   alef sync-versions
+                  alef fmt
                   # Ignore whitespace-only diffs — `alef readme` (run in a previous
                   # step) leaves rumdl-vs-alef blank-line drift in crates/*/README.md
                   # files that's tolerated by the freshness check above but would
