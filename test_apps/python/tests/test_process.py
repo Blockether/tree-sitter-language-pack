@@ -8,13 +8,18 @@
 
 from tree_sitter_language_pack import process
 
+
 def _alef_e2e_text(value: object) -> str:
     return "" if value is None else str(value)
 
 
 def _alef_e2e_item_texts(item: object) -> tuple[str, ...]:
     raw_items = getattr(item, "items", None)
-    items_text = " ".join(str(value) for value in raw_items) if isinstance(raw_items, list) else ""
+    items_text = (
+        " ".join(str(value) for value in raw_items)
+        if isinstance(raw_items, list)
+        else ""
+    )
     return (
         _alef_e2e_text(item),
         _alef_e2e_text(getattr(item, "kind", None)),
@@ -29,26 +34,36 @@ def _alef_e2e_item_texts(item: object) -> tuple[str, ...]:
 
 def test_c_function_process() -> None:
     """Intel: C function with include."""
-    source = '#include <stdio.h>\n\nint main() {\n    printf("hello");\n    return 0;\n}\n'
+    source = (
+        '#include <stdio.h>\n\nint main() {\n    printf("hello");\n    return 0;\n}\n'
+    )
     config = {"language": "c"}
 
     result = process(source, config)
     assert result.language.strip() == "c"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert result.metrics.total_lines >= 6  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
 
 
 def test_config_all_python() -> None:
     """Intel: process with all features enabled."""
-    source = "# A comment\ndef greet(name):\n    \"\"\"Say hello.\"\"\"\n    return f'Hi {name}'\n\nimport os\n"
+    source = '# A comment\ndef greet(name):\n    """Say hello."""\n    return f\'Hi {name}\'\n\nimport os\n'
     config = {"language": "python"}
 
     result = process(source, config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert len(result.imports) >= 1  # noqa: S101
     assert result.metrics.total_lines >= 6  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
@@ -66,13 +81,19 @@ def test_config_minimal_python() -> None:
 
 def test_go_function_process() -> None:
     """Intel: extract structure from Go function definition."""
-    source = 'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n'
+    source = (
+        'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n'
+    )
     config = {"language": "go"}
 
     result = process(source, config)
     assert result.language.strip() == "go"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert len(result.imports) >= 1  # noqa: S101
     assert result.metrics.total_lines >= 7  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
@@ -80,13 +101,19 @@ def test_go_function_process() -> None:
 
 def test_go_function_process_detail() -> None:
     """Intel: extract structure from Go function definition."""
-    source = 'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n'
+    source = (
+        'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n'
+    )
     config = {"language": "go"}
 
     result = process(source, config)
     assert result.language.strip() == "go"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert len(result.imports) >= 1  # noqa: S101
     assert result.metrics.total_lines >= 7  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
@@ -100,7 +127,11 @@ def test_java_class_process() -> None:
     result = process(source, config)
     assert result.language.strip() == "java"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Class" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Class" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert len(result.imports) >= 1  # noqa: S101
     assert result.metrics.total_lines >= 7  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
@@ -114,8 +145,16 @@ def test_java_package_declaration_process() -> None:
     result = process(source, config)
     assert result.language.strip() == "java"  # noqa: S101
     assert len(result.structure) >= 2  # noqa: S101
-    assert any("Module" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
-    assert any("Class" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Module" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
+    assert any(
+        "Class" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
 
 
@@ -127,7 +166,11 @@ def test_javascript_multi_import_process() -> None:
     result = process(source, config)
     assert result.language.strip() == "javascript"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert len(result.imports) >= 2  # noqa: S101
     assert result.metrics.total_lines >= 6  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
@@ -141,7 +184,11 @@ def test_javascript_multi_import_process_detail() -> None:
     result = process(source, config)
     assert result.language.strip() == "javascript"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert len(result.imports) >= 2  # noqa: S101
     assert result.metrics.total_lines >= 6  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
@@ -155,8 +202,16 @@ def test_kotlin_package_class_process() -> None:
     result = process(source, config)
     assert result.language.strip() == "kotlin"  # noqa: S101
     assert len(result.structure) >= 2  # noqa: S101
-    assert any("Module" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
-    assert any("Class" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Module" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
+    assert any(
+        "Class" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
 
 
@@ -183,7 +238,14 @@ def test_process_javascript_exports_detail() -> None:
 def test_process_python_all_features() -> None:
     """Python comprehensive source with all feature extraction enabled."""
     source = 'import os\nfrom pathlib import Path\n\n# Configuration\nMY_CONST = 42\n\ndef process_file(path):\n    """Process a file and return contents."""\n    with open(path) as f:\n        return f.read()\n\nclass FileProcessor:\n    def __init__(self, base_dir):\n        self.base_dir = base_dir\n'
-    config = {"comments": True, "docstrings": True, "imports": True, "language": "python", "structure": True, "symbols": True}
+    config = {
+        "comments": True,
+        "docstrings": True,
+        "imports": True,
+        "language": "python",
+        "structure": True,
+        "symbols": True,
+    }
 
     result = process(source, config)
     assert result.language.strip() == "python"  # noqa: S101
@@ -215,13 +277,17 @@ def test_process_python_docstrings() -> None:
 
 def test_process_python_imports_detail() -> None:
     """Python with multiple imports, verify imports contain specific source."""
-    source = "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
+    source = (
+        "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
+    )
     config = {"language": "python"}
 
     result = process(source, config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.imports) >= 2  # noqa: S101
-    assert any("os" in text for item in result.imports for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "os" in text for item in result.imports for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
 
 
 def test_process_python_metrics_detail() -> None:
@@ -254,7 +320,11 @@ def test_process_rust_structure_name() -> None:
     result = process(source, config)
     assert result.language.strip() == "rust"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("MyConfig" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "MyConfig" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
 
 
 def test_python_chunking_medium() -> None:
@@ -288,7 +358,11 @@ def test_python_class_with_methods_process() -> None:
     result = process(source, config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Class" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Class" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert result.metrics.total_lines >= 6  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
 
@@ -301,7 +375,11 @@ def test_python_class_with_methods_process_detail() -> None:
     result = process(source, config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Class" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Class" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert result.metrics.total_lines >= 6  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
 
@@ -325,7 +403,11 @@ def test_python_function_process() -> None:
     result = process(source, config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert result.metrics.total_lines >= 2  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
 
@@ -338,7 +420,11 @@ def test_python_function_process_detail() -> None:
     result = process(source, config)
     assert result.language.strip() == "python"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert result.metrics.total_lines >= 2  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
 
@@ -365,7 +451,9 @@ def test_python_malformed_code_process_detail() -> None:
 
 def test_python_multi_import_process() -> None:
     """Intel: detect multiple Python imports."""
-    source = "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
+    source = (
+        "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
+    )
     config = {"language": "python"}
 
     result = process(source, config)
@@ -378,7 +466,9 @@ def test_python_multi_import_process() -> None:
 
 def test_python_multi_import_process_detail() -> None:
     """Intel: detect multiple Python imports."""
-    source = "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
+    source = (
+        "import os\nimport sys\nfrom pathlib import Path\n\ndef main():\n    pass\n"
+    )
     config = {"language": "python"}
 
     result = process(source, config)
@@ -397,7 +487,11 @@ def test_ruby_class_process() -> None:
     result = process(source, config)
     assert result.language.strip() == "ruby"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Class" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Class" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert result.metrics.total_lines >= 7  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
 
@@ -432,7 +526,11 @@ def test_rust_function_process() -> None:
     result = process(source, config)
     assert result.language.strip() == "rust"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert result.metrics.total_lines >= 3  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
 
@@ -445,7 +543,11 @@ def test_rust_function_process_detail() -> None:
     result = process(source, config)
     assert result.language.strip() == "rust"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert result.metrics.total_lines >= 3  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
 
@@ -458,7 +560,11 @@ def test_typescript_function_process() -> None:
     result = process(source, config)
     assert result.language.strip() == "typescript"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert len(result.imports) >= 1  # noqa: S101
     assert result.metrics.total_lines >= 5  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
@@ -472,7 +578,11 @@ def test_typescript_function_process_detail() -> None:
     result = process(source, config)
     assert result.language.strip() == "typescript"  # noqa: S101
     assert len(result.structure) >= 1  # noqa: S101
-    assert any("Function" in text for item in result.structure for text in _alef_e2e_item_texts(item))  # noqa: S101
+    assert any(
+        "Function" in text
+        for item in result.structure
+        for text in _alef_e2e_item_texts(item)
+    )  # noqa: S101
     assert len(result.imports) >= 1  # noqa: S101
     assert result.metrics.total_lines >= 5  # noqa: S101
     assert result.metrics.error_count == 0  # noqa: S101
