@@ -223,6 +223,7 @@ impl DownloadManager {
     }
 
     /// Create a download manager with a custom cache directory.
+    #[cfg_attr(alef, alef(skip))]
     pub fn with_cache_dir(version: &str, cache_dir: PathBuf) -> Self {
         Self::with_cache_dir_and_tls(version, cache_dir, None)
     }
