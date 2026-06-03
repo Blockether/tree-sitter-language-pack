@@ -8,7 +8,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'lib.freezed.dart';
 
-// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `Error`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 /// Detect language name from a file extension (without leading dot).
@@ -295,6 +294,10 @@ abstract class DownloadManager implements RustOpaqueInterface {
   Future<PlatformInt64> downloadAllBestEffort();
 
   Future<List<String>> installedLanguages();
+
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<DownloadManager> newInstance({required String version}) =>
+      RustLib.instance.api.crateDownloadManagerNew(version: version);
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Language>>
@@ -304,6 +307,9 @@ abstract class Language implements RustOpaqueInterface {}
 abstract class LanguageRegistry implements RustOpaqueInterface {
   Future<List<String>> availableLanguages();
 
+  static Future<LanguageRegistry> default_() =>
+      RustLib.instance.api.crateLanguageRegistryDefault();
+
   Future<Language> getLanguage({required String name});
 
   Future<bool> hasLanguage({required String name});
@@ -311,6 +317,10 @@ abstract class LanguageRegistry implements RustOpaqueInterface {
   Future<bool> hasParser({required String name});
 
   Future<PlatformInt64> languageCount();
+
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<LanguageRegistry> newInstance() =>
+      RustLib.instance.api.crateLanguageRegistryNew();
 
   Future<ProcessResult> process({
     required String source,
@@ -365,6 +375,11 @@ abstract class Node implements RustOpaqueInterface {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Parser>>
 abstract class Parser implements RustOpaqueInterface {
+  static Future<Parser> default_() => RustLib.instance.api.crateParserDefault();
+
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<Parser> newInstance() => RustLib.instance.api.crateParserNew();
+
   Future<Tree?> parse({required String source});
 
   Future<Tree?> parseBytes({required List<int> source});
@@ -643,6 +658,33 @@ class DocstringInfo {
           span == other.span &&
           associatedItem == other.associatedItem &&
           parsedSections == other.parsedSections;
+}
+
+@freezed
+sealed class Error with _$Error {
+  const Error._();
+
+  const factory Error.languageNotFound({required String field0}) =
+      Error_LanguageNotFound;
+  const factory Error.dynamicLoad({required String field0}) = Error_DynamicLoad;
+  const factory Error.nullLanguagePointer({required String field0}) =
+      Error_NullLanguagePointer;
+  const factory Error.parserSetup({required String field0}) = Error_ParserSetup;
+  const factory Error.lockPoisoned({required String field0}) =
+      Error_LockPoisoned;
+  const factory Error.config({required String field0}) = Error_Config;
+  const factory Error.parseFailed() = Error_ParseFailed;
+  const factory Error.queryError({required String field0}) = Error_QueryError;
+  const factory Error.invalidRange({required String field0}) =
+      Error_InvalidRange;
+  const factory Error.io({required String field0}) = Error_Io;
+  const factory Error.download({required String field0}) = Error_Download;
+  const factory Error.checksumMismatch({
+    required String file,
+    required String expected,
+    required String actual,
+  }) = Error_ChecksumMismatch;
+  const factory Error.cacheLock({required String field0}) = Error_CacheLock;
 }
 
 /// An export statement extracted from source code.

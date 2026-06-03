@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.tslp.android
@@ -45,9 +46,12 @@ enum class ExportKind {
         @JvmStatic
         fun fromWire(value: String): ExportKind =
             when (value) {
-                "Named" -> NAMED
-                "Default" -> DEFAULT
-                "ReExport" -> RE_EXPORT
+                "Named",
+                "named" -> NAMED
+                "Default",
+                "default" -> DEFAULT
+                "ReExport",
+                "reexport" -> RE_EXPORT
                 else -> throw IllegalArgumentException("Unknown ExportKind value: $value")
             }
     }

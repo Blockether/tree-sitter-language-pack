@@ -668,16 +668,6 @@ Create a new download manager for the given version.
 static DownloadManager new(String version)
 ```
 
-#### withCacheDir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```dart
-static DownloadManager withCacheDir(String version, String cacheDir)
-```
-
 #### installedLanguages()
 
 List languages that are already downloaded and cached.

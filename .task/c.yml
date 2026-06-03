@@ -38,8 +38,8 @@ tasks:
         deps: [build:ffi]
         dir: e2e/c
         cmds:
-            - cmake -B build .
-            - cmake --build build
+            - make clean
+            - make
 
     e2e:test:
         desc: Run C E2E tests

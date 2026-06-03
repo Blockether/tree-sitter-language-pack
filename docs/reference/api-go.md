@@ -668,16 +668,6 @@ Create a new download manager for the given version.
 func (o *DownloadManager) New(version string) (DownloadManager, error)
 ```
 
-#### WithCacheDir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```go
-func (o *DownloadManager) WithCacheDir(version string, cacheDir string) DownloadManager
-```
-
 #### InstalledLanguages()
 
 List languages that are already downloaded and cached.

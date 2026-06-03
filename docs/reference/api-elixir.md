@@ -690,16 +690,6 @@ Create a new download manager for the given version.
 def new(version)
 ```
 
-#### with_cache_dir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```elixir
-def with_cache_dir(version, cache_dir)
-```
-
 #### installed_languages()
 
 List languages that are already downloaded and cached.

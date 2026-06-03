@@ -668,16 +668,6 @@ Create a new download manager for the given version.
 TsPackDownloadManager ts_pack_new(const char* version);
 ```
 
-#### ts_pack_with_cache_dir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```c
-TsPackDownloadManager ts_pack_with_cache_dir(const char* version, const char* cache_dir);
-```
-
 #### ts_pack_installed_languages()
 
 List languages that are already downloaded and cached.

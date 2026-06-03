@@ -21,7 +21,7 @@ repository = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 ignored = ["ahash", "serde_json", "tokio"]
 
 [lib]
-crate-type = ["cdylib", "staticlib"]
+crate-type = ["cdylib", "staticlib", "rlib"]
 
 [features]
 default = []

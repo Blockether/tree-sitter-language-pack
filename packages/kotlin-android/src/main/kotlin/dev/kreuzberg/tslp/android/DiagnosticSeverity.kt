@@ -18,6 +18,7 @@
     "LongParameterList",
     "CyclomaticComplexMethod",
     "LongMethod",
+    "MagicNumber",
 )
 
 package dev.kreuzberg.tslp.android
@@ -25,7 +26,8 @@ package dev.kreuzberg.tslp.android
 /**
  * Severity level of a diagnostic produced during parsing.
  *
- * Used to classify parse errors, warnings, and informational messages found in the syntax tree.
+ * Used to classify parse errors, warnings, and informational messages
+ * found in the syntax tree.
  */
 enum class DiagnosticSeverity {
     @com.fasterxml.jackson.annotation.JsonProperty("Error") ERROR,
@@ -45,9 +47,12 @@ enum class DiagnosticSeverity {
         @JvmStatic
         fun fromWire(value: String): DiagnosticSeverity =
             when (value) {
-                "Error" -> ERROR
-                "Warning" -> WARNING
-                "Info" -> INFO
+                "Error",
+                "error" -> ERROR
+                "Warning",
+                "warning" -> WARNING
+                "Info",
+                "info" -> INFO
                 else -> throw IllegalArgumentException("Unknown DiagnosticSeverity value: $value")
             }
     }

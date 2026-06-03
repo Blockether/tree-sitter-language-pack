@@ -358,7 +358,7 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     mut env: EnvUnowned,
     _class: JClass,
     name: JString,
-) -> jstring {
+) -> jboolean {
     // SAFETY: env is a valid EnvUnowned passed by the JVM for this native call frame.
     let mut __jni_attach_guard = unsafe { jni::AttachGuard::from_unowned(env.as_raw()) };
     let env = __jni_attach_guard.borrow_env_mut();
@@ -366,37 +366,23 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         Ok(s) => s,
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
-            return std::ptr::null_mut();
+            return false;
         }
     };
     let v = core_crate::has_language(&name);
-    let s = match serde_json::to_string(&v) {
-        Ok(s) => s,
-        Err(e) => {
-            throw_jni_error(env, &format!("serialize: {e}"));
-            return std::ptr::null_mut();
-        }
-    };
-    string_to_jstring(env, &s)
+    v
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeLanguageCount(
     mut env: EnvUnowned,
     _class: JClass,
-) -> jstring {
+) -> jlong {
     // SAFETY: env is a valid EnvUnowned passed by the JVM for this native call frame.
     let mut __jni_attach_guard = unsafe { jni::AttachGuard::from_unowned(env.as_raw()) };
     let env = __jni_attach_guard.borrow_env_mut();
     let v = core_crate::language_count();
-    let s = match serde_json::to_string(&v) {
-        Ok(s) => s,
-        Err(e) => {
-            throw_jni_error(env, &format!("serialize: {e}"));
-            return std::ptr::null_mut();
-        }
-    };
-    string_to_jstring(env, &s)
+    v as jlong
 }
 
 #[unsafe(no_mangle)]
@@ -454,7 +440,7 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     mut env: EnvUnowned,
     _class: JClass,
     config: JString,
-) -> jstring {
+) {
     // SAFETY: env is a valid EnvUnowned passed by the JVM for this native call frame.
     let mut __jni_attach_guard = unsafe { jni::AttachGuard::from_unowned(env.as_raw()) };
     let env = __jni_attach_guard.borrow_env_mut();
@@ -462,23 +448,23 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         Ok(s) => s,
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
-            return std::ptr::null_mut();
+            return ();
         }
     };
     let config: core_crate::PackConfig = match serde_json::from_str(&config_str) {
         Ok(v) => v,
         Err(e) => {
             throw_jni_error(env, &format!("deserialize: {e}"));
-            return std::ptr::null_mut();
+            return ();
         }
     };
     let result = core_crate::init(&config);
     match result {
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
-            std::ptr::null_mut()
+            ()
         }
-        Ok(v) => string_to_jstring(env, "null"),
+        Ok(v) => {}
     }
 }
 
@@ -487,7 +473,7 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     mut env: EnvUnowned,
     _class: JClass,
     config: JString,
-) -> jstring {
+) {
     // SAFETY: env is a valid EnvUnowned passed by the JVM for this native call frame.
     let mut __jni_attach_guard = unsafe { jni::AttachGuard::from_unowned(env.as_raw()) };
     let env = __jni_attach_guard.borrow_env_mut();
@@ -495,23 +481,23 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         Ok(s) => s,
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
-            return std::ptr::null_mut();
+            return ();
         }
     };
     let config: core_crate::PackConfig = match serde_json::from_str(&config_str) {
         Ok(v) => v,
         Err(e) => {
             throw_jni_error(env, &format!("deserialize: {e}"));
-            return std::ptr::null_mut();
+            return ();
         }
     };
     let result = core_crate::configure(&config);
     match result {
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
-            std::ptr::null_mut()
+            ()
         }
-        Ok(v) => string_to_jstring(env, "null"),
+        Ok(v) => {}
     }
 }
 
@@ -520,7 +506,7 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     mut env: EnvUnowned,
     _class: JClass,
     names: JString,
-) -> jstring {
+) -> jlong {
     // SAFETY: env is a valid EnvUnowned passed by the JVM for this native call frame.
     let mut __jni_attach_guard = unsafe { jni::AttachGuard::from_unowned(env.as_raw()) };
     let env = __jni_attach_guard.borrow_env_mut();
@@ -528,32 +514,23 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         Ok(s) => s,
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
-            return std::ptr::null_mut();
+            return 0;
         }
     };
     let names: Vec<String> = match serde_json::from_str(&names_str) {
         Ok(v) => v,
         Err(e) => {
             throw_jni_error(env, &format!("deserialize: {e}"));
-            return std::ptr::null_mut();
+            return 0;
         }
     };
     let result = core_crate::download(&names);
     match result {
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
-            std::ptr::null_mut()
+            0
         }
-        Ok(v) => {
-            let s = match serde_json::to_string(&v) {
-                Ok(s) => s,
-                Err(e) => {
-                    throw_jni_error(env, &format!("serialize: {e}"));
-                    return std::ptr::null_mut();
-                }
-            };
-            string_to_jstring(env, &s)
-        }
+        Ok(v) => v as jlong,
     }
 }
 
@@ -561,7 +538,7 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
 pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeDownloadAll(
     mut env: EnvUnowned,
     _class: JClass,
-) -> jstring {
+) -> jlong {
     // SAFETY: env is a valid EnvUnowned passed by the JVM for this native call frame.
     let mut __jni_attach_guard = unsafe { jni::AttachGuard::from_unowned(env.as_raw()) };
     let env = __jni_attach_guard.borrow_env_mut();
@@ -569,18 +546,9 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     match result {
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
-            std::ptr::null_mut()
+            0
         }
-        Ok(v) => {
-            let s = match serde_json::to_string(&v) {
-                Ok(s) => s,
-                Err(e) => {
-                    throw_jni_error(env, &format!("serialize: {e}"));
-                    return std::ptr::null_mut();
-                }
-            };
-            string_to_jstring(env, &s)
-        }
+        Ok(v) => v as jlong,
     }
 }
 
@@ -589,7 +557,7 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     mut env: EnvUnowned,
     _class: JClass,
     name: JString,
-) -> jstring {
+) -> jlong {
     // SAFETY: env is a valid EnvUnowned passed by the JVM for this native call frame.
     let mut __jni_attach_guard = unsafe { jni::AttachGuard::from_unowned(env.as_raw()) };
     let env = __jni_attach_guard.borrow_env_mut();
@@ -597,25 +565,16 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
         Ok(s) => s,
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
-            return std::ptr::null_mut();
+            return 0;
         }
     };
     let result = core_crate::download_group(&name);
     match result {
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
-            std::ptr::null_mut()
+            0
         }
-        Ok(v) => {
-            let s = match serde_json::to_string(&v) {
-                Ok(s) => s,
-                Err(e) => {
-                    throw_jni_error(env, &format!("serialize: {e}"));
-                    return std::ptr::null_mut();
-                }
-            };
-            string_to_jstring(env, &s)
-        }
+        Ok(v) => v as jlong,
     }
 }
 
@@ -669,7 +628,7 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
 pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguagePackBridge_nativeCleanCache(
     mut env: EnvUnowned,
     _class: JClass,
-) -> jstring {
+) {
     // SAFETY: env is a valid EnvUnowned passed by the JVM for this native call frame.
     let mut __jni_attach_guard = unsafe { jni::AttachGuard::from_unowned(env.as_raw()) };
     let env = __jni_attach_guard.borrow_env_mut();
@@ -677,9 +636,9 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
     match result {
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
-            std::ptr::null_mut()
+            ()
         }
-        Ok(v) => string_to_jstring(env, "null"),
+        Ok(v) => {}
     }
 }
 

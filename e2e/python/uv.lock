@@ -211,7 +211,7 @@ wheels = [
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.9.0rc1"
+version = "1.9.0rc17"
 source = { directory = "../../packages/python" }
 dependencies = [
     { name = "tree-sitter" },
@@ -222,7 +222,7 @@ requires-dist = [{ name = "tree-sitter", specifier = ">=0.23" }]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "mypy", specifier = ">=1.19.0" },
+    { name = "mypy", specifier = ">=1.19" },
     { name = "ruff", specifier = ">=0.14.8" },
 ]
 

@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -977407515;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1743720148;
 
 // Section: executor
 
@@ -173,6 +173,34 @@ fn wire__crate__DownloadManager_installed_languages_impl(
         },
     )
 }
+fn wire__crate__DownloadManager_new_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "DownloadManager_new",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_version = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::DownloadManager::new(api_version)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__LanguageRegistry_available_languages_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -210,6 +238,33 @@ fn wire__crate__LanguageRegistry_available_languages_impl(
                     let api_that_guard = api_that_guard.unwrap();
                     let output_ok =
                         Result::<_, ()>::Ok(crate::LanguageRegistry::available_languages(&*api_that_guard))?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__LanguageRegistry_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LanguageRegistry_default",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(crate::LanguageRegistry::default())?;
                     Ok(output_ok)
                 })())
             }
@@ -383,6 +438,33 @@ fn wire__crate__LanguageRegistry_language_count_impl(
                     }
                     let api_that_guard = api_that_guard.unwrap();
                     let output_ok = Result::<_, ()>::Ok(crate::LanguageRegistry::language_count(&*api_that_guard))?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__LanguageRegistry_new_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "LanguageRegistry_new",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(crate::LanguageRegistry::new())?;
                     Ok(output_ok)
                 })())
             }
@@ -1291,6 +1373,60 @@ fn wire__crate__Node_walk_impl(
                     }
                     let api_that_guard = api_that_guard.unwrap();
                     let output_ok = Result::<_, ()>::Ok(crate::Node::walk(&*api_that_guard))?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__Parser_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "Parser_default",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(crate::Parser::default())?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__Parser_new_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "Parser_new",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(crate::Parser::new())?;
                     Ok(output_ok)
                 })())
             }
@@ -2912,6 +3048,47 @@ const _: fn() = || {
         let _: Option<String> = DocstringInfo.associated_item;
         let _: Vec<crate::DocSection> = DocstringInfo.parsed_sections;
     }
+    match None::<crate::Error>.unwrap() {
+        crate::Error::LanguageNotFound { field0 } => {
+            let _: String = field0;
+        }
+        crate::Error::DynamicLoad { field0 } => {
+            let _: String = field0;
+        }
+        crate::Error::NullLanguagePointer { field0 } => {
+            let _: String = field0;
+        }
+        crate::Error::ParserSetup { field0 } => {
+            let _: String = field0;
+        }
+        crate::Error::LockPoisoned { field0 } => {
+            let _: String = field0;
+        }
+        crate::Error::Config { field0 } => {
+            let _: String = field0;
+        }
+        crate::Error::ParseFailed => {}
+        crate::Error::QueryError { field0 } => {
+            let _: String = field0;
+        }
+        crate::Error::InvalidRange { field0 } => {
+            let _: String = field0;
+        }
+        crate::Error::Io { field0 } => {
+            let _: String = field0;
+        }
+        crate::Error::Download { field0 } => {
+            let _: String = field0;
+        }
+        crate::Error::ChecksumMismatch { file, expected, actual } => {
+            let _: String = file;
+            let _: String = expected;
+            let _: String = actual;
+        }
+        crate::Error::CacheLock { field0 } => {
+            let _: String = field0;
+        }
+    }
     {
         let ExportInfo = None::<crate::ExportInfo>.unwrap();
         let _: String = ExportInfo.name;
@@ -3367,6 +3544,75 @@ impl SseDecode for crate::DocstringInfo {
             associated_item: var_associatedItem,
             parsed_sections: var_parsedSections,
         };
+    }
+}
+
+impl SseDecode for crate::Error {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::Error::LanguageNotFound { field0: var_field0 };
+            }
+            1 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::Error::DynamicLoad { field0: var_field0 };
+            }
+            2 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::Error::NullLanguagePointer { field0: var_field0 };
+            }
+            3 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::Error::ParserSetup { field0: var_field0 };
+            }
+            4 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::Error::LockPoisoned { field0: var_field0 };
+            }
+            5 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::Error::Config { field0: var_field0 };
+            }
+            6 => {
+                return crate::Error::ParseFailed;
+            }
+            7 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::Error::QueryError { field0: var_field0 };
+            }
+            8 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::Error::InvalidRange { field0: var_field0 };
+            }
+            9 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::Error::Io { field0: var_field0 };
+            }
+            10 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::Error::Download { field0: var_field0 };
+            }
+            11 => {
+                let mut var_file = <String>::sse_decode(deserializer);
+                let mut var_expected = <String>::sse_decode(deserializer);
+                let mut var_actual = <String>::sse_decode(deserializer);
+                return crate::Error::ChecksumMismatch {
+                    file: var_file,
+                    expected: var_expected,
+                    actual: var_actual,
+                };
+            }
+            12 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::Error::CacheLock { field0: var_field0 };
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -3912,83 +4158,88 @@ fn pde_ffi_dispatcher_primary_impl(
         1 => wire__crate__DownloadManager_clean_cache_impl(port, ptr, rust_vec_len, data_len),
         2 => wire__crate__DownloadManager_download_all_best_effort_impl(port, ptr, rust_vec_len, data_len),
         3 => wire__crate__DownloadManager_installed_languages_impl(port, ptr, rust_vec_len, data_len),
-        4 => wire__crate__LanguageRegistry_available_languages_impl(port, ptr, rust_vec_len, data_len),
-        5 => wire__crate__LanguageRegistry_get_language_impl(port, ptr, rust_vec_len, data_len),
-        6 => wire__crate__LanguageRegistry_has_language_impl(port, ptr, rust_vec_len, data_len),
-        7 => wire__crate__LanguageRegistry_has_parser_impl(port, ptr, rust_vec_len, data_len),
-        8 => wire__crate__LanguageRegistry_language_count_impl(port, ptr, rust_vec_len, data_len),
-        9 => wire__crate__LanguageRegistry_process_impl(port, ptr, rust_vec_len, data_len),
-        10 => wire__crate__Node_byte_range_impl(port, ptr, rust_vec_len, data_len),
-        11 => wire__crate__Node_child_impl(port, ptr, rust_vec_len, data_len),
-        12 => wire__crate__Node_child_by_field_name_impl(port, ptr, rust_vec_len, data_len),
-        13 => wire__crate__Node_child_count_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__Node_clone_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__Node_end_byte_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__crate__Node_end_position_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__Node_has_error_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__Node_is_error_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__Node_is_extra_impl(port, ptr, rust_vec_len, data_len),
-        20 => wire__crate__Node_is_missing_impl(port, ptr, rust_vec_len, data_len),
-        21 => wire__crate__Node_is_named_impl(port, ptr, rust_vec_len, data_len),
-        22 => wire__crate__Node_kind_impl(port, ptr, rust_vec_len, data_len),
-        23 => wire__crate__Node_kind_id_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire__crate__Node_named_child_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire__crate__Node_named_child_count_impl(port, ptr, rust_vec_len, data_len),
-        26 => wire__crate__Node_parent_impl(port, ptr, rust_vec_len, data_len),
-        27 => wire__crate__Node_start_byte_impl(port, ptr, rust_vec_len, data_len),
-        28 => wire__crate__Node_start_position_impl(port, ptr, rust_vec_len, data_len),
-        29 => wire__crate__Node_to_sexp_impl(port, ptr, rust_vec_len, data_len),
-        30 => wire__crate__Node_walk_impl(port, ptr, rust_vec_len, data_len),
-        31 => wire__crate__Parser_parse_impl(port, ptr, rust_vec_len, data_len),
-        32 => wire__crate__Parser_parse_bytes_impl(port, ptr, rust_vec_len, data_len),
-        33 => wire__crate__Parser_reset_impl(port, ptr, rust_vec_len, data_len),
-        34 => wire__crate__Parser_set_language_impl(port, ptr, rust_vec_len, data_len),
-        35 => wire__crate__TreeCursor_field_name_impl(port, ptr, rust_vec_len, data_len),
-        36 => wire__crate__TreeCursor_goto_first_child_impl(port, ptr, rust_vec_len, data_len),
-        37 => wire__crate__TreeCursor_goto_next_sibling_impl(port, ptr, rust_vec_len, data_len),
-        38 => wire__crate__TreeCursor_goto_parent_impl(port, ptr, rust_vec_len, data_len),
-        39 => wire__crate__TreeCursor_node_impl(port, ptr, rust_vec_len, data_len),
-        40 => wire__crate__Tree_root_node_impl(port, ptr, rust_vec_len, data_len),
-        41 => wire__crate__Tree_walk_impl(port, ptr, rust_vec_len, data_len),
-        42 => wire__crate__available_languages_impl(port, ptr, rust_vec_len, data_len),
-        43 => wire__crate__cache_dir_impl(port, ptr, rust_vec_len, data_len),
-        44 => wire__crate__clean_cache_impl(port, ptr, rust_vec_len, data_len),
-        45 => wire__crate__configure_impl(port, ptr, rust_vec_len, data_len),
-        46 => wire__crate__create_byte_range_from_json_impl(port, ptr, rust_vec_len, data_len),
-        47 => wire__crate__create_chunk_context_from_json_impl(port, ptr, rust_vec_len, data_len),
-        48 => wire__crate__create_code_chunk_from_json_impl(port, ptr, rust_vec_len, data_len),
-        49 => wire__crate__create_comment_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        50 => wire__crate__create_diagnostic_from_json_impl(port, ptr, rust_vec_len, data_len),
-        51 => wire__crate__create_doc_section_from_json_impl(port, ptr, rust_vec_len, data_len),
-        52 => wire__crate__create_docstring_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        53 => wire__crate__create_export_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        54 => wire__crate__create_file_metrics_from_json_impl(port, ptr, rust_vec_len, data_len),
-        55 => wire__crate__create_import_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        56 => wire__crate__create_pack_config_from_json_impl(port, ptr, rust_vec_len, data_len),
-        57 => wire__crate__create_point_from_json_impl(port, ptr, rust_vec_len, data_len),
-        58 => wire__crate__create_process_config_from_json_impl(port, ptr, rust_vec_len, data_len),
-        59 => wire__crate__create_process_result_from_json_impl(port, ptr, rust_vec_len, data_len),
-        60 => wire__crate__create_span_from_json_impl(port, ptr, rust_vec_len, data_len),
-        61 => wire__crate__create_structure_item_from_json_impl(port, ptr, rust_vec_len, data_len),
-        62 => wire__crate__create_symbol_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        63 => wire__crate__detect_language_impl(port, ptr, rust_vec_len, data_len),
-        64 => wire__crate__detect_language_from_content_impl(port, ptr, rust_vec_len, data_len),
-        65 => wire__crate__detect_language_from_extension_impl(port, ptr, rust_vec_len, data_len),
-        66 => wire__crate__detect_language_from_path_impl(port, ptr, rust_vec_len, data_len),
-        67 => wire__crate__download_impl(port, ptr, rust_vec_len, data_len),
-        68 => wire__crate__download_all_impl(port, ptr, rust_vec_len, data_len),
-        69 => wire__crate__download_group_impl(port, ptr, rust_vec_len, data_len),
-        70 => wire__crate__downloaded_languages_impl(port, ptr, rust_vec_len, data_len),
-        71 => wire__crate__get_highlights_query_impl(port, ptr, rust_vec_len, data_len),
-        72 => wire__crate__get_injections_query_impl(port, ptr, rust_vec_len, data_len),
-        73 => wire__crate__get_language_impl(port, ptr, rust_vec_len, data_len),
-        74 => wire__crate__get_locals_query_impl(port, ptr, rust_vec_len, data_len),
-        75 => wire__crate__get_parser_impl(port, ptr, rust_vec_len, data_len),
-        76 => wire__crate__has_language_impl(port, ptr, rust_vec_len, data_len),
-        77 => wire__crate__init_impl(port, ptr, rust_vec_len, data_len),
-        78 => wire__crate__language_count_impl(port, ptr, rust_vec_len, data_len),
-        79 => wire__crate__manifest_languages_impl(port, ptr, rust_vec_len, data_len),
-        80 => wire__crate__process_impl(port, ptr, rust_vec_len, data_len),
+        4 => wire__crate__DownloadManager_new_impl(port, ptr, rust_vec_len, data_len),
+        5 => wire__crate__LanguageRegistry_available_languages_impl(port, ptr, rust_vec_len, data_len),
+        6 => wire__crate__LanguageRegistry_default_impl(port, ptr, rust_vec_len, data_len),
+        7 => wire__crate__LanguageRegistry_get_language_impl(port, ptr, rust_vec_len, data_len),
+        8 => wire__crate__LanguageRegistry_has_language_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire__crate__LanguageRegistry_has_parser_impl(port, ptr, rust_vec_len, data_len),
+        10 => wire__crate__LanguageRegistry_language_count_impl(port, ptr, rust_vec_len, data_len),
+        11 => wire__crate__LanguageRegistry_new_impl(port, ptr, rust_vec_len, data_len),
+        12 => wire__crate__LanguageRegistry_process_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire__crate__Node_byte_range_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire__crate__Node_child_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__Node_child_by_field_name_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__Node_child_count_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__Node_clone_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__Node_end_byte_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__Node_end_position_impl(port, ptr, rust_vec_len, data_len),
+        20 => wire__crate__Node_has_error_impl(port, ptr, rust_vec_len, data_len),
+        21 => wire__crate__Node_is_error_impl(port, ptr, rust_vec_len, data_len),
+        22 => wire__crate__Node_is_extra_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire__crate__Node_is_missing_impl(port, ptr, rust_vec_len, data_len),
+        24 => wire__crate__Node_is_named_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire__crate__Node_kind_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__Node_kind_id_impl(port, ptr, rust_vec_len, data_len),
+        27 => wire__crate__Node_named_child_impl(port, ptr, rust_vec_len, data_len),
+        28 => wire__crate__Node_named_child_count_impl(port, ptr, rust_vec_len, data_len),
+        29 => wire__crate__Node_parent_impl(port, ptr, rust_vec_len, data_len),
+        30 => wire__crate__Node_start_byte_impl(port, ptr, rust_vec_len, data_len),
+        31 => wire__crate__Node_start_position_impl(port, ptr, rust_vec_len, data_len),
+        32 => wire__crate__Node_to_sexp_impl(port, ptr, rust_vec_len, data_len),
+        33 => wire__crate__Node_walk_impl(port, ptr, rust_vec_len, data_len),
+        34 => wire__crate__Parser_default_impl(port, ptr, rust_vec_len, data_len),
+        35 => wire__crate__Parser_new_impl(port, ptr, rust_vec_len, data_len),
+        36 => wire__crate__Parser_parse_impl(port, ptr, rust_vec_len, data_len),
+        37 => wire__crate__Parser_parse_bytes_impl(port, ptr, rust_vec_len, data_len),
+        38 => wire__crate__Parser_reset_impl(port, ptr, rust_vec_len, data_len),
+        39 => wire__crate__Parser_set_language_impl(port, ptr, rust_vec_len, data_len),
+        40 => wire__crate__TreeCursor_field_name_impl(port, ptr, rust_vec_len, data_len),
+        41 => wire__crate__TreeCursor_goto_first_child_impl(port, ptr, rust_vec_len, data_len),
+        42 => wire__crate__TreeCursor_goto_next_sibling_impl(port, ptr, rust_vec_len, data_len),
+        43 => wire__crate__TreeCursor_goto_parent_impl(port, ptr, rust_vec_len, data_len),
+        44 => wire__crate__TreeCursor_node_impl(port, ptr, rust_vec_len, data_len),
+        45 => wire__crate__Tree_root_node_impl(port, ptr, rust_vec_len, data_len),
+        46 => wire__crate__Tree_walk_impl(port, ptr, rust_vec_len, data_len),
+        47 => wire__crate__available_languages_impl(port, ptr, rust_vec_len, data_len),
+        48 => wire__crate__cache_dir_impl(port, ptr, rust_vec_len, data_len),
+        49 => wire__crate__clean_cache_impl(port, ptr, rust_vec_len, data_len),
+        50 => wire__crate__configure_impl(port, ptr, rust_vec_len, data_len),
+        51 => wire__crate__create_byte_range_from_json_impl(port, ptr, rust_vec_len, data_len),
+        52 => wire__crate__create_chunk_context_from_json_impl(port, ptr, rust_vec_len, data_len),
+        53 => wire__crate__create_code_chunk_from_json_impl(port, ptr, rust_vec_len, data_len),
+        54 => wire__crate__create_comment_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        55 => wire__crate__create_diagnostic_from_json_impl(port, ptr, rust_vec_len, data_len),
+        56 => wire__crate__create_doc_section_from_json_impl(port, ptr, rust_vec_len, data_len),
+        57 => wire__crate__create_docstring_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        58 => wire__crate__create_export_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        59 => wire__crate__create_file_metrics_from_json_impl(port, ptr, rust_vec_len, data_len),
+        60 => wire__crate__create_import_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        61 => wire__crate__create_pack_config_from_json_impl(port, ptr, rust_vec_len, data_len),
+        62 => wire__crate__create_point_from_json_impl(port, ptr, rust_vec_len, data_len),
+        63 => wire__crate__create_process_config_from_json_impl(port, ptr, rust_vec_len, data_len),
+        64 => wire__crate__create_process_result_from_json_impl(port, ptr, rust_vec_len, data_len),
+        65 => wire__crate__create_span_from_json_impl(port, ptr, rust_vec_len, data_len),
+        66 => wire__crate__create_structure_item_from_json_impl(port, ptr, rust_vec_len, data_len),
+        67 => wire__crate__create_symbol_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        68 => wire__crate__detect_language_impl(port, ptr, rust_vec_len, data_len),
+        69 => wire__crate__detect_language_from_content_impl(port, ptr, rust_vec_len, data_len),
+        70 => wire__crate__detect_language_from_extension_impl(port, ptr, rust_vec_len, data_len),
+        71 => wire__crate__detect_language_from_path_impl(port, ptr, rust_vec_len, data_len),
+        72 => wire__crate__download_impl(port, ptr, rust_vec_len, data_len),
+        73 => wire__crate__download_all_impl(port, ptr, rust_vec_len, data_len),
+        74 => wire__crate__download_group_impl(port, ptr, rust_vec_len, data_len),
+        75 => wire__crate__downloaded_languages_impl(port, ptr, rust_vec_len, data_len),
+        76 => wire__crate__get_highlights_query_impl(port, ptr, rust_vec_len, data_len),
+        77 => wire__crate__get_injections_query_impl(port, ptr, rust_vec_len, data_len),
+        78 => wire__crate__get_language_impl(port, ptr, rust_vec_len, data_len),
+        79 => wire__crate__get_locals_query_impl(port, ptr, rust_vec_len, data_len),
+        80 => wire__crate__get_parser_impl(port, ptr, rust_vec_len, data_len),
+        81 => wire__crate__has_language_impl(port, ptr, rust_vec_len, data_len),
+        82 => wire__crate__init_impl(port, ptr, rust_vec_len, data_len),
+        83 => wire__crate__language_count_impl(port, ptr, rust_vec_len, data_len),
+        84 => wire__crate__manifest_languages_impl(port, ptr, rust_vec_len, data_len),
+        85 => wire__crate__process_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -4290,6 +4541,45 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::DocstringInfo> {
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::DocstringInfo> {}
 impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::DocstringInfo>> for crate::DocstringInfo {
     fn into_into_dart(self) -> FrbWrapper<crate::DocstringInfo> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::Error> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::Error::LanguageNotFound { field0 } => {
+                [0.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::Error::DynamicLoad { field0 } => [1.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            crate::Error::NullLanguagePointer { field0 } => {
+                [2.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::Error::ParserSetup { field0 } => [3.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            crate::Error::LockPoisoned { field0 } => [4.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            crate::Error::Config { field0 } => [5.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            crate::Error::ParseFailed => [6.into_dart()].into_dart(),
+            crate::Error::QueryError { field0 } => [7.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            crate::Error::InvalidRange { field0 } => [8.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            crate::Error::Io { field0 } => [9.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            crate::Error::Download { field0 } => [10.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            crate::Error::ChecksumMismatch { file, expected, actual } => [
+                11.into_dart(),
+                file.into_into_dart().into_dart(),
+                expected.into_into_dart().into_dart(),
+                actual.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
+            crate::Error::CacheLock { field0 } => [12.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::Error> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::Error>> for crate::Error {
+    fn into_into_dart(self) -> FrbWrapper<crate::Error> {
         self.into()
     }
 }
@@ -4845,6 +5135,70 @@ impl SseEncode for crate::DocstringInfo {
         <crate::Span>::sse_encode(self.span, serializer);
         <Option<String>>::sse_encode(self.associated_item, serializer);
         <Vec<crate::DocSection>>::sse_encode(self.parsed_sections, serializer);
+    }
+}
+
+impl SseEncode for crate::Error {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            crate::Error::LanguageNotFound { field0 } => {
+                <i32>::sse_encode(0, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::Error::DynamicLoad { field0 } => {
+                <i32>::sse_encode(1, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::Error::NullLanguagePointer { field0 } => {
+                <i32>::sse_encode(2, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::Error::ParserSetup { field0 } => {
+                <i32>::sse_encode(3, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::Error::LockPoisoned { field0 } => {
+                <i32>::sse_encode(4, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::Error::Config { field0 } => {
+                <i32>::sse_encode(5, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::Error::ParseFailed => {
+                <i32>::sse_encode(6, serializer);
+            }
+            crate::Error::QueryError { field0 } => {
+                <i32>::sse_encode(7, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::Error::InvalidRange { field0 } => {
+                <i32>::sse_encode(8, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::Error::Io { field0 } => {
+                <i32>::sse_encode(9, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::Error::Download { field0 } => {
+                <i32>::sse_encode(10, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::Error::ChecksumMismatch { file, expected, actual } => {
+                <i32>::sse_encode(11, serializer);
+                <String>::sse_encode(file, serializer);
+                <String>::sse_encode(expected, serializer);
+                <String>::sse_encode(actual, serializer);
+            }
+            crate::Error::CacheLock { field0 } => {
+                <i32>::sse_encode(12, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 

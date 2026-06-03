@@ -1,9 +1,9 @@
-module e2e_go
+module github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go/e2e
 
 go 1.26
 
 require (
-	github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go v1.9.0-rc.17
+	github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go v0.0.0
 	github.com/stretchr/testify v1.11.1
 )
 

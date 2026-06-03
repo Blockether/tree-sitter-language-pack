@@ -668,16 +668,6 @@ Create a new download manager for the given version.
 static new(version: string): DownloadManager
 ```
 
-#### withCacheDir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```typescript
-static withCacheDir(version: string, cacheDir: string): DownloadManager
-```
-
 #### installedLanguages()
 
 List languages that are already downloaded and cached.

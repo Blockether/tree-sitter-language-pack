@@ -681,17 +681,6 @@ Create a new download manager for the given version.
 fun new(version: String): DownloadManager
 ```
 
-#### withCacheDir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```kotlin
-@JvmStatic
-fun withCacheDir(version: String, cacheDir: Path): DownloadManager
-```
-
 #### installedLanguages()
 
 List languages that are already downloaded and cached.

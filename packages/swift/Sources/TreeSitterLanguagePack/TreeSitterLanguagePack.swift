@@ -215,7 +215,7 @@ public struct DocstringInfo: Codable, Sendable, Hashable {
 internal extension DocstringInfo {
     init(_ rb: RustBridge.DocstringInfoRef) throws {
         self.text = rb.text().toString()
-        self.format = try JSONDecoder().decode(DocstringFormat.self, from: (rb.format().toString().data(using: .utf8) ?? Data("null".utf8)))
+        self.format = try JSONDecoder().decode(DocstringFormat.self, from: ((rb.format().toString()).data(using: .utf8) ?? Data("null".utf8)))
         self.span = try Span(rb.span())
         self.associatedItem = rb.associatedItem()?.toString()
         self.parsedSections = try rb.parsedSections().map { try DocSection($0) }
@@ -379,7 +379,7 @@ public struct SymbolInfo: Codable, Sendable, Hashable {
 internal extension SymbolInfo {
     init(_ rb: RustBridge.SymbolInfoRef) throws {
         self.name = rb.name().toString()
-        self.kind = try JSONDecoder().decode(SymbolKind.self, from: (rb.kind().toString().data(using: .utf8) ?? Data("null".utf8)))
+        self.kind = try JSONDecoder().decode(SymbolKind.self, from: ((rb.kind().toString()).data(using: .utf8) ?? Data("null".utf8)))
         self.span = try Span(rb.span())
         self.typeAnnotation = rb.typeAnnotation()?.toString()
         self.doc = rb.doc()?.toString()
@@ -845,6 +845,52 @@ public enum TreeSitterLanguagePackError: Swift.Error {
     case download(message: String, field0: String)
     case checksumMismatch(message: String, file: String, expected: String, actual: String)
     case cacheLock(message: String, field0: String)
+}
+
+// MARK: - JSON-String Convenience Overloads
+// These overloads accept JSON-encoded config parameters and decode them automatically.
+// Enables e2e tests to pass JSON strings directly without typed config construction.
+
+/// Resolves a string argument as either a file path or literal UTF-8 content.
+/// Searches: current working directory, ALEF_TEST_DOCUMENTS_DIR env var,
+/// and ancestor `test_documents/` or `fixtures/` directories (up to 16 levels).
+/// If no file is found, treats the string as UTF-8 content and returns its bytes.
+private func _loadBytesFromPathOrUtf8(_ pathOrContent: String) throws -> [UInt8] {
+    let fm = FileManager.default
+    var roots: [String] = [fm.currentDirectoryPath]
+    if let envRoot = ProcessInfo.processInfo.environment["ALEF_TEST_DOCUMENTS_DIR"] {
+        roots.append(envRoot)
+    }
+    var walker = URL(fileURLWithPath: fm.currentDirectoryPath)
+    for _ in 0..<16 {
+        roots.append(walker.appendingPathComponent("test_documents").path)
+        roots.append(walker.appendingPathComponent("fixtures").path)
+        let parent = walker.deletingLastPathComponent()
+        if parent.path == walker.path { break }
+        walker = parent
+    }
+    let candidates = [pathOrContent] + roots.map { ($0 as NSString).appendingPathComponent(pathOrContent) }
+    for path in candidates {
+        if fm.fileExists(atPath: path), let data = try? Data(contentsOf: URL(fileURLWithPath: path)) {
+            return [UInt8](data)
+        }
+    }
+    return [UInt8](pathOrContent.utf8)
+}
+
+public func process(_ source: String, _ configJson: String) throws -> ProcessResult {
+    let config = try processConfigFromJson(configJson)
+    return try process(source: source, config: config)
+}
+
+public func init_(_ configJson: String) throws -> Void {
+    let config = try packConfigFromJson(configJson)
+    return try init_(config: config)
+}
+
+public func configure(_ configJson: String) throws -> Void {
+    let config = try packConfigFromJson(configJson)
+    return try configure(config: config)
 }
 
 // MARK: - From-JSON Helpers
@@ -1446,7 +1492,33 @@ public func cacheDir() throws -> String {
 }
 
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.Span: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.ProcessResult: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.FileMetrics: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.StructureItem: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.CommentInfo: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.DocstringInfo: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.DocSection: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.ImportInfo: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.ExportInfo: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.SymbolInfo: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.Diagnostic: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.CodeChunk: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.ChunkContext: @unchecked Sendable {}
+// swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
+extension RustBridge.PackConfig: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
 extension RustBridge.Point: @unchecked Sendable {}
 // swift-bridge opaque type used across Task.detached boundaries — Rust type is Send + Sync.
