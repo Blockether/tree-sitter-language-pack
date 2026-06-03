@@ -784,14 +784,14 @@ impl From<tree_sitter_language_pack::ProcessResult> for ProcessResult {
         ProcessResult {
             language: v.language.into(),
             metrics: FileMetrics::from(v.metrics),
-            structure: v.structure.into_iter().map(StructureItem::from).collect(),
-            imports: v.imports.into_iter().map(ImportInfo::from).collect(),
-            exports: v.exports.into_iter().map(ExportInfo::from).collect(),
-            comments: v.comments.into_iter().map(CommentInfo::from).collect(),
-            docstrings: v.docstrings.into_iter().map(DocstringInfo::from).collect(),
-            symbols: v.symbols.into_iter().map(SymbolInfo::from).collect(),
-            diagnostics: v.diagnostics.into_iter().map(Diagnostic::from).collect(),
-            chunks: v.chunks.into_iter().map(CodeChunk::from).collect(),
+            structure: v.structure.into_iter().map(StructureItem::from).collect::<Vec<_>>(),
+            imports: v.imports.into_iter().map(ImportInfo::from).collect::<Vec<_>>(),
+            exports: v.exports.into_iter().map(ExportInfo::from).collect::<Vec<_>>(),
+            comments: v.comments.into_iter().map(CommentInfo::from).collect::<Vec<_>>(),
+            docstrings: v.docstrings.into_iter().map(DocstringInfo::from).collect::<Vec<_>>(),
+            symbols: v.symbols.into_iter().map(SymbolInfo::from).collect::<Vec<_>>(),
+            diagnostics: v.diagnostics.into_iter().map(Diagnostic::from).collect::<Vec<_>>(),
+            chunks: v.chunks.into_iter().map(CodeChunk::from).collect::<Vec<_>>(),
         }
     }
 }
@@ -818,8 +818,8 @@ impl From<tree_sitter_language_pack::StructureItem> for StructureItem {
             name: v.name.map(|s| s.into()),
             visibility: v.visibility.map(|s| s.into()),
             span: Span::from(v.span),
-            children: v.children.into_iter().map(StructureItem::from).collect(),
-            decorators: v.decorators.into_iter().map(|s| s.into()).collect(),
+            children: v.children.into_iter().map(StructureItem::from).collect::<Vec<_>>(),
+            decorators: v.decorators.into_iter().map(|s| s.into()).collect::<Vec<_>>(),
             doc_comment: v.doc_comment.map(|s| s.into()),
             signature: v.signature.map(|s| s.into()),
             body_span: v.body_span.map(Span::from),
@@ -845,7 +845,7 @@ impl From<tree_sitter_language_pack::DocstringInfo> for DocstringInfo {
             format: DocstringFormat::from(v.format),
             span: Span::from(v.span),
             associated_item: v.associated_item.map(|s| s.into()),
-            parsed_sections: v.parsed_sections.into_iter().map(DocSection::from).collect(),
+            parsed_sections: v.parsed_sections.into_iter().map(DocSection::from).collect::<Vec<_>>(),
         }
     }
 }
@@ -864,7 +864,7 @@ impl From<tree_sitter_language_pack::ImportInfo> for ImportInfo {
     fn from(v: tree_sitter_language_pack::ImportInfo) -> Self {
         ImportInfo {
             source: v.source.into(),
-            items: v.items.into_iter().map(|s| s.into()).collect(),
+            items: v.items.into_iter().map(|s| s.into()).collect::<Vec<_>>(),
             alias: v.alias.map(|s| s.into()),
             is_wildcard: v.is_wildcard as _,
             span: Span::from(v.span),
@@ -923,11 +923,11 @@ impl From<tree_sitter_language_pack::ChunkContext> for ChunkContext {
             language: v.language.into(),
             chunk_index: v.chunk_index as _,
             total_chunks: v.total_chunks as _,
-            node_types: v.node_types.into_iter().map(|s| s.into()).collect(),
-            context_path: v.context_path.into_iter().map(|s| s.into()).collect(),
-            symbols_defined: v.symbols_defined.into_iter().map(|s| s.into()).collect(),
-            comments: v.comments.into_iter().map(CommentInfo::from).collect(),
-            docstrings: v.docstrings.into_iter().map(DocstringInfo::from).collect(),
+            node_types: v.node_types.into_iter().map(|s| s.into()).collect::<Vec<_>>(),
+            context_path: v.context_path.into_iter().map(|s| s.into()).collect::<Vec<_>>(),
+            symbols_defined: v.symbols_defined.into_iter().map(|s| s.into()).collect::<Vec<_>>(),
+            comments: v.comments.into_iter().map(CommentInfo::from).collect::<Vec<_>>(),
+            docstrings: v.docstrings.into_iter().map(DocstringInfo::from).collect::<Vec<_>>(),
             has_error_nodes: v.has_error_nodes as _,
         }
     }
@@ -937,8 +937,12 @@ impl From<tree_sitter_language_pack::PackConfig> for PackConfig {
     fn from(v: tree_sitter_language_pack::PackConfig) -> Self {
         PackConfig {
             cache_dir: v.cache_dir.map(|p| p.to_string_lossy().into_owned()),
-            languages: v.languages.map(|vec| vec.into_iter().map(|s| s.into()).collect()),
-            groups: v.groups.map(|vec| vec.into_iter().map(|s| s.into()).collect()),
+            languages: v
+                .languages
+                .map(|vec| vec.into_iter().map(|s| s.into()).collect::<Vec<_>>()),
+            groups: v
+                .groups
+                .map(|vec| vec.into_iter().map(|s| s.into()).collect::<Vec<_>>()),
         }
     }
 }
