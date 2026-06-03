@@ -96,7 +96,7 @@ jobs:
               run: npm install -g tree-sitter-cli
 
             - name: Install uv
-              uses: astral-sh/setup-uv@v8.1.0
+              uses: astral-sh/setup-uv@v8.2.0
               with:
                   enable-cache: true
 
@@ -886,6 +886,10 @@ jobs:
                   cp -r ffi-artifacts/crates/ts-pack-core-ffi/include/* crates/ts-pack-core-ffi/include/ 2>/dev/null || true
                   mkdir -p crates/ts-pack-core-ffi/target/release
                   cp target/release/libts_pack_core_ffi.* crates/ts-pack-core-ffi/target/release/ 2>/dev/null || true
+                  mkdir -p packages/go/.lib/linux-amd64
+                  cp target/release/libts_pack_core_ffi.* packages/go/.lib/linux-amd64/ 2>/dev/null || true
+                  mkdir -p packages/go/include
+                  cp -r crates/ts-pack-core-ffi/include/* packages/go/include/ 2>/dev/null || true
 
             - name: Verify go.mod placement
               run: |

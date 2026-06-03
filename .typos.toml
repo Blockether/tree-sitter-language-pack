@@ -27,6 +27,9 @@ fo = "fo"
 nd = "nd"
 ba = "ba"
 pn = "pn"
+# `ser` is the Jackson "serializer" package segment (databind.ser.std.StdSerializer).
+# Without this, typos rewrites `ser` -> `set`, breaking kotlin-android imports.
+ser = "ser"
 
 [default.extend-identifiers]
 TreeSitter = "TreeSitter"

@@ -44,7 +44,7 @@ object TreeSitterLanguagePack {
             addSerializer(
                 ByteArray::class.java,
                 object :
-                    com.fasterxml.jackson.databind.set.std.StdSerializer<ByteArray>(
+                    com.fasterxml.jackson.databind.ser.std.StdSerializer<ByteArray>(
                         ByteArray::class.java
                     ) {
                     override fun serialize(
