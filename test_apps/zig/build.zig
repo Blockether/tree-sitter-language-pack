@@ -7,10 +7,16 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run tests");
 
     // Fetch the published Zig package from the registry.
-    const tree_sitter_language_pack_module = b.dependency("tree_sitter_language_pack", .{
+    const tree_sitter_language_pack_dep = b.dependency("tree_sitter_language_pack", .{
         .target = target,
         .optimize = optimize,
-    }).module("tree_sitter_language_pack");
+    });
+    const tree_sitter_language_pack_module = tree_sitter_language_pack_dep.module("tree_sitter_language_pack");
+    const tree_sitter_language_pack_lib_path = tree_sitter_language_pack_dep.path("lib");
+    const tree_sitter_language_pack_include_path = tree_sitter_language_pack_dep.path("include");
+    tree_sitter_language_pack_module.addLibraryPath(tree_sitter_language_pack_lib_path);
+    tree_sitter_language_pack_module.addIncludePath(tree_sitter_language_pack_include_path);
+    tree_sitter_language_pack_module.linkSystemLibrary("ts_pack_core_ffi", .{});
 
     const download_module = b.createModule(.{
         .root_source_file = b.path("src/download_test.zig"),

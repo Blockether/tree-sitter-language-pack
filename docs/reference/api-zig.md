@@ -668,16 +668,6 @@ Create a new download manager for the given version.
 pub fn new(version: [:0]const u8) Error!DownloadManager
 ```
 
-#### withCacheDir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```zig
-pub fn withCacheDir(version: [:0]const u8, cache_dir: [:0]const u8) DownloadManager
-```
-
 #### installedLanguages()
 
 List languages that are already downloaded and cached.

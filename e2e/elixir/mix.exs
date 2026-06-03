@@ -14,7 +14,7 @@ defmodule E2eElixir.MixProject do
     [
       {:tree_sitter_language_pack, path: "../../packages/elixir"},
       {:rustler_precompiled, "~> 0.9"},
-      {:rustler, "~> 0.37.0", runtime: false}
+      {:rustler, "~> 0.38.0", runtime: false}
     ]
   end
 end

@@ -8,12 +8,12 @@ importers:
 
   .:
     devDependencies:
+      '@kreuzberg/tree-sitter-language-pack-wasm':
+        specifier: file:../../crates/ts-pack-core-wasm/pkg/nodejs
+        version: ts-pack-core-wasm@file:../../crates/ts-pack-core-wasm/pkg/nodejs
       rollup:
         specifier: ^4.53.3
         version: 4.60.4
-      tree_sitter_language_pack:
-        specifier: file:../../crates/ts-pack-core-wasm/pkg/nodejs
-        version: ts-pack-core-wasm@file:../../crates/ts-pack-core-wasm/pkg/nodejs
       vitest:
         specifier: ^4.1.5
         version: 4.1.7(vite@8.0.13)

@@ -668,16 +668,6 @@ Create a new download manager for the given version.
 pub fn new(version: &str) -> DownloadManager
 ```
 
-#### with_cache_dir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```rust
-pub fn with_cache_dir(version: &str, cache_dir: PathBuf) -> DownloadManager
-```
-
 #### installed_languages()
 
 List languages that are already downloaded and cached.

@@ -668,16 +668,6 @@ Create a new download manager for the given version.
 public static function new(string $version): DownloadManager
 ```
 
-#### withCacheDir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```php
-public static function withCacheDir(string $version, string $cacheDir): DownloadManager
-```
-
 #### installedLanguages()
 
 List languages that are already downloaded and cached.

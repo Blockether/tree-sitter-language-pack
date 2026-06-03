@@ -425,6 +425,10 @@ impl From<Language> for tree_sitter_language_pack::Language {
 
 impl Parser {
     #[frb]
+    pub fn new() -> Parser {
+        (|v| Parser::from(v))(tree_sitter_language_pack::Parser::new())
+    }
+    #[frb]
     pub fn set_language(&mut self, name: String) -> Result<(), String> {
         self.inner.set_language(&name).map_err(|e| e.to_string())
     }
@@ -440,7 +444,10 @@ impl Parser {
     pub fn reset(&mut self) -> () {
         self.inner.reset()
     }
-    // Method `default` is a static/associated function and is not yet bridged through FRB — skipped.
+    #[frb]
+    pub fn default() -> Parser {
+        (|v| Parser::from(v))(tree_sitter_language_pack::Parser::default())
+    }
 }
 
 impl Tree {
@@ -566,6 +573,10 @@ impl TreeCursor {
 
 impl LanguageRegistry {
     #[frb]
+    pub fn new() -> LanguageRegistry {
+        (|v| LanguageRegistry::from(v))(tree_sitter_language_pack::LanguageRegistry::new())
+    }
+    #[frb]
     pub fn get_language(&self, name: String) -> Result<Language, String> {
         self.inner
             .get_language(&name)
@@ -595,12 +606,19 @@ impl LanguageRegistry {
             .map(|v| ProcessResult::from(v))
             .map_err(|e| e.to_string())
     }
-    // Method `default` is a static/associated function and is not yet bridged through FRB — skipped.
+    #[frb]
+    pub fn default() -> LanguageRegistry {
+        (|v| LanguageRegistry::from(v))(tree_sitter_language_pack::LanguageRegistry::default())
+    }
 }
 
 impl DownloadManager {
-    // Method `new` is a static/associated function and is not yet bridged through FRB — skipped.
-    // Method `with_cache_dir` is a static/associated function and is not yet bridged through FRB — skipped.
+    #[frb]
+    pub fn new(version: String) -> Result<DownloadManager, String> {
+        tree_sitter_language_pack::DownloadManager::new(&version)
+            .map(|v| DownloadManager::from(v))
+            .map_err(|e| e.to_string())
+    }
     #[frb]
     pub fn installed_languages(&self) -> Vec<String> {
         self.inner.installed_languages()
@@ -623,7 +641,7 @@ impl DownloadManager {
 /// Categorizes top-level and nested declarations such as functions, classes,
 /// structs, enums, traits, and more. Use [`Other`](StructureKind::Other) for
 /// language-specific constructs that do not fit a standard category.
-#[frb(mirror(StructureKind))]
+#[frb(mirror(StructureKind), unignore)]
 pub enum StructureKind {
     Function,
     Method,
@@ -642,7 +660,7 @@ pub enum StructureKind {
 ///
 /// Distinguishes between single-line comments, block (multi-line) comments,
 /// and documentation comments.
-#[frb(mirror(CommentKind))]
+#[frb(mirror(CommentKind), unignore)]
 pub enum CommentKind {
     Line,
     Block,
@@ -653,7 +671,7 @@ pub enum CommentKind {
 ///
 /// Identifies the docstring convention used, which varies by language
 /// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
-#[frb(mirror(DocstringFormat))]
+#[frb(mirror(DocstringFormat), unignore)]
 pub enum DocstringFormat {
     PythonTripleQuote,
     JSDoc,
@@ -666,7 +684,7 @@ pub enum DocstringFormat {
 /// The kind of an export statement found in source code.
 ///
 /// Covers named exports, default exports, and re-exports from other modules.
-#[frb(mirror(ExportKind))]
+#[frb(mirror(ExportKind), unignore)]
 pub enum ExportKind {
     Named,
     Default,
@@ -677,7 +695,7 @@ pub enum ExportKind {
 ///
 /// Categorizes symbol definitions such as variables, constants, functions,
 /// classes, types, interfaces, enums, and modules.
-#[frb(mirror(SymbolKind))]
+#[frb(mirror(SymbolKind), unignore)]
 pub enum SymbolKind {
     Variable,
     Constant,
@@ -694,7 +712,7 @@ pub enum SymbolKind {
 ///
 /// Used to classify parse errors, warnings, and informational messages
 /// found in the syntax tree.
-#[frb(mirror(DiagnosticSeverity))]
+#[frb(mirror(DiagnosticSeverity), unignore)]
 pub enum DiagnosticSeverity {
     Error,
     Warning,
@@ -706,7 +724,7 @@ pub enum DiagnosticSeverity {
 /// Covers language lookup failures, parse errors, query errors, and I/O issues.
 /// Feature-gated variants are included when `config`, `download`, or related
 /// features are enabled.
-#[frb(mirror(Error))]
+#[frb(mirror(Error), unignore)]
 pub enum Error {
     LanguageNotFound {
         field0: String,

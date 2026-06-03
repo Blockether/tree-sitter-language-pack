@@ -668,16 +668,6 @@ Create a new download manager for the given version.
 public static func new(version: String) throws -> DownloadManager
 ```
 
-#### withCacheDir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```swift
-public static func withCacheDir(version: String, cacheDir: URL) -> DownloadManager
-```
-
 #### installedLanguages()
 
 List languages that are already downloaded and cached.

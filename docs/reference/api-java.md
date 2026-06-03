@@ -668,16 +668,6 @@ Create a new download manager for the given version.
 public static DownloadManager new(String version) throws Error
 ```
 
-#### withCacheDir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```java
-public static DownloadManager withCacheDir(String version, String cacheDir)
-```
-
 #### installedLanguages()
 
 List languages that are already downloaded and cached.

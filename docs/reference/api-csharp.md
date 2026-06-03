@@ -668,16 +668,6 @@ Create a new download manager for the given version.
 public DownloadManager New(string version)
 ```
 
-#### WithCacheDir()
-
-Create a download manager with a custom cache directory.
-
-**Signature:**
-
-```csharp
-public DownloadManager WithCacheDir(string version, string cacheDir)
-```
-
 #### InstalledLanguages()
 
 List languages that are already downloaded and cached.

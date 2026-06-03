@@ -233,6 +233,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   DocstringInfo dco_decode_docstring_info(dynamic raw);
 
   @protected
+  Error dco_decode_error(dynamic raw);
+
+  @protected
   ExportInfo dco_decode_export_info(dynamic raw);
 
   @protected
@@ -535,6 +538,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   DocstringInfo sse_decode_docstring_info(SseDeserializer deserializer);
+
+  @protected
+  Error sse_decode_error(SseDeserializer deserializer);
 
   @protected
   ExportInfo sse_decode_export_info(SseDeserializer deserializer);
@@ -877,6 +883,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_docstring_info(DocstringInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_error(Error self, SseSerializer serializer);
 
   @protected
   void sse_encode_export_info(ExportInfo self, SseSerializer serializer);

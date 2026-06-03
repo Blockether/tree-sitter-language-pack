@@ -12,19 +12,47 @@ importers:
     devDependencies:
       '@napi-rs/cli':
         specifier: ^3.6.2
-        version: 3.6.2(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(node-addon-api@8.8.0)
+        version: 3.6.2(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@22.19.19)(node-addon-api@8.8.0)
+    optionalDependencies:
+      '@kreuzberg/tree-sitter-language-pack-darwin-arm64':
+        specifier: 1.9.0-rc.17
+        version: 1.9.0-rc.17
+      '@kreuzberg/tree-sitter-language-pack-darwin-x64':
+        specifier: 1.9.0-rc.17
+        version: 1.9.0-rc.17
+      '@kreuzberg/tree-sitter-language-pack-linux-arm64-gnu':
+        specifier: 1.9.0-rc.17
+        version: 1.9.0-rc.17
+      '@kreuzberg/tree-sitter-language-pack-linux-arm64-musl':
+        specifier: 1.9.0-rc.17
+        version: 1.9.0-rc.17
+      '@kreuzberg/tree-sitter-language-pack-linux-x64-gnu':
+        specifier: 1.9.0-rc.17
+        version: 1.9.0-rc.17
+      '@kreuzberg/tree-sitter-language-pack-linux-x64-musl':
+        specifier: 1.9.0-rc.17
+        version: 1.9.0-rc.17
+      '@kreuzberg/tree-sitter-language-pack-win32-arm64-msvc':
+        specifier: 1.9.0-rc.17
+        version: 1.9.0-rc.17
+      '@kreuzberg/tree-sitter-language-pack-win32-x64-msvc':
+        specifier: 1.9.0-rc.17
+        version: 1.9.0-rc.17
 
   e2e/node:
     devDependencies:
       '@kreuzberg/tree-sitter-language-pack':
         specifier: workspace:*
         version: link:../../crates/ts-pack-core-node
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.19
       tree-sitter:
         specifier: ^0.25.0
         version: 0.25.0
       vitest:
         specifier: ^4.1.5
-        version: 4.1.7(vite@7.3.3)
+        version: 4.1.7(@types/node@22.19.19)(vite@7.3.3(@types/node@22.19.19))
 
 packages:
 
@@ -329,6 +357,58 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
+
+  '@kreuzberg/tree-sitter-language-pack-darwin-arm64@1.9.0-rc.17':
+    resolution: {integrity: sha512-mYJggpXNTYmfTJFTex003t6TBU+HWknaVJdpdtBJfeTY1IwXdVfeWUrhOTv195BCgqGRUOCNLFq8V3yyISpV8A==}
+    engines: {node: '>= 18'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@kreuzberg/tree-sitter-language-pack-darwin-x64@1.9.0-rc.17':
+    resolution: {integrity: sha512-xrILzgVFZENajXNzi0UnH/WLF39G/zY1ao5foJGoRKU9D/gt2IrGaXJ8EsUx6zux6Dg5VyChP7r5kg/1H0cTyQ==}
+    engines: {node: '>= 18'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@kreuzberg/tree-sitter-language-pack-linux-arm64-gnu@1.9.0-rc.17':
+    resolution: {integrity: sha512-gDcDN6x2NYLBE/uBIb9FdUtmG5Snw6KqnQbE8XWMPr8AE7erHdGyBHflVvwKRBremEA2o9KBndKpScI3WfU5Nw==}
+    engines: {node: '>= 18'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@kreuzberg/tree-sitter-language-pack-linux-arm64-musl@1.9.0-rc.17':
+    resolution: {integrity: sha512-04ADIVndI45UTHk7cNffvPiIaIYLOF5u1Q3fTnV4a7wQhHoMUe7QB1XByyQ1dLkqYFfUG5quoT8hQppUkXil1w==}
+    engines: {node: '>= 18'}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@kreuzberg/tree-sitter-language-pack-linux-x64-gnu@1.9.0-rc.17':
+    resolution: {integrity: sha512-acJ/mNXKPfV0++Ov7wRhnwCqUohFfMox4NUtV6EHVTcDtmtTNGFFbD7+TXcXeXTUDSn/iV3693iaz/BvOkwUrw==}
+    engines: {node: '>= 18'}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@kreuzberg/tree-sitter-language-pack-linux-x64-musl@1.9.0-rc.17':
+    resolution: {integrity: sha512-LtE55x0aFr5n5j9psRcP4Q6woPUC/EjOVaImidNddloZTuF1ehC2aV91ChaCER3ccp7QU3jIdfaoCWnrPmDQ2Q==}
+    engines: {node: '>= 18'}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@kreuzberg/tree-sitter-language-pack-win32-arm64-msvc@1.9.0-rc.17':
+    resolution: {integrity: sha512-MpRmT8kg841tFEa+vXtl3DFWYRfcff2VZz3ZOe/+tIbT+rRTKQO8HCM59t0H3qGQdTAXvF/xtaZXzB9dI2QD8w==}
+    engines: {node: '>= 18'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@kreuzberg/tree-sitter-language-pack-win32-x64-msvc@1.9.0-rc.17':
+    resolution: {integrity: sha512-Z/wFaOcYx5dUgi4DDOt0wfWnIzg6VyNBbqGgoWTBVCgDDwjXCtqmNeNUGijE+8dcvAIo4fbz58TJCji6o1PwtQ==}
+    engines: {node: '>= 18'}
+    cpu: [x64]
+    os: [win32]
 
   '@napi-rs/cli@3.6.2':
     resolution: {integrity: sha512-jy5rABUh9tbE/vPRzw9kGzGuqZiVslyDQUV8LkvjzqVX/oJMN7g0U1uhtr9L3W1H+iRM/urXHXUf+CE4n8FvLA==}
@@ -891,6 +971,9 @@ packages:
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
+  '@types/node@22.19.19':
+    resolution: {integrity: sha512-dyh/xO2Fh5bYrfWaaqGrRQQGkNdmYw6AmaAUvYeUMNTWQtvb796ikLdmTchRmOlOiIJ1TDXfWgVx1QkUlQ6Hew==}
+
   '@vitest/expect@4.1.7':
     resolution: {integrity: sha512-1R+tw0ortHEbZDGMymm+pN7/AFQ/RkFFdtd7EN+VBpynKmLbP8A3rpEXdshBJ7+8hQ9zBJh/i1s0yKNtxAnU7w==}
 
@@ -1122,6 +1205,9 @@ packages:
   typanion@3.14.0:
     resolution: {integrity: sha512-ZW/lVMRabETuYCd9O9ZvMhAh8GslSqaUjxmK/JLPCh6l73CvLBiuXswj/+7LdnWOgYsQ130FqLzFz5aGT4I3Ug==}
 
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
   universal-user-agent@7.0.3:
     resolution: {integrity: sha512-TmnEAEAsBJVZM/AADELsK76llnwcf9vMKuPz8JflO1frO8Lchitr0fNaN9d+Ap0BjKtqWqd/J17qeDnXh8CL2A==}
 
@@ -1309,100 +1395,152 @@ snapshots:
 
   '@inquirer/ansi@2.0.5': {}
 
-  '@inquirer/checkbox@5.1.5':
+  '@inquirer/checkbox@5.1.5(@types/node@22.19.19)':
     dependencies:
       '@inquirer/ansi': 2.0.5
-      '@inquirer/core': 11.1.10
+      '@inquirer/core': 11.1.10(@types/node@22.19.19)
       '@inquirer/figures': 2.0.5
-      '@inquirer/type': 4.0.5
+      '@inquirer/type': 4.0.5(@types/node@22.19.19)
+    optionalDependencies:
+      '@types/node': 22.19.19
 
-  '@inquirer/confirm@6.0.13':
+  '@inquirer/confirm@6.0.13(@types/node@22.19.19)':
     dependencies:
-      '@inquirer/core': 11.1.10
-      '@inquirer/type': 4.0.5
+      '@inquirer/core': 11.1.10(@types/node@22.19.19)
+      '@inquirer/type': 4.0.5(@types/node@22.19.19)
+    optionalDependencies:
+      '@types/node': 22.19.19
 
-  '@inquirer/core@11.1.10':
+  '@inquirer/core@11.1.10(@types/node@22.19.19)':
     dependencies:
       '@inquirer/ansi': 2.0.5
       '@inquirer/figures': 2.0.5
-      '@inquirer/type': 4.0.5
+      '@inquirer/type': 4.0.5(@types/node@22.19.19)
       cli-width: 4.1.0
       fast-wrap-ansi: 0.2.2
       mute-stream: 3.0.0
       signal-exit: 4.1.0
+    optionalDependencies:
+      '@types/node': 22.19.19
 
-  '@inquirer/editor@5.1.2':
+  '@inquirer/editor@5.1.2(@types/node@22.19.19)':
     dependencies:
-      '@inquirer/core': 11.1.10
-      '@inquirer/external-editor': 3.0.0
-      '@inquirer/type': 4.0.5
+      '@inquirer/core': 11.1.10(@types/node@22.19.19)
+      '@inquirer/external-editor': 3.0.0(@types/node@22.19.19)
+      '@inquirer/type': 4.0.5(@types/node@22.19.19)
+    optionalDependencies:
+      '@types/node': 22.19.19
 
-  '@inquirer/expand@5.0.14':
+  '@inquirer/expand@5.0.14(@types/node@22.19.19)':
     dependencies:
-      '@inquirer/core': 11.1.10
-      '@inquirer/type': 4.0.5
+      '@inquirer/core': 11.1.10(@types/node@22.19.19)
+      '@inquirer/type': 4.0.5(@types/node@22.19.19)
+    optionalDependencies:
+      '@types/node': 22.19.19
 
-  '@inquirer/external-editor@3.0.0':
+  '@inquirer/external-editor@3.0.0(@types/node@22.19.19)':
     dependencies:
       chardet: 2.1.1
       iconv-lite: 0.7.2
+    optionalDependencies:
+      '@types/node': 22.19.19
 
   '@inquirer/figures@2.0.5': {}
 
-  '@inquirer/input@5.0.13':
+  '@inquirer/input@5.0.13(@types/node@22.19.19)':
     dependencies:
-      '@inquirer/core': 11.1.10
-      '@inquirer/type': 4.0.5
+      '@inquirer/core': 11.1.10(@types/node@22.19.19)
+      '@inquirer/type': 4.0.5(@types/node@22.19.19)
+    optionalDependencies:
+      '@types/node': 22.19.19
 
-  '@inquirer/number@4.0.13':
+  '@inquirer/number@4.0.13(@types/node@22.19.19)':
     dependencies:
-      '@inquirer/core': 11.1.10
-      '@inquirer/type': 4.0.5
+      '@inquirer/core': 11.1.10(@types/node@22.19.19)
+      '@inquirer/type': 4.0.5(@types/node@22.19.19)
+    optionalDependencies:
+      '@types/node': 22.19.19
 
-  '@inquirer/password@5.0.13':
-    dependencies:
-      '@inquirer/ansi': 2.0.5
-      '@inquirer/core': 11.1.10
-      '@inquirer/type': 4.0.5
-
-  '@inquirer/prompts@8.4.3':
-    dependencies:
-      '@inquirer/checkbox': 5.1.5
-      '@inquirer/confirm': 6.0.13
-      '@inquirer/editor': 5.1.2
-      '@inquirer/expand': 5.0.14
-      '@inquirer/input': 5.0.13
-      '@inquirer/number': 4.0.13
-      '@inquirer/password': 5.0.13
-      '@inquirer/rawlist': 5.2.9
-      '@inquirer/search': 4.1.9
-      '@inquirer/select': 5.1.5
-
-  '@inquirer/rawlist@5.2.9':
-    dependencies:
-      '@inquirer/core': 11.1.10
-      '@inquirer/type': 4.0.5
-
-  '@inquirer/search@4.1.9':
-    dependencies:
-      '@inquirer/core': 11.1.10
-      '@inquirer/figures': 2.0.5
-      '@inquirer/type': 4.0.5
-
-  '@inquirer/select@5.1.5':
+  '@inquirer/password@5.0.13(@types/node@22.19.19)':
     dependencies:
       '@inquirer/ansi': 2.0.5
-      '@inquirer/core': 11.1.10
-      '@inquirer/figures': 2.0.5
-      '@inquirer/type': 4.0.5
+      '@inquirer/core': 11.1.10(@types/node@22.19.19)
+      '@inquirer/type': 4.0.5(@types/node@22.19.19)
+    optionalDependencies:
+      '@types/node': 22.19.19
 
-  '@inquirer/type@4.0.5': {}
+  '@inquirer/prompts@8.4.3(@types/node@22.19.19)':
+    dependencies:
+      '@inquirer/checkbox': 5.1.5(@types/node@22.19.19)
+      '@inquirer/confirm': 6.0.13(@types/node@22.19.19)
+      '@inquirer/editor': 5.1.2(@types/node@22.19.19)
+      '@inquirer/expand': 5.0.14(@types/node@22.19.19)
+      '@inquirer/input': 5.0.13(@types/node@22.19.19)
+      '@inquirer/number': 4.0.13(@types/node@22.19.19)
+      '@inquirer/password': 5.0.13(@types/node@22.19.19)
+      '@inquirer/rawlist': 5.2.9(@types/node@22.19.19)
+      '@inquirer/search': 4.1.9(@types/node@22.19.19)
+      '@inquirer/select': 5.1.5(@types/node@22.19.19)
+    optionalDependencies:
+      '@types/node': 22.19.19
+
+  '@inquirer/rawlist@5.2.9(@types/node@22.19.19)':
+    dependencies:
+      '@inquirer/core': 11.1.10(@types/node@22.19.19)
+      '@inquirer/type': 4.0.5(@types/node@22.19.19)
+    optionalDependencies:
+      '@types/node': 22.19.19
+
+  '@inquirer/search@4.1.9(@types/node@22.19.19)':
+    dependencies:
+      '@inquirer/core': 11.1.10(@types/node@22.19.19)
+      '@inquirer/figures': 2.0.5
+      '@inquirer/type': 4.0.5(@types/node@22.19.19)
+    optionalDependencies:
+      '@types/node': 22.19.19
+
+  '@inquirer/select@5.1.5(@types/node@22.19.19)':
+    dependencies:
+      '@inquirer/ansi': 2.0.5
+      '@inquirer/core': 11.1.10(@types/node@22.19.19)
+      '@inquirer/figures': 2.0.5
+      '@inquirer/type': 4.0.5(@types/node@22.19.19)
+    optionalDependencies:
+      '@types/node': 22.19.19
+
+  '@inquirer/type@4.0.5(@types/node@22.19.19)':
+    optionalDependencies:
+      '@types/node': 22.19.19
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@napi-rs/cli@3.6.2(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(node-addon-api@8.8.0)':
+  '@kreuzberg/tree-sitter-language-pack-darwin-arm64@1.9.0-rc.17':
+    optional: true
+
+  '@kreuzberg/tree-sitter-language-pack-darwin-x64@1.9.0-rc.17':
+    optional: true
+
+  '@kreuzberg/tree-sitter-language-pack-linux-arm64-gnu@1.9.0-rc.17':
+    optional: true
+
+  '@kreuzberg/tree-sitter-language-pack-linux-arm64-musl@1.9.0-rc.17':
+    optional: true
+
+  '@kreuzberg/tree-sitter-language-pack-linux-x64-gnu@1.9.0-rc.17':
+    optional: true
+
+  '@kreuzberg/tree-sitter-language-pack-linux-x64-musl@1.9.0-rc.17':
+    optional: true
+
+  '@kreuzberg/tree-sitter-language-pack-win32-arm64-msvc@1.9.0-rc.17':
+    optional: true
+
+  '@kreuzberg/tree-sitter-language-pack-win32-x64-msvc@1.9.0-rc.17':
+    optional: true
+
+  '@napi-rs/cli@3.6.2(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@22.19.19)(node-addon-api@8.8.0)':
     dependencies:
-      '@inquirer/prompts': 8.4.3
+      '@inquirer/prompts': 8.4.3(@types/node@22.19.19)
       '@napi-rs/cross-toolchain': 1.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
       '@napi-rs/wasm-tools': 1.0.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
       '@octokit/rest': 22.0.1
@@ -1823,6 +1961,10 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
+  '@types/node@22.19.19':
+    dependencies:
+      undici-types: 6.21.0
+
   '@vitest/expect@4.1.7':
     dependencies:
       '@standard-schema/spec': 1.1.0
@@ -1832,13 +1974,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.7(vite@7.3.3)':
+  '@vitest/mocker@4.1.7(vite@7.3.3(@types/node@22.19.19))':
     dependencies:
       '@vitest/spy': 4.1.7
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.3
+      vite: 7.3.3(@types/node@22.19.19)
 
   '@vitest/pretty-format@4.1.7':
     dependencies:
@@ -2056,9 +2198,11 @@ snapshots:
 
   typanion@3.14.0: {}
 
+  undici-types@6.21.0: {}
+
   universal-user-agent@7.0.3: {}
 
-  vite@7.3.3:
+  vite@7.3.3(@types/node@22.19.19):
     dependencies:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.4)
@@ -2067,12 +2211,13 @@ snapshots:
       rollup: 4.60.4
       tinyglobby: 0.2.16
     optionalDependencies:
+      '@types/node': 22.19.19
       fsevents: 2.3.3
 
-  vitest@4.1.7(vite@7.3.3):
+  vitest@4.1.7(@types/node@22.19.19)(vite@7.3.3(@types/node@22.19.19)):
     dependencies:
       '@vitest/expect': 4.1.7
-      '@vitest/mocker': 4.1.7(vite@7.3.3)
+      '@vitest/mocker': 4.1.7(vite@7.3.3(@types/node@22.19.19))
       '@vitest/pretty-format': 4.1.7
       '@vitest/runner': 4.1.7
       '@vitest/snapshot': 4.1.7
@@ -2089,8 +2234,10 @@ snapshots:
       tinyexec: 1.2.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vite: 7.3.3
+      vite: 7.3.3(@types/node@22.19.19)
       why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@types/node': 22.19.19
     transitivePeerDependencies:
       - msw
 

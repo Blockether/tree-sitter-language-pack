@@ -542,14 +542,12 @@ mod ffi {
     }
 
     extern "Rust" {
-
         #[swift_bridge(swift_name = "packConfigFromJson")]
         fn pack_config_from_json(json: String) -> Result<PackConfig, String>;
         #[swift_bridge(swift_name = "processConfigFromJson")]
         fn process_config_from_json(json: String) -> Result<ProcessConfig, String>;
     }
     extern "Rust" {
-
         #[swift_bridge(swift_name = "spanFromJson")]
         fn span_from_json(json: String) -> Result<Span, String>;
         #[swift_bridge(swift_name = "processResultFromJson")]
@@ -582,7 +580,6 @@ mod ffi {
         fn byte_range_from_json(json: String) -> Result<ByteRange, String>;
     }
     extern "Rust" {
-
         #[swift_bridge(swift_name = "structureKindFromJson")]
         fn structure_kind_from_json(json: String) -> Result<StructureKind, String>;
         #[swift_bridge(swift_name = "commentKindFromJson")]

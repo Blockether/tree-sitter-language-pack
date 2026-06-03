@@ -422,6 +422,1060 @@ as String,
 }
 
 /// @nodoc
+mixin _$Error {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'Error()';
+}
+
+
+}
+
+/// @nodoc
+class $ErrorCopyWith<$Res>  {
+$ErrorCopyWith(Error _, $Res Function(Error) __);
+}
+
+
+/// Adds pattern-matching-related methods to [Error].
+extension ErrorPatterns on Error {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( Error_LanguageNotFound value)?  languageNotFound,TResult Function( Error_DynamicLoad value)?  dynamicLoad,TResult Function( Error_NullLanguagePointer value)?  nullLanguagePointer,TResult Function( Error_ParserSetup value)?  parserSetup,TResult Function( Error_LockPoisoned value)?  lockPoisoned,TResult Function( Error_Config value)?  config,TResult Function( Error_ParseFailed value)?  parseFailed,TResult Function( Error_QueryError value)?  queryError,TResult Function( Error_InvalidRange value)?  invalidRange,TResult Function( Error_Io value)?  io,TResult Function( Error_Download value)?  download,TResult Function( Error_ChecksumMismatch value)?  checksumMismatch,TResult Function( Error_CacheLock value)?  cacheLock,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case Error_LanguageNotFound() when languageNotFound != null:
+return languageNotFound(_that);case Error_DynamicLoad() when dynamicLoad != null:
+return dynamicLoad(_that);case Error_NullLanguagePointer() when nullLanguagePointer != null:
+return nullLanguagePointer(_that);case Error_ParserSetup() when parserSetup != null:
+return parserSetup(_that);case Error_LockPoisoned() when lockPoisoned != null:
+return lockPoisoned(_that);case Error_Config() when config != null:
+return config(_that);case Error_ParseFailed() when parseFailed != null:
+return parseFailed(_that);case Error_QueryError() when queryError != null:
+return queryError(_that);case Error_InvalidRange() when invalidRange != null:
+return invalidRange(_that);case Error_Io() when io != null:
+return io(_that);case Error_Download() when download != null:
+return download(_that);case Error_ChecksumMismatch() when checksumMismatch != null:
+return checksumMismatch(_that);case Error_CacheLock() when cacheLock != null:
+return cacheLock(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( Error_LanguageNotFound value)  languageNotFound,required TResult Function( Error_DynamicLoad value)  dynamicLoad,required TResult Function( Error_NullLanguagePointer value)  nullLanguagePointer,required TResult Function( Error_ParserSetup value)  parserSetup,required TResult Function( Error_LockPoisoned value)  lockPoisoned,required TResult Function( Error_Config value)  config,required TResult Function( Error_ParseFailed value)  parseFailed,required TResult Function( Error_QueryError value)  queryError,required TResult Function( Error_InvalidRange value)  invalidRange,required TResult Function( Error_Io value)  io,required TResult Function( Error_Download value)  download,required TResult Function( Error_ChecksumMismatch value)  checksumMismatch,required TResult Function( Error_CacheLock value)  cacheLock,}){
+final _that = this;
+switch (_that) {
+case Error_LanguageNotFound():
+return languageNotFound(_that);case Error_DynamicLoad():
+return dynamicLoad(_that);case Error_NullLanguagePointer():
+return nullLanguagePointer(_that);case Error_ParserSetup():
+return parserSetup(_that);case Error_LockPoisoned():
+return lockPoisoned(_that);case Error_Config():
+return config(_that);case Error_ParseFailed():
+return parseFailed(_that);case Error_QueryError():
+return queryError(_that);case Error_InvalidRange():
+return invalidRange(_that);case Error_Io():
+return io(_that);case Error_Download():
+return download(_that);case Error_ChecksumMismatch():
+return checksumMismatch(_that);case Error_CacheLock():
+return cacheLock(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( Error_LanguageNotFound value)?  languageNotFound,TResult? Function( Error_DynamicLoad value)?  dynamicLoad,TResult? Function( Error_NullLanguagePointer value)?  nullLanguagePointer,TResult? Function( Error_ParserSetup value)?  parserSetup,TResult? Function( Error_LockPoisoned value)?  lockPoisoned,TResult? Function( Error_Config value)?  config,TResult? Function( Error_ParseFailed value)?  parseFailed,TResult? Function( Error_QueryError value)?  queryError,TResult? Function( Error_InvalidRange value)?  invalidRange,TResult? Function( Error_Io value)?  io,TResult? Function( Error_Download value)?  download,TResult? Function( Error_ChecksumMismatch value)?  checksumMismatch,TResult? Function( Error_CacheLock value)?  cacheLock,}){
+final _that = this;
+switch (_that) {
+case Error_LanguageNotFound() when languageNotFound != null:
+return languageNotFound(_that);case Error_DynamicLoad() when dynamicLoad != null:
+return dynamicLoad(_that);case Error_NullLanguagePointer() when nullLanguagePointer != null:
+return nullLanguagePointer(_that);case Error_ParserSetup() when parserSetup != null:
+return parserSetup(_that);case Error_LockPoisoned() when lockPoisoned != null:
+return lockPoisoned(_that);case Error_Config() when config != null:
+return config(_that);case Error_ParseFailed() when parseFailed != null:
+return parseFailed(_that);case Error_QueryError() when queryError != null:
+return queryError(_that);case Error_InvalidRange() when invalidRange != null:
+return invalidRange(_that);case Error_Io() when io != null:
+return io(_that);case Error_Download() when download != null:
+return download(_that);case Error_ChecksumMismatch() when checksumMismatch != null:
+return checksumMismatch(_that);case Error_CacheLock() when cacheLock != null:
+return cacheLock(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String field0)?  languageNotFound,TResult Function( String field0)?  dynamicLoad,TResult Function( String field0)?  nullLanguagePointer,TResult Function( String field0)?  parserSetup,TResult Function( String field0)?  lockPoisoned,TResult Function( String field0)?  config,TResult Function()?  parseFailed,TResult Function( String field0)?  queryError,TResult Function( String field0)?  invalidRange,TResult Function( String field0)?  io,TResult Function( String field0)?  download,TResult Function( String file,  String expected,  String actual)?  checksumMismatch,TResult Function( String field0)?  cacheLock,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case Error_LanguageNotFound() when languageNotFound != null:
+return languageNotFound(_that.field0);case Error_DynamicLoad() when dynamicLoad != null:
+return dynamicLoad(_that.field0);case Error_NullLanguagePointer() when nullLanguagePointer != null:
+return nullLanguagePointer(_that.field0);case Error_ParserSetup() when parserSetup != null:
+return parserSetup(_that.field0);case Error_LockPoisoned() when lockPoisoned != null:
+return lockPoisoned(_that.field0);case Error_Config() when config != null:
+return config(_that.field0);case Error_ParseFailed() when parseFailed != null:
+return parseFailed();case Error_QueryError() when queryError != null:
+return queryError(_that.field0);case Error_InvalidRange() when invalidRange != null:
+return invalidRange(_that.field0);case Error_Io() when io != null:
+return io(_that.field0);case Error_Download() when download != null:
+return download(_that.field0);case Error_ChecksumMismatch() when checksumMismatch != null:
+return checksumMismatch(_that.file,_that.expected,_that.actual);case Error_CacheLock() when cacheLock != null:
+return cacheLock(_that.field0);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String field0)  languageNotFound,required TResult Function( String field0)  dynamicLoad,required TResult Function( String field0)  nullLanguagePointer,required TResult Function( String field0)  parserSetup,required TResult Function( String field0)  lockPoisoned,required TResult Function( String field0)  config,required TResult Function()  parseFailed,required TResult Function( String field0)  queryError,required TResult Function( String field0)  invalidRange,required TResult Function( String field0)  io,required TResult Function( String field0)  download,required TResult Function( String file,  String expected,  String actual)  checksumMismatch,required TResult Function( String field0)  cacheLock,}) {final _that = this;
+switch (_that) {
+case Error_LanguageNotFound():
+return languageNotFound(_that.field0);case Error_DynamicLoad():
+return dynamicLoad(_that.field0);case Error_NullLanguagePointer():
+return nullLanguagePointer(_that.field0);case Error_ParserSetup():
+return parserSetup(_that.field0);case Error_LockPoisoned():
+return lockPoisoned(_that.field0);case Error_Config():
+return config(_that.field0);case Error_ParseFailed():
+return parseFailed();case Error_QueryError():
+return queryError(_that.field0);case Error_InvalidRange():
+return invalidRange(_that.field0);case Error_Io():
+return io(_that.field0);case Error_Download():
+return download(_that.field0);case Error_ChecksumMismatch():
+return checksumMismatch(_that.file,_that.expected,_that.actual);case Error_CacheLock():
+return cacheLock(_that.field0);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String field0)?  languageNotFound,TResult? Function( String field0)?  dynamicLoad,TResult? Function( String field0)?  nullLanguagePointer,TResult? Function( String field0)?  parserSetup,TResult? Function( String field0)?  lockPoisoned,TResult? Function( String field0)?  config,TResult? Function()?  parseFailed,TResult? Function( String field0)?  queryError,TResult? Function( String field0)?  invalidRange,TResult? Function( String field0)?  io,TResult? Function( String field0)?  download,TResult? Function( String file,  String expected,  String actual)?  checksumMismatch,TResult? Function( String field0)?  cacheLock,}) {final _that = this;
+switch (_that) {
+case Error_LanguageNotFound() when languageNotFound != null:
+return languageNotFound(_that.field0);case Error_DynamicLoad() when dynamicLoad != null:
+return dynamicLoad(_that.field0);case Error_NullLanguagePointer() when nullLanguagePointer != null:
+return nullLanguagePointer(_that.field0);case Error_ParserSetup() when parserSetup != null:
+return parserSetup(_that.field0);case Error_LockPoisoned() when lockPoisoned != null:
+return lockPoisoned(_that.field0);case Error_Config() when config != null:
+return config(_that.field0);case Error_ParseFailed() when parseFailed != null:
+return parseFailed();case Error_QueryError() when queryError != null:
+return queryError(_that.field0);case Error_InvalidRange() when invalidRange != null:
+return invalidRange(_that.field0);case Error_Io() when io != null:
+return io(_that.field0);case Error_Download() when download != null:
+return download(_that.field0);case Error_ChecksumMismatch() when checksumMismatch != null:
+return checksumMismatch(_that.file,_that.expected,_that.actual);case Error_CacheLock() when cacheLock != null:
+return cacheLock(_that.field0);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class Error_LanguageNotFound extends Error {
+  const Error_LanguageNotFound({required this.field0}): super._();
+
+
+ final  String field0;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_LanguageNotFoundCopyWith<Error_LanguageNotFound> get copyWith => _$Error_LanguageNotFoundCopyWithImpl<Error_LanguageNotFound>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_LanguageNotFound&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'Error.languageNotFound(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_LanguageNotFoundCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_LanguageNotFoundCopyWith(Error_LanguageNotFound value, $Res Function(Error_LanguageNotFound) _then) = _$Error_LanguageNotFoundCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_LanguageNotFoundCopyWithImpl<$Res>
+    implements $Error_LanguageNotFoundCopyWith<$Res> {
+  _$Error_LanguageNotFoundCopyWithImpl(this._self, this._then);
+
+  final Error_LanguageNotFound _self;
+  final $Res Function(Error_LanguageNotFound) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(Error_LanguageNotFound(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class Error_DynamicLoad extends Error {
+  const Error_DynamicLoad({required this.field0}): super._();
+
+
+ final  String field0;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_DynamicLoadCopyWith<Error_DynamicLoad> get copyWith => _$Error_DynamicLoadCopyWithImpl<Error_DynamicLoad>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_DynamicLoad&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'Error.dynamicLoad(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_DynamicLoadCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_DynamicLoadCopyWith(Error_DynamicLoad value, $Res Function(Error_DynamicLoad) _then) = _$Error_DynamicLoadCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_DynamicLoadCopyWithImpl<$Res>
+    implements $Error_DynamicLoadCopyWith<$Res> {
+  _$Error_DynamicLoadCopyWithImpl(this._self, this._then);
+
+  final Error_DynamicLoad _self;
+  final $Res Function(Error_DynamicLoad) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(Error_DynamicLoad(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class Error_NullLanguagePointer extends Error {
+  const Error_NullLanguagePointer({required this.field0}): super._();
+
+
+ final  String field0;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_NullLanguagePointerCopyWith<Error_NullLanguagePointer> get copyWith => _$Error_NullLanguagePointerCopyWithImpl<Error_NullLanguagePointer>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_NullLanguagePointer&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'Error.nullLanguagePointer(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_NullLanguagePointerCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_NullLanguagePointerCopyWith(Error_NullLanguagePointer value, $Res Function(Error_NullLanguagePointer) _then) = _$Error_NullLanguagePointerCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_NullLanguagePointerCopyWithImpl<$Res>
+    implements $Error_NullLanguagePointerCopyWith<$Res> {
+  _$Error_NullLanguagePointerCopyWithImpl(this._self, this._then);
+
+  final Error_NullLanguagePointer _self;
+  final $Res Function(Error_NullLanguagePointer) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(Error_NullLanguagePointer(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class Error_ParserSetup extends Error {
+  const Error_ParserSetup({required this.field0}): super._();
+
+
+ final  String field0;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_ParserSetupCopyWith<Error_ParserSetup> get copyWith => _$Error_ParserSetupCopyWithImpl<Error_ParserSetup>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_ParserSetup&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'Error.parserSetup(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_ParserSetupCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_ParserSetupCopyWith(Error_ParserSetup value, $Res Function(Error_ParserSetup) _then) = _$Error_ParserSetupCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_ParserSetupCopyWithImpl<$Res>
+    implements $Error_ParserSetupCopyWith<$Res> {
+  _$Error_ParserSetupCopyWithImpl(this._self, this._then);
+
+  final Error_ParserSetup _self;
+  final $Res Function(Error_ParserSetup) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(Error_ParserSetup(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class Error_LockPoisoned extends Error {
+  const Error_LockPoisoned({required this.field0}): super._();
+
+
+ final  String field0;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_LockPoisonedCopyWith<Error_LockPoisoned> get copyWith => _$Error_LockPoisonedCopyWithImpl<Error_LockPoisoned>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_LockPoisoned&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'Error.lockPoisoned(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_LockPoisonedCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_LockPoisonedCopyWith(Error_LockPoisoned value, $Res Function(Error_LockPoisoned) _then) = _$Error_LockPoisonedCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_LockPoisonedCopyWithImpl<$Res>
+    implements $Error_LockPoisonedCopyWith<$Res> {
+  _$Error_LockPoisonedCopyWithImpl(this._self, this._then);
+
+  final Error_LockPoisoned _self;
+  final $Res Function(Error_LockPoisoned) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(Error_LockPoisoned(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class Error_Config extends Error {
+  const Error_Config({required this.field0}): super._();
+
+
+ final  String field0;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_ConfigCopyWith<Error_Config> get copyWith => _$Error_ConfigCopyWithImpl<Error_Config>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_Config&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'Error.config(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_ConfigCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_ConfigCopyWith(Error_Config value, $Res Function(Error_Config) _then) = _$Error_ConfigCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_ConfigCopyWithImpl<$Res>
+    implements $Error_ConfigCopyWith<$Res> {
+  _$Error_ConfigCopyWithImpl(this._self, this._then);
+
+  final Error_Config _self;
+  final $Res Function(Error_Config) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(Error_Config(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class Error_ParseFailed extends Error {
+  const Error_ParseFailed(): super._();
+
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_ParseFailed);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'Error.parseFailed()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class Error_QueryError extends Error {
+  const Error_QueryError({required this.field0}): super._();
+
+
+ final  String field0;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_QueryErrorCopyWith<Error_QueryError> get copyWith => _$Error_QueryErrorCopyWithImpl<Error_QueryError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_QueryError&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'Error.queryError(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_QueryErrorCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_QueryErrorCopyWith(Error_QueryError value, $Res Function(Error_QueryError) _then) = _$Error_QueryErrorCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_QueryErrorCopyWithImpl<$Res>
+    implements $Error_QueryErrorCopyWith<$Res> {
+  _$Error_QueryErrorCopyWithImpl(this._self, this._then);
+
+  final Error_QueryError _self;
+  final $Res Function(Error_QueryError) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(Error_QueryError(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class Error_InvalidRange extends Error {
+  const Error_InvalidRange({required this.field0}): super._();
+
+
+ final  String field0;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_InvalidRangeCopyWith<Error_InvalidRange> get copyWith => _$Error_InvalidRangeCopyWithImpl<Error_InvalidRange>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_InvalidRange&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'Error.invalidRange(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_InvalidRangeCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_InvalidRangeCopyWith(Error_InvalidRange value, $Res Function(Error_InvalidRange) _then) = _$Error_InvalidRangeCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_InvalidRangeCopyWithImpl<$Res>
+    implements $Error_InvalidRangeCopyWith<$Res> {
+  _$Error_InvalidRangeCopyWithImpl(this._self, this._then);
+
+  final Error_InvalidRange _self;
+  final $Res Function(Error_InvalidRange) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(Error_InvalidRange(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class Error_Io extends Error {
+  const Error_Io({required this.field0}): super._();
+
+
+ final  String field0;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_IoCopyWith<Error_Io> get copyWith => _$Error_IoCopyWithImpl<Error_Io>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_Io&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'Error.io(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_IoCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_IoCopyWith(Error_Io value, $Res Function(Error_Io) _then) = _$Error_IoCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_IoCopyWithImpl<$Res>
+    implements $Error_IoCopyWith<$Res> {
+  _$Error_IoCopyWithImpl(this._self, this._then);
+
+  final Error_Io _self;
+  final $Res Function(Error_Io) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(Error_Io(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class Error_Download extends Error {
+  const Error_Download({required this.field0}): super._();
+
+
+ final  String field0;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_DownloadCopyWith<Error_Download> get copyWith => _$Error_DownloadCopyWithImpl<Error_Download>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_Download&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'Error.download(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_DownloadCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_DownloadCopyWith(Error_Download value, $Res Function(Error_Download) _then) = _$Error_DownloadCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_DownloadCopyWithImpl<$Res>
+    implements $Error_DownloadCopyWith<$Res> {
+  _$Error_DownloadCopyWithImpl(this._self, this._then);
+
+  final Error_Download _self;
+  final $Res Function(Error_Download) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(Error_Download(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class Error_ChecksumMismatch extends Error {
+  const Error_ChecksumMismatch({required this.file, required this.expected, required this.actual}): super._();
+
+
+ final  String file;
+ final  String expected;
+ final  String actual;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_ChecksumMismatchCopyWith<Error_ChecksumMismatch> get copyWith => _$Error_ChecksumMismatchCopyWithImpl<Error_ChecksumMismatch>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_ChecksumMismatch&&(identical(other.file, file) || other.file == file)&&(identical(other.expected, expected) || other.expected == expected)&&(identical(other.actual, actual) || other.actual == actual));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,file,expected,actual);
+
+@override
+String toString() {
+  return 'Error.checksumMismatch(file: $file, expected: $expected, actual: $actual)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_ChecksumMismatchCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_ChecksumMismatchCopyWith(Error_ChecksumMismatch value, $Res Function(Error_ChecksumMismatch) _then) = _$Error_ChecksumMismatchCopyWithImpl;
+@useResult
+$Res call({
+ String file, String expected, String actual
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_ChecksumMismatchCopyWithImpl<$Res>
+    implements $Error_ChecksumMismatchCopyWith<$Res> {
+  _$Error_ChecksumMismatchCopyWithImpl(this._self, this._then);
+
+  final Error_ChecksumMismatch _self;
+  final $Res Function(Error_ChecksumMismatch) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? file = null,Object? expected = null,Object? actual = null,}) {
+  return _then(Error_ChecksumMismatch(
+file: null == file ? _self.file : file // ignore: cast_nullable_to_non_nullable
+as String,expected: null == expected ? _self.expected : expected // ignore: cast_nullable_to_non_nullable
+as String,actual: null == actual ? _self.actual : actual // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class Error_CacheLock extends Error {
+  const Error_CacheLock({required this.field0}): super._();
+
+
+ final  String field0;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$Error_CacheLockCopyWith<Error_CacheLock> get copyWith => _$Error_CacheLockCopyWithImpl<Error_CacheLock>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Error_CacheLock&&(identical(other.field0, field0) || other.field0 == field0));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,field0);
+
+@override
+String toString() {
+  return 'Error.cacheLock(field0: $field0)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $Error_CacheLockCopyWith<$Res> implements $ErrorCopyWith<$Res> {
+  factory $Error_CacheLockCopyWith(Error_CacheLock value, $Res Function(Error_CacheLock) _then) = _$Error_CacheLockCopyWithImpl;
+@useResult
+$Res call({
+ String field0
+});
+
+
+
+
+}
+/// @nodoc
+class _$Error_CacheLockCopyWithImpl<$Res>
+    implements $Error_CacheLockCopyWith<$Res> {
+  _$Error_CacheLockCopyWithImpl(this._self, this._then);
+
+  final Error_CacheLock _self;
+  final $Res Function(Error_CacheLock) _then;
+
+/// Create a copy of Error
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? field0 = null,}) {
+  return _then(Error_CacheLock(
+field0: null == field0 ? _self.field0 : field0 // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$StructureKind {
 
 
