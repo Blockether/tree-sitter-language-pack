@@ -10,7 +10,12 @@ defmodule TreeSitterLanguagePack.MixProject do
       rustler_crates: [
         tree_sitter_language_pack_nif: [
           mode: :release,
-          targets: ~w(aarch64-apple-darwin aarch64-unknown-linux-gnu x86_64-unknown-linux-gnu x86_64-pc-windows-gnu)
+          targets: [
+            "aarch64-apple-darwin",
+            "aarch64-unknown-linux-gnu",
+            "x86_64-unknown-linux-gnu",
+            "x86_64-pc-windows-gnu"
+          ]
         ]
       ],
       description: "Pre-compiled tree-sitter grammars for 306 programming languages",
@@ -31,7 +36,7 @@ defmodule TreeSitterLanguagePack.MixProject do
   defp deps do
     [
       {:jason, "~> 1.4"},
-      {:rustler, "~> 0.38.0", runtime: false},
+      {:rustler, "~> 0.37", runtime: false},
       {:rustler_precompiled, "~> 0.9"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.40", only: :dev, runtime: false}
