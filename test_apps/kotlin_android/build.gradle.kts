@@ -87,7 +87,7 @@ tasks.register("verifyAarPublished") {
             Triple(parts[0], parts[1], parts[2])
         }
         val aarFileName = "${artifactId}-${version}.aar"
-        val mavenUrl = "https://repo1.maven.org/maven2/${groupId.replace('.', '/')}//${artifactId}//${version}//${aarFileName}"
+        val mavenUrl = "https://repo1.maven.org/maven2/${groupId.replace('.', '/')}/${artifactId}/${version}/${aarFileName}"
         val aarFile = layout.buildDirectory.file("tmp/${aarFileName}").get().asFile
 
         println("Downloading AAR from Maven Central: ${mavenUrl}")
@@ -128,7 +128,7 @@ tasks.register("verifyAarPublished") {
 
             println("  + jniLibs: YES")
             println("  + classes.jar: YES")
-            println("  + Android ABIs: ${abiDirs.sorted().joinToString(\", \")}")
+            println("  + Android ABIs: " + abiDirs.sorted().joinToString(", "))
             println("\nAAR verification PASSED!")
         }
     }

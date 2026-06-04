@@ -8,31 +8,29 @@ PHP_ARG_ENABLE([tree_sitter_language_pack],
   [yes])
 
 if test "$PHP_TREE_SITTER_LANGUAGE_PACK_ENABLED" = "yes"; then
-  dnl Recognize the extension directory for phpize/make
+  dnl Register the extension directory so phpize creates modules/ and sets up build rules.
   PHP_NEW_EXTENSION(tree_sitter_language_pack, [], $ext_shared)
 
-  dnl Invoke cargo build to compile the Rust FFI library
+  dnl Invoke cargo build to compile the Rust FFI library and copy it to modules/.
   AC_CONFIG_COMMANDS([cargo-build], [
     if test -f "crates/tree-sitter-language-pack-php/Cargo.toml"; then
-      cargo build --release --manifest-path crates/tree-sitter-language-pack-php/Cargo.toml || exit 1
-      cargo_output_dir="crates/tree-sitter-language-pack-php/target/release"
-      ext_soname="tree_sitter_language_pack"
+      (cd crates/tree-sitter-language-pack-php && cargo build --release) || exit 1
 
       dnl Detect output filename based on platform
-      if test -f "${cargo_output_dir}/libtree-sitter-language-pack_php.dylib"; then
-        cargo_lib="${cargo_output_dir}/libtree-sitter-language-pack_php.dylib"
-      elif test -f "${cargo_output_dir}/libtree-sitter-language-pack_php.so"; then
-        cargo_lib="${cargo_output_dir}/libtree-sitter-language-pack_php.so"
+      if test -f "crates/tree-sitter-language-pack-php/target/release/libtree-sitter-language-pack_php.dylib"; then
+        cargo_lib="crates/tree-sitter-language-pack-php/target/release/libtree-sitter-language-pack_php.dylib"
+      elif test -f "crates/tree-sitter-language-pack-php/target/release/libtree-sitter-language-pack_php.so"; then
+        cargo_lib="crates/tree-sitter-language-pack-php/target/release/libtree-sitter-language-pack_php.so"
       else
-        AC_MSG_ERROR([cargo build succeeded but .so/.dylib not found])
+        echo "ERROR: cargo build succeeded but .so/.dylib not found in crates/tree_sitter_language_pack-php/target/release" >&2
+        exit 1
       fi
 
-      dnl Copy the compiled library to modules/ directory for phpize to install
-      cp "${cargo_lib}" "modules/${ext_soname}.so" || exit 1
+      mkdir -p modules
+      cp "$cargo_lib" "modules/tree-sitter-language-pack.so" || exit 1
     else
-      AC_MSG_ERROR([crates/tree-sitter-language-pack-php/Cargo.toml not found])
+      echo "ERROR: crates/tree_sitter_language_pack-php/Cargo.toml not found" >&2
+      exit 1
     fi
-  ], [
-    extension_name=tree_sitter_language_pack
-  ])
+  ], [])
 fi
