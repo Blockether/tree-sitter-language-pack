@@ -1770,14 +1770,19 @@ jobs:
                   assets: "*.tar.gz"
 
     # ─── Publish Rust crates ───────────────────────────────────────────
+    # build-parser-sources must complete first: cargo publish --verify
+    # invokes the crate's build.rs which downloads the parser-sources tarball
+    # from this release's GH assets. Without that dependency the two jobs
+    # race; verify panics with HTTP 404 if it wins.
     publish-crates:
         name: Publish Rust crates
-        needs: [prepare, validate-versions, clone-vendors, check-registries]
+        needs: [prepare, validate-versions, clone-vendors, check-registries, build-parser-sources]
         if: |
             always() &&
             needs.prepare.outputs.release_crates == 'true' &&
             needs.validate-versions.result == 'success' &&
             needs.clone-vendors.result == 'success' &&
+            needs.build-parser-sources.result == 'success' &&
             (fromJson(needs.check-registries.outputs.results).cratesio != 'true' || needs.prepare.outputs.force_republish == 'true')
         runs-on: ubuntu-latest
         timeout-minutes: 30
