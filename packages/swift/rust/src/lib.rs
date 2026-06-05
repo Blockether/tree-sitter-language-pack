@@ -1990,7 +1990,8 @@ pub fn configure(config: PackConfig) -> Result<(), String> {
 }
 
 pub fn download(names: Vec<String>) -> Result<usize, String> {
-    tree_sitter_language_pack::download(&names).map_err(|e| e.to_string())
+    tree_sitter_language_pack::download(&names.iter().map(|s| s.as_str()).collect::<Vec<_>>())
+        .map_err(|e| e.to_string())
 }
 
 pub fn download_all() -> Result<usize, String> {

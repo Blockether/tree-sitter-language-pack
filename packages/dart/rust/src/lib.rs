@@ -1268,7 +1268,7 @@ pub fn configure(config: PackConfig) -> Result<(), String> {
 /// Returns an error if any language is not available in the manifest or if
 /// the download fails.
 pub fn download(names: Vec<String>) -> Result<i64, String> {
-    tree_sitter_language_pack::download(&names)
+    tree_sitter_language_pack::download(&names.iter().map(|s| s.as_str()).collect::<Vec<_>>())
         .map(|v| v as i64)
         .map_err(|e| e.to_string())
 }

@@ -30,10 +30,7 @@ android {
     sourceSets { getByName("main") { jniLibs.srcDirs("src/main/jniLibs") } }
 }
 
-kotlin {
-    jvmToolchain(21)
-    compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
-}
+kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }
 
 ktlint {
     version.set("1.8.0")
@@ -74,7 +71,7 @@ mavenPublishing {
     coordinates(
         groupId = "dev.kreuzberg.tslp.android",
         artifactId = "tree-sitter-language-pack-android",
-        version = "1.9.0-rc.19",
+        version = "1.9.0-rc.20",
     )
 
     pom {

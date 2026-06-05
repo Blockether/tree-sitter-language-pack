@@ -524,7 +524,8 @@ pub unsafe extern "system" fn Java_dev_kreuzberg_tslp_android_TreeSitterLanguage
             return 0;
         }
     };
-    let result = core_crate::download(&names);
+    let names_refs: Vec<&str> = names.iter().map(String::as_str).collect();
+    let result = core_crate::download(&names_refs);
     match result {
         Err(e) => {
             throw_jni_error(env, &format!("{e}"));
