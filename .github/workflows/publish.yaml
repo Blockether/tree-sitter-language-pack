@@ -2815,6 +2815,25 @@ jobs:
                   alef publish package --lang zig \
                     --target ${{ matrix.target }} \
                     -o dist/zig-ffi
+
+            - name: Fix macOS dylib install_name (Zig FFI)
+              if: runner.os == 'macOS'
+              shell: bash
+              run: |
+                  echo "=== Fixing macOS dylib install_name in Zig FFI package ==="
+                  find dist/zig-ffi -name "*.dylib" -type f | while read -r dylib; do
+                    echo "Processing: $dylib"
+                    # Get the dylib filename
+                    dylib_name=$(basename "$dylib")
+                    echo "  Current install_name:"
+                    otool -D "$dylib" | tail -1 | sed 's/^/    /'
+                    # Rewrite to @rpath
+                    install_name_tool -id "@rpath/$dylib_name" "$dylib"
+                    echo "  New install_name:"
+                    otool -D "$dylib" | tail -1 | sed 's/^/    /'
+                  done
+                  echo "=== Zig FFI dylib install_name fixes complete ==="
+
             - uses: actions/upload-artifact@v7
               with:
                   name: zig-ffi-${{ matrix.label }}
