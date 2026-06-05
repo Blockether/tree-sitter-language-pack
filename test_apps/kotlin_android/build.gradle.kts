@@ -33,13 +33,9 @@ android {
 }
 
 kotlin {
-    // Pin the JDK toolchain used for compilation AND test execution. Without this,
-    // Gradle picks the host JDK; under JDK 25 (Temurin) the Android Gradle Plugin
-    // fails to parse the host version string and aborts with
-    // `What went wrong: 25.0.2`. `jvmToolchain(N)` makes Gradle provision the
-    // requested LTS JDK (downloading via toolchains if not present locally) so
-    // `./gradlew test` succeeds on hosts with newer JDKs installed.
-    jvmToolchain(17)
+    // Set JVM target for compilation. gradle.properties enables auto-detection
+    // of host JDK installations so Gradle uses the available JDK version on the
+    // build machine, preventing provisioning failures when the target version is not installed.
     compilerOptions {
         jvmTarget = JvmTarget.JVM_17
     }
@@ -51,7 +47,7 @@ kotlin {
 
 dependencies {
     // Published Android AAR from Maven Central (verifies artifact resolution)
-    implementation("dev.kreuzberg.tslp.android:tree-sitter-language-pack-android:1.9.0-rc.19")
+    implementation("dev.kreuzberg.tslp.android:tree-sitter-language-pack-android:1.9.0-rc.20")
     // Jackson for JSON assertion helpers
     testImplementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
@@ -84,7 +80,7 @@ dependencies {
 tasks.register("verifyAarPublished") {
     description = "Verify the published Android AAR contains jniLibs and classes.jar"
     doLast {
-        val aarCoord = "dev.kreuzberg.tslp.android:tree-sitter-language-pack-android:1.9.0-rc.19"
+        val aarCoord = "dev.kreuzberg.tslp.android:tree-sitter-language-pack-android:1.9.0-rc.20"
         val (groupId, artifactId, version) = run {
             val parts = aarCoord.split(':')
             Triple(parts[0], parts[1], parts[2])

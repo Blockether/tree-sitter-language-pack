@@ -269,7 +269,7 @@ global instance via the module-level convenience functions
 
 ---
 
-### Document Structure
+### Structured Data Types
 
 #### Node
 

@@ -353,7 +353,8 @@ pub fn init(config: &PackConfig) -> Result<(), Error> {
         .map_err(|e| Error::LockPoisoned(e.to_string()))?;
     configure_inner(config)?;
     if let Some(ref languages) = config.languages {
-        download_inner(languages)?;
+        let refs: Vec<&str> = languages.iter().map(String::as_str).collect();
+        download_inner(&refs)?;
     }
     if let Some(ref groups) = config.groups {
         let cache_dir = effective_cache_dir()?;
@@ -433,7 +434,7 @@ fn configure_inner(config: &PackConfig) -> Result<(), Error> {
 /// println!("Ensured {} languages", count);
 /// ```
 #[cfg(feature = "download")]
-pub fn download<S: AsRef<str>>(names: &[S]) -> Result<usize, Error> {
+pub fn download(names: &[&str]) -> Result<usize, Error> {
     let _cache_guard = DOWNLOAD_CACHE_LOCK
         .lock()
         .map_err(|e| Error::LockPoisoned(e.to_string()))?;
@@ -441,17 +442,17 @@ pub fn download<S: AsRef<str>>(names: &[S]) -> Result<usize, Error> {
 }
 
 #[cfg(feature = "download")]
-fn download_inner<S: AsRef<str>>(names: &[S]) -> Result<usize, Error> {
+fn download_inner(names: &[&str]) -> Result<usize, Error> {
     ensure_cache_registered()?;
     let cache_dir = effective_cache_dir()?;
     let dm = DownloadManager::with_cache_dir(env!("CARGO_PKG_VERSION"), cache_dir);
     let unavailable: Vec<&str> = names
         .iter()
-        .map(|s| s.as_ref())
+        .copied()
         .filter(|name| !REGISTRY.has_language(name))
         .collect();
     dm.ensure_languages(&unavailable)?;
-    let unique: std::collections::BTreeSet<&str> = names.iter().map(|s| s.as_ref()).collect();
+    let unique: std::collections::BTreeSet<&str> = names.iter().copied().collect();
     Ok(unique.len())
 }
 
