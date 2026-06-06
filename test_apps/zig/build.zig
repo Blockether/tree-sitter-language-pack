@@ -6,11 +6,28 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
     const test_step = b.step("test", "Run tests");
 
-    // Fetch the published Zig package from the registry.
-    const tree_sitter_language_pack_dep = b.dependency("tree_sitter_language_pack", .{
+    // Fetch the published Zig package from the registry (multi-target lazy dependency).
+    // Select the appropriate platform variant based on the target triple.
+    const target_os = target.result.os.tag;
+    const target_arch = target.result.cpu.arch;
+
+    const tree_sitter_language_pack_dep_name = if (target_os == .linux and target_arch == .x86_64)
+        "tree_sitter_language_pack_linux_x86_64"
+    else if (target_os == .linux and target_arch == .aarch64)
+        "tree_sitter_language_pack_linux_aarch64"
+    else if (target_os == .macos and target_arch == .aarch64)
+        "tree_sitter_language_pack_macos_arm64"
+    else if (target_os == .macos and target_arch == .x86_64)
+        "tree_sitter_language_pack_macos_x86_64"
+    else if (target_os == .windows and target_arch == .x86_64)
+        "tree_sitter_language_pack_windows_x86_64"
+    else
+        @panic("unsupported target — supported: linux-{x86_64,aarch64}, macos-{arm64,x86_64}, windows-x86_64");
+
+    const tree_sitter_language_pack_dep = b.lazyDependency(tree_sitter_language_pack_dep_name, .{
         .target = target,
         .optimize = optimize,
-    });
+    }) orelse return;
     const tree_sitter_language_pack_module = tree_sitter_language_pack_dep.module("tree_sitter_language_pack");
     const tree_sitter_language_pack_lib_path = tree_sitter_language_pack_dep.path("lib");
     const tree_sitter_language_pack_include_path = tree_sitter_language_pack_dep.path("include");

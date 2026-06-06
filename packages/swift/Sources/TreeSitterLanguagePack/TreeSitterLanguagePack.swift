@@ -875,19 +875,19 @@ private func _loadBytesFromPathOrUtf8(_ pathOrContent: String) throws -> [UInt8]
     return [UInt8](pathOrContent.utf8)
 }
 
-public func process(_ source: String, _ configJson: String) throws -> ProcessResult {
-    let config = try processConfigFromJson(configJson)
-    return try process(source: source, config: config)
+public func process(_ source: String, _ configprocessConfigJson: String) throws -> ProcessResult {
+    let configprocessConfig = try processConfigFromJson(configprocessConfigJson)
+    return try process(source: source, config: configprocessConfig)
 }
 
-public func init_(_ configJson: String) throws -> Void {
-    let config = try packConfigFromJson(configJson)
-    return try init_(config: config)
+public func init_(_ configpackConfigJson: String) throws -> Void {
+    let configpackConfig = try packConfigFromJson(configpackConfigJson)
+    return try init_(config: configpackConfig)
 }
 
-public func configure(_ configJson: String) throws -> Void {
-    let config = try packConfigFromJson(configJson)
-    return try configure(config: config)
+public func configure(_ configpackConfigJson: String) throws -> Void {
+    let configpackConfig = try packConfigFromJson(configpackConfigJson)
+    return try configure(config: configpackConfig)
 }
 
 // MARK: - From-JSON Helpers

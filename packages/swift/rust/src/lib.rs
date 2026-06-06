@@ -593,6 +593,197 @@ mod ffi {
         #[swift_bridge(swift_name = "diagnosticSeverityFromJson")]
         fn diagnostic_severity_from_json(json: String) -> Result<DiagnosticSeverity, String>;
     }
+    extern "Rust" {
+        // Phantom Vec<T> functions: swift-bridge-build must emit the full Vec support
+        // C ABI symbols (__swift_bridge__$Vec_T$new, drop, push, pop, get, get_mut, as_ptr, len)
+        // which the auto-generated Swift Vec<T> conformances reference.
+        //
+        // swift-bridge 0.1.59 only emits these when Vec<T> appears as a return type
+        // in an extern block. Without these phantom functions, Swift linker fails when
+        // trying to construct or manipulate Vec<T> of opaque types.
+        //
+        // These declarations are paired with phantom_impl functions below the bridge module.
+        fn __alef_phantom_vec_span() -> Vec<Span>;
+        fn __alef_phantom_vec_process_result() -> Vec<ProcessResult>;
+        fn __alef_phantom_vec_file_metrics() -> Vec<FileMetrics>;
+        fn __alef_phantom_vec_structure_item() -> Vec<StructureItem>;
+        fn __alef_phantom_vec_comment_info() -> Vec<CommentInfo>;
+        fn __alef_phantom_vec_docstring_info() -> Vec<DocstringInfo>;
+        fn __alef_phantom_vec_doc_section() -> Vec<DocSection>;
+        fn __alef_phantom_vec_import_info() -> Vec<ImportInfo>;
+        fn __alef_phantom_vec_export_info() -> Vec<ExportInfo>;
+        fn __alef_phantom_vec_symbol_info() -> Vec<SymbolInfo>;
+        fn __alef_phantom_vec_diagnostic() -> Vec<Diagnostic>;
+        fn __alef_phantom_vec_code_chunk() -> Vec<CodeChunk>;
+        fn __alef_phantom_vec_chunk_context() -> Vec<ChunkContext>;
+        fn __alef_phantom_vec_pack_config() -> Vec<PackConfig>;
+        fn __alef_phantom_vec_point() -> Vec<Point>;
+        fn __alef_phantom_vec_byte_range() -> Vec<ByteRange>;
+        fn __alef_phantom_vec_parser() -> Vec<Parser>;
+        fn __alef_phantom_vec_tree() -> Vec<Tree>;
+        fn __alef_phantom_vec_node() -> Vec<Node>;
+        fn __alef_phantom_vec_tree_cursor() -> Vec<TreeCursor>;
+        fn __alef_phantom_vec_process_config() -> Vec<ProcessConfig>;
+        fn __alef_phantom_vec_language_registry() -> Vec<LanguageRegistry>;
+        fn __alef_phantom_vec_download_manager() -> Vec<DownloadManager>;
+        fn __alef_phantom_vec_language() -> Vec<Language>;
+        fn __alef_phantom_vec_structure_kind() -> Vec<StructureKind>;
+        fn __alef_phantom_vec_comment_kind() -> Vec<CommentKind>;
+        fn __alef_phantom_vec_docstring_format() -> Vec<DocstringFormat>;
+        fn __alef_phantom_vec_export_kind() -> Vec<ExportKind>;
+        fn __alef_phantom_vec_symbol_kind() -> Vec<SymbolKind>;
+        fn __alef_phantom_vec_diagnostic_severity() -> Vec<DiagnosticSeverity>;
+    }
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_span() -> Vec<Span> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_process_result() -> Vec<ProcessResult> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_file_metrics() -> Vec<FileMetrics> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_structure_item() -> Vec<StructureItem> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_comment_info() -> Vec<CommentInfo> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_docstring_info() -> Vec<DocstringInfo> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_doc_section() -> Vec<DocSection> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_import_info() -> Vec<ImportInfo> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_export_info() -> Vec<ExportInfo> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_symbol_info() -> Vec<SymbolInfo> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_diagnostic() -> Vec<Diagnostic> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_code_chunk() -> Vec<CodeChunk> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_chunk_context() -> Vec<ChunkContext> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_pack_config() -> Vec<PackConfig> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_point() -> Vec<Point> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_byte_range() -> Vec<ByteRange> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_parser() -> Vec<Parser> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_tree() -> Vec<Tree> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_node() -> Vec<Node> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_tree_cursor() -> Vec<TreeCursor> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_process_config() -> Vec<ProcessConfig> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_language_registry() -> Vec<LanguageRegistry> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_download_manager() -> Vec<DownloadManager> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_language() -> Vec<Language> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_structure_kind() -> Vec<StructureKind> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_comment_kind() -> Vec<CommentKind> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_docstring_format() -> Vec<DocstringFormat> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_export_kind() -> Vec<ExportKind> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_symbol_kind() -> Vec<SymbolKind> {
+    Vec::new()
+}
+
+#[doc(hidden)]
+pub fn __alef_phantom_vec_diagnostic_severity() -> Vec<DiagnosticSeverity> {
+    Vec::new()
 }
 
 pub struct Span(pub tree_sitter_language_pack::Span);
