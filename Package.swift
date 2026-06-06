@@ -31,8 +31,8 @@ let package = Package(
     // Depends on RustBridgeC so generated Swift files can use the C types.
     .binaryTarget(
       name: "RustBridge",
-      url: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v__ALEF_SWIFT_VERSION__/TreeSitterLanguagePack-rs.artifactbundle.zip",
-      checksum: "__ALEF_SWIFT_CHECKSUM__"
+      url: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v1.9.0-rc.22/TreeSitterLanguagePack-rs.artifactbundle.zip",
+      checksum: "9a4e78f997a0f53a7708bc62a15b04fa7ad294d88af069d2f101f4744b3728b2"
     ),
     .target(
       name: "TreeSitterLanguagePack",
