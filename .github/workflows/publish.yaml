@@ -2662,6 +2662,7 @@ jobs:
               with:
                   crate-name: tree-sitter-language-pack-swift
                   artifact-name: TreeSitterLanguagePack-rs
+                  binary-target-name: RustBridge
             - uses: actions/upload-artifact@v7
               with:
                   name: swift-artifactbundle
@@ -3361,7 +3362,7 @@ jobs:
                   fi
                   echo "Staged $lib_count libraries"
 
-            - name: Commit staged libraries
+            - name: Commit staged libraries and tag Go module
               if: ${{ needs.prepare.outputs.dry_run != 'true' }}
               run: |
                   cd packages/go
@@ -3371,14 +3372,21 @@ jobs:
 
                   # Check if there are changes to commit
                   if git diff --cached --quiet; then
-                    echo "No changes to commit"
-                  else
-                    git commit --no-verify -m "chore(go): stage pre-built FFI libraries for ${{ needs.prepare.outputs.version }}"
-                    echo "Libraries committed successfully"
+                    echo "No changes to commit; skipping tag"
+                    exit 0
                   fi
+
+                  git commit --no-verify -m "chore(go): stage pre-built FFI libraries for ${{ needs.prepare.outputs.version }}"
+                  echo "Libraries committed successfully"
 
                   # Log the commit
                   git log --oneline -1
+
+                  # Tag the staged commit as the Go module version
+                  # This ensures consumers fetching v<version> get the libraries
+                  git tag -a "packages/go/v${{ needs.prepare.outputs.version }}" -m "Go module v${{ needs.prepare.outputs.version }}"
+                  git push origin "refs/tags/packages/go/v${{ needs.prepare.outputs.version }}"
+                  echo "Go module tag pushed successfully"
 
     # ─── Release finalize ──────────────────────────────────────────────
     release-finalize:
@@ -3419,11 +3427,11 @@ jobs:
                   ref: ${{ needs.prepare.outputs.checkout_ref }}
                   fetch-depth: 0
 
-            - name: Finalize release (publish from draft, tag Go module)
+            - name: Finalize release (publish from draft)
               uses: kreuzberg-dev/actions/finalize-release@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
-                  go-module-path: ${{ needs.prepare.outputs.release_go == 'true' && 'packages/go' || '' }}
+                  go-module-path: ""
                   dry-run: ${{ needs.prepare.outputs.dry_run }}
                   token: ${{ github.token }}
 
