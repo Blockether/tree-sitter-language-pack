@@ -3301,6 +3301,7 @@ jobs:
                   tag: ${{ needs.prepare.outputs.tag }}
                   go-module-path: ${{ needs.prepare.outputs.release_go == 'true' && 'packages/go' || '' }}
                   dry-run: ${{ needs.prepare.outputs.dry_run }}
+                  token: ${{ github.token }}
 
             - name: Aggregate release status
               if: always()
