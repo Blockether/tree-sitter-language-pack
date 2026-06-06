@@ -24,7 +24,36 @@ const CACHE_REMOVE_RETRIES: usize = 5;
 const CACHE_REMOVE_RETRY_DELAY: Duration = Duration::from_millis(10);
 const HTTP_TIMEOUT: Duration = Duration::from_secs(60);
 const TLS_ROOTS_ENV: &str = "TREE_SITTER_LANGUAGE_PACK_TLS_ROOTS";
+const MANIFEST_URL_ENV: &str = "TREE_SITTER_LANGUAGE_PACK_MANIFEST_URL";
 const LOCK_FILE_NAME: &str = ".download.lock";
+
+/// Resolve the URL used to fetch the parser manifest.
+///
+/// Layered override: `TREE_SITTER_LANGUAGE_PACK_MANIFEST_URL` env var (if set
+/// and non-empty) wins over the compile-time GitHub release URL. Allows tests,
+/// air-gapped deployments, and private mirrors to redirect manifest fetches
+/// without recompiling. Supports both `http(s)://` (over the ureq agent) and
+/// `file://` (read straight from disk) schemes.
+fn resolve_manifest_url(version: &str) -> String {
+    if let Ok(url) = std::env::var(MANIFEST_URL_ENV)
+        && !url.trim().is_empty()
+    {
+        return url;
+    }
+    format!("{GITHUB_RELEASE_BASE}/v{version}/parsers.json")
+}
+
+/// Read a `file://` URL as a UTF-8 string.
+///
+/// Returns the body bytes decoded as UTF-8. Errors are wrapped in
+/// `Error::Download` so callers see the same error variant whether the
+/// manifest was fetched over HTTP or read from disk.
+fn read_file_url(url: &str) -> Result<String, Error> {
+    let path = url
+        .strip_prefix("file://")
+        .ok_or_else(|| Error::Download(format!("not a file:// URL: {url}")))?;
+    fs::read_to_string(path).map_err(|e| Error::Download(format!("Failed to read manifest from {url}: {e}")))
+}
 
 /// Sibling tmp path for atomic writes: `<dest_dir>/.<name>.tmp.<pid>.<seq>`.
 /// Lives in the same directory as `dest` so `fs::rename` stays on the same
@@ -466,16 +495,19 @@ impl DownloadManager {
             return Ok(manifest);
         }
 
-        let url = format!("{}/v{}/parsers.json", GITHUB_RELEASE_BASE, self.version);
+        let url = resolve_manifest_url(&self.version);
 
-        let body = self
-            .agent
-            .get(&url)
-            .call()
-            .map_err(|e| Error::Download(format!("Failed to fetch manifest from {}: {}", url, e)))?
-            .into_body()
-            .read_to_string()
-            .map_err(|e| Error::Download(format!("Failed to read manifest body: {}", e)))?;
+        let body = if url.starts_with("file://") {
+            read_file_url(&url)?
+        } else {
+            self.agent
+                .get(&url)
+                .call()
+                .map_err(|e| Error::Download(format!("Failed to fetch manifest from {url}: {e}")))?
+                .into_body()
+                .read_to_string()
+                .map_err(|e| Error::Download(format!("Failed to read manifest body: {e}")))?
+        };
 
         let manifest: ParserManifest = serde_json::from_str(&body)?;
 
@@ -604,6 +636,10 @@ impl DownloadManager {
 
     /// Download a bundle archive from the given URL.
     fn download_bundle(&self, url: &str) -> Result<Vec<u8>, Error> {
+        if let Some(path) = url.strip_prefix("file://") {
+            return fs::read(path).map_err(|e| Error::Download(format!("Failed to read bundle from {url}: {e}")));
+        }
+
         let response = self
             .agent
             .get(url)
@@ -1185,6 +1221,91 @@ mod tests {
     #[test]
     fn build_agent_webpki_mode_constructs_an_agent() {
         let _agent = build_agent(TlsRootsMode::WebPki);
+    }
+
+    // ----- Manifest URL override (TREE_SITTER_LANGUAGE_PACK_MANIFEST_URL) -----
+    //
+    // Shares the TLS env-var test guard pattern: env-mutating tests serialise
+    // on a single mutex so concurrent `cargo test` runs do not flake.
+    static MANIFEST_URL_ENV_GUARD: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+    #[test]
+    fn resolve_manifest_url_defaults_to_github_release() {
+        let _guard = MANIFEST_URL_ENV_GUARD.lock().expect("env guard should not be poisoned");
+        let _env = EnvVarGuard::unset(MANIFEST_URL_ENV);
+        assert_eq!(
+            resolve_manifest_url("1.2.3"),
+            "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v1.2.3/parsers.json"
+        );
+    }
+
+    #[test]
+    fn resolve_manifest_url_honours_env_override_http() {
+        let _guard = MANIFEST_URL_ENV_GUARD.lock().expect("env guard should not be poisoned");
+        let _env = EnvVarGuard::set(MANIFEST_URL_ENV, "https://mirror.example.com/parsers.json");
+        assert_eq!(resolve_manifest_url("1.2.3"), "https://mirror.example.com/parsers.json");
+    }
+
+    #[test]
+    fn resolve_manifest_url_honours_env_override_file_url() {
+        let _guard = MANIFEST_URL_ENV_GUARD.lock().expect("env guard should not be poisoned");
+        let _env = EnvVarGuard::set(MANIFEST_URL_ENV, "file:///tmp/local-parsers.json");
+        assert_eq!(resolve_manifest_url("1.2.3"), "file:///tmp/local-parsers.json");
+    }
+
+    #[test]
+    fn resolve_manifest_url_falls_back_when_env_is_empty_or_whitespace() {
+        let _guard = MANIFEST_URL_ENV_GUARD.lock().expect("env guard should not be poisoned");
+        // An empty or whitespace-only env value should not override the default URL —
+        // the env var is "unset" semantically, not a request to fetch from the
+        // empty URL (which would deterministically fail with a confusing error).
+        let _env = EnvVarGuard::set(MANIFEST_URL_ENV, "   ");
+        assert!(resolve_manifest_url("1.2.3").starts_with(GITHUB_RELEASE_BASE));
+    }
+
+    #[test]
+    fn read_file_url_returns_body_for_existing_file() {
+        let _guard = MANIFEST_URL_ENV_GUARD.lock().expect("env guard should not be poisoned");
+        let temp_dir = temp_cache_dir();
+        let path = temp_dir.path().join("parsers.json");
+        let body = r#"{"version":"9.9.9","platforms":{},"languages":{},"groups":{}}"#;
+        fs::write(&path, body).expect("seed file should be written");
+        let url = format!("file://{}", path.display());
+
+        let result = read_file_url(&url).expect("file:// read should succeed");
+        assert_eq!(result, body);
+    }
+
+    #[test]
+    fn read_file_url_errors_on_missing_file() {
+        let _guard = MANIFEST_URL_ENV_GUARD.lock().expect("env guard should not be poisoned");
+        let temp_dir = temp_cache_dir();
+        let url = format!("file://{}", temp_dir.path().join("nope.json").display());
+        let err = read_file_url(&url).expect_err("missing file should error");
+        assert!(matches!(err, Error::Download(_)));
+    }
+
+    #[test]
+    fn read_file_url_errors_on_non_file_scheme() {
+        let _guard = MANIFEST_URL_ENV_GUARD.lock().expect("env guard should not be poisoned");
+        let err = read_file_url("https://example.com/parsers.json").expect_err("non-file URL should error");
+        assert!(matches!(err, Error::Download(_)));
+    }
+
+    #[test]
+    fn fetch_manifest_reads_from_file_url_when_env_is_set() {
+        let _guard = MANIFEST_URL_ENV_GUARD.lock().expect("env guard should not be poisoned");
+        let temp_dir = temp_cache_dir();
+        let manifest_src = temp_dir.path().join("local-parsers.json");
+        let body = r#"{"version":"local-test","platforms":{},"languages":{},"groups":{}}"#;
+        fs::write(&manifest_src, body).expect("seed manifest should be written");
+        let _env = EnvVarGuard::set(MANIFEST_URL_ENV, &format!("file://{}", manifest_src.display()));
+
+        let manager = DownloadManager::with_cache_dir("local-test", temp_dir.path().join("libs"));
+        let manifest = manager
+            .fetch_manifest_inner_locked()
+            .expect("file:// manifest fetch should succeed");
+        assert_eq!(manifest.version, "local-test");
     }
 
     #[test]
