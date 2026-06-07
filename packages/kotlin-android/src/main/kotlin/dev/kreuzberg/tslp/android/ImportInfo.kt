@@ -25,9 +25,14 @@ package dev.kreuzberg.tslp.android
 
 /** An import statement extracted from source code. */
 data class ImportInfo(
+    /** The module or path being imported from. */
     val source: String = "",
+    /** Specific names imported from the source module. */
     val items: List<String> = emptyList(),
+    /** Alias assigned to the import (e.g., `import numpy as np`). */
     val alias: String? = null,
+    /** Whether this is a wildcard import (e.g., `import *` or `use foo.*`). */
     val isWildcard: Boolean = false,
+    /** Source span covering the import statement. */
     val span: Span = Span(),
 )

@@ -26,12 +26,15 @@ package dev.kreuzberg.tslp.android
 /**
  * The kind of a comment found in source code.
  *
- * Distinguishes between single-line comments, block (multi-line) comments, and documentation
- * comments.
+ * Distinguishes between single-line comments, block (multi-line) comments,
+ * and documentation comments.
  */
 enum class CommentKind {
+    /** A single-line comment (e.g., `// ...` or `# ...`). */
     @com.fasterxml.jackson.annotation.JsonProperty("Line") LINE,
+    /** A block or multi-line comment (e.g., `/ * ... * /`). */
     @com.fasterxml.jackson.annotation.JsonProperty("Block") BLOCK,
+    /** A documentation comment (e.g., `/// ...` or `/ ** ... * /`). */
     @com.fasterxml.jackson.annotation.JsonProperty("Doc") DOC;
 
     @com.fasterxml.jackson.annotation.JsonValue

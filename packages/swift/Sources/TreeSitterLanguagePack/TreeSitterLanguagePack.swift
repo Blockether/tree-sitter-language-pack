@@ -8,11 +8,17 @@ import RustBridge
 /// Represents both byte offsets (for slicing) and human-readable line/column
 /// positions (for display and diagnostics).
 public struct Span: Codable, Sendable, Hashable {
+    /// Inclusive start byte offset in the source.
     public let startByte: UInt
+    /// Exclusive end byte offset in the source.
     public let endByte: UInt
+    /// Zero-indexed line number of the span's start.
     public let startLine: UInt
+    /// Zero-indexed column number of the span's start.
     public let startColumn: UInt
+    /// Zero-indexed line number of the span's end.
     public let endLine: UInt
+    /// Zero-indexed column number of the span's end.
     public let endColumn: UInt
     public init(startByte: UInt, endByte: UInt, startLine: UInt, startColumn: UInt, endLine: UInt, endColumn: UInt) {
         self.startByte = startByte
@@ -79,13 +85,21 @@ public typealias ProcessResult = RustBridge.ProcessResult
 
 /// Aggregate metrics for a source file.
 public struct FileMetrics: Codable, Sendable, Hashable {
+    /// Total number of lines (including blank and comment lines).
     public let totalLines: UInt
+    /// Number of lines containing non-blank, non-comment source code.
     public let codeLines: UInt
+    /// Number of lines that are entirely comments.
     public let commentLines: UInt
+    /// Number of blank (whitespace-only) lines.
     public let blankLines: UInt
+    /// Total byte length of the source file.
     public let totalBytes: UInt
+    /// Total number of nodes in the syntax tree.
     public let nodeCount: UInt
+    /// Number of error nodes in the syntax tree (parse errors).
     public let errorCount: UInt
+    /// Maximum nesting depth reached in the syntax tree.
     public let maxDepth: UInt
     public init(totalLines: UInt, codeLines: UInt, commentLines: UInt, blankLines: UInt, totalBytes: UInt, nodeCount: UInt, errorCount: UInt, maxDepth: UInt) {
         self.totalLines = totalLines
@@ -143,9 +157,13 @@ public typealias StructureItem = RustBridge.StructureItem
 
 /// A comment extracted from source code.
 public struct CommentInfo: Codable, Sendable, Hashable {
+    /// The raw text content of the comment.
     public let text: String
+    /// The kind of comment (line, block, or doc).
     public let kind: CommentKind
+    /// Source span covering the comment.
     public let span: Span
+    /// Name of the syntax node this comment is directly associated with.
     public let associatedNode: String?
     public init(text: String, kind: CommentKind, span: Span, associatedNode: String? = nil) {
         self.text = text
@@ -184,10 +202,15 @@ internal extension CommentInfo {
 
 /// A docstring extracted from source code.
 public struct DocstringInfo: Codable, Sendable, Hashable {
+    /// The raw text of the docstring.
     public let text: String
+    /// The docstring format (Python, JSDoc, Rustdoc, etc.).
     public let format: DocstringFormat
+    /// Source span covering the docstring.
     public let span: Span
+    /// Name of the item this docstring documents.
     public let associatedItem: String?
+    /// Parsed sections of the docstring (Args, Returns, Raises, etc.).
     public let parsedSections: [DocSection]
     public init(text: String, format: DocstringFormat, span: Span, associatedItem: String? = nil, parsedSections: [DocSection]) {
         self.text = text
@@ -232,8 +255,11 @@ internal extension DocstringInfo {
 
 /// A section within a docstring (e.g., Args, Returns, Raises).
 public struct DocSection: Codable, Sendable, Hashable {
+    /// Section kind (e.g., `"args"`, `"returns"`, `"raises"`).
     public let kind: String
+    /// Parameter or return value name, if applicable.
     public let name: String?
+    /// Description text for this section.
     public let description: String
     public init(kind: String, name: String? = nil, description: String) {
         self.kind = kind
@@ -268,10 +294,15 @@ internal extension DocSection {
 
 /// An import statement extracted from source code.
 public struct ImportInfo: Codable, Sendable, Hashable {
+    /// The module or path being imported from.
     public let source: String
+    /// Specific names imported from the source module.
     public let items: [String]
+    /// Alias assigned to the import (e.g., `import numpy as np`).
     public let alias: String?
+    /// Whether this is a wildcard import (e.g., `import *` or `use foo::*`).
     public let isWildcard: Bool
+    /// Source span covering the import statement.
     public let span: Span
     public init(source: String, items: [String], alias: String? = nil, isWildcard: Bool, span: Span) {
         self.source = source
@@ -316,8 +347,11 @@ internal extension ImportInfo {
 
 /// An export statement extracted from source code.
 public struct ExportInfo: Codable, Sendable, Hashable {
+    /// The exported name.
     public let name: String
+    /// The kind of export (named, default, or re-export).
     public let kind: ExportKind
+    /// Source span covering the export statement.
     public let span: Span
     public init(name: String, kind: ExportKind, span: Span) {
         self.name = name
@@ -352,10 +386,15 @@ internal extension ExportInfo {
 
 /// A symbol (variable, function, type, etc.) extracted from source code.
 public struct SymbolInfo: Codable, Sendable, Hashable {
+    /// The name of the symbol.
     public let name: String
+    /// The kind of symbol (variable, function, class, etc.).
     public let kind: SymbolKind
+    /// Source span covering the symbol definition.
     public let span: Span
+    /// Explicit type annotation, if present in the source.
     public let typeAnnotation: String?
+    /// Documentation comment associated with this symbol.
     public let doc: String?
     public init(name: String, kind: SymbolKind, span: Span, typeAnnotation: String? = nil, doc: String? = nil) {
         self.name = name
@@ -398,8 +437,11 @@ internal extension SymbolInfo {
 
 /// A diagnostic (syntax error, missing node, etc.) from parsing.
 public struct Diagnostic: Codable, Sendable, Hashable {
+    /// Human-readable description of the diagnostic.
     public let message: String
+    /// Severity of the diagnostic.
     public let severity: DiagnosticSeverity
+    /// Source span where the diagnostic was detected.
     public let span: Span
     public init(message: String, severity: DiagnosticSeverity, span: Span) {
         self.message = message
@@ -434,11 +476,17 @@ internal extension Diagnostic {
 
 /// A chunk of source code with rich metadata.
 public struct CodeChunk: Codable, Sendable, Hashable {
+    /// The raw source text of this chunk.
     public let content: String
+    /// Inclusive start byte offset of this chunk in the original source.
     public let startByte: UInt
+    /// Exclusive end byte offset of this chunk in the original source.
     public let endByte: UInt
+    /// Zero-indexed start line of this chunk.
     public let startLine: UInt
+    /// Zero-indexed end line of this chunk.
     public let endLine: UInt
+    /// Contextual metadata about this chunk.
     public let metadata: ChunkContext
     public init(content: String, startByte: UInt, endByte: UInt, startLine: UInt, endLine: UInt, metadata: ChunkContext) {
         self.content = content
@@ -485,14 +533,23 @@ internal extension CodeChunk {
 
 /// Metadata for a single chunk of source code.
 public struct ChunkContext: Codable, Sendable, Hashable {
+    /// Language name used to parse this chunk.
     public let language: String
+    /// Zero-indexed position of this chunk within the file's chunk list.
     public let chunkIndex: UInt
+    /// Total number of chunks the file was split into.
     public let totalChunks: UInt
+    /// Tree-sitter node kinds that appear at the top level of this chunk.
     public let nodeTypes: [String]
+    /// Hierarchical path of enclosing structural items (e.g., `["MyClass", "my_method"]`).
     public let contextPath: [String]
+    /// Names of symbols defined within this chunk.
     public let symbolsDefined: [String]
+    /// Comments contained within this chunk.
     public let comments: [CommentInfo]
+    /// Docstrings contained within this chunk.
     public let docstrings: [DocstringInfo]
+    /// Whether this chunk contains any tree-sitter error nodes.
     public let hasErrorNodes: Bool
     public init(language: String, chunkIndex: UInt, totalChunks: UInt, nodeTypes: [String], contextPath: [String], symbolsDefined: [String], comments: [CommentInfo], docstrings: [DocstringInfo], hasErrorNodes: Bool) {
         self.language = language
@@ -724,16 +781,27 @@ internal extension ProcessConfig {
 /// structs, enums, traits, and more. Use [`Other`](StructureKind::Other) for
 /// language-specific constructs that do not fit a standard category.
 public enum StructureKind: Codable, Sendable, Hashable {
+    /// A free-standing or associated function.
     case function
+    /// A method defined inside a class, struct, trait, or impl block.
     case method
+    /// A class definition.
     case class_
+    /// A struct definition.
     case struct_
+    /// An interface or protocol definition.
     case interface
+    /// An enum definition.
     case enum_
+    /// A module or package declaration.
     case module
+    /// A trait definition.
     case trait
+    /// An impl block (Rust) or similar implementation block.
     case impl
+    /// A namespace declaration.
     case namespace
+    /// A language-specific construct that does not fit any standard category.
     case other(field0: String)
 }
 extension StructureKind {
@@ -749,8 +817,11 @@ extension StructureKind {
 /// Distinguishes between single-line comments, block (multi-line) comments,
 /// and documentation comments.
 public enum CommentKind: String, Codable, Sendable, Hashable {
+    /// A single-line comment (e.g., `// ...` or `# ...`).
     case line = "Line"
+    /// A block or multi-line comment (e.g., `/* ... */`).
     case block = "Block"
+    /// A documentation comment (e.g., `/// ...` or `/** ... */`).
     case doc = "Doc"
 }
 extension CommentKind {
@@ -766,11 +837,17 @@ extension CommentKind {
 /// Identifies the docstring convention used, which varies by language
 /// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 public enum DocstringFormat: Codable, Sendable, Hashable {
+    /// Python triple-quoted string docstring (`"""..."""`).
     case pythonTripleQuote
+    /// JavaScript/TypeScript JSDoc comment (`/** ... */`).
     case jsDoc
+    /// Rust `///` or `//!` doc comment.
     case rustdoc
+    /// Go doc comment (a comment block immediately preceding a declaration).
     case goDoc
+    /// Java Javadoc comment (`/** ... */`).
     case javaDoc
+    /// A language-specific docstring format not covered by the standard variants.
     case other(field0: String)
 }
 extension DocstringFormat {
@@ -785,8 +862,11 @@ extension DocstringFormat {
 ///
 /// Covers named exports, default exports, and re-exports from other modules.
 public enum ExportKind: String, Codable, Sendable, Hashable {
+    /// A named export (e.g., `export { foo }`).
     case named = "Named"
+    /// A default export (e.g., `export default foo`).
     case default_ = "Default"
+    /// A re-export from another module (e.g., `export { foo } from 'bar'`).
     case reExport = "ReExport"
 }
 extension ExportKind {
@@ -802,14 +882,23 @@ extension ExportKind {
 /// Categorizes symbol definitions such as variables, constants, functions,
 /// classes, types, interfaces, enums, and modules.
 public enum SymbolKind: Codable, Sendable, Hashable {
+    /// A variable binding.
     case variable
+    /// A constant (immutable binding).
     case constant
+    /// A function definition.
     case function
+    /// A class definition.
     case class_
+    /// A type alias or typedef.
     case type
+    /// An interface definition.
     case interface
+    /// An enum definition.
     case enum_
+    /// A module declaration.
     case module
+    /// A symbol kind not covered by the standard variants.
     case other(field0: String)
 }
 extension SymbolKind {
@@ -825,8 +914,11 @@ extension SymbolKind {
 /// Used to classify parse errors, warnings, and informational messages
 /// found in the syntax tree.
 public enum DiagnosticSeverity: String, Codable, Sendable, Hashable {
+    /// A parse error (e.g., an `ERROR` or `MISSING` node in the tree).
     case error = "Error"
+    /// A warning-level diagnostic.
     case warning = "Warning"
+    /// An informational diagnostic.
     case info = "Info"
 }
 extension DiagnosticSeverity {
@@ -843,17 +935,29 @@ extension DiagnosticSeverity {
 /// Feature-gated variants are included when `config`, `download`, or related
 /// features are enabled.
 public enum TreeSitterLanguagePackError: Swift.Error {
+    /// The requested language name (or alias) was not found in the registry.
     case languageNotFound(message: String, field0: String)
+    /// A dynamic shared library could not be loaded at runtime.
     case dynamicLoad(message: String, field0: String)
+    /// The tree-sitter language function returned a null pointer for the given language name.
     case nullLanguagePointer(message: String, field0: String)
+    /// The language could not be applied to the parser (e.g., ABI version mismatch).
     case parserSetup(message: String, field0: String)
+    /// An internal `RwLock` or `Mutex` was poisoned by a previous panic.
     case lockPoisoned(message: String, field0: String)
+    /// A configuration file or value was invalid or could not be applied.
     case config(message: String, field0: String)
+    /// The tree-sitter parser returned no tree for the given source input.
     case parseFailed
+    /// A tree-sitter query could not be compiled or executed.
     case queryError(message: String, field0: String)
+    /// A byte range was invalid (e.g., end before start, or out of bounds).
     case invalidRange(message: String, field0: String)
+    /// A parser download from GitHub releases failed.
     case download(message: String, field0: String)
+    /// The downloaded file's SHA-256 digest did not match the manifest's expected value.
     case checksumMismatch(message: String, file: String, expected: String, actual: String)
+    /// The cross-process download cache lock file could not be acquired or created.
     case cacheLock(message: String, field0: String)
 }
 
@@ -1366,7 +1470,7 @@ public func downloadAll() throws -> UInt {
 ///
 /// Groups are defined in the remote manifest and let you ensure a curated
 /// set of related grammars in one call instead of listing each name to
-/// [`download`]. Already-cached languages are skipped.
+/// [`download()`]. Already-cached languages are skipped.
 ///
 /// Returns the total number of languages now available (statically compiled
 /// plus downloaded and cached).

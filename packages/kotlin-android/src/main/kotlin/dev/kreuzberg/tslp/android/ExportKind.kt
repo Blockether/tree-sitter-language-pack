@@ -29,8 +29,11 @@ package dev.kreuzberg.tslp.android
  * Covers named exports, default exports, and re-exports from other modules.
  */
 enum class ExportKind {
+    /** A named export (e.g., `export { foo }`). */
     @com.fasterxml.jackson.annotation.JsonProperty("Named") NAMED,
+    /** A default export (e.g., `export default foo`). */
     @com.fasterxml.jackson.annotation.JsonProperty("Default") DEFAULT,
+    /** A re-export from another module (e.g., `export { foo } from 'bar'`). */
     @com.fasterxml.jackson.annotation.JsonProperty("ReExport") RE_EXPORT;
 
     @com.fasterxml.jackson.annotation.JsonValue

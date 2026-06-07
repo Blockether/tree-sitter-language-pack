@@ -444,7 +444,7 @@ Download every language in a named group (e.g. `"web"`, `"data"`).
 
 Groups are defined in the remote manifest and let you ensure a curated
 set of related grammars in one call instead of listing each name to
-`download`. Already-cached languages are skipped.
+`download()`. Already-cached languages are skipped.
 
 Returns the total number of languages now available (statically compiled
 plus downloaded and cached).
@@ -574,15 +574,15 @@ Metadata for a single chunk of source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `const char*` | — | Language |
-| `chunk_index` | `uintptr_t` | — | Chunk index |
-| `total_chunks` | `uintptr_t` | — | Total chunks |
-| `node_types` | `const char**` | `NULL` | Node types |
-| `context_path` | `const char**` | `NULL` | Context path |
-| `symbols_defined` | `const char**` | `NULL` | Symbols defined |
-| `comments` | `TsPackCommentInfo*` | `NULL` | Comments |
-| `docstrings` | `TsPackDocstringInfo*` | `NULL` | Docstrings |
-| `has_error_nodes` | `bool` | — | Whether error nodes |
+| `language` | `const char*` | — | Language name used to parse this chunk. |
+| `chunk_index` | `uintptr_t` | — | Zero-indexed position of this chunk within the file's chunk list. |
+| `total_chunks` | `uintptr_t` | — | Total number of chunks the file was split into. |
+| `node_types` | `const char**` | `NULL` | Tree-sitter node kinds that appear at the top level of this chunk. |
+| `context_path` | `const char**` | `NULL` | Hierarchical path of enclosing structural items (e.g., `["MyClass", "my_method"]`). |
+| `symbols_defined` | `const char**` | `NULL` | Names of symbols defined within this chunk. |
+| `comments` | `TsPackCommentInfo*` | `NULL` | Comments contained within this chunk. |
+| `docstrings` | `TsPackDocstringInfo*` | `NULL` | Docstrings contained within this chunk. |
+| `has_error_nodes` | `bool` | — | Whether this chunk contains any tree-sitter error nodes. |
 
 ---
 
@@ -592,12 +592,12 @@ A chunk of source code with rich metadata.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `content` | `const char*` | — | The extracted text content |
-| `start_byte` | `uintptr_t` | — | Start byte |
-| `end_byte` | `uintptr_t` | — | End byte |
-| `start_line` | `uintptr_t` | — | Start line |
-| `end_line` | `uintptr_t` | — | End line |
-| `metadata` | `TsPackChunkContext` | — | Document metadata |
+| `content` | `const char*` | — | The raw source text of this chunk. |
+| `start_byte` | `uintptr_t` | — | Inclusive start byte offset of this chunk in the original source. |
+| `end_byte` | `uintptr_t` | — | Exclusive end byte offset of this chunk in the original source. |
+| `start_line` | `uintptr_t` | — | Zero-indexed start line of this chunk. |
+| `end_line` | `uintptr_t` | — | Zero-indexed end line of this chunk. |
+| `metadata` | `TsPackChunkContext` | — | Contextual metadata about this chunk. |
 
 ---
 
@@ -607,10 +607,10 @@ A comment extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `text` | `const char*` | — | Text |
-| `kind` | `TsPackCommentKind` | `TS_PACK_TS_PACK_LINE` | Kind (comment kind) |
-| `span` | `TsPackSpan` | — | Span (span) |
-| `associated_node` | `const char**` | `NULL` | Associated node |
+| `text` | `const char*` | — | The raw text content of the comment. |
+| `kind` | `TsPackCommentKind` | `TS_PACK_TS_PACK_LINE` | The kind of comment (line, block, or doc). |
+| `span` | `TsPackSpan` | — | Source span covering the comment. |
+| `associated_node` | `const char**` | `NULL` | Name of the syntax node this comment is directly associated with. |
 
 ---
 
@@ -620,9 +620,9 @@ A diagnostic (syntax error, missing node, etc.) from parsing.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `message` | `const char*` | — | Message |
-| `severity` | `TsPackDiagnosticSeverity` | `TS_PACK_TS_PACK_ERROR` | Severity (diagnostic severity) |
-| `span` | `TsPackSpan` | — | Span (span) |
+| `message` | `const char*` | — | Human-readable description of the diagnostic. |
+| `severity` | `TsPackDiagnosticSeverity` | `TS_PACK_TS_PACK_ERROR` | Severity of the diagnostic. |
+| `span` | `TsPackSpan` | — | Source span where the diagnostic was detected. |
 
 ---
 
@@ -632,9 +632,9 @@ A section within a docstring (e.g., Args, Returns, Raises).
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `const char*` | — | Kind |
-| `name` | `const char**` | `NULL` | The name |
-| `description` | `const char*` | — | Human-readable description |
+| `kind` | `const char*` | — | Section kind (e.g., `"args"`, `"returns"`, `"raises"`). |
+| `name` | `const char**` | `NULL` | Parameter or return value name, if applicable. |
+| `description` | `const char*` | — | Description text for this section. |
 
 ---
 
@@ -644,11 +644,11 @@ A docstring extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `text` | `const char*` | — | Text |
-| `format` | `TsPackDocstringFormat` | `TS_PACK_TS_PACK_PYTHON_TRIPLE_QUOTE` | Format (docstring format) |
-| `span` | `TsPackSpan` | — | Span (span) |
-| `associated_item` | `const char**` | `NULL` | Associated item |
-| `parsed_sections` | `TsPackDocSection*` | `NULL` | Parsed sections |
+| `text` | `const char*` | — | The raw text of the docstring. |
+| `format` | `TsPackDocstringFormat` | `TS_PACK_TS_PACK_PYTHON_TRIPLE_QUOTE` | The docstring format (Python, JSDoc, Rustdoc, etc.). |
+| `span` | `TsPackSpan` | — | Source span covering the docstring. |
+| `associated_item` | `const char**` | `NULL` | Name of the item this docstring documents. |
+| `parsed_sections` | `TsPackDocSection*` | `NULL` | Parsed sections of the docstring (Args, Returns, Raises, etc.). |
 
 ---
 
@@ -682,7 +682,7 @@ const char** ts_pack_installed_languages();
 
 Download the platform bundle and extract every library file it contains.
 
-Unlike `ensure_languages`, this does not check the manifest language list
+Unlike `Self.ensure_languages`, this does not check the manifest language list
 against archive contents — it simply extracts all `.so`/`.dylib`/`.dll` files
 from the bundle. Languages in the manifest that are missing from the archive
 are silently ignored rather than returning an error.
@@ -720,9 +720,9 @@ An export statement extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `name` | `const char*` | — | The name |
-| `kind` | `TsPackExportKind` | `TS_PACK_TS_PACK_NAMED` | Kind (export kind) |
-| `span` | `TsPackSpan` | — | Span (span) |
+| `name` | `const char*` | — | The exported name. |
+| `kind` | `TsPackExportKind` | `TS_PACK_TS_PACK_NAMED` | The kind of export (named, default, or re-export). |
+| `span` | `TsPackSpan` | — | Source span covering the export statement. |
 
 ---
 
@@ -732,14 +732,14 @@ Aggregate metrics for a source file.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `total_lines` | `uintptr_t` | — | Total lines |
-| `code_lines` | `uintptr_t` | — | Code lines |
-| `comment_lines` | `uintptr_t` | — | Comment lines |
-| `blank_lines` | `uintptr_t` | — | Blank lines |
-| `total_bytes` | `uintptr_t` | — | Total bytes |
-| `node_count` | `uintptr_t` | — | Number of nodes |
-| `error_count` | `uintptr_t` | — | Number of errors |
-| `max_depth` | `uintptr_t` | — | Maximum depth |
+| `total_lines` | `uintptr_t` | — | Total number of lines (including blank and comment lines). |
+| `code_lines` | `uintptr_t` | — | Number of lines containing non-blank, non-comment source code. |
+| `comment_lines` | `uintptr_t` | — | Number of lines that are entirely comments. |
+| `blank_lines` | `uintptr_t` | — | Number of blank (whitespace-only) lines. |
+| `total_bytes` | `uintptr_t` | — | Total byte length of the source file. |
+| `node_count` | `uintptr_t` | — | Total number of nodes in the syntax tree. |
+| `error_count` | `uintptr_t` | — | Number of error nodes in the syntax tree (parse errors). |
+| `max_depth` | `uintptr_t` | — | Maximum nesting depth reached in the syntax tree. |
 
 ---
 
@@ -749,11 +749,11 @@ An import statement extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `source` | `const char*` | — | Source |
-| `items` | `const char**` | `NULL` | Items |
-| `alias` | `const char**` | `NULL` | Alias |
-| `is_wildcard` | `bool` | — | Whether wildcard |
-| `span` | `TsPackSpan` | — | Span (span) |
+| `source` | `const char*` | — | The module or path being imported from. |
+| `items` | `const char**` | `NULL` | Specific names imported from the source module. |
+| `alias` | `const char**` | `NULL` | Alias assigned to the import (e.g., `import numpy as np`). |
+| `is_wildcard` | `bool` | — | Whether this is a wildcard import (e.g., `import *` or `use foo.*`). |
+| `span` | `TsPackSpan` | — | Source span covering the import statement. |
 
 ---
 
@@ -1291,16 +1291,16 @@ Fields are populated based on the `ProcessConfig` flags.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `const char*` | — | Language |
-| `metrics` | `TsPackFileMetrics` | — | Metrics (file metrics) |
-| `structure` | `TsPackStructureItem*` | `NULL` | Structure |
-| `imports` | `TsPackImportInfo*` | `NULL` | Imports |
-| `exports` | `TsPackExportInfo*` | `NULL` | Exports |
-| `comments` | `TsPackCommentInfo*` | `NULL` | Comments |
-| `docstrings` | `TsPackDocstringInfo*` | `NULL` | Docstrings |
-| `symbols` | `TsPackSymbolInfo*` | `NULL` | Symbols |
-| `diagnostics` | `TsPackDiagnostic*` | `NULL` | Diagnostics |
-| `chunks` | `TsPackCodeChunk*` | `NULL` | Text chunks for chunking/embedding |
+| `language` | `const char*` | — | The language name used to parse the source file. |
+| `metrics` | `TsPackFileMetrics` | — | File-level metrics (line counts, byte size, error count). |
+| `structure` | `TsPackStructureItem*` | `NULL` | Top-level structural items (functions, classes, etc.). |
+| `imports` | `TsPackImportInfo*` | `NULL` | Import statements extracted from the source. |
+| `exports` | `TsPackExportInfo*` | `NULL` | Export statements extracted from the source. |
+| `comments` | `TsPackCommentInfo*` | `NULL` | Comments extracted from the source. |
+| `docstrings` | `TsPackDocstringInfo*` | `NULL` | Docstrings extracted from the source. |
+| `symbols` | `TsPackSymbolInfo*` | `NULL` | Symbol definitions (variables, types, functions) extracted from the source. |
+| `diagnostics` | `TsPackDiagnostic*` | `NULL` | Parse diagnostics (syntax errors, missing nodes) from tree-sitter. |
+| `chunks` | `TsPackCodeChunk*` | `NULL` | Syntax-aware code chunks produced when chunking is enabled. |
 
 ---
 
@@ -1313,12 +1313,12 @@ positions (for display and diagnostics).
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `start_byte` | `uintptr_t` | — | Start byte |
-| `end_byte` | `uintptr_t` | — | End byte |
-| `start_line` | `uintptr_t` | — | Start line |
-| `start_column` | `uintptr_t` | — | Start column |
-| `end_line` | `uintptr_t` | — | End line |
-| `end_column` | `uintptr_t` | — | End column |
+| `start_byte` | `uintptr_t` | — | Inclusive start byte offset in the source. |
+| `end_byte` | `uintptr_t` | — | Exclusive end byte offset in the source. |
+| `start_line` | `uintptr_t` | — | Zero-indexed line number of the span's start. |
+| `start_column` | `uintptr_t` | — | Zero-indexed column number of the span's start. |
+| `end_line` | `uintptr_t` | — | Zero-indexed line number of the span's end. |
+| `end_column` | `uintptr_t` | — | Zero-indexed column number of the span's end. |
 
 ---
 
@@ -1328,15 +1328,15 @@ A structural item (function, class, struct, etc.) in source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `TsPackStructureKind` | `TS_PACK_TS_PACK_FUNCTION` | Kind (structure kind) |
-| `name` | `const char**` | `NULL` | The name |
-| `visibility` | `const char**` | `NULL` | Visibility |
-| `span` | `TsPackSpan` | — | Span (span) |
-| `children` | `TsPackStructureItem*` | `NULL` | Children |
-| `decorators` | `const char**` | `NULL` | Decorators |
-| `doc_comment` | `const char**` | `NULL` | Doc comment |
-| `signature` | `const char**` | `NULL` | Signature |
-| `body_span` | `TsPackSpan*` | `NULL` | Body span (span) |
+| `kind` | `TsPackStructureKind` | `TS_PACK_TS_PACK_FUNCTION` | The kind of structural item. |
+| `name` | `const char**` | `NULL` | The declared name of the item, if present. |
+| `visibility` | `const char**` | `NULL` | Visibility modifier (e.g., `"pub"`, `"public"`, `"private"`). |
+| `span` | `TsPackSpan` | — | Source span covering the entire item declaration. |
+| `children` | `TsPackStructureItem*` | `NULL` | Nested structural items (e.g., methods within a class). |
+| `decorators` | `const char**` | `NULL` | Decorator or attribute names applied to the item. |
+| `doc_comment` | `const char**` | `NULL` | Documentation comment attached to the item, if any. |
+| `signature` | `const char**` | `NULL` | Full signature text of the item (e.g., function parameters and return type). |
+| `body_span` | `TsPackSpan*` | `NULL` | Source span covering only the body of the item, if distinct from the declaration. |
 
 ---
 
@@ -1346,11 +1346,11 @@ A symbol (variable, function, type, etc.) extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `name` | `const char*` | — | The name |
-| `kind` | `TsPackSymbolKind` | `TS_PACK_TS_PACK_VARIABLE` | Kind (symbol kind) |
-| `span` | `TsPackSpan` | — | Span (span) |
-| `type_annotation` | `const char**` | `NULL` | Type annotation |
-| `doc` | `const char**` | `NULL` | Doc |
+| `name` | `const char*` | — | The name of the symbol. |
+| `kind` | `TsPackSymbolKind` | `TS_PACK_TS_PACK_VARIABLE` | The kind of symbol (variable, function, class, etc.). |
+| `span` | `TsPackSpan` | — | Source span covering the symbol definition. |
+| `type_annotation` | `const char**` | `NULL` | Explicit type annotation, if present in the source. |
+| `doc` | `const char**` | `NULL` | Documentation comment associated with this symbol. |
 
 ---
 
@@ -1455,17 +1455,17 @@ language-specific constructs that do not fit a standard category.
 
 | Value | Description |
 |-------|-------------|
-| `TS_PACK_FUNCTION` | Function |
-| `TS_PACK_METHOD` | Method |
-| `TS_PACK_CLASS` | Class |
-| `TS_PACK_STRUCT` | Struct |
-| `TS_PACK_INTERFACE` | Interface |
-| `TS_PACK_ENUM` | Enum |
-| `TS_PACK_MODULE` | Module |
-| `TS_PACK_TRAIT` | Trait |
-| `TS_PACK_IMPL` | Impl |
-| `TS_PACK_NAMESPACE` | Namespace |
-| `TS_PACK_OTHER` | Other — Fields: `0`: `const char*` |
+| `TS_PACK_FUNCTION` | A free-standing or associated function. |
+| `TS_PACK_METHOD` | A method defined inside a class, struct, trait, or impl block. |
+| `TS_PACK_CLASS` | A class definition. |
+| `TS_PACK_STRUCT` | A struct definition. |
+| `TS_PACK_INTERFACE` | An interface or protocol definition. |
+| `TS_PACK_ENUM` | An enum definition. |
+| `TS_PACK_MODULE` | A module or package declaration. |
+| `TS_PACK_TRAIT` | A trait definition. |
+| `TS_PACK_IMPL` | An impl block (Rust) or similar implementation block. |
+| `TS_PACK_NAMESPACE` | A namespace declaration. |
+| `TS_PACK_OTHER` | A language-specific construct that does not fit any standard category. — Fields: `0`: `const char*` |
 
 ---
 
@@ -1478,9 +1478,9 @@ and documentation comments.
 
 | Value | Description |
 |-------|-------------|
-| `TS_PACK_LINE` | Line |
-| `TS_PACK_BLOCK` | Block |
-| `TS_PACK_DOC` | Doc |
+| `TS_PACK_LINE` | A single-line comment (e.g., `// ...` or `# ...`). |
+| `TS_PACK_BLOCK` | A block or multi-line comment (e.g., `/* ... */`). |
+| `TS_PACK_DOC` | A documentation comment (e.g., `/// ...` or `/** ... */`). |
 
 ---
 
@@ -1493,12 +1493,12 @@ Identifies the docstring convention used, which varies by language
 
 | Value | Description |
 |-------|-------------|
-| `TS_PACK_PYTHON_TRIPLE_QUOTE` | Python triple quote |
-| `TS_PACK_JS_DOC` | J s doc |
-| `TS_PACK_RUSTDOC` | Rustdoc |
-| `TS_PACK_GO_DOC` | Go doc |
-| `TS_PACK_JAVA_DOC` | Java doc |
-| `TS_PACK_OTHER` | Other — Fields: `0`: `const char*` |
+| `TS_PACK_PYTHON_TRIPLE_QUOTE` | Python triple-quoted string docstring (`"""..."""`). |
+| `TS_PACK_JS_DOC` | JavaScript/TypeScript JSDoc comment (`/** ... */`). |
+| `TS_PACK_RUSTDOC` | Rust `///` or `//!` doc comment. |
+| `TS_PACK_GO_DOC` | Go doc comment (a comment block immediately preceding a declaration). |
+| `TS_PACK_JAVA_DOC` | Java Javadoc comment (`/** ... */`). |
+| `TS_PACK_OTHER` | A language-specific docstring format not covered by the standard variants. — Fields: `0`: `const char*` |
 
 ---
 
@@ -1510,9 +1510,9 @@ Covers named exports, default exports, and re-exports from other modules.
 
 | Value | Description |
 |-------|-------------|
-| `TS_PACK_NAMED` | Named |
-| `TS_PACK_DEFAULT` | Default |
-| `TS_PACK_RE_EXPORT` | Re export |
+| `TS_PACK_NAMED` | A named export (e.g., `export { foo }`). |
+| `TS_PACK_DEFAULT` | A default export (e.g., `export default foo`). |
+| `TS_PACK_RE_EXPORT` | A re-export from another module (e.g., `export { foo } from 'bar'`). |
 
 ---
 
@@ -1525,15 +1525,15 @@ classes, types, interfaces, enums, and modules.
 
 | Value | Description |
 |-------|-------------|
-| `TS_PACK_VARIABLE` | Variable |
-| `TS_PACK_CONSTANT` | Constant |
-| `TS_PACK_FUNCTION` | Function |
-| `TS_PACK_CLASS` | Class |
-| `TS_PACK_TYPE` | Type |
-| `TS_PACK_INTERFACE` | Interface |
-| `TS_PACK_ENUM` | Enum |
-| `TS_PACK_MODULE` | Module |
-| `TS_PACK_OTHER` | Other — Fields: `0`: `const char*` |
+| `TS_PACK_VARIABLE` | A variable binding. |
+| `TS_PACK_CONSTANT` | A constant (immutable binding). |
+| `TS_PACK_FUNCTION` | A function definition. |
+| `TS_PACK_CLASS` | A class definition. |
+| `TS_PACK_TYPE` | A type alias or typedef. |
+| `TS_PACK_INTERFACE` | An interface definition. |
+| `TS_PACK_ENUM` | An enum definition. |
+| `TS_PACK_MODULE` | A module declaration. |
+| `TS_PACK_OTHER` | A symbol kind not covered by the standard variants. — Fields: `0`: `const char*` |
 
 ---
 
@@ -1546,9 +1546,9 @@ found in the syntax tree.
 
 | Value | Description |
 |-------|-------------|
-| `TS_PACK_ERROR` | Error |
-| `TS_PACK_WARNING` | Warning |
-| `TS_PACK_INFO` | Info |
+| `TS_PACK_ERROR` | A parse error (e.g., an `ERROR` or `MISSING` node in the tree). |
+| `TS_PACK_WARNING` | A warning-level diagnostic. |
+| `TS_PACK_INFO` | An informational diagnostic. |
 
 ---
 
@@ -1564,17 +1564,17 @@ features are enabled.
 
 | Variant | Description |
 |---------|-------------|
-| `TS_PACK_LANGUAGE_NOT_FOUND` | Language '{0}' not found |
-| `TS_PACK_DYNAMIC_LOAD` | Dynamic library load error: {0} |
-| `TS_PACK_NULL_LANGUAGE_POINTER` | Language function returned null pointer for '{0}' |
-| `TS_PACK_PARSER_SETUP` | Failed to set parser language: {0} |
-| `TS_PACK_LOCK_POISONED` | Registry lock poisoned: {0} |
-| `TS_PACK_CONFIG` | Configuration error: {0} |
-| `TS_PACK_PARSE_FAILED` | Parse failed: parsing returned no tree |
-| `TS_PACK_QUERY_ERROR` | Query error: {0} |
-| `TS_PACK_INVALID_RANGE` | Invalid byte range: {0} |
-| `TS_PACK_DOWNLOAD` | Download error: {0} |
-| `TS_PACK_CHECKSUM_MISMATCH` | Checksum mismatch for '{file}': expected {expected}, got {actual} |
-| `TS_PACK_CACHE_LOCK` | Download cache lock error: {0} |
+| `TS_PACK_LANGUAGE_NOT_FOUND` | The requested language name (or alias) was not found in the registry. |
+| `TS_PACK_DYNAMIC_LOAD` | A dynamic shared library could not be loaded at runtime. |
+| `TS_PACK_NULL_LANGUAGE_POINTER` | The tree-sitter language function returned a null pointer for the given language name. |
+| `TS_PACK_PARSER_SETUP` | The language could not be applied to the parser (e.g., ABI version mismatch). |
+| `TS_PACK_LOCK_POISONED` | An internal `RwLock` or `Mutex` was poisoned by a previous panic. |
+| `TS_PACK_CONFIG` | A configuration file or value was invalid or could not be applied. |
+| `TS_PACK_PARSE_FAILED` | The tree-sitter parser returned no tree for the given source input. |
+| `TS_PACK_QUERY_ERROR` | A tree-sitter query could not be compiled or executed. |
+| `TS_PACK_INVALID_RANGE` | A byte range was invalid (e.g., end before start, or out of bounds). |
+| `TS_PACK_DOWNLOAD` | A parser download from GitHub releases failed. |
+| `TS_PACK_CHECKSUM_MISMATCH` | The downloaded file's SHA-256 digest did not match the manifest's expected value. |
+| `TS_PACK_CACHE_LOCK` | The cross-process download cache lock file could not be acquired or created. |
 
 ---

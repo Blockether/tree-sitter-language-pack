@@ -26,14 +26,20 @@ package dev.kreuzberg.tslp.android
 /**
  * Byte and line/column range in source code.
  *
- * Represents both byte offsets (for slicing) and human-readable line/column positions (for display
- * and diagnostics).
+ * Represents both byte offsets (for slicing) and human-readable line/column
+ * positions (for display and diagnostics).
  */
 data class Span(
+    /** Inclusive start byte offset in the source. */
     val startByte: Long = 0L,
+    /** Exclusive end byte offset in the source. */
     val endByte: Long = 0L,
+    /** Zero-indexed line number of the span's start. */
     val startLine: Long = 0L,
+    /** Zero-indexed column number of the span's start. */
     val startColumn: Long = 0L,
+    /** Zero-indexed line number of the span's end. */
     val endLine: Long = 0L,
+    /** Zero-indexed column number of the span's end. */
     val endColumn: Long = 0L,
 )

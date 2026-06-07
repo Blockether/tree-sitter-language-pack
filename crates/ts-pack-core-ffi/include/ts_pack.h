@@ -1712,7 +1712,7 @@ char *ts_pack_download_manager_installed_languages(const TS_PACKDownloadManager 
 /**
  * Download the platform bundle and extract every library file it contains.
  *
- * Unlike [`ensure_languages`], this does not check the manifest language list
+ * Unlike [`Self::ensure_languages`], this does not check the manifest language list
  * against archive contents â it simply extracts all `.so`/`.dylib`/`.dll` files
  * from the bundle. Languages in the manifest that are missing from the archive
  * are silently ignored rather than returning an error.
@@ -2390,7 +2390,7 @@ uintptr_t ts_pack_download_all(void);
  *
  * Groups are defined in the remote manifest and let you ensure a curated
  * set of related grammars in one call instead of listing each name to
- * [`download`]. Already-cached languages are skipped.
+ * [`download()`]. Already-cached languages are skipped.
  *
  * Returns the total number of languages now available (statically compiled
  * plus downloaded and cached).

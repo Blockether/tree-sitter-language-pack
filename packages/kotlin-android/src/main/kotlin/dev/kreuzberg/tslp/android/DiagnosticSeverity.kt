@@ -26,11 +26,15 @@ package dev.kreuzberg.tslp.android
 /**
  * Severity level of a diagnostic produced during parsing.
  *
- * Used to classify parse errors, warnings, and informational messages found in the syntax tree.
+ * Used to classify parse errors, warnings, and informational messages
+ * found in the syntax tree.
  */
 enum class DiagnosticSeverity {
+    /** A parse error (e.g., an `ERROR` or `MISSING` node in the tree). */
     @com.fasterxml.jackson.annotation.JsonProperty("Error") ERROR,
+    /** A warning-level diagnostic. */
     @com.fasterxml.jackson.annotation.JsonProperty("Warning") WARNING,
+    /** An informational diagnostic. */
     @com.fasterxml.jackson.annotation.JsonProperty("Info") INFO;
 
     @com.fasterxml.jackson.annotation.JsonValue

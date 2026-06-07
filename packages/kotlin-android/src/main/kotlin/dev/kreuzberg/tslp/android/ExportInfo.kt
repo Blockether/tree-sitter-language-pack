@@ -25,7 +25,10 @@ package dev.kreuzberg.tslp.android
 
 /** An export statement extracted from source code. */
 data class ExportInfo(
+    /** The exported name. */
     val name: String = "",
+    /** The kind of export (named, default, or re-export). */
     val kind: ExportKind = ExportKind.NAMED,
+    /** Source span covering the export statement. */
     val span: Span = Span(),
 )

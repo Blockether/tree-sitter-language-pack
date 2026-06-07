@@ -26,19 +26,29 @@ package dev.kreuzberg.tslp.android
 /**
  * Complete analysis result from processing a source file.
  *
- * Contains metrics, structural analysis, imports/exports, comments, docstrings, symbols,
- * diagnostics, and optionally chunked code segments. Fields are populated based on the
- * `ProcessConfig` flags.
+ * Contains metrics, structural analysis, imports/exports, comments,
+ * docstrings, symbols, diagnostics, and optionally chunked code segments.
+ * Fields are populated based on the `ProcessConfig` flags.
  */
 data class ProcessResult(
+    /** The language name used to parse the source file. */
     val language: String = "",
+    /** File-level metrics (line counts, byte size, error count). */
     val metrics: FileMetrics = FileMetrics(),
+    /** Top-level structural items (functions, classes, etc.). */
     val structure: List<StructureItem> = emptyList(),
+    /** Import statements extracted from the source. */
     val imports: List<ImportInfo> = emptyList(),
+    /** Export statements extracted from the source. */
     val exports: List<ExportInfo> = emptyList(),
+    /** Comments extracted from the source. */
     val comments: List<CommentInfo> = emptyList(),
+    /** Docstrings extracted from the source. */
     val docstrings: List<DocstringInfo> = emptyList(),
+    /** Symbol definitions (variables, types, functions) extracted from the source. */
     val symbols: List<SymbolInfo> = emptyList(),
+    /** Parse diagnostics (syntax errors, missing nodes) from tree-sitter. */
     val diagnostics: List<Diagnostic> = emptyList(),
+    /** Syntax-aware code chunks produced when chunking is enabled. */
     val chunks: List<CodeChunk> = emptyList(),
 )

@@ -25,8 +25,12 @@ package dev.kreuzberg.tslp.android
 
 /** A comment extracted from source code. */
 data class CommentInfo(
+    /** The raw text content of the comment. */
     val text: String = "",
+    /** The kind of comment (line, block, or doc). */
     val kind: CommentKind = CommentKind.LINE,
+    /** Source span covering the comment. */
     val span: Span = Span(),
+    /** Name of the syntax node this comment is directly associated with. */
     val associatedNode: String? = null,
 )

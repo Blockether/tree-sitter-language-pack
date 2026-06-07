@@ -15,12 +15,12 @@ positions (for display and diagnostics).
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `start_byte` | `int` | — | Start byte |
-| `end_byte` | `int` | — | End byte |
-| `start_line` | `int` | — | Start line |
-| `start_column` | `int` | — | Start column |
-| `end_line` | `int` | — | End line |
-| `end_column` | `int` | — | End column |
+| `start_byte` | `int` | — | Inclusive start byte offset in the source. |
+| `end_byte` | `int` | — | Exclusive end byte offset in the source. |
+| `start_line` | `int` | — | Zero-indexed line number of the span's start. |
+| `start_column` | `int` | — | Zero-indexed column number of the span's start. |
+| `end_line` | `int` | — | Zero-indexed line number of the span's end. |
+| `end_column` | `int` | — | Zero-indexed column number of the span's end. |
 
 ---
 
@@ -34,16 +34,16 @@ Fields are populated based on the `ProcessConfig` flags.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `str` | — | Language |
-| `metrics` | `FileMetrics` | — | Metrics (file metrics) |
-| `structure` | `list[StructureItem]` | `[]` | Structure |
-| `imports` | `list[ImportInfo]` | `[]` | Imports |
-| `exports` | `list[ExportInfo]` | `[]` | Exports |
-| `comments` | `list[CommentInfo]` | `[]` | Comments |
-| `docstrings` | `list[DocstringInfo]` | `[]` | Docstrings |
-| `symbols` | `list[SymbolInfo]` | `[]` | Symbols |
-| `diagnostics` | `list[Diagnostic]` | `[]` | Diagnostics |
-| `chunks` | `list[CodeChunk]` | `[]` | Text chunks for chunking/embedding |
+| `language` | `str` | — | The language name used to parse the source file. |
+| `metrics` | `FileMetrics` | — | File-level metrics (line counts, byte size, error count). |
+| `structure` | `list[StructureItem]` | `[]` | Top-level structural items (functions, classes, etc.). |
+| `imports` | `list[ImportInfo]` | `[]` | Import statements extracted from the source. |
+| `exports` | `list[ExportInfo]` | `[]` | Export statements extracted from the source. |
+| `comments` | `list[CommentInfo]` | `[]` | Comments extracted from the source. |
+| `docstrings` | `list[DocstringInfo]` | `[]` | Docstrings extracted from the source. |
+| `symbols` | `list[SymbolInfo]` | `[]` | Symbol definitions (variables, types, functions) extracted from the source. |
+| `diagnostics` | `list[Diagnostic]` | `[]` | Parse diagnostics (syntax errors, missing nodes) from tree-sitter. |
+| `chunks` | `list[CodeChunk]` | `[]` | Syntax-aware code chunks produced when chunking is enabled. |
 
 ---
 
@@ -53,14 +53,14 @@ Aggregate metrics for a source file.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `total_lines` | `int` | — | Total lines |
-| `code_lines` | `int` | — | Code lines |
-| `comment_lines` | `int` | — | Comment lines |
-| `blank_lines` | `int` | — | Blank lines |
-| `total_bytes` | `int` | — | Total bytes |
-| `node_count` | `int` | — | Number of nodes |
-| `error_count` | `int` | — | Number of errors |
-| `max_depth` | `int` | — | Maximum depth |
+| `total_lines` | `int` | — | Total number of lines (including blank and comment lines). |
+| `code_lines` | `int` | — | Number of lines containing non-blank, non-comment source code. |
+| `comment_lines` | `int` | — | Number of lines that are entirely comments. |
+| `blank_lines` | `int` | — | Number of blank (whitespace-only) lines. |
+| `total_bytes` | `int` | — | Total byte length of the source file. |
+| `node_count` | `int` | — | Total number of nodes in the syntax tree. |
+| `error_count` | `int` | — | Number of error nodes in the syntax tree (parse errors). |
+| `max_depth` | `int` | — | Maximum nesting depth reached in the syntax tree. |
 
 ---
 
@@ -70,15 +70,15 @@ A structural item (function, class, struct, etc.) in source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `StructureKind` | `StructureKind.FUNCTION` | Kind (structure kind) |
-| `name` | `str \| None` | `None` | The name |
-| `visibility` | `str \| None` | `None` | Visibility |
-| `span` | `Span` | — | Span (span) |
-| `children` | `list[StructureItem]` | `[]` | Children |
-| `decorators` | `list[str]` | `[]` | Decorators |
-| `doc_comment` | `str \| None` | `None` | Doc comment |
-| `signature` | `str \| None` | `None` | Signature |
-| `body_span` | `Span \| None` | `None` | Body span (span) |
+| `kind` | `StructureKind` | `StructureKind.FUNCTION` | The kind of structural item. |
+| `name` | `str \| None` | `None` | The declared name of the item, if present. |
+| `visibility` | `str \| None` | `None` | Visibility modifier (e.g., `"pub"`, `"public"`, `"private"`). |
+| `span` | `Span` | — | Source span covering the entire item declaration. |
+| `children` | `list[StructureItem]` | `[]` | Nested structural items (e.g., methods within a class). |
+| `decorators` | `list[str]` | `[]` | Decorator or attribute names applied to the item. |
+| `doc_comment` | `str \| None` | `None` | Documentation comment attached to the item, if any. |
+| `signature` | `str \| None` | `None` | Full signature text of the item (e.g., function parameters and return type). |
+| `body_span` | `Span \| None` | `None` | Source span covering only the body of the item, if distinct from the declaration. |
 
 ---
 
@@ -88,10 +88,10 @@ A comment extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `text` | `str` | — | Text |
-| `kind` | `CommentKind` | `CommentKind.LINE` | Kind (comment kind) |
-| `span` | `Span` | — | Span (span) |
-| `associated_node` | `str \| None` | `None` | Associated node |
+| `text` | `str` | — | The raw text content of the comment. |
+| `kind` | `CommentKind` | `CommentKind.LINE` | The kind of comment (line, block, or doc). |
+| `span` | `Span` | — | Source span covering the comment. |
+| `associated_node` | `str \| None` | `None` | Name of the syntax node this comment is directly associated with. |
 
 ---
 
@@ -101,11 +101,11 @@ A docstring extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `text` | `str` | — | Text |
-| `format` | `DocstringFormat` | `DocstringFormat.PYTHON_TRIPLE_QUOTE` | Format (docstring format) |
-| `span` | `Span` | — | Span (span) |
-| `associated_item` | `str \| None` | `None` | Associated item |
-| `parsed_sections` | `list[DocSection]` | `[]` | Parsed sections |
+| `text` | `str` | — | The raw text of the docstring. |
+| `format` | `DocstringFormat` | `DocstringFormat.PYTHON_TRIPLE_QUOTE` | The docstring format (Python, JSDoc, Rustdoc, etc.). |
+| `span` | `Span` | — | Source span covering the docstring. |
+| `associated_item` | `str \| None` | `None` | Name of the item this docstring documents. |
+| `parsed_sections` | `list[DocSection]` | `[]` | Parsed sections of the docstring (Args, Returns, Raises, etc.). |
 
 ---
 
@@ -115,9 +115,9 @@ A section within a docstring (e.g., Args, Returns, Raises).
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `str` | — | Kind |
-| `name` | `str \| None` | `None` | The name |
-| `description` | `str` | — | Human-readable description |
+| `kind` | `str` | — | Section kind (e.g., `"args"`, `"returns"`, `"raises"`). |
+| `name` | `str \| None` | `None` | Parameter or return value name, if applicable. |
+| `description` | `str` | — | Description text for this section. |
 
 ---
 
@@ -127,11 +127,11 @@ An import statement extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `source` | `str` | — | Source |
-| `items` | `list[str]` | `[]` | Items |
-| `alias` | `str \| None` | `None` | Alias |
-| `is_wildcard` | `bool` | — | Whether wildcard |
-| `span` | `Span` | — | Span (span) |
+| `source` | `str` | — | The module or path being imported from. |
+| `items` | `list[str]` | `[]` | Specific names imported from the source module. |
+| `alias` | `str \| None` | `None` | Alias assigned to the import (e.g., `import numpy as np`). |
+| `is_wildcard` | `bool` | — | Whether this is a wildcard import (e.g., `import *` or `use foo.*`). |
+| `span` | `Span` | — | Source span covering the import statement. |
 
 ---
 
@@ -141,9 +141,9 @@ An export statement extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `name` | `str` | — | The name |
-| `kind` | `ExportKind` | `ExportKind.NAMED` | Kind (export kind) |
-| `span` | `Span` | — | Span (span) |
+| `name` | `str` | — | The exported name. |
+| `kind` | `ExportKind` | `ExportKind.NAMED` | The kind of export (named, default, or re-export). |
+| `span` | `Span` | — | Source span covering the export statement. |
 
 ---
 
@@ -153,11 +153,11 @@ A symbol (variable, function, type, etc.) extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `name` | `str` | — | The name |
-| `kind` | `SymbolKind` | `SymbolKind.VARIABLE` | Kind (symbol kind) |
-| `span` | `Span` | — | Span (span) |
-| `type_annotation` | `str \| None` | `None` | Type annotation |
-| `doc` | `str \| None` | `None` | Doc |
+| `name` | `str` | — | The name of the symbol. |
+| `kind` | `SymbolKind` | `SymbolKind.VARIABLE` | The kind of symbol (variable, function, class, etc.). |
+| `span` | `Span` | — | Source span covering the symbol definition. |
+| `type_annotation` | `str \| None` | `None` | Explicit type annotation, if present in the source. |
+| `doc` | `str \| None` | `None` | Documentation comment associated with this symbol. |
 
 ---
 
@@ -167,9 +167,9 @@ A diagnostic (syntax error, missing node, etc.) from parsing.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `message` | `str` | — | Message |
-| `severity` | `DiagnosticSeverity` | `DiagnosticSeverity.ERROR` | Severity (diagnostic severity) |
-| `span` | `Span` | — | Span (span) |
+| `message` | `str` | — | Human-readable description of the diagnostic. |
+| `severity` | `DiagnosticSeverity` | `DiagnosticSeverity.ERROR` | Severity of the diagnostic. |
+| `span` | `Span` | — | Source span where the diagnostic was detected. |
 
 ---
 
@@ -179,12 +179,12 @@ A chunk of source code with rich metadata.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `content` | `str` | — | The extracted text content |
-| `start_byte` | `int` | — | Start byte |
-| `end_byte` | `int` | — | End byte |
-| `start_line` | `int` | — | Start line |
-| `end_line` | `int` | — | End line |
-| `metadata` | `ChunkContext` | — | Document metadata |
+| `content` | `str` | — | The raw source text of this chunk. |
+| `start_byte` | `int` | — | Inclusive start byte offset of this chunk in the original source. |
+| `end_byte` | `int` | — | Exclusive end byte offset of this chunk in the original source. |
+| `start_line` | `int` | — | Zero-indexed start line of this chunk. |
+| `end_line` | `int` | — | Zero-indexed end line of this chunk. |
+| `metadata` | `ChunkContext` | — | Contextual metadata about this chunk. |
 
 ---
 
@@ -194,15 +194,15 @@ Metadata for a single chunk of source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `str` | — | Language |
-| `chunk_index` | `int` | — | Chunk index |
-| `total_chunks` | `int` | — | Total chunks |
-| `node_types` | `list[str]` | `[]` | Node types |
-| `context_path` | `list[str]` | `[]` | Context path |
-| `symbols_defined` | `list[str]` | `[]` | Symbols defined |
-| `comments` | `list[CommentInfo]` | `[]` | Comments |
-| `docstrings` | `list[DocstringInfo]` | `[]` | Docstrings |
-| `has_error_nodes` | `bool` | — | Whether error nodes |
+| `language` | `str` | — | Language name used to parse this chunk. |
+| `chunk_index` | `int` | — | Zero-indexed position of this chunk within the file's chunk list. |
+| `total_chunks` | `int` | — | Total number of chunks the file was split into. |
+| `node_types` | `list[str]` | `[]` | Tree-sitter node kinds that appear at the top level of this chunk. |
+| `context_path` | `list[str]` | `[]` | Hierarchical path of enclosing structural items (e.g., `["MyClass", "my_method"]`). |
+| `symbols_defined` | `list[str]` | `[]` | Names of symbols defined within this chunk. |
+| `comments` | `list[CommentInfo]` | `[]` | Comments contained within this chunk. |
+| `docstrings` | `list[DocstringInfo]` | `[]` | Docstrings contained within this chunk. |
+| `has_error_nodes` | `bool` | — | Whether this chunk contains any tree-sitter error nodes. |
 
 ---
 
@@ -253,9 +253,9 @@ and documentation comments.
 
 | Variant | Description |
 |---------|-------------|
-| `Line` | Line |
-| `Block` | Block |
-| `Doc` | Doc |
+| `Line` | A single-line comment (e.g., `// ...` or `# ...`). |
+| `Block` | A block or multi-line comment (e.g., `/* ... */`). |
+| `Doc` | A documentation comment (e.g., `/// ...` or `/** ... */`). |
 
 ---
 
@@ -268,9 +268,9 @@ found in the syntax tree.
 
 | Variant | Description |
 |---------|-------------|
-| `Error` | Error |
-| `Warning` | Warning |
-| `Info` | Info |
+| `Error` | A parse error (e.g., an `ERROR` or `MISSING` node in the tree). |
+| `Warning` | A warning-level diagnostic. |
+| `Info` | An informational diagnostic. |
 
 ---
 
@@ -283,12 +283,12 @@ Identifies the docstring convention used, which varies by language
 
 | Variant | Description |
 |---------|-------------|
-| `PythonTripleQuote` | Python triple quote |
-| `JSDoc` | J s doc |
-| `Rustdoc` | Rustdoc |
-| `GoDoc` | Go doc |
-| `JavaDoc` | Java doc |
-| `Other` | Other — Fields: `_0`: `String` |
+| `PythonTripleQuote` | Python triple-quoted string docstring (`"""..."""`). |
+| `JSDoc` | JavaScript/TypeScript JSDoc comment (`/** ... */`). |
+| `Rustdoc` | Rust `///` or `//!` doc comment. |
+| `GoDoc` | Go doc comment (a comment block immediately preceding a declaration). |
+| `JavaDoc` | Java Javadoc comment (`/** ... */`). |
+| `Other` | A language-specific docstring format not covered by the standard variants. — Fields: `_0`: `String` |
 
 ---
 
@@ -300,9 +300,9 @@ Covers named exports, default exports, and re-exports from other modules.
 
 | Variant | Description |
 |---------|-------------|
-| `Named` | Named |
-| `Default` | Default |
-| `ReExport` | Re export |
+| `Named` | A named export (e.g., `export { foo }`). |
+| `Default` | A default export (e.g., `export default foo`). |
+| `ReExport` | A re-export from another module (e.g., `export { foo } from 'bar'`). |
 
 ---
 
@@ -316,17 +316,17 @@ language-specific constructs that do not fit a standard category.
 
 | Variant | Description |
 |---------|-------------|
-| `Function` | Function |
-| `Method` | Method |
-| `Class` | Class |
-| `Struct` | Struct |
-| `Interface` | Interface |
-| `Enum` | Enum |
-| `Module` | Module |
-| `Trait` | Trait |
-| `Impl` | Impl |
-| `Namespace` | Namespace |
-| `Other` | Other — Fields: `_0`: `String` |
+| `Function` | A free-standing or associated function. |
+| `Method` | A method defined inside a class, struct, trait, or impl block. |
+| `Class` | A class definition. |
+| `Struct` | A struct definition. |
+| `Interface` | An interface or protocol definition. |
+| `Enum` | An enum definition. |
+| `Module` | A module or package declaration. |
+| `Trait` | A trait definition. |
+| `Impl` | An impl block (Rust) or similar implementation block. |
+| `Namespace` | A namespace declaration. |
+| `Other` | A language-specific construct that does not fit any standard category. — Fields: `_0`: `String` |
 
 ---
 
@@ -339,14 +339,14 @@ classes, types, interfaces, enums, and modules.
 
 | Variant | Description |
 |---------|-------------|
-| `Variable` | Variable |
-| `Constant` | Constant |
-| `Function` | Function |
-| `Class` | Class |
-| `Type` | Type |
-| `Interface` | Interface |
-| `Enum` | Enum |
-| `Module` | Module |
-| `Other` | Other — Fields: `_0`: `String` |
+| `Variable` | A variable binding. |
+| `Constant` | A constant (immutable binding). |
+| `Function` | A function definition. |
+| `Class` | A class definition. |
+| `Type` | A type alias or typedef. |
+| `Interface` | An interface definition. |
+| `Enum` | An enum definition. |
+| `Module` | A module declaration. |
+| `Other` | A symbol kind not covered by the standard variants. — Fields: `_0`: `String` |
 
 ---

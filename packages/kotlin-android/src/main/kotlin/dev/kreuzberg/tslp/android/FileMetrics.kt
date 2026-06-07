@@ -25,12 +25,20 @@ package dev.kreuzberg.tslp.android
 
 /** Aggregate metrics for a source file. */
 data class FileMetrics(
+    /** Total number of lines (including blank and comment lines). */
     val totalLines: Long = 0L,
+    /** Number of lines containing non-blank, non-comment source code. */
     val codeLines: Long = 0L,
+    /** Number of lines that are entirely comments. */
     val commentLines: Long = 0L,
+    /** Number of blank (whitespace-only) lines. */
     val blankLines: Long = 0L,
+    /** Total byte length of the source file. */
     val totalBytes: Long = 0L,
+    /** Total number of nodes in the syntax tree. */
     val nodeCount: Long = 0L,
+    /** Number of error nodes in the syntax tree (parse errors). */
     val errorCount: Long = 0L,
+    /** Maximum nesting depth reached in the syntax tree. */
     val maxDepth: Long = 0L,
 )

@@ -25,7 +25,10 @@ package dev.kreuzberg.tslp.android
 
 /** A diagnostic (syntax error, missing node, etc.) from parsing. */
 data class Diagnostic(
+    /** Human-readable description of the diagnostic. */
     val message: String = "",
+    /** Severity of the diagnostic. */
     val severity: DiagnosticSeverity = DiagnosticSeverity.ERROR,
+    /** Source span where the diagnostic was detected. */
     val span: Span = Span(),
 )
