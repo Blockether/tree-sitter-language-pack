@@ -744,7 +744,7 @@ impl DownloadManager {
         Ok(())
     }
 
-    /// Thin public re-export of [`extract_languages`] gated on the
+    /// Thin public re-export of `extract_languages` gated on the
     /// `test-internals` feature (or `#[cfg(test)]`).
     ///
     /// Integration tests that need to call `extract_languages` directly (e.g.
@@ -759,7 +759,7 @@ impl DownloadManager {
 
     /// Download the platform bundle and extract every library file it contains.
     ///
-    /// Unlike [`ensure_languages`], this does not check the manifest language list
+    /// Unlike [`Self::ensure_languages`], this does not check the manifest language list
     /// against archive contents — it simply extracts all `.so`/`.dylib`/`.dll` files
     /// from the bundle. Languages in the manifest that are missing from the archive
     /// are silently ignored rather than returning an error.

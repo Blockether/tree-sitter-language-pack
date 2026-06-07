@@ -502,7 +502,7 @@ pub fn download_all() -> Result<usize, Error> {
 ///
 /// Groups are defined in the remote manifest and let you ensure a curated
 /// set of related grammars in one call instead of listing each name to
-/// [`download`]. Already-cached languages are skipped.
+/// [`download()`]. Already-cached languages are skipped.
 ///
 /// Returns the total number of languages now available (statically compiled
 /// plus downloaded and cached).

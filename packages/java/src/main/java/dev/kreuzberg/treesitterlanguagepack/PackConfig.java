@@ -4,11 +4,11 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import java.util.List;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -23,50 +23,46 @@ import org.jspecify.annotations.Nullable;
 public record PackConfig(
     @JsonProperty("cache_dir") java.nio.file.@Nullable Path cacheDir,
     @Nullable @JsonProperty("languages") List<String> languages,
-    @Nullable @JsonProperty("groups") List<String> groups
-) {
-    public static Builder builder() {
-        return new Builder();
+    @Nullable @JsonProperty("groups") List<String> groups) {
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  // CPD-OFF
+  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
+  public static final class Builder {
+
+    @JsonProperty("cache_dir")
+    private java.nio.file.Path cacheDir = null;
+
+    private List<String> languages = null;
+    private List<String> groups = null;
+
+    /** Sets the cacheDir field. */
+    @JsonProperty("cache_dir")
+    public Builder withCacheDir(final java.nio.file.@Nullable Path value) {
+      this.cacheDir = value;
+      return this;
     }
 
-    // CPD-OFF
-    @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
-    public static final class Builder {
-
-        @JsonProperty("cache_dir")
-private java.nio.file.Path cacheDir = null;
-private List<String> languages = null;
-private List<String> groups = null;
-
-        /** Sets the cacheDir field. */
-        @JsonProperty("cache_dir")
-        public Builder withCacheDir(final java.nio.file.@Nullable Path value) {
-            this.cacheDir = value;
-            return this;
-        }
-
-        /** Sets the languages field. */
-        @JsonProperty("languages")
-        public Builder withLanguages(final @Nullable List<String> value) {
-            this.languages = value;
-            return this;
-        }
-
-        /** Sets the groups field. */
-        @JsonProperty("groups")
-        public Builder withGroups(final @Nullable List<String> value) {
-            this.groups = value;
-            return this;
-        }
-
-        /** Builds the PackConfig instance. */
-        public PackConfig build() {
-            return new PackConfig(
-                cacheDir,
-                languages,
-                groups
-            );
-        }
+    /** Sets the languages field. */
+    @JsonProperty("languages")
+    public Builder withLanguages(final @Nullable List<String> value) {
+      this.languages = value;
+      return this;
     }
-    // CPD-ON
+
+    /** Sets the groups field. */
+    @JsonProperty("groups")
+    public Builder withGroups(final @Nullable List<String> value) {
+      this.groups = value;
+      return this;
+    }
+
+    /** Builds the PackConfig instance. */
+    public PackConfig build() {
+      return new PackConfig(cacheDir, languages, groups);
+    }
+  }
+  // CPD-ON
 }
