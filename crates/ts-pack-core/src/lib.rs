@@ -33,12 +33,14 @@
 //! ## Modules
 //!
 //! - [`registry`] - Thread-safe language registry for parser lookup
-//! - [`intel`] - Source code intelligence extraction (structure, imports, exports, etc.)
-//! - [`parse`] - Low-level tree-sitter parsing utilities
-//! - [`text_splitter`] - Syntax-aware code chunking
-//! - [`process_config`] - Configuration for the `process` pipeline
+//! - [`parsing`] - Ownership-safe tree-sitter parser, tree, node, and cursor wrappers
+//! - [`process_config`] - Configuration for the [`process`] pipeline
 //! - [`pack_config`] - Configuration for the language pack (cache dir, languages to download)
 //! - [`error`] - Error types
+//!
+//! Source-code intelligence and the syntax-aware text splitter are exposed via re-exports
+//! from the crate root (for example [`process`] and [`StructureItem`]); their backing
+//! modules are internal implementation details.
 
 /// Error types for tree-sitter language pack operations.
 pub mod error;
