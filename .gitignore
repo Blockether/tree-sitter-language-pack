@@ -3,6 +3,8 @@ target/
 build/
 dist/
 wheelhouse/
+.build/
+.yardoc/
 
 # Language-specific build artifacts
 *.so
