@@ -20,11 +20,17 @@ use flutter_rust_bridge::frb;
 /// positions (for display and diagnostics).
 #[frb(mirror(Span))]
 pub struct Span {
+    /// Inclusive start byte offset in the source.
     pub start_byte: i64,
+    /// Exclusive end byte offset in the source.
     pub end_byte: i64,
+    /// Zero-indexed line number of the span's start.
     pub start_line: i64,
+    /// Zero-indexed column number of the span's start.
     pub start_column: i64,
+    /// Zero-indexed line number of the span's end.
     pub end_line: i64,
+    /// Zero-indexed column number of the span's end.
     pub end_column: i64,
 }
 
@@ -48,130 +54,200 @@ pub struct Span {
 /// - `chunks` - Chunked code segments (when `config.chunk_max_size` is set)
 #[frb(mirror(ProcessResult))]
 pub struct ProcessResult {
+    /// The language name used to parse the source file.
     pub language: String,
+    /// File-level metrics (line counts, byte size, error count).
     pub metrics: FileMetrics,
+    /// Top-level structural items (functions, classes, etc.).
     pub structure: Vec<StructureItem>,
+    /// Import statements extracted from the source.
     pub imports: Vec<ImportInfo>,
+    /// Export statements extracted from the source.
     pub exports: Vec<ExportInfo>,
+    /// Comments extracted from the source.
     pub comments: Vec<CommentInfo>,
+    /// Docstrings extracted from the source.
     pub docstrings: Vec<DocstringInfo>,
+    /// Symbol definitions (variables, types, functions) extracted from the source.
     pub symbols: Vec<SymbolInfo>,
+    /// Parse diagnostics (syntax errors, missing nodes) from tree-sitter.
     pub diagnostics: Vec<Diagnostic>,
+    /// Syntax-aware code chunks produced when chunking is enabled.
     pub chunks: Vec<CodeChunk>,
 }
 
 /// Aggregate metrics for a source file.
 #[frb(mirror(FileMetrics))]
 pub struct FileMetrics {
+    /// Total number of lines (including blank and comment lines).
     pub total_lines: i64,
+    /// Number of lines containing non-blank, non-comment source code.
     pub code_lines: i64,
+    /// Number of lines that are entirely comments.
     pub comment_lines: i64,
+    /// Number of blank (whitespace-only) lines.
     pub blank_lines: i64,
+    /// Total byte length of the source file.
     pub total_bytes: i64,
+    /// Total number of nodes in the syntax tree.
     pub node_count: i64,
+    /// Number of error nodes in the syntax tree (parse errors).
     pub error_count: i64,
+    /// Maximum nesting depth reached in the syntax tree.
     pub max_depth: i64,
 }
 
 /// A structural item (function, class, struct, etc.) in source code.
 #[frb(mirror(StructureItem))]
 pub struct StructureItem {
+    /// The kind of structural item.
     pub kind: StructureKind,
+    /// The declared name of the item, if present.
     pub name: Option<String>,
+    /// Visibility modifier (e.g., `"pub"`, `"public"`, `"private"`).
     pub visibility: Option<String>,
+    /// Source span covering the entire item declaration.
     pub span: Span,
+    /// Nested structural items (e.g., methods within a class).
     pub children: Vec<StructureItem>,
+    /// Decorator or attribute names applied to the item.
     pub decorators: Vec<String>,
+    /// Documentation comment attached to the item, if any.
     pub doc_comment: Option<String>,
+    /// Full signature text of the item (e.g., function parameters and return type).
     pub signature: Option<String>,
+    /// Source span covering only the body of the item, if distinct from the declaration.
     pub body_span: Option<Span>,
 }
 
 /// A comment extracted from source code.
 #[frb(mirror(CommentInfo))]
 pub struct CommentInfo {
+    /// The raw text content of the comment.
     pub text: String,
+    /// The kind of comment (line, block, or doc).
     pub kind: CommentKind,
+    /// Source span covering the comment.
     pub span: Span,
+    /// Name of the syntax node this comment is directly associated with.
     pub associated_node: Option<String>,
 }
 
 /// A docstring extracted from source code.
 #[frb(mirror(DocstringInfo))]
 pub struct DocstringInfo {
+    /// The raw text of the docstring.
     pub text: String,
+    /// The docstring format (Python, JSDoc, Rustdoc, etc.).
     pub format: DocstringFormat,
+    /// Source span covering the docstring.
     pub span: Span,
+    /// Name of the item this docstring documents.
     pub associated_item: Option<String>,
+    /// Parsed sections of the docstring (Args, Returns, Raises, etc.).
     pub parsed_sections: Vec<DocSection>,
 }
 
 /// A section within a docstring (e.g., Args, Returns, Raises).
 #[frb(mirror(DocSection))]
 pub struct DocSection {
+    /// Section kind (e.g., `"args"`, `"returns"`, `"raises"`).
     pub kind: String,
+    /// Parameter or return value name, if applicable.
     pub name: Option<String>,
+    /// Description text for this section.
     pub description: String,
 }
 
 /// An import statement extracted from source code.
 #[frb(mirror(ImportInfo))]
 pub struct ImportInfo {
+    /// The module or path being imported from.
     pub source: String,
+    /// Specific names imported from the source module.
     pub items: Vec<String>,
+    /// Alias assigned to the import (e.g., `import numpy as np`).
     pub alias: Option<String>,
+    /// Whether this is a wildcard import (e.g., `import *` or `use foo::*`).
     pub is_wildcard: bool,
+    /// Source span covering the import statement.
     pub span: Span,
 }
 
 /// An export statement extracted from source code.
 #[frb(mirror(ExportInfo))]
 pub struct ExportInfo {
+    /// The exported name.
     pub name: String,
+    /// The kind of export (named, default, or re-export).
     pub kind: ExportKind,
+    /// Source span covering the export statement.
     pub span: Span,
 }
 
 /// A symbol (variable, function, type, etc.) extracted from source code.
 #[frb(mirror(SymbolInfo))]
 pub struct SymbolInfo {
+    /// The name of the symbol.
     pub name: String,
+    /// The kind of symbol (variable, function, class, etc.).
     pub kind: SymbolKind,
+    /// Source span covering the symbol definition.
     pub span: Span,
+    /// Explicit type annotation, if present in the source.
     pub type_annotation: Option<String>,
+    /// Documentation comment associated with this symbol.
     pub doc: Option<String>,
 }
 
 /// A diagnostic (syntax error, missing node, etc.) from parsing.
 #[frb(mirror(Diagnostic))]
 pub struct Diagnostic {
+    /// Human-readable description of the diagnostic.
     pub message: String,
+    /// Severity of the diagnostic.
     pub severity: DiagnosticSeverity,
+    /// Source span where the diagnostic was detected.
     pub span: Span,
 }
 
 /// A chunk of source code with rich metadata.
 #[frb(mirror(CodeChunk))]
 pub struct CodeChunk {
+    /// The raw source text of this chunk.
     pub content: String,
+    /// Inclusive start byte offset of this chunk in the original source.
     pub start_byte: i64,
+    /// Exclusive end byte offset of this chunk in the original source.
     pub end_byte: i64,
+    /// Zero-indexed start line of this chunk.
     pub start_line: i64,
+    /// Zero-indexed end line of this chunk.
     pub end_line: i64,
+    /// Contextual metadata about this chunk.
     pub metadata: ChunkContext,
 }
 
 /// Metadata for a single chunk of source code.
 #[frb(mirror(ChunkContext))]
 pub struct ChunkContext {
+    /// Language name used to parse this chunk.
     pub language: String,
+    /// Zero-indexed position of this chunk within the file's chunk list.
     pub chunk_index: i64,
+    /// Total number of chunks the file was split into.
     pub total_chunks: i64,
+    /// Tree-sitter node kinds that appear at the top level of this chunk.
     pub node_types: Vec<String>,
+    /// Hierarchical path of enclosing structural items (e.g., `["MyClass", "my_method"]`).
     pub context_path: Vec<String>,
+    /// Names of symbols defined within this chunk.
     pub symbols_defined: Vec<String>,
+    /// Comments contained within this chunk.
     pub comments: Vec<CommentInfo>,
+    /// Docstrings contained within this chunk.
     pub docstrings: Vec<DocstringInfo>,
+    /// Whether this chunk contains any tree-sitter error nodes.
     pub has_error_nodes: bool,
 }
 
@@ -643,16 +719,27 @@ impl DownloadManager {
 /// language-specific constructs that do not fit a standard category.
 #[frb(mirror(StructureKind), unignore)]
 pub enum StructureKind {
+    /// A free-standing or associated function.
     Function,
+    /// A method defined inside a class, struct, trait, or impl block.
     Method,
+    /// A class definition.
     Class,
+    /// A struct definition.
     Struct,
+    /// An interface or protocol definition.
     Interface,
+    /// An enum definition.
     Enum,
+    /// A module or package declaration.
     Module,
+    /// A trait definition.
     Trait,
+    /// An impl block (Rust) or similar implementation block.
     Impl,
+    /// A namespace declaration.
     Namespace,
+    /// A language-specific construct that does not fit any standard category.
     Other { field0: String },
 }
 
@@ -662,8 +749,11 @@ pub enum StructureKind {
 /// and documentation comments.
 #[frb(mirror(CommentKind), unignore)]
 pub enum CommentKind {
+    /// A single-line comment (e.g., `// ...` or `# ...`).
     Line,
+    /// A block or multi-line comment (e.g., `/* ... */`).
     Block,
+    /// A documentation comment (e.g., `/// ...` or `/** ... */`).
     Doc,
 }
 
@@ -673,11 +763,17 @@ pub enum CommentKind {
 /// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 #[frb(mirror(DocstringFormat), unignore)]
 pub enum DocstringFormat {
+    /// Python triple-quoted string docstring (`"""..."""`).
     PythonTripleQuote,
+    /// JavaScript/TypeScript JSDoc comment (`/** ... */`).
     JSDoc,
+    /// Rust `///` or `//!` doc comment.
     Rustdoc,
+    /// Go doc comment (a comment block immediately preceding a declaration).
     GoDoc,
+    /// Java Javadoc comment (`/** ... */`).
     JavaDoc,
+    /// A language-specific docstring format not covered by the standard variants.
     Other { field0: String },
 }
 
@@ -686,8 +782,11 @@ pub enum DocstringFormat {
 /// Covers named exports, default exports, and re-exports from other modules.
 #[frb(mirror(ExportKind), unignore)]
 pub enum ExportKind {
+    /// A named export (e.g., `export { foo }`).
     Named,
+    /// A default export (e.g., `export default foo`).
     Default,
+    /// A re-export from another module (e.g., `export { foo } from 'bar'`).
     ReExport,
 }
 
@@ -697,14 +796,23 @@ pub enum ExportKind {
 /// classes, types, interfaces, enums, and modules.
 #[frb(mirror(SymbolKind), unignore)]
 pub enum SymbolKind {
+    /// A variable binding.
     Variable,
+    /// A constant (immutable binding).
     Constant,
+    /// A function definition.
     Function,
+    /// A class definition.
     Class,
+    /// A type alias or typedef.
     Type,
+    /// An interface definition.
     Interface,
+    /// An enum definition.
     Enum,
+    /// A module declaration.
     Module,
+    /// A symbol kind not covered by the standard variants.
     Other { field0: String },
 }
 
@@ -714,8 +822,11 @@ pub enum SymbolKind {
 /// found in the syntax tree.
 #[frb(mirror(DiagnosticSeverity), unignore)]
 pub enum DiagnosticSeverity {
+    /// A parse error (e.g., an `ERROR` or `MISSING` node in the tree).
     Error,
+    /// A warning-level diagnostic.
     Warning,
+    /// An informational diagnostic.
     Info,
 }
 
@@ -726,42 +837,34 @@ pub enum DiagnosticSeverity {
 /// features are enabled.
 #[frb(mirror(Error), unignore)]
 pub enum Error {
-    LanguageNotFound {
-        field0: String,
-    },
-    DynamicLoad {
-        field0: String,
-    },
-    NullLanguagePointer {
-        field0: String,
-    },
-    ParserSetup {
-        field0: String,
-    },
-    LockPoisoned {
-        field0: String,
-    },
-    Config {
-        field0: String,
-    },
+    /// The requested language name (or alias) was not found in the registry.
+    LanguageNotFound { field0: String },
+    /// A dynamic shared library could not be loaded at runtime.
+    DynamicLoad { field0: String },
+    /// The tree-sitter language function returned a null pointer for the given language name.
+    NullLanguagePointer { field0: String },
+    /// The language could not be applied to the parser (e.g., ABI version mismatch).
+    ParserSetup { field0: String },
+    /// An internal `RwLock` or `Mutex` was poisoned by a previous panic.
+    LockPoisoned { field0: String },
+    /// A configuration file or value was invalid or could not be applied.
+    Config { field0: String },
+    /// The tree-sitter parser returned no tree for the given source input.
     ParseFailed,
-    QueryError {
-        field0: String,
-    },
-    InvalidRange {
-        field0: String,
-    },
-    Download {
-        field0: String,
-    },
+    /// A tree-sitter query could not be compiled or executed.
+    QueryError { field0: String },
+    /// A byte range was invalid (e.g., end before start, or out of bounds).
+    InvalidRange { field0: String },
+    /// A parser download from GitHub releases failed.
+    Download { field0: String },
+    /// The downloaded file's SHA-256 digest did not match the manifest's expected value.
     ChecksumMismatch {
         file: String,
         expected: String,
         actual: String,
     },
-    CacheLock {
-        field0: String,
-    },
+    /// The cross-process download cache lock file could not be acquired or created.
+    CacheLock { field0: String },
 }
 
 // From<SourceT> conversions for bridge return types.
@@ -1296,7 +1399,7 @@ pub fn download_all() -> Result<i64, String> {
 ///
 /// Groups are defined in the remote manifest and let you ensure a curated
 /// set of related grammars in one call instead of listing each name to
-/// `download`. Already-cached languages are skipped.
+/// `download()`. Already-cached languages are skipped.
 ///
 /// Returns the total number of languages now available (statically compiled
 /// plus downloaded and cached).

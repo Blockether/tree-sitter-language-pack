@@ -25,9 +25,14 @@ package dev.kreuzberg.tslp.android
 
 /** A symbol (variable, function, type, etc.) extracted from source code. */
 data class SymbolInfo(
+    /** The name of the symbol. */
     val name: String = "",
+    /** The kind of symbol (variable, function, class, etc.). */
     val kind: SymbolKind,
+    /** Source span covering the symbol definition. */
     val span: Span = Span(),
+    /** Explicit type annotation, if present in the source. */
     val typeAnnotation: String? = null,
+    /** Documentation comment associated with this symbol. */
     val doc: String? = null,
 )

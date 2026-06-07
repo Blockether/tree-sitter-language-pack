@@ -26,25 +26,26 @@ package dev.kreuzberg.tslp.android
 /**
  * The kind of a symbol definition found in source code.
  *
- * Categorizes symbol definitions such as variables, constants, functions, classes, types,
- * interfaces, enums, and modules.
+ * Categorizes symbol definitions such as variables, constants, functions,
+ * classes, types, interfaces, enums, and modules.
  */
 sealed class SymbolKind {
+    /** A variable binding. */
     object Variable : SymbolKind()
-
+    /** A constant (immutable binding). */
     object Constant : SymbolKind()
-
+    /** A function definition. */
     object Function : SymbolKind()
-
+    /** A class definition. */
     object Class : SymbolKind()
-
+    /** A type alias or typedef. */
     object Type : SymbolKind()
-
+    /** An interface definition. */
     object Interface : SymbolKind()
-
+    /** An enum definition. */
     object Enum : SymbolKind()
-
+    /** A module declaration. */
     object Module : SymbolKind()
-
+    /** A symbol kind not covered by the standard variants. */
     data class Other(val value: String) : SymbolKind()
 }

@@ -185,7 +185,7 @@ Future<PlatformInt64> downloadAll() => RustLib.instance.api.crateDownloadAll();
 ///
 /// Groups are defined in the remote manifest and let you ensure a curated
 /// set of related grammars in one call instead of listing each name to
-/// `download`. Already-cached languages are skipped.
+/// `download()`. Already-cached languages are skipped.
 ///
 /// Returns the total number of languages now available (statically compiled
 /// plus downloaded and cached).
@@ -433,14 +433,31 @@ class ByteRange {
 
 /// Metadata for a single chunk of source code.
 class ChunkContext {
+  /// Language name used to parse this chunk.
   final String language;
+
+  /// Zero-indexed position of this chunk within the file's chunk list.
   final PlatformInt64 chunkIndex;
+
+  /// Total number of chunks the file was split into.
   final PlatformInt64 totalChunks;
+
+  /// Tree-sitter node kinds that appear at the top level of this chunk.
   final List<String> nodeTypes;
+
+  /// Hierarchical path of enclosing structural items (e.g., `["MyClass", "my_method"]`).
   final List<String> contextPath;
+
+  /// Names of symbols defined within this chunk.
   final List<String> symbolsDefined;
+
+  /// Comments contained within this chunk.
   final List<CommentInfo> comments;
+
+  /// Docstrings contained within this chunk.
   final List<DocstringInfo> docstrings;
+
+  /// Whether this chunk contains any tree-sitter error nodes.
   final bool hasErrorNodes;
 
   const ChunkContext({
@@ -485,11 +502,22 @@ class ChunkContext {
 
 /// A chunk of source code with rich metadata.
 class CodeChunk {
+  /// The raw source text of this chunk.
   final String content;
+
+  /// Inclusive start byte offset of this chunk in the original source.
   final PlatformInt64 startByte;
+
+  /// Exclusive end byte offset of this chunk in the original source.
   final PlatformInt64 endByte;
+
+  /// Zero-indexed start line of this chunk.
   final PlatformInt64 startLine;
+
+  /// Zero-indexed end line of this chunk.
   final PlatformInt64 endLine;
+
+  /// Contextual metadata about this chunk.
   final ChunkContext metadata;
 
   const CodeChunk({
@@ -525,9 +553,16 @@ class CodeChunk {
 
 /// A comment extracted from source code.
 class CommentInfo {
+  /// The raw text content of the comment.
   final String text;
+
+  /// The kind of comment (line, block, or doc).
   final CommentKind kind;
+
+  /// Source span covering the comment.
   final Span span;
+
+  /// Name of the syntax node this comment is directly associated with.
   final String? associatedNode;
 
   const CommentInfo({
@@ -556,12 +591,26 @@ class CommentInfo {
 ///
 /// Distinguishes between single-line comments, block (multi-line) comments,
 /// and documentation comments.
-enum CommentKind { line, block, doc }
+enum CommentKind {
+  /// A single-line comment (e.g., `// ...` or `# ...`).
+  line,
+
+  /// A block or multi-line comment (e.g., `/* ... */`).
+  block,
+
+  /// A documentation comment (e.g., `/// ...` or `/** ... */`).
+  doc,
+}
 
 /// A diagnostic (syntax error, missing node, etc.) from parsing.
 class Diagnostic {
+  /// Human-readable description of the diagnostic.
   final String message;
+
+  /// Severity of the diagnostic.
   final DiagnosticSeverity severity;
+
+  /// Source span where the diagnostic was detected.
   final Span span;
 
   const Diagnostic({
@@ -587,12 +636,26 @@ class Diagnostic {
 ///
 /// Used to classify parse errors, warnings, and informational messages
 /// found in the syntax tree.
-enum DiagnosticSeverity { error, warning, info }
+enum DiagnosticSeverity {
+  /// A parse error (e.g., an `ERROR` or `MISSING` node in the tree).
+  error,
+
+  /// A warning-level diagnostic.
+  warning,
+
+  /// An informational diagnostic.
+  info,
+}
 
 /// A section within a docstring (e.g., Args, Returns, Raises).
 class DocSection {
+  /// Section kind (e.g., `"args"`, `"returns"`, `"raises"`).
   final String kind;
+
+  /// Parameter or return value name, if applicable.
   final String? name;
+
+  /// Description text for this section.
   final String description;
 
   const DocSection({required this.kind, this.name, required this.description});
@@ -614,22 +677,42 @@ class DocSection {
 sealed class DocstringFormat with _$DocstringFormat {
   const DocstringFormat._();
 
+  /// Python triple-quoted string docstring (`"""..."""`).
   const factory DocstringFormat.pythonTripleQuote() =
       DocstringFormat_PythonTripleQuote;
+
+  /// JavaScript/TypeScript JSDoc comment (`/** ... */`).
   const factory DocstringFormat.jsDoc() = DocstringFormat_JSDoc;
+
+  /// Rust `///` or `//!` doc comment.
   const factory DocstringFormat.rustdoc() = DocstringFormat_Rustdoc;
+
+  /// Go doc comment (a comment block immediately preceding a declaration).
   const factory DocstringFormat.goDoc() = DocstringFormat_GoDoc;
+
+  /// Java Javadoc comment (`/** ... */`).
   const factory DocstringFormat.javaDoc() = DocstringFormat_JavaDoc;
+
+  /// A language-specific docstring format not covered by the standard variants.
   const factory DocstringFormat.other({required String field0}) =
       DocstringFormat_Other;
 }
 
 /// A docstring extracted from source code.
 class DocstringInfo {
+  /// The raw text of the docstring.
   final String text;
+
+  /// The docstring format (Python, JSDoc, Rustdoc, etc.).
   final DocstringFormat format;
+
+  /// Source span covering the docstring.
   final Span span;
+
+  /// Name of the item this docstring documents.
   final String? associatedItem;
+
+  /// Parsed sections of the docstring (Args, Returns, Raises, etc.).
   final List<DocSection> parsedSections;
 
   const DocstringInfo({
@@ -664,32 +747,60 @@ class DocstringInfo {
 sealed class Error with _$Error {
   const Error._();
 
+  /// The requested language name (or alias) was not found in the registry.
   const factory Error.languageNotFound({required String field0}) =
       Error_LanguageNotFound;
+
+  /// A dynamic shared library could not be loaded at runtime.
   const factory Error.dynamicLoad({required String field0}) = Error_DynamicLoad;
+
+  /// The tree-sitter language function returned a null pointer for the given language name.
   const factory Error.nullLanguagePointer({required String field0}) =
       Error_NullLanguagePointer;
+
+  /// The language could not be applied to the parser (e.g., ABI version mismatch).
   const factory Error.parserSetup({required String field0}) = Error_ParserSetup;
+
+  /// An internal `RwLock` or `Mutex` was poisoned by a previous panic.
   const factory Error.lockPoisoned({required String field0}) =
       Error_LockPoisoned;
+
+  /// A configuration file or value was invalid or could not be applied.
   const factory Error.config({required String field0}) = Error_Config;
+
+  /// The tree-sitter parser returned no tree for the given source input.
   const factory Error.parseFailed() = Error_ParseFailed;
+
+  /// A tree-sitter query could not be compiled or executed.
   const factory Error.queryError({required String field0}) = Error_QueryError;
+
+  /// A byte range was invalid (e.g., end before start, or out of bounds).
   const factory Error.invalidRange({required String field0}) =
       Error_InvalidRange;
+
+  /// A parser download from GitHub releases failed.
   const factory Error.download({required String field0}) = Error_Download;
+
+  /// The downloaded file's SHA-256 digest did not match the manifest's expected value.
   const factory Error.checksumMismatch({
     required String file,
     required String expected,
     required String actual,
   }) = Error_ChecksumMismatch;
+
+  /// The cross-process download cache lock file could not be acquired or created.
   const factory Error.cacheLock({required String field0}) = Error_CacheLock;
 }
 
 /// An export statement extracted from source code.
 class ExportInfo {
+  /// The exported name.
   final String name;
+
+  /// The kind of export (named, default, or re-export).
   final ExportKind kind;
+
+  /// Source span covering the export statement.
   final Span span;
 
   const ExportInfo({
@@ -714,17 +825,41 @@ class ExportInfo {
 /// The kind of an export statement found in source code.
 ///
 /// Covers named exports, default exports, and re-exports from other modules.
-enum ExportKind { named, default_, reExport }
+enum ExportKind {
+  /// A named export (e.g., `export { foo }`).
+  named,
+
+  /// A default export (e.g., `export default foo`).
+  default_,
+
+  /// A re-export from another module (e.g., `export { foo } from 'bar'`).
+  reExport,
+}
 
 /// Aggregate metrics for a source file.
 class FileMetrics {
+  /// Total number of lines (including blank and comment lines).
   final PlatformInt64 totalLines;
+
+  /// Number of lines containing non-blank, non-comment source code.
   final PlatformInt64 codeLines;
+
+  /// Number of lines that are entirely comments.
   final PlatformInt64 commentLines;
+
+  /// Number of blank (whitespace-only) lines.
   final PlatformInt64 blankLines;
+
+  /// Total byte length of the source file.
   final PlatformInt64 totalBytes;
+
+  /// Total number of nodes in the syntax tree.
   final PlatformInt64 nodeCount;
+
+  /// Number of error nodes in the syntax tree (parse errors).
   final PlatformInt64 errorCount;
+
+  /// Maximum nesting depth reached in the syntax tree.
   final PlatformInt64 maxDepth;
 
   const FileMetrics({
@@ -766,10 +901,19 @@ class FileMetrics {
 
 /// An import statement extracted from source code.
 class ImportInfo {
+  /// The module or path being imported from.
   final String source;
+
+  /// Specific names imported from the source module.
   final List<String> items;
+
+  /// Alias assigned to the import (e.g., `import numpy as np`).
   final String? alias;
+
+  /// Whether this is a wildcard import (e.g., `import *` or `use foo::*`).
   final bool isWildcard;
+
+  /// Source span covering the import statement.
   final Span span;
 
   const ImportInfo({
@@ -973,15 +1117,34 @@ class ProcessConfig {
 /// - `diagnostics` - Parse errors (when `config.diagnostics = true`)
 /// - `chunks` - Chunked code segments (when `config.chunk_max_size` is set)
 class ProcessResult {
+  /// The language name used to parse the source file.
   final String language;
+
+  /// File-level metrics (line counts, byte size, error count).
   final FileMetrics metrics;
+
+  /// Top-level structural items (functions, classes, etc.).
   final List<StructureItem> structure;
+
+  /// Import statements extracted from the source.
   final List<ImportInfo> imports;
+
+  /// Export statements extracted from the source.
   final List<ExportInfo> exports;
+
+  /// Comments extracted from the source.
   final List<CommentInfo> comments;
+
+  /// Docstrings extracted from the source.
   final List<DocstringInfo> docstrings;
+
+  /// Symbol definitions (variables, types, functions) extracted from the source.
   final List<SymbolInfo> symbols;
+
+  /// Parse diagnostics (syntax errors, missing nodes) from tree-sitter.
   final List<Diagnostic> diagnostics;
+
+  /// Syntax-aware code chunks produced when chunking is enabled.
   final List<CodeChunk> chunks;
 
   const ProcessResult({
@@ -1032,11 +1195,22 @@ class ProcessResult {
 /// Represents both byte offsets (for slicing) and human-readable line/column
 /// positions (for display and diagnostics).
 class Span {
+  /// Inclusive start byte offset in the source.
   final PlatformInt64 startByte;
+
+  /// Exclusive end byte offset in the source.
   final PlatformInt64 endByte;
+
+  /// Zero-indexed line number of the span's start.
   final PlatformInt64 startLine;
+
+  /// Zero-indexed column number of the span's start.
   final PlatformInt64 startColumn;
+
+  /// Zero-indexed line number of the span's end.
   final PlatformInt64 endLine;
+
+  /// Zero-indexed column number of the span's end.
   final PlatformInt64 endColumn;
 
   const Span({
@@ -1072,14 +1246,31 @@ class Span {
 
 /// A structural item (function, class, struct, etc.) in source code.
 class StructureItem {
+  /// The kind of structural item.
   final StructureKind kind;
+
+  /// The declared name of the item, if present.
   final String? name;
+
+  /// Visibility modifier (e.g., `"pub"`, `"public"`, `"private"`).
   final String? visibility;
+
+  /// Source span covering the entire item declaration.
   final Span span;
+
+  /// Nested structural items (e.g., methods within a class).
   final List<StructureItem> children;
+
+  /// Decorator or attribute names applied to the item.
   final List<String> decorators;
+
+  /// Documentation comment attached to the item, if any.
   final String? docComment;
+
+  /// Full signature text of the item (e.g., function parameters and return type).
   final String? signature;
+
+  /// Source span covering only the body of the item, if distinct from the declaration.
   final Span? bodySpan;
 
   const StructureItem({
@@ -1126,26 +1317,56 @@ class StructureItem {
 sealed class StructureKind with _$StructureKind {
   const StructureKind._();
 
+  /// A free-standing or associated function.
   const factory StructureKind.function() = StructureKind_Function;
+
+  /// A method defined inside a class, struct, trait, or impl block.
   const factory StructureKind.method() = StructureKind_Method;
+
+  /// A class definition.
   const factory StructureKind.class_() = StructureKind_Class;
+
+  /// A struct definition.
   const factory StructureKind.struct() = StructureKind_Struct;
+
+  /// An interface or protocol definition.
   const factory StructureKind.interface_() = StructureKind_Interface;
+
+  /// An enum definition.
   const factory StructureKind.enum_() = StructureKind_Enum;
+
+  /// A module or package declaration.
   const factory StructureKind.module() = StructureKind_Module;
+
+  /// A trait definition.
   const factory StructureKind.trait() = StructureKind_Trait;
+
+  /// An impl block (Rust) or similar implementation block.
   const factory StructureKind.impl() = StructureKind_Impl;
+
+  /// A namespace declaration.
   const factory StructureKind.namespace() = StructureKind_Namespace;
+
+  /// A language-specific construct that does not fit any standard category.
   const factory StructureKind.other({required String field0}) =
       StructureKind_Other;
 }
 
 /// A symbol (variable, function, type, etc.) extracted from source code.
 class SymbolInfo {
+  /// The name of the symbol.
   final String name;
+
+  /// The kind of symbol (variable, function, class, etc.).
   final SymbolKind kind;
+
+  /// Source span covering the symbol definition.
   final Span span;
+
+  /// Explicit type annotation, if present in the source.
   final String? typeAnnotation;
+
+  /// Documentation comment associated with this symbol.
   final String? doc;
 
   const SymbolInfo({
@@ -1180,13 +1401,30 @@ class SymbolInfo {
 sealed class SymbolKind with _$SymbolKind {
   const SymbolKind._();
 
+  /// A variable binding.
   const factory SymbolKind.variable() = SymbolKind_Variable;
+
+  /// A constant (immutable binding).
   const factory SymbolKind.constant() = SymbolKind_Constant;
+
+  /// A function definition.
   const factory SymbolKind.function() = SymbolKind_Function;
+
+  /// A class definition.
   const factory SymbolKind.class_() = SymbolKind_Class;
+
+  /// A type alias or typedef.
   const factory SymbolKind.type() = SymbolKind_Type;
+
+  /// An interface definition.
   const factory SymbolKind.interface_() = SymbolKind_Interface;
+
+  /// An enum definition.
   const factory SymbolKind.enum_() = SymbolKind_Enum;
+
+  /// A module declaration.
   const factory SymbolKind.module() = SymbolKind_Module;
+
+  /// A symbol kind not covered by the standard variants.
   const factory SymbolKind.other({required String field0}) = SymbolKind_Other;
 }

@@ -461,7 +461,7 @@ Download every language in a named group (e.g. `"web"`, `"data"`).
 
 Groups are defined in the remote manifest and let you ensure a curated
 set of related grammars in one call instead of listing each name to
-`download`. Already-cached languages are skipped.
+`download()`. Already-cached languages are skipped.
 
 Returns the total number of languages now available (statically compiled
 plus downloaded and cached).
@@ -596,15 +596,15 @@ Metadata for a single chunk of source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `String.t()` | — | Language |
-| `chunk_index` | `integer()` | — | Chunk index |
-| `total_chunks` | `integer()` | — | Total chunks |
-| `node_types` | `list(String.t())` | `[]` | Node types |
-| `context_path` | `list(String.t())` | `[]` | Context path |
-| `symbols_defined` | `list(String.t())` | `[]` | Symbols defined |
-| `comments` | `list(CommentInfo)` | `[]` | Comments |
-| `docstrings` | `list(DocstringInfo)` | `[]` | Docstrings |
-| `has_error_nodes` | `boolean()` | — | Whether error nodes |
+| `language` | `String.t()` | — | Language name used to parse this chunk. |
+| `chunk_index` | `integer()` | — | Zero-indexed position of this chunk within the file's chunk list. |
+| `total_chunks` | `integer()` | — | Total number of chunks the file was split into. |
+| `node_types` | `list(String.t())` | `[]` | Tree-sitter node kinds that appear at the top level of this chunk. |
+| `context_path` | `list(String.t())` | `[]` | Hierarchical path of enclosing structural items (e.g., `["MyClass", "my_method"]`). |
+| `symbols_defined` | `list(String.t())` | `[]` | Names of symbols defined within this chunk. |
+| `comments` | `list(CommentInfo)` | `[]` | Comments contained within this chunk. |
+| `docstrings` | `list(DocstringInfo)` | `[]` | Docstrings contained within this chunk. |
+| `has_error_nodes` | `boolean()` | — | Whether this chunk contains any tree-sitter error nodes. |
 
 ---
 
@@ -614,12 +614,12 @@ A chunk of source code with rich metadata.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `content` | `String.t()` | — | The extracted text content |
-| `start_byte` | `integer()` | — | Start byte |
-| `end_byte` | `integer()` | — | End byte |
-| `start_line` | `integer()` | — | Start line |
-| `end_line` | `integer()` | — | End line |
-| `metadata` | `ChunkContext` | — | Document metadata |
+| `content` | `String.t()` | — | The raw source text of this chunk. |
+| `start_byte` | `integer()` | — | Inclusive start byte offset of this chunk in the original source. |
+| `end_byte` | `integer()` | — | Exclusive end byte offset of this chunk in the original source. |
+| `start_line` | `integer()` | — | Zero-indexed start line of this chunk. |
+| `end_line` | `integer()` | — | Zero-indexed end line of this chunk. |
+| `metadata` | `ChunkContext` | — | Contextual metadata about this chunk. |
 
 ---
 
@@ -629,10 +629,10 @@ A comment extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `text` | `String.t()` | — | Text |
-| `kind` | `CommentKind` | `:line` | Kind (comment kind) |
-| `span` | `Span` | — | Span (span) |
-| `associated_node` | `String.t() \| nil` | `nil` | Associated node |
+| `text` | `String.t()` | — | The raw text content of the comment. |
+| `kind` | `CommentKind` | `:line` | The kind of comment (line, block, or doc). |
+| `span` | `Span` | — | Source span covering the comment. |
+| `associated_node` | `String.t() \| nil` | `nil` | Name of the syntax node this comment is directly associated with. |
 
 ---
 
@@ -642,9 +642,9 @@ A diagnostic (syntax error, missing node, etc.) from parsing.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `message` | `String.t()` | — | Message |
-| `severity` | `DiagnosticSeverity` | `:error` | Severity (diagnostic severity) |
-| `span` | `Span` | — | Span (span) |
+| `message` | `String.t()` | — | Human-readable description of the diagnostic. |
+| `severity` | `DiagnosticSeverity` | `:error` | Severity of the diagnostic. |
+| `span` | `Span` | — | Source span where the diagnostic was detected. |
 
 ---
 
@@ -654,9 +654,9 @@ A section within a docstring (e.g., Args, Returns, Raises).
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `String.t()` | — | Kind |
-| `name` | `String.t() \| nil` | `nil` | The name |
-| `description` | `String.t()` | — | Human-readable description |
+| `kind` | `String.t()` | — | Section kind (e.g., `"args"`, `"returns"`, `"raises"`). |
+| `name` | `String.t() \| nil` | `nil` | Parameter or return value name, if applicable. |
+| `description` | `String.t()` | — | Description text for this section. |
 
 ---
 
@@ -666,11 +666,11 @@ A docstring extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `text` | `String.t()` | — | Text |
-| `format` | `DocstringFormat` | `:python_triple_quote` | Format (docstring format) |
-| `span` | `Span` | — | Span (span) |
-| `associated_item` | `String.t() \| nil` | `nil` | Associated item |
-| `parsed_sections` | `list(DocSection)` | `[]` | Parsed sections |
+| `text` | `String.t()` | — | The raw text of the docstring. |
+| `format` | `DocstringFormat` | `:python_triple_quote` | The docstring format (Python, JSDoc, Rustdoc, etc.). |
+| `span` | `Span` | — | Source span covering the docstring. |
+| `associated_item` | `String.t() \| nil` | `nil` | Name of the item this docstring documents. |
+| `parsed_sections` | `list(DocSection)` | `[]` | Parsed sections of the docstring (Args, Returns, Raises, etc.). |
 
 ---
 
@@ -704,7 +704,7 @@ def installed_languages()
 
 Download the platform bundle and extract every library file it contains.
 
-Unlike `ensure_languages`, this does not check the manifest language list
+Unlike `Self.ensure_languages`, this does not check the manifest language list
 against archive contents — it simply extracts all `.so`/`.dylib`/`.dll` files
 from the bundle. Languages in the manifest that are missing from the archive
 are silently ignored rather than returning an error.
@@ -742,9 +742,9 @@ An export statement extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `name` | `String.t()` | — | The name |
-| `kind` | `ExportKind` | `:named` | Kind (export kind) |
-| `span` | `Span` | — | Span (span) |
+| `name` | `String.t()` | — | The exported name. |
+| `kind` | `ExportKind` | `:named` | The kind of export (named, default, or re-export). |
+| `span` | `Span` | — | Source span covering the export statement. |
 
 ---
 
@@ -754,14 +754,14 @@ Aggregate metrics for a source file.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `total_lines` | `integer()` | — | Total lines |
-| `code_lines` | `integer()` | — | Code lines |
-| `comment_lines` | `integer()` | — | Comment lines |
-| `blank_lines` | `integer()` | — | Blank lines |
-| `total_bytes` | `integer()` | — | Total bytes |
-| `node_count` | `integer()` | — | Number of nodes |
-| `error_count` | `integer()` | — | Number of errors |
-| `max_depth` | `integer()` | — | Maximum depth |
+| `total_lines` | `integer()` | — | Total number of lines (including blank and comment lines). |
+| `code_lines` | `integer()` | — | Number of lines containing non-blank, non-comment source code. |
+| `comment_lines` | `integer()` | — | Number of lines that are entirely comments. |
+| `blank_lines` | `integer()` | — | Number of blank (whitespace-only) lines. |
+| `total_bytes` | `integer()` | — | Total byte length of the source file. |
+| `node_count` | `integer()` | — | Total number of nodes in the syntax tree. |
+| `error_count` | `integer()` | — | Number of error nodes in the syntax tree (parse errors). |
+| `max_depth` | `integer()` | — | Maximum nesting depth reached in the syntax tree. |
 
 ---
 
@@ -771,11 +771,11 @@ An import statement extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `source` | `String.t()` | — | Source |
-| `items` | `list(String.t())` | `[]` | Items |
-| `alias` | `String.t() \| nil` | `nil` | Alias |
-| `is_wildcard` | `boolean()` | — | Whether wildcard |
-| `span` | `Span` | — | Span (span) |
+| `source` | `String.t()` | — | The module or path being imported from. |
+| `items` | `list(String.t())` | `[]` | Specific names imported from the source module. |
+| `alias` | `String.t() \| nil` | `nil` | Alias assigned to the import (e.g., `import numpy as np`). |
+| `is_wildcard` | `boolean()` | — | Whether this is a wildcard import (e.g., `import *` or `use foo.*`). |
+| `span` | `Span` | — | Source span covering the import statement. |
 
 ---
 
@@ -1313,16 +1313,16 @@ Fields are populated based on the `ProcessConfig` flags.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `language` | `String.t()` | — | Language |
-| `metrics` | `FileMetrics` | — | Metrics (file metrics) |
-| `structure` | `list(StructureItem)` | `[]` | Structure |
-| `imports` | `list(ImportInfo)` | `[]` | Imports |
-| `exports` | `list(ExportInfo)` | `[]` | Exports |
-| `comments` | `list(CommentInfo)` | `[]` | Comments |
-| `docstrings` | `list(DocstringInfo)` | `[]` | Docstrings |
-| `symbols` | `list(SymbolInfo)` | `[]` | Symbols |
-| `diagnostics` | `list(Diagnostic)` | `[]` | Diagnostics |
-| `chunks` | `list(CodeChunk)` | `[]` | Text chunks for chunking/embedding |
+| `language` | `String.t()` | — | The language name used to parse the source file. |
+| `metrics` | `FileMetrics` | — | File-level metrics (line counts, byte size, error count). |
+| `structure` | `list(StructureItem)` | `[]` | Top-level structural items (functions, classes, etc.). |
+| `imports` | `list(ImportInfo)` | `[]` | Import statements extracted from the source. |
+| `exports` | `list(ExportInfo)` | `[]` | Export statements extracted from the source. |
+| `comments` | `list(CommentInfo)` | `[]` | Comments extracted from the source. |
+| `docstrings` | `list(DocstringInfo)` | `[]` | Docstrings extracted from the source. |
+| `symbols` | `list(SymbolInfo)` | `[]` | Symbol definitions (variables, types, functions) extracted from the source. |
+| `diagnostics` | `list(Diagnostic)` | `[]` | Parse diagnostics (syntax errors, missing nodes) from tree-sitter. |
+| `chunks` | `list(CodeChunk)` | `[]` | Syntax-aware code chunks produced when chunking is enabled. |
 
 ---
 
@@ -1335,12 +1335,12 @@ positions (for display and diagnostics).
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `start_byte` | `integer()` | — | Start byte |
-| `end_byte` | `integer()` | — | End byte |
-| `start_line` | `integer()` | — | Start line |
-| `start_column` | `integer()` | — | Start column |
-| `end_line` | `integer()` | — | End line |
-| `end_column` | `integer()` | — | End column |
+| `start_byte` | `integer()` | — | Inclusive start byte offset in the source. |
+| `end_byte` | `integer()` | — | Exclusive end byte offset in the source. |
+| `start_line` | `integer()` | — | Zero-indexed line number of the span's start. |
+| `start_column` | `integer()` | — | Zero-indexed column number of the span's start. |
+| `end_line` | `integer()` | — | Zero-indexed line number of the span's end. |
+| `end_column` | `integer()` | — | Zero-indexed column number of the span's end. |
 
 ---
 
@@ -1350,15 +1350,15 @@ A structural item (function, class, struct, etc.) in source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `kind` | `StructureKind` | `:function` | Kind (structure kind) |
-| `name` | `String.t() \| nil` | `nil` | The name |
-| `visibility` | `String.t() \| nil` | `nil` | Visibility |
-| `span` | `Span` | — | Span (span) |
-| `children` | `list(StructureItem)` | `[]` | Children |
-| `decorators` | `list(String.t())` | `[]` | Decorators |
-| `doc_comment` | `String.t() \| nil` | `nil` | Doc comment |
-| `signature` | `String.t() \| nil` | `nil` | Signature |
-| `body_span` | `Span \| nil` | `nil` | Body span (span) |
+| `kind` | `StructureKind` | `:function` | The kind of structural item. |
+| `name` | `String.t() \| nil` | `nil` | The declared name of the item, if present. |
+| `visibility` | `String.t() \| nil` | `nil` | Visibility modifier (e.g., `"pub"`, `"public"`, `"private"`). |
+| `span` | `Span` | — | Source span covering the entire item declaration. |
+| `children` | `list(StructureItem)` | `[]` | Nested structural items (e.g., methods within a class). |
+| `decorators` | `list(String.t())` | `[]` | Decorator or attribute names applied to the item. |
+| `doc_comment` | `String.t() \| nil` | `nil` | Documentation comment attached to the item, if any. |
+| `signature` | `String.t() \| nil` | `nil` | Full signature text of the item (e.g., function parameters and return type). |
+| `body_span` | `Span \| nil` | `nil` | Source span covering only the body of the item, if distinct from the declaration. |
 
 ---
 
@@ -1368,11 +1368,11 @@ A symbol (variable, function, type, etc.) extracted from source code.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `name` | `String.t()` | — | The name |
-| `kind` | `SymbolKind` | `:variable` | Kind (symbol kind) |
-| `span` | `Span` | — | Span (span) |
-| `type_annotation` | `String.t() \| nil` | `nil` | Type annotation |
-| `doc` | `String.t() \| nil` | `nil` | Doc |
+| `name` | `String.t()` | — | The name of the symbol. |
+| `kind` | `SymbolKind` | `:variable` | The kind of symbol (variable, function, class, etc.). |
+| `span` | `Span` | — | Source span covering the symbol definition. |
+| `type_annotation` | `String.t() \| nil` | `nil` | Explicit type annotation, if present in the source. |
+| `doc` | `String.t() \| nil` | `nil` | Documentation comment associated with this symbol. |
 
 ---
 
@@ -1477,17 +1477,17 @@ language-specific constructs that do not fit a standard category.
 
 | Value | Description |
 |-------|-------------|
-| `function` | Function |
-| `method` | Method |
-| `class` | Class |
-| `struct` | Struct |
-| `interface` | Interface |
-| `enum` | Enum |
-| `module` | Module |
-| `trait` | Trait |
-| `impl` | Impl |
-| `namespace` | Namespace |
-| `other` | Other — Fields: `0`: `String.t()` |
+| `function` | A free-standing or associated function. |
+| `method` | A method defined inside a class, struct, trait, or impl block. |
+| `class` | A class definition. |
+| `struct` | A struct definition. |
+| `interface` | An interface or protocol definition. |
+| `enum` | An enum definition. |
+| `module` | A module or package declaration. |
+| `trait` | A trait definition. |
+| `impl` | An impl block (Rust) or similar implementation block. |
+| `namespace` | A namespace declaration. |
+| `other` | A language-specific construct that does not fit any standard category. — Fields: `0`: `String.t()` |
 
 ---
 
@@ -1500,9 +1500,9 @@ and documentation comments.
 
 | Value | Description |
 |-------|-------------|
-| `line` | Line |
-| `block` | Block |
-| `doc` | Doc |
+| `line` | A single-line comment (e.g., `// ...` or `# ...`). |
+| `block` | A block or multi-line comment (e.g., `/* ... */`). |
+| `doc` | A documentation comment (e.g., `/// ...` or `/** ... */`). |
 
 ---
 
@@ -1515,12 +1515,12 @@ Identifies the docstring convention used, which varies by language
 
 | Value | Description |
 |-------|-------------|
-| `python_triple_quote` | Python triple quote |
-| `js_doc` | J s doc |
-| `rustdoc` | Rustdoc |
-| `go_doc` | Go doc |
-| `java_doc` | Java doc |
-| `other` | Other — Fields: `0`: `String.t()` |
+| `python_triple_quote` | Python triple-quoted string docstring (`"""..."""`). |
+| `js_doc` | JavaScript/TypeScript JSDoc comment (`/** ... */`). |
+| `rustdoc` | Rust `///` or `//!` doc comment. |
+| `go_doc` | Go doc comment (a comment block immediately preceding a declaration). |
+| `java_doc` | Java Javadoc comment (`/** ... */`). |
+| `other` | A language-specific docstring format not covered by the standard variants. — Fields: `0`: `String.t()` |
 
 ---
 
@@ -1532,9 +1532,9 @@ Covers named exports, default exports, and re-exports from other modules.
 
 | Value | Description |
 |-------|-------------|
-| `named` | Named |
-| `default` | Default |
-| `re_export` | Re export |
+| `named` | A named export (e.g., `export { foo }`). |
+| `default` | A default export (e.g., `export default foo`). |
+| `re_export` | A re-export from another module (e.g., `export { foo } from 'bar'`). |
 
 ---
 
@@ -1547,15 +1547,15 @@ classes, types, interfaces, enums, and modules.
 
 | Value | Description |
 |-------|-------------|
-| `variable` | Variable |
-| `constant` | Constant |
-| `function` | Function |
-| `class` | Class |
-| `type` | Type |
-| `interface` | Interface |
-| `enum` | Enum |
-| `module` | Module |
-| `other` | Other — Fields: `0`: `String.t()` |
+| `variable` | A variable binding. |
+| `constant` | A constant (immutable binding). |
+| `function` | A function definition. |
+| `class` | A class definition. |
+| `type` | A type alias or typedef. |
+| `interface` | An interface definition. |
+| `enum` | An enum definition. |
+| `module` | A module declaration. |
+| `other` | A symbol kind not covered by the standard variants. — Fields: `0`: `String.t()` |
 
 ---
 
@@ -1568,9 +1568,9 @@ found in the syntax tree.
 
 | Value | Description |
 |-------|-------------|
-| `error` | Error |
-| `warning` | Warning |
-| `info` | Info |
+| `error` | A parse error (e.g., an `ERROR` or `MISSING` node in the tree). |
+| `warning` | A warning-level diagnostic. |
+| `info` | An informational diagnostic. |
 
 ---
 
@@ -1586,17 +1586,17 @@ features are enabled.
 
 | Variant | Description |
 |---------|-------------|
-| `language_not_found` | Language '{0}' not found |
-| `dynamic_load` | Dynamic library load error: {0} |
-| `null_language_pointer` | Language function returned null pointer for '{0}' |
-| `parser_setup` | Failed to set parser language: {0} |
-| `lock_poisoned` | Registry lock poisoned: {0} |
-| `config` | Configuration error: {0} |
-| `parse_failed` | Parse failed: parsing returned no tree |
-| `query_error` | Query error: {0} |
-| `invalid_range` | Invalid byte range: {0} |
-| `download` | Download error: {0} |
-| `checksum_mismatch` | Checksum mismatch for '{file}': expected {expected}, got {actual} |
-| `cache_lock` | Download cache lock error: {0} |
+| `language_not_found` | The requested language name (or alias) was not found in the registry. |
+| `dynamic_load` | A dynamic shared library could not be loaded at runtime. |
+| `null_language_pointer` | The tree-sitter language function returned a null pointer for the given language name. |
+| `parser_setup` | The language could not be applied to the parser (e.g., ABI version mismatch). |
+| `lock_poisoned` | An internal `RwLock` or `Mutex` was poisoned by a previous panic. |
+| `config` | A configuration file or value was invalid or could not be applied. |
+| `parse_failed` | The tree-sitter parser returned no tree for the given source input. |
+| `query_error` | A tree-sitter query could not be compiled or executed. |
+| `invalid_range` | A byte range was invalid (e.g., end before start, or out of bounds). |
+| `download` | A parser download from GitHub releases failed. |
+| `checksum_mismatch` | The downloaded file's SHA-256 digest did not match the manifest's expected value. |
+| `cache_lock` | The cross-process download cache lock file could not be acquired or created. |
 
 ---

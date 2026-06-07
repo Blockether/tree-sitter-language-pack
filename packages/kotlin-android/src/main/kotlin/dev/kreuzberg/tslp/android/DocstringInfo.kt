@@ -25,9 +25,14 @@ package dev.kreuzberg.tslp.android
 
 /** A docstring extracted from source code. */
 data class DocstringInfo(
+    /** The raw text of the docstring. */
     val text: String = "",
+    /** The docstring format (Python, JSDoc, Rustdoc, etc.). */
     val format: DocstringFormat,
+    /** Source span covering the docstring. */
     val span: Span = Span(),
+    /** Name of the item this docstring documents. */
     val associatedItem: String? = null,
+    /** Parsed sections of the docstring (Args, Returns, Raises, etc.). */
     val parsedSections: List<DocSection> = emptyList(),
 )

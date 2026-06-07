@@ -26,19 +26,20 @@ package dev.kreuzberg.tslp.android
 /**
  * The format of a docstring extracted from source code.
  *
- * Identifies the docstring convention used, which varies by language (e.g., Python triple-quoted
- * strings, JSDoc, Rustdoc `///` comments).
+ * Identifies the docstring convention used, which varies by language
+ * (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
  */
 sealed class DocstringFormat {
+    /** Python triple-quoted string docstring (`"""..."""`). */
     object PythonTripleQuote : DocstringFormat()
-
+    /** JavaScript/TypeScript JSDoc comment (`/ ** ... * /`). */
     object JSDoc : DocstringFormat()
-
+    /** Rust `///` or `//!` doc comment. */
     object Rustdoc : DocstringFormat()
-
+    /** Go doc comment (a comment block immediately preceding a declaration). */
     object GoDoc : DocstringFormat()
-
+    /** Java Javadoc comment (`/ ** ... * /`). */
     object JavaDoc : DocstringFormat()
-
+    /** A language-specific docstring format not covered by the standard variants. */
     data class Other(val value: String) : DocstringFormat()
 }

@@ -25,13 +25,22 @@ package dev.kreuzberg.tslp.android
 
 /** A structural item (function, class, struct, etc.) in source code. */
 data class StructureItem(
+    /** The kind of structural item. */
     val kind: StructureKind,
+    /** The declared name of the item, if present. */
     val name: String? = null,
+    /** Visibility modifier (e.g., `"pub"`, `"public"`, `"private"`). */
     val visibility: String? = null,
+    /** Source span covering the entire item declaration. */
     val span: Span = Span(),
+    /** Nested structural items (e.g., methods within a class). */
     val children: List<StructureItem> = emptyList(),
+    /** Decorator or attribute names applied to the item. */
     val decorators: List<String> = emptyList(),
+    /** Documentation comment attached to the item, if any. */
     val docComment: String? = null,
+    /** Full signature text of the item (e.g., function parameters and return type). */
     val signature: String? = null,
+    /** Source span covering only the body of the item, if distinct from the declaration. */
     val bodySpan: Span? = null,
 )

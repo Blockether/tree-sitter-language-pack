@@ -56,11 +56,17 @@ pub const Error = error{
 /// Represents both byte offsets (for slicing) and human-readable line/column
 /// positions (for display and diagnostics).
 pub const Span = struct {
+    /// Inclusive start byte offset in the source.
     start_byte: u64,
+    /// Exclusive end byte offset in the source.
     end_byte: u64,
+    /// Zero-indexed line number of the span's start.
     start_line: u64,
+    /// Zero-indexed column number of the span's start.
     start_column: u64,
+    /// Zero-indexed line number of the span's end.
     end_line: u64,
+    /// Zero-indexed column number of the span's end.
     end_column: u64,
 };
 
@@ -70,119 +76,189 @@ pub const Span = struct {
 /// docstrings, symbols, diagnostics, and optionally chunked code segments.
 /// Fields are populated based on the `ProcessConfig` flags.
 pub const ProcessResult = struct {
+    /// The language name used to parse the source file.
     language: []const u8,
+    /// File-level metrics (line counts, byte size, error count).
     metrics: FileMetrics,
+    /// Top-level structural items (functions, classes, etc.).
     structure: []const StructureItem,
+    /// Import statements extracted from the source.
     imports: []const ImportInfo,
+    /// Export statements extracted from the source.
     exports: []const ExportInfo,
+    /// Comments extracted from the source.
     comments: []const CommentInfo,
+    /// Docstrings extracted from the source.
     docstrings: []const DocstringInfo,
+    /// Symbol definitions (variables, types, functions) extracted from the source.
     symbols: []const SymbolInfo,
+    /// Parse diagnostics (syntax errors, missing nodes) from tree-sitter.
     diagnostics: []const Diagnostic,
+    /// Syntax-aware code chunks produced when chunking is enabled.
     chunks: []const CodeChunk,
 };
 
 /// Aggregate metrics for a source file.
 pub const FileMetrics = struct {
+    /// Total number of lines (including blank and comment lines).
     total_lines: u64,
+    /// Number of lines containing non-blank, non-comment source code.
     code_lines: u64,
+    /// Number of lines that are entirely comments.
     comment_lines: u64,
+    /// Number of blank (whitespace-only) lines.
     blank_lines: u64,
+    /// Total byte length of the source file.
     total_bytes: u64,
+    /// Total number of nodes in the syntax tree.
     node_count: u64,
+    /// Number of error nodes in the syntax tree (parse errors).
     error_count: u64,
+    /// Maximum nesting depth reached in the syntax tree.
     max_depth: u64,
 };
 
 /// A structural item (function, class, struct, etc.) in source code.
 pub const StructureItem = struct {
+    /// The kind of structural item.
     kind: StructureKind,
+    /// The declared name of the item, if present.
     name: ?[]const u8,
+    /// Visibility modifier (e.g., `"pub"`, `"public"`, `"private"`).
     visibility: ?[]const u8,
+    /// Source span covering the entire item declaration.
     span: Span,
+    /// Nested structural items (e.g., methods within a class).
     children: []const StructureItem,
+    /// Decorator or attribute names applied to the item.
     decorators: []const []const u8,
+    /// Documentation comment attached to the item, if any.
     doc_comment: ?[]const u8,
+    /// Full signature text of the item (e.g., function parameters and return type).
     signature: ?[]const u8,
+    /// Source span covering only the body of the item, if distinct from the declaration.
     body_span: ?Span,
 };
 
 /// A comment extracted from source code.
 pub const CommentInfo = struct {
+    /// The raw text content of the comment.
     text: []const u8,
+    /// The kind of comment (line, block, or doc).
     kind: CommentKind,
+    /// Source span covering the comment.
     span: Span,
+    /// Name of the syntax node this comment is directly associated with.
     associated_node: ?[]const u8,
 };
 
 /// A docstring extracted from source code.
 pub const DocstringInfo = struct {
+    /// The raw text of the docstring.
     text: []const u8,
+    /// The docstring format (Python, JSDoc, Rustdoc, etc.).
     format: DocstringFormat,
+    /// Source span covering the docstring.
     span: Span,
+    /// Name of the item this docstring documents.
     associated_item: ?[]const u8,
+    /// Parsed sections of the docstring (Args, Returns, Raises, etc.).
     parsed_sections: []const DocSection,
 };
 
 /// A section within a docstring (e.g., Args, Returns, Raises).
 pub const DocSection = struct {
+    /// Section kind (e.g., `"args"`, `"returns"`, `"raises"`).
     kind: []const u8,
+    /// Parameter or return value name, if applicable.
     name: ?[]const u8,
+    /// Description text for this section.
     description: []const u8,
 };
 
 /// An import statement extracted from source code.
 pub const ImportInfo = struct {
+    /// The module or path being imported from.
     source: []const u8,
+    /// Specific names imported from the source module.
     items: []const []const u8,
+    /// Alias assigned to the import (e.g., `import numpy as np`).
     alias: ?[]const u8,
+    /// Whether this is a wildcard import (e.g., `import *` or `use foo.*`).
     is_wildcard: bool,
+    /// Source span covering the import statement.
     span: Span,
 };
 
 /// An export statement extracted from source code.
 pub const ExportInfo = struct {
+    /// The exported name.
     name: []const u8,
+    /// The kind of export (named, default, or re-export).
     kind: ExportKind,
+    /// Source span covering the export statement.
     span: Span,
 };
 
 /// A symbol (variable, function, type, etc.) extracted from source code.
 pub const SymbolInfo = struct {
+    /// The name of the symbol.
     name: []const u8,
+    /// The kind of symbol (variable, function, class, etc.).
     kind: SymbolKind,
+    /// Source span covering the symbol definition.
     span: Span,
+    /// Explicit type annotation, if present in the source.
     type_annotation: ?[]const u8,
+    /// Documentation comment associated with this symbol.
     doc: ?[]const u8,
 };
 
 /// A diagnostic (syntax error, missing node, etc.) from parsing.
 pub const Diagnostic = struct {
+    /// Human-readable description of the diagnostic.
     message: []const u8,
+    /// Severity of the diagnostic.
     severity: DiagnosticSeverity,
+    /// Source span where the diagnostic was detected.
     span: Span,
 };
 
 /// A chunk of source code with rich metadata.
 pub const CodeChunk = struct {
+    /// The raw source text of this chunk.
     content: []const u8,
+    /// Inclusive start byte offset of this chunk in the original source.
     start_byte: u64,
+    /// Exclusive end byte offset of this chunk in the original source.
     end_byte: u64,
+    /// Zero-indexed start line of this chunk.
     start_line: u64,
+    /// Zero-indexed end line of this chunk.
     end_line: u64,
+    /// Contextual metadata about this chunk.
     metadata: ChunkContext,
 };
 
 /// Metadata for a single chunk of source code.
 pub const ChunkContext = struct {
+    /// Language name used to parse this chunk.
     language: []const u8,
+    /// Zero-indexed position of this chunk within the file's chunk list.
     chunk_index: u64,
+    /// Total number of chunks the file was split into.
     total_chunks: u64,
+    /// Tree-sitter node kinds that appear at the top level of this chunk.
     node_types: []const []const u8,
+    /// Hierarchical path of enclosing structural items (e.g., `["MyClass", "my_method"]`).
     context_path: []const []const u8,
+    /// Names of symbols defined within this chunk.
     symbols_defined: []const []const u8,
+    /// Comments contained within this chunk.
     comments: []const CommentInfo,
+    /// Docstrings contained within this chunk.
     docstrings: []const DocstringInfo,
+    /// Whether this chunk contains any tree-sitter error nodes.
     has_error_nodes: bool,
 };
 
@@ -250,16 +326,27 @@ pub const ProcessConfig = struct {
 /// structs, enums, traits, and more. Use `Other` for
 /// language-specific constructs that do not fit a standard category.
 pub const StructureKind = union(enum) {
+    /// A free-standing or associated function.
     function: void,
+    /// A method defined inside a class, struct, trait, or impl block.
     method: void,
+    /// A class definition.
     class: void,
+    /// A struct definition.
     struct_: void,
+    /// An interface or protocol definition.
     interface: void,
+    /// An enum definition.
     enum_: void,
+    /// A module or package declaration.
     module: void,
+    /// A trait definition.
     trait: void,
+    /// An impl block (Rust) or similar implementation block.
     impl: void,
+    /// A namespace declaration.
     namespace: void,
+    /// A language-specific construct that does not fit any standard category.
     other: []const u8,
 };
 
@@ -268,8 +355,11 @@ pub const StructureKind = union(enum) {
 /// Distinguishes between single-line comments, block (multi-line) comments,
 /// and documentation comments.
 pub const CommentKind = enum {
+    /// A single-line comment (e.g., `// ...` or `# ...`).
     line,
+    /// A block or multi-line comment (e.g., `/* ... */`).
     block,
+    /// A documentation comment (e.g., `/// ...` or `/** ... */`).
     doc,
 };
 
@@ -278,11 +368,17 @@ pub const CommentKind = enum {
 /// Identifies the docstring convention used, which varies by language
 /// (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 pub const DocstringFormat = union(enum) {
+    /// Python triple-quoted string docstring (`"""..."""`).
     python_triple_quote: void,
+    /// JavaScript/TypeScript JSDoc comment (`/** ... */`).
     js_doc: void,
+    /// Rust `///` or `//!` doc comment.
     rustdoc: void,
+    /// Go doc comment (a comment block immediately preceding a declaration).
     go_doc: void,
+    /// Java Javadoc comment (`/** ... */`).
     java_doc: void,
+    /// A language-specific docstring format not covered by the standard variants.
     other: []const u8,
 };
 
@@ -290,8 +386,11 @@ pub const DocstringFormat = union(enum) {
 ///
 /// Covers named exports, default exports, and re-exports from other modules.
 pub const ExportKind = enum {
+    /// A named export (e.g., `export { foo }`).
     named,
+    /// A default export (e.g., `export default foo`).
     default,
+    /// A re-export from another module (e.g., `export { foo } from 'bar'`).
     re_export,
 };
 
@@ -300,14 +399,23 @@ pub const ExportKind = enum {
 /// Categorizes symbol definitions such as variables, constants, functions,
 /// classes, types, interfaces, enums, and modules.
 pub const SymbolKind = union(enum) {
+    /// A variable binding.
     variable: void,
+    /// A constant (immutable binding).
     constant: void,
+    /// A function definition.
     function: void,
+    /// A class definition.
     class: void,
+    /// A type alias or typedef.
     type: void,
+    /// An interface definition.
     interface: void,
+    /// An enum definition.
     enum_: void,
+    /// A module declaration.
     module: void,
+    /// A symbol kind not covered by the standard variants.
     other: []const u8,
 };
 
@@ -316,8 +424,11 @@ pub const SymbolKind = union(enum) {
 /// Used to classify parse errors, warnings, and informational messages
 /// found in the syntax tree.
 pub const DiagnosticSeverity = enum {
+    /// A parse error (e.g., an `ERROR` or `MISSING` node in the tree).
     error_,
+    /// A warning-level diagnostic.
     warning,
+    /// An informational diagnostic.
     info,
 };
 
@@ -325,7 +436,8 @@ pub const DiagnosticSeverity = enum {
 ///
 /// Returns `null` for unrecognized extensions. The match is case-insensitive.
 pub fn detect_language_from_extension(ext: []const u8) error{OutOfMemory}!?[]u8 {
-    const ext_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{ext}, 0);
+    const ext_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{ext}, 0);
     defer std.heap.c_allocator.free(ext_z);
     const _result = c.ts_pack_detect_language_from_extension(ext_z);
     const _result_len = c.ts_pack_detect_language_from_extension_len(ext_z);
@@ -335,7 +447,8 @@ pub fn detect_language_from_extension(ext: []const u8) error{OutOfMemory}!?[]u8 
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         _free_string(_result);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// Detect language name from a file path.
@@ -343,7 +456,8 @@ pub fn detect_language_from_extension(ext: []const u8) error{OutOfMemory}!?[]u8 
 /// Extracts the file extension and looks it up. Returns `null` if the
 /// path has no extension or the extension is not recognized.
 pub fn detect_language_from_path(path: []const u8) error{OutOfMemory}!?[]u8 {
-    const path_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{path}, 0);
+    const path_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{path}, 0);
     defer std.heap.c_allocator.free(path_z);
     const _result = c.ts_pack_detect_language_from_path(path_z);
     const _result_len = c.ts_pack_detect_language_from_path_len(path_z);
@@ -353,7 +467,8 @@ pub fn detect_language_from_path(path: []const u8) error{OutOfMemory}!?[]u8 {
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         _free_string(_result);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// Detect language name from file content using the shebang line (`#!`).
@@ -373,7 +488,8 @@ pub fn detect_language_from_path(path: []const u8) error{OutOfMemory}!?[]u8 {
 /// Returns `null` when content does not start with `#!`, the shebang is
 /// malformed, or the interpreter is not recognised.
 pub fn detect_language_from_content(content: []const u8) error{OutOfMemory}!?[]u8 {
-    const content_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{content}, 0);
+    const content_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{content}, 0);
     defer std.heap.c_allocator.free(content_z);
     const _result = c.ts_pack_detect_language_from_content(content_z);
     const _result_len = c.ts_pack_detect_language_from_content_len(content_z);
@@ -383,7 +499,8 @@ pub fn detect_language_from_content(content: []const u8) error{OutOfMemory}!?[]u
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         _free_string(_result);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// Get the highlights query for a language, if bundled.
@@ -391,7 +508,8 @@ pub fn detect_language_from_content(content: []const u8) error{OutOfMemory}!?[]u
 /// Returns the contents of `highlights.scm` as a static string, or `null`
 /// if no highlights query is bundled for this language.
 pub fn get_highlights_query(language: []const u8) error{OutOfMemory}!?[]u8 {
-    const language_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{language}, 0);
+    const language_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{language}, 0);
     defer std.heap.c_allocator.free(language_z);
     const _result = c.ts_pack_get_highlights_query(language_z);
     const _result_len = c.ts_pack_get_highlights_query_len(language_z);
@@ -401,7 +519,8 @@ pub fn get_highlights_query(language: []const u8) error{OutOfMemory}!?[]u8 {
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         _free_string(_result);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// Get the injections query for a language, if bundled.
@@ -409,7 +528,8 @@ pub fn get_highlights_query(language: []const u8) error{OutOfMemory}!?[]u8 {
 /// Returns the contents of `injections.scm` as a static string, or `null`
 /// if no injections query is bundled for this language.
 pub fn get_injections_query(language: []const u8) error{OutOfMemory}!?[]u8 {
-    const language_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{language}, 0);
+    const language_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{language}, 0);
     defer std.heap.c_allocator.free(language_z);
     const _result = c.ts_pack_get_injections_query(language_z);
     const _result_len = c.ts_pack_get_injections_query_len(language_z);
@@ -419,7 +539,8 @@ pub fn get_injections_query(language: []const u8) error{OutOfMemory}!?[]u8 {
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         _free_string(_result);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// Get the locals query for a language, if bundled.
@@ -427,7 +548,8 @@ pub fn get_injections_query(language: []const u8) error{OutOfMemory}!?[]u8 {
 /// Returns the contents of `locals.scm` as a static string, or `null`
 /// if no locals query is bundled for this language.
 pub fn get_locals_query(language: []const u8) error{OutOfMemory}!?[]u8 {
-    const language_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{language}, 0);
+    const language_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{language}, 0);
     defer std.heap.c_allocator.free(language_z);
     const _result = c.ts_pack_get_locals_query(language_z);
     const _result_len = c.ts_pack_get_locals_query_len(language_z);
@@ -437,7 +559,8 @@ pub fn get_locals_query(language: []const u8) error{OutOfMemory}!?[]u8 {
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         _free_string(_result);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// Get a tree-sitter `Language` by name using the global registry.
@@ -451,7 +574,8 @@ pub fn get_locals_query(language: []const u8) error{OutOfMemory}!?[]u8 {
 /// Returns `Error.LanguageNotFound` if the language is not recognized,
 /// or `Error.Download` if auto-download fails.
 pub fn get_language(name: []const u8) Error!Language {
-    const name_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{name}, 0);
+    const name_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{name}, 0);
     defer std.heap.c_allocator.free(name_z);
     const _result = c.ts_pack_get_language(name_z);
     if (_result == null) {
@@ -470,7 +594,8 @@ pub fn get_language(name: []const u8) Error!Language {
 /// Returns `Error.LanguageNotFound` if the language is not recognized, or
 /// `Error.ParserSetup` if the language cannot be applied to the parser.
 pub fn get_parser(name: []const u8) Error!Parser {
-    const name_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{name}, 0);
+    const name_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{name}, 0);
     defer std.heap.c_allocator.free(name_z);
     const _result = c.ts_pack_get_parser(name_z);
     if (_result == null) {
@@ -483,7 +608,8 @@ pub fn get_parser(name: []const u8) Error!Parser {
 ///
 /// This compatibility alias matches the pre-Alef Python binding API.
 pub fn detect_language(path: []const u8) error{OutOfMemory}!?[]u8 {
-    const path_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{path}, 0);
+    const path_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{path}, 0);
     defer std.heap.c_allocator.free(path_z);
     const _result = c.ts_pack_detect_language(path_z);
     const _result_len = c.ts_pack_detect_language_len(path_z);
@@ -493,7 +619,8 @@ pub fn detect_language(path: []const u8) error{OutOfMemory}!?[]u8 {
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         _free_string(_result);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// List all available language names (sorted, deduplicated, includes aliases).
@@ -508,7 +635,8 @@ pub fn available_languages() error{OutOfMemory}![]u8 {
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         _free_string(_result);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// Check if a language is available by name or alias.
@@ -516,7 +644,8 @@ pub fn available_languages() error{OutOfMemory}![]u8 {
 /// Returns `true` if the language can be loaded (statically compiled,
 /// dynamically available, or a known alias for one of these).
 pub fn has_language(name: []const u8) error{OutOfMemory}!bool {
-    const name_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{name}, 0);
+    const name_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{name}, 0);
     defer std.heap.c_allocator.free(name_z);
     const _result = c.ts_pack_has_language(name_z);
     return _result != 0;
@@ -541,9 +670,11 @@ pub fn language_count() u64 {
 ///
 /// Returns an error if the language is not found or parsing fails.
 pub fn process(source: []const u8, config: []const u8) Error![]u8 {
-    const source_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{source}, 0);
+    const source_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{source}, 0);
     defer std.heap.c_allocator.free(source_z);
-    const config_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{config}, 0);
+    const config_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{config}, 0);
     defer std.heap.c_allocator.free(config_z);
     const config_handle = c.ts_pack_process_config_from_json(config_z);
     if (config_handle == null) return _first_error(Error);
@@ -559,7 +690,8 @@ pub fn process(source: []const u8, config: []const u8) Error![]u8 {
         const slice = std.mem.sliceTo(_json_ptr, 0);
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// Initialize the language pack with the given configuration.
@@ -572,7 +704,8 @@ pub fn process(source: []const u8, config: []const u8) Error![]u8 {
 ///
 /// Returns an error if configuration cannot be applied or if downloads fail.
 pub fn init(config: []const u8) Error!void {
-    const config_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{config}, 0);
+    const config_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{config}, 0);
     defer std.heap.c_allocator.free(config_z);
     const config_handle = c.ts_pack_pack_config_from_json(config_z);
     if (config_handle == null) return _first_error(Error);
@@ -595,7 +728,8 @@ pub fn init(config: []const u8) Error!void {
 ///
 /// Returns an error if the lock cannot be acquired.
 pub fn configure(config: []const u8) Error!void {
-    const config_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{config}, 0);
+    const config_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{config}, 0);
     defer std.heap.c_allocator.free(config_z);
     const config_handle = c.ts_pack_pack_config_from_json(config_z);
     if (config_handle == null) return _first_error(Error);
@@ -618,7 +752,8 @@ pub fn configure(config: []const u8) Error!void {
 /// the download fails.
 pub fn download(names: []const u8) Error!u64 {
     // Vec/Map parameters are passed as JSON strings across the FFI boundary.
-    const names_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{names}, 0);
+    const names_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{names}, 0);
     defer std.heap.c_allocator.free(names_z);
     const _result = c.ts_pack_download(names_z);
     if (_result == null) {
@@ -652,7 +787,7 @@ pub fn download_all() Error!u64 {
 ///
 /// Groups are defined in the remote manifest and let you ensure a curated
 /// set of related grammars in one call instead of listing each name to
-/// `download`. Already-cached languages are skipped.
+/// `download()`. Already-cached languages are skipped.
 ///
 /// Returns the total number of languages now available (statically compiled
 /// plus downloaded and cached).
@@ -662,7 +797,8 @@ pub fn download_all() Error!u64 {
 /// Returns an error if the manifest cannot be fetched, the group is unknown,
 /// or any constituent language fails to download.
 pub fn download_group(name: []const u8) Error!u64 {
-    const name_z = try std.fmt.allocPrintSentinel(std.heap.c_allocator, "{s}", .{name}, 0);
+    const name_z = try std.fmt.allocPrintSentinel(
+        std.heap.c_allocator, "{s}", .{name}, 0);
     defer std.heap.c_allocator.free(name_z);
     const _result = c.ts_pack_download_group(name_z);
     if (_result == null) {
@@ -692,7 +828,8 @@ pub fn manifest_languages() Error![]u8 {
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         _free_string(_result);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// Return languages that are already downloaded and cached locally.
@@ -707,7 +844,8 @@ pub fn downloaded_languages() error{OutOfMemory}![]u8 {
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         _free_string(_result);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// Delete all cached parser shared libraries.
@@ -746,7 +884,8 @@ pub fn cache_dir() Error![]u8 {
         const owned = try std.heap.c_allocator.dupe(u8, slice);
         _free_string(_result);
         break :blk owned;
-    };
+    }
+;
 }
 
 /// Construct a new parser with no language set.
@@ -777,7 +916,7 @@ pub const Parser = struct {
     ///
     /// Returns `Error.LanguageNotFound` if the language is not recognized,
     /// or `Error.ParserSetup` if the language ABI is incompatible.
-    pub fn set_language(self: *Parser, name: []const u8) (Error || error{OutOfMemory})!void {
+    pub fn set_language(self: *Parser, name: []const u8) (Error||error{OutOfMemory})!void {
         const name_z = try std.heap.c_allocator.dupeZ(u8, name);
         defer std.heap.c_allocator.free(name_z);
         _ = c.ts_pack_parser_set_language(@as(*c.TS_PACKParser, @ptrCast(self._handle)), name_z);
@@ -1092,7 +1231,7 @@ pub const LanguageRegistry = struct {
     ///
     /// Returns `Error.LanguageNotFound` if the name (after alias resolution)
     /// does not match any known grammar.
-    pub fn get_language(self: *LanguageRegistry, name: []const u8) (Error || error{OutOfMemory})!Language {
+    pub fn get_language(self: *LanguageRegistry, name: []const u8) (Error||error{OutOfMemory})!Language {
         const name_z = try std.heap.c_allocator.dupeZ(u8, name);
         defer std.heap.c_allocator.free(name_z);
         const _result = c.ts_pack_language_registry_get_language(@as(*c.TS_PACKLanguageRegistry, @ptrCast(self._handle)), name_z);
@@ -1161,7 +1300,7 @@ pub const LanguageRegistry = struct {
     }
 
     /// Parse source code and extract file intelligence based on config in a single pass.
-    pub fn process(self: *LanguageRegistry, source: []const u8, config: []const u8) (Error || error{OutOfMemory})![]u8 {
+    pub fn process(self: *LanguageRegistry, source: []const u8, config: []const u8) (Error||error{OutOfMemory})![]u8 {
         const source_z = try std.heap.c_allocator.dupeZ(u8, source);
         defer std.heap.c_allocator.free(source_z);
         const config_z = try std.heap.c_allocator.dupeZ(u8, config);
@@ -1215,13 +1354,13 @@ pub const DownloadManager = struct {
 
     /// Download the platform bundle and extract every library file it contains.
     ///
-    /// Unlike `ensure_languages`, this does not check the manifest language list
+    /// Unlike `Self.ensure_languages`, this does not check the manifest language list
     /// against archive contents — it simply extracts all `.so`/`.dylib`/`.dll` files
     /// from the bundle. Languages in the manifest that are missing from the archive
     /// are silently ignored rather than returning an error.
     ///
     /// Returns the number of library files extracted (including those already cached).
-    pub fn download_all_best_effort(self: *DownloadManager) (Error || error{OutOfMemory})!u64 {
+    pub fn download_all_best_effort(self: *DownloadManager) (Error||error{OutOfMemory})!u64 {
         const _result = c.ts_pack_download_manager_download_all_best_effort(@as(*c.TS_PACKDownloadManager, @ptrCast(self._handle)));
         if (_result == null) {
             return _first_error(Error);
@@ -1237,7 +1376,7 @@ pub const DownloadManager = struct {
     /// permanent infrastructure; deleting it could allow a concurrent process that
     /// already opened the file to continue holding a stale lock handle while a new
     /// process opens a fresh inode, breaking the mutual-exclusion guarantee.
-    pub fn clean_cache(self: *DownloadManager) (Error || error{OutOfMemory})!void {
+    pub fn clean_cache(self: *DownloadManager) (Error||error{OutOfMemory})!void {
         _ = c.ts_pack_download_manager_clean_cache(@as(*c.TS_PACKDownloadManager, @ptrCast(self._handle)));
         if (c.ts_pack_last_error_code() != 0) {
             return _first_error(Error);

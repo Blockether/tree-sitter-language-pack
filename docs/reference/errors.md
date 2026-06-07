@@ -16,17 +16,17 @@ features are enabled.
 
 | Variant | Message | Description |
 |---------|---------|-------------|
-| `LanguageNotFound` | Language '{0}' not found | Language not found errors |
-| `DynamicLoad` | Dynamic library load error: {0} | Dynamic load errors |
-| `NullLanguagePointer` | Language function returned null pointer for '{0}' | Null language pointer errors |
-| `ParserSetup` | Failed to set parser language: {0} | Parser setup errors |
-| `LockPoisoned` | Registry lock poisoned: {0} | Lock poisoned errors |
-| `Config` | Configuration error: {0} | Config errors |
-| `ParseFailed` | Parse failed: parsing returned no tree | Parse failed errors |
-| `QueryError` | Query error: {0} | Query error errors |
-| `InvalidRange` | Invalid byte range: {0} | Invalid range errors |
-| `Download` | Download error: {0} | Download errors |
-| `ChecksumMismatch` | Checksum mismatch for '{file}': expected {expected}, got {actual} | Checksum mismatch errors |
-| `CacheLock` | Download cache lock error: {0} | Cache lock errors |
+| `LanguageNotFound` | Language '{0}' not found | The requested language name (or alias) was not found in the registry. |
+| `DynamicLoad` | Dynamic library load error: {0} | A dynamic shared library could not be loaded at runtime. |
+| `NullLanguagePointer` | Language function returned null pointer for '{0}' | The tree-sitter language function returned a null pointer for the given language name. |
+| `ParserSetup` | Failed to set parser language: {0} | The language could not be applied to the parser (e.g., ABI version mismatch). |
+| `LockPoisoned` | Registry lock poisoned: {0} | An internal `RwLock` or `Mutex` was poisoned by a previous panic. |
+| `Config` | Configuration error: {0} | A configuration file or value was invalid or could not be applied. |
+| `ParseFailed` | Parse failed: parsing returned no tree | The tree-sitter parser returned no tree for the given source input. |
+| `QueryError` | Query error: {0} | A tree-sitter query could not be compiled or executed. |
+| `InvalidRange` | Invalid byte range: {0} | A byte range was invalid (e.g., end before start, or out of bounds). |
+| `Download` | Download error: {0} | A parser download from GitHub releases failed. |
+| `ChecksumMismatch` | Checksum mismatch for '{file}': expected {expected}, got {actual} | The downloaded file's SHA-256 digest did not match the manifest's expected value. |
+| `CacheLock` | Download cache lock error: {0} | The cross-process download cache lock file could not be acquired or created. |
 
 ---

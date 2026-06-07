@@ -24,4 +24,11 @@
 package dev.kreuzberg.tslp.android
 
 /** A section within a docstring (e.g., Args, Returns, Raises). */
-data class DocSection(val kind: String = "", val name: String? = null, val description: String = "")
+data class DocSection(
+    /** Section kind (e.g., `"args"`, `"returns"`, `"raises"`). */
+    val kind: String = "",
+    /** Parameter or return value name, if applicable. */
+    val name: String? = null,
+    /** Description text for this section. */
+    val description: String = "",
+)
