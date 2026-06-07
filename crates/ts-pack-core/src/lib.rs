@@ -40,17 +40,22 @@
 //! - [`pack_config`] - Configuration for the language pack (cache dir, languages to download)
 //! - [`error`] - Error types
 
+/// Error types for tree-sitter language pack operations.
 pub mod error;
 pub(crate) mod extensions;
 pub(crate) mod intel;
 #[cfg(feature = "serde")]
 #[doc(hidden)]
 pub mod json_utils;
+/// Configuration for the language pack (cache directory, languages to pre-download).
 pub mod pack_config;
 pub(crate) mod parse;
+/// Ownership-safe tree-sitter parser, tree, node, and cursor wrappers for FFI.
 pub mod parsing;
+/// Configuration for the `process()` pipeline (which analysis features to enable).
 pub mod process_config;
 pub(crate) mod queries;
+/// Thread-safe language registry mapping names to compiled tree-sitter parsers.
 pub mod registry;
 pub(crate) mod text_splitter;
 
@@ -58,6 +63,7 @@ pub(crate) mod text_splitter;
 pub(crate) mod config;
 #[cfg(feature = "config")]
 pub(crate) mod definitions;
+/// Download manager for fetching pre-built parser shared libraries from GitHub releases.
 #[cfg(feature = "download")]
 pub mod download;
 
