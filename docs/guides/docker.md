@@ -4,7 +4,9 @@ description: "Run ts-pack in Docker — a statically-linked Alpine image with al
 
 # Docker
 
-The Docker image ships a statically-linked `ts-pack` binary on Alpine Linux. The build process compiles all parsers at image build time; the container needs no internet access or runtime downloads.
+The Docker image ships a statically-linked `ts-pack` binary on Alpine Linux.
+The build process compiles all parsers at image build time; the container needs
+no internet access or runtime downloads.
 
 ## Quick start
 
@@ -90,8 +92,10 @@ COPY --from=builder /build/target/release/ts-pack /usr/local/bin/ts-pack
 ENTRYPOINT ["ts-pack"]
 ```
 
-Run `uv run scripts/clone_vendors.py --languages python,javascript,typescript` first to fetch the needed grammar sources.
+Run `uv run scripts/clone_vendors.py --languages python,javascript,typescript`
+first to fetch the needed grammar sources.
 
 ## Multi-arch
 
-The published image targets `linux/amd64` and `linux/arm64`. The `ci-docker.yaml` and `publish-docker.yaml` workflows handle this via `docker buildx`.
+The published image targets `linux/amd64` and `linux/arm64`. The `ci-docker.yaml`
+and `publish-docker.yaml` workflows handle this via `docker buildx`.
