@@ -42,9 +42,16 @@ fi
 EXT_DIR="$(php -r 'echo ini_get("extension_dir");')"
 test -f "$EXT_DIR/tree_sitter_language_pack.so" || test -f "$EXT_DIR/tree_sitter_language_pack.dylib" || test -f "$EXT_DIR/tree_sitter_language_pack.dll"
 
-# Load it explicitly for the smoke test (the verify-install action runs
-# phpunit with this same `-d extension=` flag in CI).
-if ! php -dextension=tree_sitter_language_pack -m | grep -qi tree_sitter_language_pack; then
+# Export the installed extension path for downstream test runners (composer test).
+# The test app's run_tests.php checks for PIE_INSTALLED_EXTENSION_PATH and loads the extension via `-d`.
+export PIE_INSTALLED_EXTENSION_PATH="$EXT_DIR/tree_sitter_language_pack.so"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export PIE_INSTALLED_EXTENSION_PATH="$EXT_DIR/tree_sitter_language_pack.dylib"
+fi
+
+# Verify the extension loads via explicit `-d` flag (same mechanism run_tests.php uses).
+# Note: The extension internally registers as "ts-pack-core-php" despite the filename.
+if ! php -d extension=tree_sitter_language_pack -m | grep -qi "ts-pack-core-php"; then
   echo "::error::tree_sitter_language_pack extension failed to load after PIE install" >&2
   exit 1
 fi
