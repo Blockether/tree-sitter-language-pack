@@ -265,10 +265,9 @@ final class NativeLib {
 
   static final MethodHandle TS_PACK_DETECT_LANGUAGE_FROM_EXTENSION = LINKER.downcallHandle(
       LIB.find("ts_pack_detect_language_from_extension")
-          .or(
-              () -> LIB.find(
-                  "_ts_pack_detect_language_from_extension")) // Try underscore-prefixed variant for
-                                                              // macOS
+          .or(() -> LIB.find(
+              "_ts_pack_detect_language_from_extension")) // Try underscore-prefixed variant for
+          // macOS
           .or(() -> LINKER
               .defaultLookup()
               .find("ts_pack_detect_language_from_extension")) // Fallback to default lookup
@@ -280,10 +279,9 @@ final class NativeLib {
 
   static final MethodHandle TS_PACK_DETECT_LANGUAGE_FROM_EXTENSION_LEN = LINKER.downcallHandle(
       LIB.find("ts_pack_detect_language_from_extension_len")
-          .or(
-              () -> LIB.find(
-                  "_ts_pack_detect_language_from_extension_len")) // Try underscore-prefixed variant
-                                                                  // for macOS
+          .or(() -> LIB.find(
+              "_ts_pack_detect_language_from_extension_len")) // Try underscore-prefixed variant
+          // for macOS
           .or(() -> LINKER
               .defaultLookup()
               .find("ts_pack_detect_language_from_extension_len")) // Fallback to default lookup
@@ -308,10 +306,9 @@ final class NativeLib {
 
   static final MethodHandle TS_PACK_DETECT_LANGUAGE_FROM_PATH_LEN = LINKER.downcallHandle(
       LIB.find("ts_pack_detect_language_from_path_len")
-          .or(
-              () -> LIB.find(
-                  "_ts_pack_detect_language_from_path_len")) // Try underscore-prefixed variant for
-                                                             // macOS
+          .or(() -> LIB.find(
+              "_ts_pack_detect_language_from_path_len")) // Try underscore-prefixed variant for
+          // macOS
           .or(() -> LINKER
               .defaultLookup()
               .find("ts_pack_detect_language_from_path_len")) // Fallback to default lookup
@@ -336,10 +333,9 @@ final class NativeLib {
 
   static final MethodHandle TS_PACK_DETECT_LANGUAGE_FROM_CONTENT_LEN = LINKER.downcallHandle(
       LIB.find("ts_pack_detect_language_from_content_len")
-          .or(
-              () -> LIB.find(
-                  "_ts_pack_detect_language_from_content_len")) // Try underscore-prefixed variant
-                                                                // for macOS
+          .or(() -> LIB.find(
+              "_ts_pack_detect_language_from_content_len")) // Try underscore-prefixed variant
+          // for macOS
           .or(() -> LINKER
               .defaultLookup()
               .find("ts_pack_detect_language_from_content_len")) // Fallback to default lookup
@@ -977,10 +973,9 @@ final class NativeLib {
 
   static final MethodHandle TS_PACK_TREE_CURSOR_GOTO_NEXT_SIBLING = LINKER.downcallHandle(
       LIB.find("ts_pack_tree_cursor_goto_next_sibling")
-          .or(
-              () -> LIB.find(
-                  "_ts_pack_tree_cursor_goto_next_sibling")) // Try underscore-prefixed variant for
-                                                             // macOS
+          .or(() -> LIB.find(
+              "_ts_pack_tree_cursor_goto_next_sibling")) // Try underscore-prefixed variant for
+          // macOS
           .or(() -> LINKER
               .defaultLookup()
               .find("ts_pack_tree_cursor_goto_next_sibling")) // Fallback to default lookup
@@ -1018,10 +1013,9 @@ final class NativeLib {
 
   static final MethodHandle TS_PACK_LANGUAGE_REGISTRY_GET_LANGUAGE = LINKER.downcallHandle(
       LIB.find("ts_pack_language_registry_get_language")
-          .or(
-              () -> LIB.find(
-                  "_ts_pack_language_registry_get_language")) // Try underscore-prefixed variant for
-                                                              // macOS
+          .or(() -> LIB.find(
+              "_ts_pack_language_registry_get_language")) // Try underscore-prefixed variant for
+          // macOS
           .or(() -> LINKER
               .defaultLookup()
               .find("ts_pack_language_registry_get_language")) // Fallback to default lookup
@@ -1033,10 +1027,9 @@ final class NativeLib {
 
   static final MethodHandle TS_PACK_LANGUAGE_REGISTRY_AVAILABLE_LANGUAGES = LINKER.downcallHandle(
       LIB.find("ts_pack_language_registry_available_languages")
-          .or(
-              () -> LIB.find(
-                  "_ts_pack_language_registry_available_languages")) // Try underscore-prefixed
-                                                                     // variant for macOS
+          .or(() ->
+              LIB.find("_ts_pack_language_registry_available_languages")) // Try underscore-prefixed
+          // variant for macOS
           .or(() -> LINKER
               .defaultLookup()
               .find("ts_pack_language_registry_available_languages")) // Fallback to default lookup
@@ -1062,10 +1055,9 @@ final class NativeLib {
 
   static final MethodHandle TS_PACK_LANGUAGE_REGISTRY_HAS_LANGUAGE = LINKER.downcallHandle(
       LIB.find("ts_pack_language_registry_has_language")
-          .or(
-              () -> LIB.find(
-                  "_ts_pack_language_registry_has_language")) // Try underscore-prefixed variant for
-                                                              // macOS
+          .or(() -> LIB.find(
+              "_ts_pack_language_registry_has_language")) // Try underscore-prefixed variant for
+          // macOS
           .or(() -> LINKER
               .defaultLookup()
               .find("ts_pack_language_registry_has_language")) // Fallback to default lookup
@@ -1077,10 +1069,9 @@ final class NativeLib {
 
   static final MethodHandle TS_PACK_LANGUAGE_REGISTRY_LANGUAGE_COUNT = LINKER.downcallHandle(
       LIB.find("ts_pack_language_registry_language_count")
-          .or(
-              () -> LIB.find(
-                  "_ts_pack_language_registry_language_count")) // Try underscore-prefixed variant
-                                                                // for macOS
+          .or(() -> LIB.find(
+              "_ts_pack_language_registry_language_count")) // Try underscore-prefixed variant
+          // for macOS
           .or(() -> LINKER
               .defaultLookup()
               .find("ts_pack_language_registry_language_count")) // Fallback to default lookup
@@ -1119,10 +1110,9 @@ final class NativeLib {
 
   static final MethodHandle TS_PACK_DOWNLOAD_MANAGER_INSTALLED_LANGUAGES = LINKER.downcallHandle(
       LIB.find("ts_pack_download_manager_installed_languages")
-          .or(
-              () -> LIB.find(
-                  "_ts_pack_download_manager_installed_languages")) // Try underscore-prefixed
-                                                                    // variant for macOS
+          .or(() ->
+              LIB.find("_ts_pack_download_manager_installed_languages")) // Try underscore-prefixed
+          // variant for macOS
           .or(() -> LINKER
               .defaultLookup()
               .find("ts_pack_download_manager_installed_languages")) // Fallback to default lookup
@@ -1135,24 +1125,17 @@ final class NativeLib {
   static final MethodHandle TS_PACK_DOWNLOAD_MANAGER_DOWNLOAD_ALL_BEST_EFFORT =
       LINKER.downcallHandle(
           LIB.find("ts_pack_download_manager_download_all_best_effort")
-              .or(
-                  () ->
-                      LIB.find(
-                          "_ts_pack_download_manager_download_all_best_effort")) // Try
-                                                                                 // underscore-prefixed variant for macOS
-              .or(
-                  () -> LINKER
-                      .defaultLookup()
-                      .find(
-                          "ts_pack_download_manager_download_all_best_effort")) // Fallback to
-                                                                                // default lookup
-              .or(
-                  () -> LINKER
-                      .defaultLookup()
-                      .find(
-                          "_ts_pack_download_manager_download_all_best_effort")) // Fallback
-                                                                                 // underscore
-                                                                                 // variant
+              .or(() -> LIB.find("_ts_pack_download_manager_download_all_best_effort")) // Try
+              // underscore-prefixed variant for macOS
+              .or(() -> LINKER
+                  .defaultLookup()
+                  .find("ts_pack_download_manager_download_all_best_effort")) // Fallback to
+              // default lookup
+              .or(() -> LINKER
+                  .defaultLookup()
+                  .find("_ts_pack_download_manager_download_all_best_effort")) // Fallback
+              // underscore
+              // variant
               .orElseThrow(),
           FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS));
 
