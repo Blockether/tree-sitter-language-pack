@@ -138,6 +138,8 @@ e2e/dart/.dart_tool/
 test_apps/c/ffi/
 e2e/c/ffi/
 
+ .ai-rulez/.generated-manifest.json
+
 # BEGIN ai-rulez (DO NOT EDIT - managed by ai-rulez)
 .agents/
 .github/agents/

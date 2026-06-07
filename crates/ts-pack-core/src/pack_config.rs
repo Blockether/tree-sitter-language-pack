@@ -12,8 +12,9 @@ use std::path::PathBuf;
 ///
 /// Selected at process start via the `TREE_SITTER_LANGUAGE_PACK_TLS_ROOTS`
 /// environment variable (`platform` or `webpki`, case-insensitive). The enum
-/// is exposed publicly for callers that construct a [`DownloadManager`]
-/// directly via [`DownloadManager::with_cache_dir_and_tls`].
+/// is exposed publicly for callers that construct a
+/// [`crate::download::DownloadManager`] directly via
+/// [`crate::download::DownloadManager::with_cache_dir_and_tls`].
 #[cfg_attr(alef, alef(skip))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum TlsRootsMode {
