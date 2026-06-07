@@ -46,7 +46,8 @@ let package = Package(
     ),
     .target(
       name: "TreeSitterLanguagePack", dependencies: ["RustBridge"],
-      path: "Sources/TreeSitterLanguagePack"),
+      path: "Sources/TreeSitterLanguagePack",
+      exclude: ["LICENSE"]),
     .testTarget(
       name: "TreeSitterLanguagePackTests", dependencies: ["TreeSitterLanguagePack"],
       path: "Tests/TreeSitterLanguagePackTests"),

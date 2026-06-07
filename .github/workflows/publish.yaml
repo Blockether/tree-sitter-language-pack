@@ -3348,6 +3348,7 @@ jobs:
                     fi
 
                     cp "${src_lib}"/* ".lib/$libdir/"
+                    # shellcheck disable=SC2012
                     echo "  Copied: $(ls "${src_lib}" | tr '\n' ' ')"
                   done
 
