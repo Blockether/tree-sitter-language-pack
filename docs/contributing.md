@@ -61,7 +61,10 @@ The most common contribution is adding a new tree-sitter grammar.
 
 The grammar must:
 
-- **Be permissively licensed** — MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, or Unlicense only. We do **not** accept GPL, AGPL, LGPL, MPL, or any copyleft license. This ensures tree-sitter-language-pack can be used freely in any project without imposing license obligations on downstream users.
+- **Be permissively licensed** — MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause,
+  ISC, or Unlicense only. We do **not** accept GPL, AGPL, LGPL, MPL, or any
+  copyleft license. This ensures tree-sitter-language-pack can be used freely
+  in any project without imposing license obligations on downstream users.
 - Have a **public Git repository**.
 - Produce valid `parser.c` output from `tree-sitter generate`.
 - Compile cleanly on **Linux, macOS, and Windows**.
@@ -152,7 +155,9 @@ task test:e2e
 
 ## Improving bindings
 
-Binding improvements (better error messages, idiomatic APIs, new methods) are welcome. Each binding lives in `crates/ts-pack-<language>/`. See the [Architecture](concepts/architecture.md) page for the full crate layout.
+Binding improvements (better error messages, idiomatic APIs, new methods) are
+welcome. Each binding lives in `crates/ts-pack-<language>/`. See the
+[Architecture](concepts/architecture.md) page for the full crate layout.
 
 Binding changes must:
 
