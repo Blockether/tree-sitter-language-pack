@@ -256,7 +256,7 @@ class TreeSitterLanguagePackBridge {
   /// println!("Structures: {}", result.structure.len());
   /// ```
   /// throws Error on failure
-  static Future<ProcessResult> process(String source, [ProcessConfig? config]) async {
+  static Future<ProcessResult> process(String source, {ProcessConfig? config}) async {
     return await rust_bridge.process(source: source, config: config ?? ProcessConfig(language: '', structure: true, imports: true, exports: true, comments: false, docstrings: false, symbols: false, diagnostics: false, chunkMaxSize: null));
   }
 
@@ -283,7 +283,7 @@ class TreeSitterLanguagePackBridge {
   /// init(&config).unwrap();
   /// ```
   /// throws Error on failure
-  static Future<void> init([PackConfig? config]) async {
+  static Future<void> init({PackConfig? config}) async {
     return await rust_bridge.init(config: config ?? PackConfig(cacheDir: '', languages: [], groups: []));
   }
 
@@ -312,7 +312,7 @@ class TreeSitterLanguagePackBridge {
   /// configure(&config).unwrap();
   /// ```
   /// throws Error on failure
-  static Future<void> configure([PackConfig? config]) async {
+  static Future<void> configure({PackConfig? config}) async {
     return await rust_bridge.configure(config: config ?? PackConfig(cacheDir: '', languages: [], groups: []));
   }
 

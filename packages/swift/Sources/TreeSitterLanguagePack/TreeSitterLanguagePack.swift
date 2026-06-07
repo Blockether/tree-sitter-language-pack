@@ -1011,7 +1011,8 @@ public func diagnosticSeverityFromJson(_ json: String) throws -> DiagnosticSever
 /// assert_eq!(detect_language_from_extension("xyz"), None);
 /// ```
 public func detectLanguageFromExtension(ext: String) -> String? {
-    let _rb_json = RustBridge.detectLanguageFromExtension(ext).toString()
+        let _rb_ext = RustString(ext)
+    let _rb_json = RustBridge.detectLanguageFromExtension(_rb_ext).toString()
     let _rb_data = _rb_json.data(using: .utf8) ?? Data()
     return (try? JSONDecoder().decode(String?.self, from: _rb_data)) ?? nil
 }
@@ -1027,7 +1028,8 @@ public func detectLanguageFromExtension(ext: String) -> String? {
 /// assert_eq!(detect_language_from_path("Makefile"), None);
 /// ```
 public func detectLanguageFromPath(path: String) -> String? {
-    let _rb_json = RustBridge.detectLanguageFromPath(path).toString()
+        let _rb_path = RustString(path)
+    let _rb_json = RustBridge.detectLanguageFromPath(_rb_path).toString()
     let _rb_data = _rb_json.data(using: .utf8) ?? Data()
     return (try? JSONDecoder().decode(String?.self, from: _rb_data)) ?? nil
 }
@@ -1054,7 +1056,8 @@ public func detectLanguageFromPath(path: String) -> String? {
 /// assert_eq!(detect_language_from_content("no shebang here"), None);
 /// ```
 public func detectLanguageFromContent(content: String) -> String? {
-    let _rb_json = RustBridge.detectLanguageFromContent(content).toString()
+        let _rb_content = RustString(content)
+    let _rb_json = RustBridge.detectLanguageFromContent(_rb_content).toString()
     let _rb_data = _rb_json.data(using: .utf8) ?? Data()
     return (try? JSONDecoder().decode(String?.self, from: _rb_data)) ?? nil
 }
@@ -1075,7 +1078,8 @@ public func detectLanguageFromContent(content: String) -> String? {
 /// assert!(missing.is_none());
 /// ```
 public func getHighlightsQuery(language: String) -> String? {
-    let _rb_json = RustBridge.getHighlightsQuery(language).toString()
+        let _rb_language = RustString(language)
+    let _rb_json = RustBridge.getHighlightsQuery(_rb_language).toString()
     let _rb_data = _rb_json.data(using: .utf8) ?? Data()
     return (try? JSONDecoder().decode(String?.self, from: _rb_data)) ?? nil
 }
@@ -1095,7 +1099,8 @@ public func getHighlightsQuery(language: String) -> String? {
 /// assert!(missing.is_none());
 /// ```
 public func getInjectionsQuery(language: String) -> String? {
-    let _rb_json = RustBridge.getInjectionsQuery(language).toString()
+        let _rb_language = RustString(language)
+    let _rb_json = RustBridge.getInjectionsQuery(_rb_language).toString()
     let _rb_data = _rb_json.data(using: .utf8) ?? Data()
     return (try? JSONDecoder().decode(String?.self, from: _rb_data)) ?? nil
 }
@@ -1115,7 +1120,8 @@ public func getInjectionsQuery(language: String) -> String? {
 /// assert!(missing.is_none());
 /// ```
 public func getLocalsQuery(language: String) -> String? {
-    let _rb_json = RustBridge.getLocalsQuery(language).toString()
+        let _rb_language = RustString(language)
+    let _rb_json = RustBridge.getLocalsQuery(_rb_language).toString()
     let _rb_data = _rb_json.data(using: .utf8) ?? Data()
     return (try? JSONDecoder().decode(String?.self, from: _rb_data)) ?? nil
 }
@@ -1143,7 +1149,8 @@ public func getLocalsQuery(language: String) -> String? {
 /// # Ok::<(), tree_sitter_language_pack::Error>(())
 /// ```
 public func getLanguage(name: String) throws -> Language {
-    return try RustBridge.getLanguage(name)
+        let _rb_name = RustString(name)
+    return try RustBridge.getLanguage(_rb_name)
 }
 /// Get a [`Parser`] pre-configured for the given language.
 ///
@@ -1166,13 +1173,15 @@ public func getLanguage(name: String) throws -> Language {
 /// # Ok::<(), tree_sitter_language_pack::Error>(())
 /// ```
 public func getParser(name: String) throws -> Parser {
-    return try RustBridge.getParser(name)
+        let _rb_name = RustString(name)
+    return try RustBridge.getParser(_rb_name)
 }
 /// Detect language name from a file path or extension.
 ///
 /// This compatibility alias matches the pre-Alef Python binding API.
 public func detectLanguage(path: String) -> String? {
-    let _rb_json = RustBridge.detectLanguage(path).toString()
+        let _rb_path = RustString(path)
+    let _rb_json = RustBridge.detectLanguage(_rb_path).toString()
     let _rb_data = _rb_json.data(using: .utf8) ?? Data()
     return (try? JSONDecoder().decode(String?.self, from: _rb_data)) ?? nil
 }
@@ -1209,7 +1218,8 @@ public func availableLanguages() -> [String] {
 /// assert!(!has_language("nonexistent_language"));
 /// ```
 public func hasLanguage(name: String) -> Bool {
-    return RustBridge.hasLanguage(name)
+        let _rb_name = RustString(name)
+    return RustBridge.hasLanguage(_rb_name)
 }
 /// Return the number of available languages.
 ///
@@ -1249,8 +1259,9 @@ public func languageCount() -> UInt {
 /// println!("Structures: {}", result.structure.len());
 /// ```
 public func process(source: String, config: ProcessConfig) throws -> ProcessResult {
+        let _rb_source = RustString(source)
         let _rb_config = try config.intoRust()
-    return try RustBridge.process(source, _rb_config)
+    return try RustBridge.process(_rb_source, _rb_config)
 }
 /// Initialize the language pack with the given configuration.
 ///
@@ -1374,7 +1385,8 @@ public func downloadAll() throws -> UInt {
 /// println!("{} languages available", count);
 /// ```
 public func downloadGroup(name: String) throws -> UInt {
-    return try RustBridge.downloadGroup(name)
+        let _rb_name = RustString(name)
+    return try RustBridge.downloadGroup(_rb_name)
 }
 /// Return all language names available in the remote manifest (306).
 ///
