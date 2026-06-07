@@ -18,7 +18,9 @@ use std::path::PathBuf;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum TlsRootsMode {
     #[default]
+    /// Use the host OS platform trust store (default); honours locally installed CAs.
     Platform,
+    /// Use the bundled Mozilla WebPKI root certificates only.
     WebPki,
 }
 

@@ -215,24 +215,35 @@ fn build_agent(mode: TlsRootsMode) -> ureq::Agent {
 #[cfg_attr(alef, alef(skip))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ParserManifest {
+    /// Crate version this manifest was published for.
     pub version: String,
+    /// Per-platform download bundle metadata, keyed by target triple.
     pub platforms: HashMap<String, PlatformBundle>,
+    /// Per-language metadata, keyed by language name.
     pub languages: HashMap<String, LanguageInfo>,
+    /// Named language groups (e.g., `"web"`, `"systems"`), each mapping to a list of language names.
     pub groups: HashMap<String, Vec<String>>,
 }
 
+/// Download metadata for a single platform's parser bundle.
 #[cfg_attr(alef, alef(skip))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlatformBundle {
+    /// URL of the bundle archive.
     pub url: String,
+    /// Expected SHA-256 hex digest of the bundle archive.
     pub sha256: String,
+    /// Size of the bundle archive in bytes.
     pub size: u64,
 }
 
+/// Metadata for a single language's parser entry in the manifest.
 #[cfg_attr(alef, alef(skip))]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LanguageInfo {
+    /// Name of the language group this parser belongs to.
     pub group: String,
+    /// Size of the parser shared library in bytes.
     pub size: u64,
 }
 
