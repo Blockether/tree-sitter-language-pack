@@ -35,6 +35,7 @@ class Span:
 
 class ProcessResult(TypedDict, total=False):
     """Complete analysis result from processing a source file."""
+
     language: str
 
     metrics: FileMetrics
@@ -250,6 +251,7 @@ class PackConfig:
 
 class Parser(TypedDict, total=False):
     """A tree-sitter parser configured for one language at a time."""
+
 
 @dataclass(frozen=True, slots=True)
 class ProcessConfig:
