@@ -46,7 +46,7 @@ pub fn chunk_source(
                 has_errors: &mut has_error_nodes,
                 context_path: &mut context_path,
             };
-            collect_chunk_metadata(&root, source, language, start_byte, end_byte, &mut collector, 0);
+            collect_chunk_metadata(&root, source, start_byte, end_byte, &mut collector, 0);
 
             CodeChunk {
                 content: content.to_string(),
@@ -97,11 +97,9 @@ struct MetadataCollector<'a> {
     context_path: &'a mut Vec<String>,
 }
 
-#[allow(clippy::only_used_in_recursion)]
 fn collect_chunk_metadata(
     node: &tree_sitter::Node,
     source: &str,
-    language: &str,
     chunk_start: usize,
     chunk_end: usize,
     collector: &mut MetadataCollector<'_>,
@@ -189,7 +187,7 @@ fn collect_chunk_metadata(
 
     let mut cursor = node.walk();
     for child in node.children(&mut cursor) {
-        collect_chunk_metadata(&child, source, language, chunk_start, chunk_end, collector, depth + 1);
+        collect_chunk_metadata(&child, source, chunk_start, chunk_end, collector, depth + 1);
     }
 }
 
