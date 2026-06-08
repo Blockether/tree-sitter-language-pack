@@ -903,16 +903,44 @@ fn fetch_bytes(url: &str) -> Result<Vec<u8>, String> {
     if let Some(path) = url.strip_prefix("file://") {
         return fs::read(path).map_err(|e| format!("read {path}: {e}"));
     }
-    let response = ureq::get(url)
-        .config()
-        .timeout_global(Some(Duration::from_secs(300)))
-        .build()
-        .call()
-        .map_err(|e| format!("GET {url}: {e}"))?;
-    let mut reader = response.into_body().into_reader();
-    let mut buf = Vec::new();
-    std::io::Read::read_to_end(&mut reader, &mut buf).map_err(|e| format!("read body: {e}"))?;
-    Ok(buf)
+
+    // Retry with exponential backoff on any transport error. ureq returns 4xx
+    // and 5xx as Err by default, so this covers both network blips and the
+    // GitHub release CDN's intermittent 504s — without those retries, every
+    // `cargo publish` verify-build hits a 504 once and blows up.
+    let max_attempts = 6u32;
+    let mut last_err = String::new();
+    for attempt in 1..=max_attempts {
+        let call_result = ureq::get(url)
+            .config()
+            .timeout_global(Some(Duration::from_secs(300)))
+            .build()
+            .call();
+
+        match call_result {
+            Ok(response) => {
+                let mut reader = response.into_body().into_reader();
+                let mut buf = Vec::new();
+                match std::io::Read::read_to_end(&mut reader, &mut buf) {
+                    Ok(_) => return Ok(buf),
+                    Err(e) => last_err = format!("read body for {url}: {e}"),
+                }
+            }
+            Err(e) => last_err = format!("GET {url}: {e}"),
+        }
+
+        if attempt < max_attempts {
+            let backoff = Duration::from_secs(2u64.saturating_pow(attempt));
+            println!(
+                "cargo:warning={last_err}; retrying in {}s (attempt {}/{})",
+                backoff.as_secs(),
+                attempt + 1,
+                max_attempts
+            );
+            std::thread::sleep(backoff);
+        }
+    }
+    Err(last_err)
 }
 
 fn fetch_text(url: &str) -> Result<String, String> {
