@@ -344,6 +344,7 @@ functions = [
   "get_highlights_query",
   "get_injections_query",
   "get_locals_query",
+  "get_tags_query",
   "process",
   "init",
   "configure",
@@ -814,6 +815,21 @@ result_is_pointer = true
 
 [crates.e2e.calls.locals.overrides.c]
 function = "ts_pack_get_locals_query"
+raw_c_result_type = "char*"
+
+[crates.e2e.calls.tags]
+function = "get_tags_query"
+module = "tree_sitter_language_pack"
+result_var = "result"
+result_is_simple = true
+result_is_option = true
+args = [{ name = "language", field = "language", type = "string" }]
+
+[crates.e2e.calls.tags.overrides.go]
+result_is_pointer = true
+
+[crates.e2e.calls.tags.overrides.c]
+function = "ts_pack_get_tags_query"
 raw_c_result_type = "char*"
 
 [crates.e2e.calls.language_count]

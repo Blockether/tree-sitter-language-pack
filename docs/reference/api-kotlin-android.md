@@ -155,6 +155,29 @@ fun getLocalsQuery(language: String): String?
 
 ---
 
+#### getTagsQuery()
+
+Get the tags query for a language, if bundled.
+
+Returns the contents of `tags.scm` as a static string, or `null`
+if no tags query is bundled for this language.
+
+**Signature:**
+
+```kotlin
+fun getTagsQuery(language: String): String?
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `language` | `String` | Yes | The language |
+
+**Returns:** `String?`
+
+---
+
 #### getLanguage()
 
 Get a tree-sitter `Language` by name using the global registry.

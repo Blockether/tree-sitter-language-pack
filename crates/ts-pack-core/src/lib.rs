@@ -84,7 +84,7 @@ pub use intel::types::{
 pub use pack_config::{PackConfig, TlsRootsMode};
 pub use parsing::{ByteRange, Node, Parser, Point, Tree, TreeCursor};
 pub use process_config::ProcessConfig;
-pub use queries::{get_highlights_query, get_injections_query, get_locals_query};
+pub use queries::{get_highlights_query, get_injections_query, get_locals_query, get_tags_query};
 pub use registry::LanguageRegistry;
 pub use tree_sitter::Language;
 

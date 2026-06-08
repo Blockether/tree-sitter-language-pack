@@ -695,6 +695,7 @@ void* __swift_bridge__$detect_language_from_content(void* content);
 void* __swift_bridge__$get_highlights_query(void* language);
 void* __swift_bridge__$get_injections_query(void* language);
 void* __swift_bridge__$get_locals_query(void* language);
+void* __swift_bridge__$get_tags_query(void* language);
 struct __private__ResultPtrAndPtr __swift_bridge__$get_language(void* name);
 struct __private__ResultPtrAndPtr __swift_bridge__$get_parser(void* name);
 void* __swift_bridge__$detect_language(void* path);

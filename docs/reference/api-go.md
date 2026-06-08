@@ -155,6 +155,29 @@ func GetLocalsQuery(language string) *string
 
 ---
 
+#### GetTagsQuery()
+
+Get the tags query for a language, if bundled.
+
+Returns the contents of `tags.scm` as a static string, or `nil`
+if no tags query is bundled for this language.
+
+**Signature:**
+
+```go
+func GetTagsQuery(language string) *string
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `Language` | `string` | Yes | The language |
+
+**Returns:** `*string`
+
+---
+
 #### GetLanguage()
 
 Get a tree-sitter `Language` by name using the global registry.

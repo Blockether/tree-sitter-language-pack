@@ -155,6 +155,29 @@ public static Optional<String> getLocalsQuery(String language)
 
 ---
 
+#### getTagsQuery()
+
+Get the tags query for a language, if bundled.
+
+Returns the contents of `tags.scm` as a static string, or `null`
+if no tags query is bundled for this language.
+
+**Signature:**
+
+```java
+public static Optional<String> getTagsQuery(String language)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `language` | `String` | Yes | The language |
+
+**Returns:** `Optional<String>`
+
+---
+
 #### getLanguage()
 
 Get a tree-sitter `Language` by name using the global registry.

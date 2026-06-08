@@ -63,6 +63,13 @@ Future<String?> getInjectionsQuery({required String language}) =>
 Future<String?> getLocalsQuery({required String language}) =>
     RustLib.instance.api.crateGetLocalsQuery(language: language);
 
+/// Get the tags query for a language, if bundled.
+///
+/// Returns the contents of `tags.scm` as a static string, or `null`
+/// if no tags query is bundled for this language.
+Future<String?> getTagsQuery({required String language}) =>
+    RustLib.instance.api.crateGetTagsQuery(language: language);
+
 /// Get a tree-sitter `Language` by name using the global registry.
 ///
 /// Resolves language aliases (e.g., `"shell"` maps to `"bash"`).

@@ -669,12 +669,12 @@ fn generate_extensions_lookup(definitions: &BTreeMap<String, LanguageDefinition>
     writeln!(af, "}}").unwrap();
 }
 
-/// Generate bundled highlight/injection/locals query functions from parsers/{lang}/queries/*.scm.
+/// Generate bundled highlight/injection/locals/tags query functions from parsers/{lang}/queries/*.scm.
 ///
-/// Scans the parsers directory for query files and generates a Rust source file with three
-/// match functions: `get_highlights_query_impl`, `get_injections_query_impl`, and
-/// `get_locals_query_impl`. Only languages that actually have the relevant .scm file on
-/// disk at build time are included.
+/// Scans the parsers directory for query files and generates a Rust source file with four
+/// match functions: `get_highlights_query_impl`, `get_injections_query_impl`,
+/// `get_locals_query_impl`, and `get_tags_query_impl`. Only languages that actually have the
+/// relevant .scm file on disk at build time are included.
 fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>, parsers_dir: &Path, out_dir: &Path) {
     let path = out_dir.join("queries_generated.rs");
     let mut f = fs::File::create(&path).expect("Failed to create queries_generated.rs");
@@ -686,6 +686,7 @@ fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>,
     let mut highlights: Vec<String> = Vec::new();
     let mut injections: Vec<String> = Vec::new();
     let mut locals: Vec<String> = Vec::new();
+    let mut tags: Vec<String> = Vec::new();
 
     for lang in definitions.keys() {
         let queries_dir = parsers_dir.join(lang).join("queries");
@@ -706,6 +707,10 @@ fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>,
         if queries_dir.join("locals.scm").exists() {
             locals.push(lang.clone());
             println!("cargo:rerun-if-changed={}", queries_dir.join("locals.scm").display());
+        }
+        if queries_dir.join("tags.scm").exists() {
+            tags.push(lang.clone());
+            println!("cargo:rerun-if-changed={}", queries_dir.join("tags.scm").display());
         }
     }
 
@@ -737,6 +742,7 @@ fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>,
     gen_query_fn(&mut f, "get_highlights_query_impl", &highlights, "highlights.scm");
     gen_query_fn(&mut f, "get_injections_query_impl", &injections, "injections.scm");
     gen_query_fn(&mut f, "get_locals_query_impl", &locals, "locals.scm");
+    gen_query_fn(&mut f, "get_tags_query_impl", &tags, "tags.scm");
 }
 
 /// Fetch grammar sources from the GitHub release artifact when they aren't on
