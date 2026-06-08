@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Retry transient HTTP errors when downloading parser sources in `crates/ts-pack-core/build.rs`.** `fetch_bytes` now retries up to 6 times with exponential backoff (2s → 64s) on any ureq error, covering both network blips and the GitHub release CDN's intermittent 504s. Without retries, a single 504 mid-`cargo publish` verify-build would blow up the publish workflow (as happened on rc.26's `Publish Rust crates` job during the 2026-06-08 GH CDN incident).
+
 - **Local-clone fallback in `crates/ts-pack-core/build.rs`.** When the workspace `parsers/` tree is empty (gitignored on a fresh clone) and the GH release tarball for `parser-sources-{version}.tar.zst` isn't published yet (rc builds during the publish workflow window), the build no longer panics on a 404. The new resolution order is: workspace populated → OUT_DIR cache → `scripts/clone_vendors.py` (if present, dev workspace) → GH release tarball. The local-clone path tries `uv run --no-sync`, `uv run`, `python3`, and `python` in turn so it works across dev environments. Existing `TSLP_OFFLINE` and `TSLP_SOURCE_BUNDLE_URL` overrides are unchanged.
 
 ### Added
