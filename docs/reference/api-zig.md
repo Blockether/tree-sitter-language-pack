@@ -155,6 +155,29 @@ pub fn get_locals_query(language: [:0]const u8) ?[:0]const u8
 
 ---
 
+#### getTagsQuery()
+
+Get the tags query for a language, if bundled.
+
+Returns the contents of `tags.scm` as a static string, or `null`
+if no tags query is bundled for this language.
+
+**Signature:**
+
+```zig
+pub fn get_tags_query(language: [:0]const u8) ?[:0]const u8
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `language` | `[:0]const u8` | Yes | The language |
+
+**Returns:** `?[:0]const u8`
+
+---
+
 #### getLanguage()
 
 Get a tree-sitter `Language` by name using the global registry.

@@ -155,6 +155,29 @@ pub fn get_locals_query(language: &str) -> Option<String>
 
 ---
 
+#### get_tags_query()
+
+Get the tags query for a language, if bundled.
+
+Returns the contents of `tags.scm` as a static string, or `None`
+if no tags query is bundled for this language.
+
+**Signature:**
+
+```rust
+pub fn get_tags_query(language: &str) -> Option<String>
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `language` | `String` | Yes | The language |
+
+**Returns:** `Option<String>`
+
+---
+
 #### get_language()
 
 Get a tree-sitter `Language` by name using the global registry.

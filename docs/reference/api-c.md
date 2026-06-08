@@ -155,6 +155,29 @@ const char** ts_pack_get_locals_query(const char* language);
 
 ---
 
+#### ts_pack_get_tags_query()
+
+Get the tags query for a language, if bundled.
+
+Returns the contents of `tags.scm` as a static string, or `NULL`
+if no tags query is bundled for this language.
+
+**Signature:**
+
+```c
+const char** ts_pack_get_tags_query(const char* language);
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `language` | `const char*` | Yes | The language |
+
+**Returns:** `const char**`
+
+---
+
 #### ts_pack_get_language()
 
 Get a tree-sitter `Language` by name using the global registry.

@@ -155,6 +155,29 @@ def self.get_locals_query(language)
 
 ---
 
+#### get_tags_query()
+
+Get the tags query for a language, if bundled.
+
+Returns the contents of `tags.scm` as a static string, or `nil`
+if no tags query is bundled for this language.
+
+**Signature:**
+
+```ruby
+def self.get_tags_query(language)
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `language` | `String` | Yes | The language |
+
+**Returns:** `String?`
+
+---
+
 #### get_language()
 
 Get a tree-sitter `Language` by name using the global registry.

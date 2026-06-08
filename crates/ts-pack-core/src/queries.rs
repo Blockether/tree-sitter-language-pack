@@ -1,4 +1,4 @@
-//! Bundled tree-sitter highlight, injection, and locals queries.
+//! Bundled tree-sitter highlight, injection, locals, and tags queries.
 //!
 //! Queries are embedded from `parsers/{lang}/queries/*.scm` at build time.
 //! Not all languages have queries — returns `None` for languages without bundled queries.
@@ -61,4 +61,23 @@ pub fn get_injections_query(language: &str) -> Option<&'static str> {
 /// ```
 pub fn get_locals_query(language: &str) -> Option<&'static str> {
     get_locals_query_impl(language)
+}
+
+/// Get the tags query for a language, if bundled.
+///
+/// Returns the contents of `tags.scm` as a static string, or `None`
+/// if no tags query is bundled for this language.
+///
+/// # Example
+///
+/// ```
+/// use tree_sitter_language_pack::get_tags_query;
+///
+/// let query = get_tags_query("rust");
+/// // Returns None for languages without bundled tags queries
+/// let missing = get_tags_query("nonexistent_lang");
+/// assert!(missing.is_none());
+/// ```
+pub fn get_tags_query(language: &str) -> Option<&'static str> {
+    get_tags_query_impl(language)
 }

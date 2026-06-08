@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1743720148;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 686323644;
 
 // Section: executor
 
@@ -2841,6 +2841,34 @@ fn wire__crate__get_parser_impl(
         },
     )
 }
+fn wire__crate__get_tags_query_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_tags_query",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_language = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(crate::get_tags_query(api_language))?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__has_language_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -4228,11 +4256,12 @@ fn pde_ffi_dispatcher_primary_impl(
         78 => wire__crate__get_language_impl(port, ptr, rust_vec_len, data_len),
         79 => wire__crate__get_locals_query_impl(port, ptr, rust_vec_len, data_len),
         80 => wire__crate__get_parser_impl(port, ptr, rust_vec_len, data_len),
-        81 => wire__crate__has_language_impl(port, ptr, rust_vec_len, data_len),
-        82 => wire__crate__init_impl(port, ptr, rust_vec_len, data_len),
-        83 => wire__crate__language_count_impl(port, ptr, rust_vec_len, data_len),
-        84 => wire__crate__manifest_languages_impl(port, ptr, rust_vec_len, data_len),
-        85 => wire__crate__process_impl(port, ptr, rust_vec_len, data_len),
+        81 => wire__crate__get_tags_query_impl(port, ptr, rust_vec_len, data_len),
+        82 => wire__crate__has_language_impl(port, ptr, rust_vec_len, data_len),
+        83 => wire__crate__init_impl(port, ptr, rust_vec_len, data_len),
+        84 => wire__crate__language_count_impl(port, ptr, rust_vec_len, data_len),
+        85 => wire__crate__manifest_languages_impl(port, ptr, rust_vec_len, data_len),
+        86 => wire__crate__process_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }

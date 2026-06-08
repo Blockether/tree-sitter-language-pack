@@ -25,6 +25,7 @@ export {
 	getLanguage,
 	getLocalsQuery,
 	getParser,
+	getTagsQuery,
 	hasLanguage,
 	init,
 	languageCount,

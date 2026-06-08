@@ -2157,6 +2157,33 @@ char *ts_pack_get_locals_query(const char *language);
 uintptr_t ts_pack_get_locals_query_len(const char *_language);
 
 /**
+ * Get the tags query for a language, if bundled.
+ *
+ * Returns the contents of `tags.scm` as a static string, or `None`
+ * if no tags query is bundled for this language.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::get_tags_query;
+ *
+ * let query = get_tags_query("rust");
+ * // Returns None for languages without bundled tags queries
+ * let missing = get_tags_query("nonexistent_lang");
+ * assert!(missing.is_none());
+ * \endcode
+ */
+char *ts_pack_get_tags_query(const char *language);
+
+/**
+ * Return the byte length of the C string most recently returned by `ts_pack_get_tags_query` on this
+ * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
+ * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_get_tags_query`.
+ */
+uintptr_t ts_pack_get_tags_query_len(const char *_language);
+
+/**
  * Get a tree-sitter [`Language`] by name using the global registry.
  *
  * Resolves language aliases (e.g., `"shell"` maps to `"bash"`).

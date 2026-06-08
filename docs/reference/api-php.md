@@ -155,6 +155,29 @@ public static function getLocalsQuery(string $language): ?string
 
 ---
 
+#### getTagsQuery()
+
+Get the tags query for a language, if bundled.
+
+Returns the contents of `tags.scm` as a static string, or `null`
+if no tags query is bundled for this language.
+
+**Signature:**
+
+```php
+public static function getTagsQuery(string $language): ?string
+```
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `language` | `string` | Yes | The language |
+
+**Returns:** `?string`
+
+---
+
 #### getLanguage()
 
 Get a tree-sitter `Language` by name using the global registry.

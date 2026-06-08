@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`get_tags_query(language: &str) -> Option<&'static str>`** — new public accessor in `crates/ts-pack-core` mirroring `get_highlights_query` / `get_injections_query` / `get_locals_query`. Returns `Some` for the 15 languages with vendored `tags.scm` (rust, kotlin, csharp, swift, gleam, gap, al, enforce, gdshader, roc, cfml, ql, tact, sourcepawn, mojo) and `None` otherwise. Propagated to the PyO3, NAPI, and FFI bindings via the alef codegen cascade.
+
 - **`gherkin` grammar.** Pre-compiled `tree-sitter-gherkin` parser for `.feature` files. Source: `SamyAB/tree-sitter-gherkin` pinned at `43873ee8de16476635b48d52c46f5b6407cb5c09`.
 
 ### Fixed
