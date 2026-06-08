@@ -1423,6 +1423,11 @@ jobs:
                     - php: "8.5"
                       platform:
                           label: windows-x86_64
+                    # shivammathur/setup-php@2.37.1 cannot install PHP 8.5 on macos-arm64
+                    # (brew arm64 bottle not yet available). Re-enable when upstream supports it.
+                    - php: "8.5"
+                      platform:
+                          label: macos-arm64
         steps:
             - name: Checkout
               uses: actions/checkout@v6
