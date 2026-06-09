@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0-rc.29] - 2026-06-09
+
 ### Changed
 
 - **Alef pin bumped 0.23.48 → 0.23.58.** Pulls in the PHP MINIT module-startup mutex (0.23.50 — `crates/ts-pack-core-php/src/lib.rs` now wires `__ext_php_rs_module_startup` into the extension builder so class registrations actually reach PHP), the NAPI TS overload/optional-param signature cleanup (0.23.55), the NAPI arrow-type return type strip fix (0.23.54), the napi service-wrapper lowerCamelCase fix (0.23.57), per-item version annotations in the IR + docs generator (0.23.58), the NAPI enum variant JSDoc `*/` escape (0.23.58 — `crates/ts-pack-core-node/index.d.ts` no longer prematurely closes the JSDoc block around `DocstringFormat::JSDoc` / `::JavaDoc` variant docs), and a sweep of Java/Kotlin/Zig/Dart formatting normalization across all generated binding files.
