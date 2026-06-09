@@ -3367,10 +3367,10 @@ jobs:
                   staging="$(mktemp -d)"
                   trap 'rm -rf "${staging}"' EXIT
 
-                  mapfile -t tarballs < <(find ../../../tmp/go-ffi-all -type f -name 'tree-sitter-language-pack-go-v*.tar.gz')
+                  mapfile -t tarballs < <(find ../../tmp/go-ffi-all -type f -name 'tree-sitter-language-pack-go-v*.tar.gz')
                   if [[ ${#tarballs[@]} -eq 0 ]]; then
                     echo "ERROR: no go-ffi tarballs found under tmp/go-ffi-all/" >&2
-                    find ../../../tmp/go-ffi-all -maxdepth 4 -print
+                    find ../../tmp/go-ffi-all -maxdepth 4 -print
                     exit 1
                   fi
 
