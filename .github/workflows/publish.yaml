@@ -3562,6 +3562,11 @@ jobs:
                   fetch-depth: 0
 
             - name: Finalize release (publish from draft)
+              # Skip when prepare didn't succeed: `needs.prepare.outputs.tag` is empty on a
+              # cancelled/failed prepare and `finalize-release@v1` errors with `INPUT_TAG is
+              # required`, surfacing as a confusing "Finalize release: failure" on top of
+              # the actual upstream failure.
+              if: needs.prepare.result == 'success'
               uses: kreuzberg-dev/actions/finalize-release@v1
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
