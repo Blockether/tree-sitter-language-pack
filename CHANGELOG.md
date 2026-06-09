@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`Stage Go FFI libraries` step in `.github/workflows/publish.yaml` now resolves the artifact path correctly.** The step `cd`s into `packages/go/` before walking the downloaded artifact tree, so the `find` invocation needs `../../tmp/go-ffi-all` (two levels up to the repo root). Commit `1de6c8dca` introduced `../../../tmp/go-ffi-all` (three levels up), pointing one directory above the workspace root → `find: '…/tmp/go-ffi-all': No such file or directory` → exit 1 → `packages/go/v1.9.0-rc.28` subtree tag never pushed. Manually staged + tagged rc.28; the next publish run picks up the fix.
+
 ## [1.9.0-rc.28] - 2026-06-08
 
 ### Fixed
