@@ -1773,11 +1773,10 @@ jobs:
                   tag: ${{ needs.prepare.outputs.tag }}
                   working-directory: dist/go
                   dry-run: ${{ needs.prepare.outputs.dry_run }}
+                  token: ${{ steps.app-token.outputs.token }}
                   assets: |
                       **/*.tar.gz
                       **/*.zip
-              env:
-                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
     # ─── Upload to GitHub Release: C FFI ───────────────────────────────
     upload-c-ffi-release:
@@ -1865,9 +1864,8 @@ jobs:
               with:
                   tag: ${{ needs.prepare.outputs.tag }}
                   working-directory: dist/elixir
+                  token: ${{ steps.app-token.outputs.token }}
                   assets: "*.tar.gz"
-              env:
-                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
     # ─── Publish Rust crates ───────────────────────────────────────────
     # build-parser-sources must complete first: cargo publish --verify
@@ -2850,10 +2848,9 @@ jobs:
                   tag: ${{ needs.prepare.outputs.tag }}
                   working-directory: dist/swift
                   dry-run: ${{ needs.prepare.outputs.dry_run }}
+                  token: ${{ steps.app-token.outputs.token }}
                   assets: |
                       *.artifactbundle.zip
-              env:
-                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
     # ─── Zig (GitHub Release tarball) ─────────────────────────────────
     build-zig-package:
@@ -2960,11 +2957,10 @@ jobs:
                   tag: ${{ needs.prepare.outputs.tag }}
                   working-directory: dist/zig
                   dry-run: ${{ needs.prepare.outputs.dry_run }}
+                  token: ${{ steps.app-token.outputs.token }}
                   assets: |
                       **/*.tar.gz
                       **/*.zip
-              env:
-                  GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
     # ─── Kotlin-Android (Maven Central via Gradle) ────────────────────
     build-kotlin-android-natives:
