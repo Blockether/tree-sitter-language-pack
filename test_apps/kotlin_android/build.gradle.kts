@@ -134,7 +134,80 @@ tasks.register("verifyAarPublished") {
     }
 }
 
+// Build host JNI library for JVM unit tests (macOS/Linux/Windows).
+// The generated Kotlin Bridge object calls System.loadLibrary("ts_pack_jni") for JVM
+// unit tests running on developer machines. This task builds the host-platform binary
+// and stages it into src/test/resources/host-jni/<platform>/ for the test loader.
+// Set alef.skipHostJni=true to disable this (e.g., in CI where only AAR validation is needed).
+tasks.register("buildHostJni", Exec::class) {
+    if (project.properties["alef.skipHostJni"] != "true") {
+        val jniCargoPath = layout.projectDirectory.asFile.parentFile.parentFile.resolve("crates/tree-sitter-language-pack-jni/Cargo.toml").absolutePath
+        description = "Build host-platform JNI library from crates/tree-sitter-language-pack-jni"
+        commandLine("cargo", "build", "--release", "--manifest-path", jniCargoPath)
+        errorOutput = System.err
+    } else {
+        description = "Build host JNI (disabled via alef.skipHostJni=true)"
+        commandLine("true")
+    }
+}
+
+tasks.register("copyHostJni", Copy::class) {
+    if (project.properties["alef.skipHostJni"] != "true") {
+        description = "Copy host JNI library to test resources"
+        dependsOn("buildHostJni")
+
+        val hostPlatform = if (System.getProperty("os.name").lowercase().contains("mac")) {
+            "darwin"
+        } else if (System.getProperty("os.name").lowercase().contains("win")) {
+            "windows"
+        } else {
+            "linux"
+        }
+        // For workspace builds, cargo places artifacts in the workspace root target/release,
+        // not in the crate subdirectory. Check both locations for compatibility.
+        val workspaceTarget = file("../../target/release")
+        val crateTarget = file("../../crates/tree-sitter-language-pack-jni/target/release")
+        val buildDir = if (workspaceTarget.exists()) workspaceTarget else crateTarget
+
+        // Map host platform to library filename
+        val libName = when (hostPlatform) {
+            "darwin" -> "libts_pack_jni.dylib"
+            "windows" -> "ts_pack_jni.dll"
+            else -> "libts_pack_jni.so"  // linux
+        }
+
+        from(buildDir) {
+            include(libName)
+        }
+        into(layout.projectDirectory.dir("src/test/resources/host-jni/$hostPlatform"))
+    }
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
     dependsOn("verifyAarPublished")
+    if (project.properties["alef.skipHostJni"] != "true") {
+        val hostPlatform = if (System.getProperty("os.name").lowercase().contains("mac")) {
+            "darwin"
+        } else if (System.getProperty("os.name").lowercase().contains("win")) {
+            "windows"
+        } else {
+            "linux"
+        }
+        systemProperty(
+            "java.library.path",
+            project.layout.projectDirectory.dir("src/test/resources/host-jni/$hostPlatform").asFile.absolutePath
+        )
+        dependsOn("copyHostJni")
+    }
+}
+
+// `processDebugUnitTestJavaRes` and `processReleaseUnitTestJavaRes` package the
+// `src/test/resources` tree into the unit-test runtime classpath. They consume
+// the dylib emitted by `copyHostJni`, so AGP 8.10+ requires an explicit
+// dependency declaration to satisfy Gradle's task-output validation.
+tasks.matching { it.name.startsWith("processDebug") || it.name.startsWith("processRelease") }.configureEach {
+    if (project.properties["alef.skipHostJni"] != "true" && name.contains("UnitTestJavaRes")) {
+        dependsOn("copyHostJni")
+    }
 }
