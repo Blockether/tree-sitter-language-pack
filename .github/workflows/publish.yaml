@@ -46,7 +46,7 @@ jobs:
     prepare:
         name: Prepare release
         runs-on: ubuntu-latest
-        timeout-minutes: 5
+        timeout-minutes: 15
         outputs:
             tag: ${{ steps.meta.outputs.tag }}
             checkout_ref: ${{ steps.ref.outputs.checkout_ref }}
