@@ -701,10 +701,8 @@ sealed class DocstringFormat with _$DocstringFormat {
   const factory DocstringFormat.javaDoc() = DocstringFormat_JavaDoc;
 
   /// A language-specific docstring format not covered by the standard variants.
-  const factory DocstringFormat.other({
-    /// The format name not covered by standard variants.
-    required String value,
-  }) = DocstringFormat_Other;
+  const factory DocstringFormat.other({required String field0}) =
+      DocstringFormat_Other;
 }
 
 /// A docstring extracted from source code.
@@ -1357,11 +1355,8 @@ sealed class StructureKind with _$StructureKind {
   const factory StructureKind.namespace() = StructureKind_Namespace;
 
   /// A language-specific construct that does not fit any standard category.
-  /// The `value` field carries the language-specific kind label.
-  const factory StructureKind.other({
-    /// The language-specific kind name (e.g. `"macro"`, `"fixture"`).
-    required String value,
-  }) = StructureKind_Other;
+  const factory StructureKind.other({required String field0}) =
+      StructureKind_Other;
 }
 
 /// A symbol (variable, function, type, etc.) extracted from source code.
@@ -1438,8 +1433,5 @@ sealed class SymbolKind with _$SymbolKind {
   const factory SymbolKind.module() = SymbolKind_Module;
 
   /// A symbol kind not covered by the standard variants.
-  const factory SymbolKind.other({
-    /// The language-specific symbol kind name.
-    required String value,
-  }) = SymbolKind_Other;
+  const factory SymbolKind.other({required String field0}) = SymbolKind_Other;
 }
