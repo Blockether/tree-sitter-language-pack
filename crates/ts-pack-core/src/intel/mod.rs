@@ -133,7 +133,11 @@ mod tests {
     #[test]
     fn test_process_with_small_chunk_size() {
         let registry = LanguageRegistry::new();
-        if !registry.has_language("python") {
+        // `has_language` returns true for any name in the dynamic registry whether or
+        // not the parser shared library is actually present on disk; `get_language`
+        // is the load-side check. Skip when python isn't loadable in this test build
+        // (TSLP_LANGUAGES gating, no extra-dirs configured, etc.).
+        if registry.get_language("python").is_err() {
             return;
         }
         let source = "def foo():\n    pass\ndef bar():\n    pass\n";

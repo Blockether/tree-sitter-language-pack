@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 686323644;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1815465885;
 
 // Section: executor
 
@@ -2115,6 +2115,62 @@ fn wire__crate__create_comment_info_from_json_impl(
         },
     )
 }
+fn wire__crate__create_data_attribute_from_json_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "create_data_attribute_from_json",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_json = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::create_data_attribute_from_json(api_json)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__create_data_node_from_json_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "create_data_node_from_json",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_)
+            };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_json = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::create_data_node_from_json(api_json)?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__create_diagnostic_from_json_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -3047,6 +3103,21 @@ const _: fn() = || {
         let _: Option<String> = CommentInfo.associated_node;
     }
     {
+        let DataAttribute = None::<crate::DataAttribute>.unwrap();
+        let _: String = DataAttribute.name;
+        let _: String = DataAttribute.value;
+        let _: crate::Span = DataAttribute.span;
+    }
+    {
+        let DataNode = None::<crate::DataNode>.unwrap();
+        let _: crate::DataNodeKind = DataNode.kind;
+        let _: Option<String> = DataNode.key;
+        let _: Option<String> = DataNode.value;
+        let _: Vec<crate::DataAttribute> = DataNode.attributes;
+        let _: Vec<crate::DataNode> = DataNode.children;
+        let _: crate::Span = DataNode.span;
+    }
+    {
         let Diagnostic = None::<crate::Diagnostic>.unwrap();
         let _: String = Diagnostic.message;
         let _: crate::DiagnosticSeverity = Diagnostic.severity;
@@ -3161,6 +3232,7 @@ const _: fn() = || {
         let _: bool = ProcessConfig.symbols;
         let _: bool = ProcessConfig.diagnostics;
         let _: Option<i64> = ProcessConfig.chunk_max_size;
+        let _: bool = ProcessConfig.data_extraction;
     }
     {
         let ProcessResult = None::<crate::ProcessResult>.unwrap();
@@ -3174,6 +3246,7 @@ const _: fn() = || {
         let _: Vec<crate::SymbolInfo> = ProcessResult.symbols;
         let _: Vec<crate::Diagnostic> = ProcessResult.diagnostics;
         let _: Vec<crate::CodeChunk> = ProcessResult.chunks;
+        let _: Option<crate::DataNode> = ProcessResult.data;
     }
     {
         let Span = None::<crate::Span>.unwrap();
@@ -3482,6 +3555,53 @@ impl SseDecode for crate::CommentKind {
     }
 }
 
+impl SseDecode for crate::DataAttribute {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_name = <String>::sse_decode(deserializer);
+        let mut var_value = <String>::sse_decode(deserializer);
+        let mut var_span = <crate::Span>::sse_decode(deserializer);
+        return crate::DataAttribute {
+            name: var_name,
+            value: var_value,
+            span: var_span,
+        };
+    }
+}
+
+impl SseDecode for crate::DataNode {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_kind = <crate::DataNodeKind>::sse_decode(deserializer);
+        let mut var_key = <Option<String>>::sse_decode(deserializer);
+        let mut var_value = <Option<String>>::sse_decode(deserializer);
+        let mut var_attributes = <Vec<crate::DataAttribute>>::sse_decode(deserializer);
+        let mut var_children = <Vec<crate::DataNode>>::sse_decode(deserializer);
+        let mut var_span = <crate::Span>::sse_decode(deserializer);
+        return crate::DataNode {
+            kind: var_kind,
+            key: var_key,
+            value: var_value,
+            attributes: var_attributes,
+            children: var_children,
+            span: var_span,
+        };
+    }
+}
+
+impl SseDecode for crate::DataNodeKind {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::DataNodeKind::KeyValue,
+            1 => crate::DataNodeKind::Element,
+            2 => crate::DataNodeKind::Sequence,
+            _ => unreachable!("Invalid variant for DataNodeKind: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for crate::Diagnostic {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3756,6 +3876,30 @@ impl SseDecode for Vec<crate::CommentInfo> {
     }
 }
 
+impl SseDecode for Vec<crate::DataAttribute> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::DataAttribute>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::DataNode> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::DataNode>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::Diagnostic> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3885,6 +4029,17 @@ impl SseDecode for Option<Tree> {
     }
 }
 
+impl SseDecode for Option<crate::DataNode> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::DataNode>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<i64> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3956,6 +4111,7 @@ impl SseDecode for crate::ProcessConfig {
         let mut var_symbols = <bool>::sse_decode(deserializer);
         let mut var_diagnostics = <bool>::sse_decode(deserializer);
         let mut var_chunkMaxSize = <Option<i64>>::sse_decode(deserializer);
+        let mut var_dataExtraction = <bool>::sse_decode(deserializer);
         return crate::ProcessConfig {
             language: var_language,
             structure: var_structure,
@@ -3966,6 +4122,7 @@ impl SseDecode for crate::ProcessConfig {
             symbols: var_symbols,
             diagnostics: var_diagnostics,
             chunk_max_size: var_chunkMaxSize,
+            data_extraction: var_dataExtraction,
         };
     }
 }
@@ -3983,6 +4140,7 @@ impl SseDecode for crate::ProcessResult {
         let mut var_symbols = <Vec<crate::SymbolInfo>>::sse_decode(deserializer);
         let mut var_diagnostics = <Vec<crate::Diagnostic>>::sse_decode(deserializer);
         let mut var_chunks = <Vec<crate::CodeChunk>>::sse_decode(deserializer);
+        let mut var_data = <Option<crate::DataNode>>::sse_decode(deserializer);
         return crate::ProcessResult {
             language: var_language,
             metrics: var_metrics,
@@ -3994,6 +4152,7 @@ impl SseDecode for crate::ProcessResult {
             symbols: var_symbols,
             diagnostics: var_diagnostics,
             chunks: var_chunks,
+            data: var_data,
         };
     }
 }
@@ -4230,38 +4389,40 @@ fn pde_ffi_dispatcher_primary_impl(
         52 => wire__crate__create_chunk_context_from_json_impl(port, ptr, rust_vec_len, data_len),
         53 => wire__crate__create_code_chunk_from_json_impl(port, ptr, rust_vec_len, data_len),
         54 => wire__crate__create_comment_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        55 => wire__crate__create_diagnostic_from_json_impl(port, ptr, rust_vec_len, data_len),
-        56 => wire__crate__create_doc_section_from_json_impl(port, ptr, rust_vec_len, data_len),
-        57 => wire__crate__create_docstring_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        58 => wire__crate__create_export_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        59 => wire__crate__create_file_metrics_from_json_impl(port, ptr, rust_vec_len, data_len),
-        60 => wire__crate__create_import_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        61 => wire__crate__create_pack_config_from_json_impl(port, ptr, rust_vec_len, data_len),
-        62 => wire__crate__create_point_from_json_impl(port, ptr, rust_vec_len, data_len),
-        63 => wire__crate__create_process_config_from_json_impl(port, ptr, rust_vec_len, data_len),
-        64 => wire__crate__create_process_result_from_json_impl(port, ptr, rust_vec_len, data_len),
-        65 => wire__crate__create_span_from_json_impl(port, ptr, rust_vec_len, data_len),
-        66 => wire__crate__create_structure_item_from_json_impl(port, ptr, rust_vec_len, data_len),
-        67 => wire__crate__create_symbol_info_from_json_impl(port, ptr, rust_vec_len, data_len),
-        68 => wire__crate__detect_language_impl(port, ptr, rust_vec_len, data_len),
-        69 => wire__crate__detect_language_from_content_impl(port, ptr, rust_vec_len, data_len),
-        70 => wire__crate__detect_language_from_extension_impl(port, ptr, rust_vec_len, data_len),
-        71 => wire__crate__detect_language_from_path_impl(port, ptr, rust_vec_len, data_len),
-        72 => wire__crate__download_impl(port, ptr, rust_vec_len, data_len),
-        73 => wire__crate__download_all_impl(port, ptr, rust_vec_len, data_len),
-        74 => wire__crate__download_group_impl(port, ptr, rust_vec_len, data_len),
-        75 => wire__crate__downloaded_languages_impl(port, ptr, rust_vec_len, data_len),
-        76 => wire__crate__get_highlights_query_impl(port, ptr, rust_vec_len, data_len),
-        77 => wire__crate__get_injections_query_impl(port, ptr, rust_vec_len, data_len),
-        78 => wire__crate__get_language_impl(port, ptr, rust_vec_len, data_len),
-        79 => wire__crate__get_locals_query_impl(port, ptr, rust_vec_len, data_len),
-        80 => wire__crate__get_parser_impl(port, ptr, rust_vec_len, data_len),
-        81 => wire__crate__get_tags_query_impl(port, ptr, rust_vec_len, data_len),
-        82 => wire__crate__has_language_impl(port, ptr, rust_vec_len, data_len),
-        83 => wire__crate__init_impl(port, ptr, rust_vec_len, data_len),
-        84 => wire__crate__language_count_impl(port, ptr, rust_vec_len, data_len),
-        85 => wire__crate__manifest_languages_impl(port, ptr, rust_vec_len, data_len),
-        86 => wire__crate__process_impl(port, ptr, rust_vec_len, data_len),
+        55 => wire__crate__create_data_attribute_from_json_impl(port, ptr, rust_vec_len, data_len),
+        56 => wire__crate__create_data_node_from_json_impl(port, ptr, rust_vec_len, data_len),
+        57 => wire__crate__create_diagnostic_from_json_impl(port, ptr, rust_vec_len, data_len),
+        58 => wire__crate__create_doc_section_from_json_impl(port, ptr, rust_vec_len, data_len),
+        59 => wire__crate__create_docstring_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        60 => wire__crate__create_export_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        61 => wire__crate__create_file_metrics_from_json_impl(port, ptr, rust_vec_len, data_len),
+        62 => wire__crate__create_import_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        63 => wire__crate__create_pack_config_from_json_impl(port, ptr, rust_vec_len, data_len),
+        64 => wire__crate__create_point_from_json_impl(port, ptr, rust_vec_len, data_len),
+        65 => wire__crate__create_process_config_from_json_impl(port, ptr, rust_vec_len, data_len),
+        66 => wire__crate__create_process_result_from_json_impl(port, ptr, rust_vec_len, data_len),
+        67 => wire__crate__create_span_from_json_impl(port, ptr, rust_vec_len, data_len),
+        68 => wire__crate__create_structure_item_from_json_impl(port, ptr, rust_vec_len, data_len),
+        69 => wire__crate__create_symbol_info_from_json_impl(port, ptr, rust_vec_len, data_len),
+        70 => wire__crate__detect_language_impl(port, ptr, rust_vec_len, data_len),
+        71 => wire__crate__detect_language_from_content_impl(port, ptr, rust_vec_len, data_len),
+        72 => wire__crate__detect_language_from_extension_impl(port, ptr, rust_vec_len, data_len),
+        73 => wire__crate__detect_language_from_path_impl(port, ptr, rust_vec_len, data_len),
+        74 => wire__crate__download_impl(port, ptr, rust_vec_len, data_len),
+        75 => wire__crate__download_all_impl(port, ptr, rust_vec_len, data_len),
+        76 => wire__crate__download_group_impl(port, ptr, rust_vec_len, data_len),
+        77 => wire__crate__downloaded_languages_impl(port, ptr, rust_vec_len, data_len),
+        78 => wire__crate__get_highlights_query_impl(port, ptr, rust_vec_len, data_len),
+        79 => wire__crate__get_injections_query_impl(port, ptr, rust_vec_len, data_len),
+        80 => wire__crate__get_language_impl(port, ptr, rust_vec_len, data_len),
+        81 => wire__crate__get_locals_query_impl(port, ptr, rust_vec_len, data_len),
+        82 => wire__crate__get_parser_impl(port, ptr, rust_vec_len, data_len),
+        83 => wire__crate__get_tags_query_impl(port, ptr, rust_vec_len, data_len),
+        84 => wire__crate__has_language_impl(port, ptr, rust_vec_len, data_len),
+        85 => wire__crate__init_impl(port, ptr, rust_vec_len, data_len),
+        86 => wire__crate__language_count_impl(port, ptr, rust_vec_len, data_len),
+        87 => wire__crate__manifest_languages_impl(port, ptr, rust_vec_len, data_len),
+        88 => wire__crate__process_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -4469,6 +4630,60 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::CommentKind> {
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::CommentKind> {}
 impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::CommentKind>> for crate::CommentKind {
     fn into_into_dart(self) -> FrbWrapper<crate::CommentKind> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::DataAttribute> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.name.into_into_dart().into_dart(),
+            self.0.value.into_into_dart().into_dart(),
+            self.0.span.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::DataAttribute> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::DataAttribute>> for crate::DataAttribute {
+    fn into_into_dart(self) -> FrbWrapper<crate::DataAttribute> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::DataNode> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.0.kind.into_into_dart().into_dart(),
+            self.0.key.into_into_dart().into_dart(),
+            self.0.value.into_into_dart().into_dart(),
+            self.0.attributes.into_into_dart().into_dart(),
+            self.0.children.into_into_dart().into_dart(),
+            self.0.span.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::DataNode> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::DataNode>> for crate::DataNode {
+    fn into_into_dart(self) -> FrbWrapper<crate::DataNode> {
+        self.into()
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::DataNodeKind> {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self.0 {
+            crate::DataNodeKind::KeyValue => 0.into_dart(),
+            crate::DataNodeKind::Element => 1.into_dart(),
+            crate::DataNodeKind::Sequence => 2.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<crate::DataNodeKind> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::DataNodeKind>> for crate::DataNodeKind {
+    fn into_into_dart(self) -> FrbWrapper<crate::DataNodeKind> {
         self.into()
     }
 }
@@ -4725,6 +4940,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ProcessConfig> {
             self.0.symbols.into_into_dart().into_dart(),
             self.0.diagnostics.into_into_dart().into_dart(),
             self.0.chunk_max_size.into_into_dart().into_dart(),
+            self.0.data_extraction.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4749,6 +4965,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::ProcessResult> {
             self.0.symbols.into_into_dart().into_dart(),
             self.0.diagnostics.into_into_dart().into_dart(),
             self.0.chunks.into_into_dart().into_dart(),
+            self.0.data.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -5083,6 +5300,44 @@ impl SseEncode for crate::CommentKind {
     }
 }
 
+impl SseEncode for crate::DataAttribute {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.name, serializer);
+        <String>::sse_encode(self.value, serializer);
+        <crate::Span>::sse_encode(self.span, serializer);
+    }
+}
+
+impl SseEncode for crate::DataNode {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::DataNodeKind>::sse_encode(self.kind, serializer);
+        <Option<String>>::sse_encode(self.key, serializer);
+        <Option<String>>::sse_encode(self.value, serializer);
+        <Vec<crate::DataAttribute>>::sse_encode(self.attributes, serializer);
+        <Vec<crate::DataNode>>::sse_encode(self.children, serializer);
+        <crate::Span>::sse_encode(self.span, serializer);
+    }
+}
+
+impl SseEncode for crate::DataNodeKind {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::DataNodeKind::KeyValue => 0,
+                crate::DataNodeKind::Element => 1,
+                crate::DataNodeKind::Sequence => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
 impl SseEncode for crate::Diagnostic {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5314,6 +5569,26 @@ impl SseEncode for Vec<crate::CommentInfo> {
     }
 }
 
+impl SseEncode for Vec<crate::DataAttribute> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::DataAttribute>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::DataNode> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::DataNode>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::Diagnostic> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5424,6 +5699,16 @@ impl SseEncode for Option<Tree> {
     }
 }
 
+impl SseEncode for Option<crate::DataNode> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::DataNode>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<i64> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5483,6 +5768,7 @@ impl SseEncode for crate::ProcessConfig {
         <bool>::sse_encode(self.symbols, serializer);
         <bool>::sse_encode(self.diagnostics, serializer);
         <Option<i64>>::sse_encode(self.chunk_max_size, serializer);
+        <bool>::sse_encode(self.data_extraction, serializer);
     }
 }
 
@@ -5499,6 +5785,7 @@ impl SseEncode for crate::ProcessResult {
         <Vec<crate::SymbolInfo>>::sse_encode(self.symbols, serializer);
         <Vec<crate::Diagnostic>>::sse_encode(self.diagnostics, serializer);
         <Vec<crate::CodeChunk>>::sse_encode(self.chunks, serializer);
+        <Option<crate::DataNode>>::sse_encode(self.data, serializer);
     }
 }
 

@@ -89,9 +89,7 @@ fn strip_quotes(s: &str) -> &str {
 /// Collect the first named child of a given `kind` from `node`.
 fn named_child_of_kind<'a>(node: &Node<'a>, kind: &str) -> Option<Node<'a>> {
     let mut cursor = node.walk();
-    node.named_children(&mut cursor)
-        .find(|c| c.kind() == kind)
-        .map(|c| c)
+    node.named_children(&mut cursor).find(|c| c.kind() == kind).map(|c| c)
 }
 
 // ── Bucket A: JSON / HJSON / JSON5 ───────────────────────────────────────────
@@ -169,10 +167,10 @@ fn json_object_children(node: &Node, source: &str) -> Vec<DataNode> {
     let mut result = Vec::new();
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
-        if child.kind() == "pair" {
-            if let Some(n) = json_value_node(&child, source, None) {
-                result.push(n);
-            }
+        if child.kind() == "pair"
+            && let Some(n) = json_value_node(&child, source, None)
+        {
+            result.push(n);
         }
     }
     result
@@ -345,10 +343,10 @@ fn extract_properties(root: &Node, source: &str) -> Option<DataNode> {
     let mut children = Vec::new();
     let mut cursor = root.walk();
     for child in root.named_children(&mut cursor) {
-        if child.kind() == "property" {
-            if let Some(n) = properties_property_node(&child, source) {
-                children.push(n);
-            }
+        if child.kind() == "property"
+            && let Some(n) = properties_property_node(&child, source)
+        {
+            children.push(n);
         }
     }
     Some(DataNode {
@@ -510,10 +508,10 @@ fn kdl_node_children(node: &Node, source: &str) -> Vec<DataNode> {
     let mut result = Vec::new();
     let mut cursor = node.walk();
     for child in node.named_children(&mut cursor) {
-        if child.kind() == "node" {
-            if let Some(n) = kdl_single_node(&child, source) {
-                result.push(n);
-            }
+        if child.kind() == "node"
+            && let Some(n) = kdl_single_node(&child, source)
+        {
+            result.push(n);
         }
     }
     result
@@ -870,10 +868,10 @@ fn extract_po(root: &Node, source: &str) -> Option<DataNode> {
     let mut messages = Vec::new();
     let mut cursor = root.walk();
     for child in root.named_children(&mut cursor) {
-        if child.kind() == "message" {
-            if let Some(n) = po_message_node(&child, source) {
-                messages.push(n);
-            }
+        if child.kind() == "message"
+            && let Some(n) = po_message_node(&child, source)
+        {
+            messages.push(n);
         }
     }
     Some(DataNode {
@@ -1247,7 +1245,9 @@ mod tests {
     #[test]
     fn test_properties_flat() {
         let source = "host=localhost\nport=8080\n";
-        let Some(root) = extract(source, "properties") else { return };
+        let Some(root) = extract(source, "properties") else {
+            return;
+        };
         assert!(root.children.iter().any(|c| c.key.as_deref() == Some("host")));
         assert!(root.children.iter().any(|c| c.key.as_deref() == Some("port")));
     }

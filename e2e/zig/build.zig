@@ -20,6 +20,22 @@ pub fn build(b: *std.Build) void {
     tree_sitter_language_pack_module.linkSystemLibrary("ts_pack_core_ffi", .{});
     tree_sitter_language_pack_module.addRPath(.{ .cwd_relative = ffi_path_abs });
 
+    const data_extraction_module = b.createModule(.{
+        .root_source_file = b.path("src/data_extraction_test.zig"),
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    });
+    data_extraction_module.addImport("tree_sitter_language_pack", tree_sitter_language_pack_module);
+    const data_extraction_tests = b.addTest(.{
+        .name = "data_extraction_test",
+        .root_module = data_extraction_module,
+        .use_llvm = true,
+    });
+    data_extraction_tests.root_module.addRPath(.{ .cwd_relative = ffi_path_abs });
+    const data_extraction_run = b.addRunArtifact(data_extraction_tests);
+    test_step.dependOn(&data_extraction_run.step);
+
     const download_module = b.createModule(.{
         .root_source_file = b.path("src/download_test.zig"),
         .target = target,

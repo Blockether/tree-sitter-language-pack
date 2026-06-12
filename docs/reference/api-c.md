@@ -637,6 +637,48 @@ A comment extracted from source code.
 
 ---
 
+#### TsPackDataAttribute
+
+An XML-style attribute attached to an `Element` node.
+
+Populated only for `DataNodeKind.Element`; always empty for `KeyValue` and
+`Sequence` nodes.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `name` | `const char*` | — | Attribute name (e.g. `"class"`, `"href"`). |
+| `value` | `const char*` | — | Attribute value as a raw string (quotes stripped). |
+| `span` | `TsPackSpan` | — | Source span covering the entire `name="value"` attribute token. |
+
+---
+
+#### TsPackDataNode
+
+A node in the hierarchical data tree produced by data-format extraction.
+
+When `ProcessConfig.data_extraction` is
+`true`, `ProcessResult.data` is populated with a root `DataNode` whose
+`children` mirror the structure of the parsed file.
+
+The `kind` field determines which other fields are meaningful:
+
+| `kind`     | `key`                    | `value`       | `attributes` | `children` |
+|------------|--------------------------|---------------|--------------|------------|
+| `KeyValue` | key / mapping key / index | leaf value   | empty        | nested map |
+| `Element`  | XML tag name             | text content  | XML attrs    | child elements |
+| `Sequence` | positional index (`"0"`) | leaf value   | empty        | sub-items  |
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `kind` | `TsPackDataNodeKind` | `TS_PACK_TS_PACK_KEY_VALUE` | Whether this node is a key/value pair, XML element, or sequence item. |
+| `key` | `const char**` | `NULL` | Key, attribute name, tag name, or positional index (`"0"`, `"1"`, …). `NULL` at the document root. |
+| `value` | `const char**` | `NULL` | Leaf scalar value, if any. `NULL` for containers (objects, arrays, XML elements with child elements). |
+| `attributes` | `TsPackDataAttribute*` | `NULL` | Attributes on element-shape nodes (XML `STag` attributes). Empty for all other kinds. |
+| `children` | `TsPackDataNode*` | `NULL` | Children for nested containers and XML element bodies. |
+| `span` | `TsPackSpan` | — | Source span covering this node in the original source file. |
+
+---
+
 #### TsPackDiagnostic
 
 A diagnostic (syntax error, missing node, etc.) from parsing.
@@ -1261,6 +1303,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
 | `chunk_max_size` | `uintptr_t*` | `NULL` | Maximum chunk size in bytes. `NULL` disables chunking. |
+| `data_extraction` | `bool` | `false` | Extract hierarchical key/value data tree from data-format files. Default: false. When `true`, `ProcessResult.data` is populated with a `DataNode` tree for supported languages: JSON, YAML, TOML, `.properties`, HCL/HOCON, INI, editorconfig, KDL, CUE, CSV, PSV, PO, nginx config, Caddy config, XML, and DTD. For languages outside this set the field is left as `NULL`. |
 
 ### Methods
 
@@ -1302,6 +1345,19 @@ Disable all analysis features (only metrics computed).
 TsPackProcessConfig ts_pack_minimal();
 ```
 
+#### ts_pack_with_data_extraction()
+
+Enable or disable hierarchical data extraction for data-format files.
+
+When `true`, `ProcessResult.data` is
+populated with a key/value tree for supported data-format languages.
+
+**Signature:**
+
+```c
+TsPackProcessConfig ts_pack_with_data_extraction(bool enabled);
+```
+
 ---
 
 #### TsPackProcessResult
@@ -1324,6 +1380,7 @@ Fields are populated based on the `ProcessConfig` flags.
 | `symbols` | `TsPackSymbolInfo*` | `NULL` | Symbol definitions (variables, types, functions) extracted from the source. |
 | `diagnostics` | `TsPackDiagnostic*` | `NULL` | Parse diagnostics (syntax errors, missing nodes) from tree-sitter. |
 | `chunks` | `TsPackCodeChunk*` | `NULL` | Syntax-aware code chunks produced when chunking is enabled. |
+| `data` | `TsPackDataNode*` | `NULL` | Hierarchical data tree extracted when `config.data_extraction` is `true`. Populated for supported data-format languages (JSON, YAML, TOML, properties, HCL, INI, XML, CSV, and more). `NULL` when `data_extraction` is `false` (the default) or when the language is not a recognised data format. See `DataNode` for the shape of the returned tree. |
 
 ---
 
@@ -1468,6 +1525,29 @@ const char** ts_pack_field_name();
 
 ### Enums
 
+#### TsPackDataNodeKind
+
+The kind of a data node extracted from a data-format file.
+
+Classifies each node in the hierarchical `DataNode` tree returned when
+`data_extraction` is enabled on `ProcessConfig`.
+
+### Wire format (public JSON contract)
+
+Unit variants serialize as a bare string (`"KeyValue"`). DO NOT add
+`#[serde(tag = "...")]` or rename variants — every language binding has a
+hand-written deserializer matching this exact shape, and any change breaks
+all bindings' `process()` tests simultaneously.
+Covered by `tests/wire_format.rs`.
+
+| Value | Description |
+|-------|-------------|
+| `TS_PACK_KEY_VALUE` | A key/value pair or mapping (json/toml/properties/yaml/hcl/cue/kdl pair, or a wrapper "object"/"mapping" container). |
+| `TS_PACK_ELEMENT` | An XML element with a tag name in `key` and attributes in `attributes`. |
+| `TS_PACK_SEQUENCE` | A positional sequence item (JSON array element, YAML block sequence item, CSV/PSV row or cell). |
+
+---
+
 #### TsPackStructureKind
 
 The kind of structural item found in source code.
@@ -1475,6 +1555,15 @@ The kind of structural item found in source code.
 Categorizes top-level and nested declarations such as functions, classes,
 structs, enums, traits, and more. Use `Other` for
 language-specific constructs that do not fit a standard category.
+
+### Wire format (public JSON contract)
+
+Unit variants serialize as a bare string (`"Function"`); the `Other`
+variant serializes as a single-keyed object (`{"Other": "macro"}`). DO
+NOT add `#[serde(tag = "...")]` or rename variants — every language
+binding has a hand-written deserializer matching this exact shape, and
+any change breaks all bindings' `process()` tests simultaneously.
+Covered by `tests/wire_format.rs`.
 
 | Value | Description |
 |-------|-------------|
@@ -1514,6 +1603,12 @@ The format of a docstring extracted from source code.
 Identifies the docstring convention used, which varies by language
 (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
 
+### Wire format (public JSON contract)
+
+Unit variants serialize as a bare string (`"JSDoc"`); the `Other`
+variant serializes as a single-keyed object (`{"Other": "rst"}`). DO
+NOT add `#[serde(tag = "...")]`. Covered by `tests/wire_format.rs`.
+
 | Value | Description |
 |-------|-------------|
 | `TS_PACK_PYTHON_TRIPLE_QUOTE` | Python triple-quoted string docstring (`"""..."""`). |
@@ -1545,6 +1640,12 @@ The kind of a symbol definition found in source code.
 
 Categorizes symbol definitions such as variables, constants, functions,
 classes, types, interfaces, enums, and modules.
+
+### Wire format (public JSON contract)
+
+Unit variants serialize as a bare string (`"Function"`); the `Other`
+variant serializes as a single-keyed object (`{"Other": "macro"}`). DO
+NOT add `#[serde(tag = "...")]`. Covered by `tests/wire_format.rs`.
 
 | Value | Description |
 |-------|-------------|
