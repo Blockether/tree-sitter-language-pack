@@ -69,7 +69,7 @@
       "asciidoc"
     ],
     "repo": "https://github.com/cathaysia/tree-sitter-asciidoc",
-    "rev": "a153694f9783d8fa798ff4eff0994b93f52f0691"
+    "rev": "957a33d9b17a7a95b81f81734cb92e90ea5e7324"
   },
   "asm": {
     "extensions": [
@@ -670,7 +670,7 @@
       "fsx"
     ],
     "repo": "https://github.com/ionide/tree-sitter-fsharp",
-    "rev": "5916cf8b720c141d3725855c6c1fd0dc30e7e0e2"
+    "rev": "9a3c4ac77264e8463fee60bd14203ab31e36770e"
   },
   "fsharp_signature": {
     "branch": "main",
@@ -679,7 +679,7 @@
       "fsi"
     ],
     "repo": "https://github.com/ionide/tree-sitter-fsharp",
-    "rev": "5916cf8b720c141d3725855c6c1fd0dc30e7e0e2"
+    "rev": "9a3c4ac77264e8463fee60bd14203ab31e36770e"
   },
   "func": {
     "extensions": [
@@ -694,7 +694,7 @@
       "gi"
     ],
     "repo": "https://github.com/gap-system/tree-sitter-gap",
-    "rev": "3fa54a9bce964731f8a3e0fb80d55805dd4ec8f0"
+    "rev": "96fe2e49745ecd62b80cd19dca01fb52b83f93a1"
   },
   "gdscript": {
     "ambiguous": {
@@ -758,7 +758,7 @@
       "gleam"
     ],
     "repo": "https://github.com/gleam-lang/tree-sitter-gleam",
-    "rev": "0ae061fea67cb39639b47c7acc46cbf5d109fda1"
+    "rev": "c610c282ef73f830d80c1f0999dce8e83f024ef5"
   },
   "glimmer": {
     "extensions": [
@@ -790,7 +790,7 @@
       "plt"
     ],
     "repo": "https://github.com/dpezto/tree-sitter-gnuplot",
-    "rev": "cccf7a6893dfddc7eb3784870960982acf476a9d"
+    "rev": "12325509f4b5beb9f77b3da134c0560f0a7c7063"
   },
   "go": {
     "branch": "master",
@@ -1026,7 +1026,7 @@
   "javadoc": {
     "extensions": [],
     "repo": "https://github.com/rmuir/tree-sitter-javadoc",
-    "rev": "1547215c619cba23f52a2563d1e3ff5d0b41a98b"
+    "rev": "ec2814bb4c6b7f532f03f247b11caf42f29dea40"
   },
   "javascript": {
     "branch": "master",
@@ -1141,7 +1141,7 @@
       "lean"
     ],
     "repo": "https://github.com/Julian/tree-sitter-lean",
-    "rev": "5255dc53a4e4f423f1978018ab430b6f9100f645"
+    "rev": "463a9d8a509c935f4e10854b5078bbe2839b274c"
   },
   "ledger": {
     "extensions": [
@@ -1453,7 +1453,7 @@
       "pm"
     ],
     "repo": "https://github.com/tree-sitter-perl/tree-sitter-perl",
-    "rev": "f48744e7ff7ae60b633fed4edf48151309901f3a"
+    "rev": "567caa6fc6adbe19977bc6c21fd31275fc54d810"
   },
   "pgn": {
     "branch": "master",
@@ -1482,7 +1482,7 @@
     ],
     "generate": true,
     "repo": "https://github.com/apple/tree-sitter-pkl",
-    "rev": "99308a46db039c0903e57fc17750e2ae13979a7f"
+    "rev": "90b64cb6e563bcc96552490ccd40667418c65cdc"
   },
   "po": {
     "extensions": [
@@ -1668,7 +1668,7 @@
       "cshtml"
     ],
     "repo": "https://github.com/tris203/tree-sitter-razor",
-    "rev": "a3399c26610817c6d32c7643793caf3729cfb6d2"
+    "rev": "900f53dc6cc592f6e616adc2f732cb0f66fc9147"
   },
   "rbs": {
     "extensions": [
@@ -1743,7 +1743,7 @@
       "rst"
     ],
     "repo": "https://github.com/stsewd/tree-sitter-rst",
-    "rev": "4ad5fc52c42474249f29240f349829b3882cec62"
+    "rev": "a60f1070b824cb8bb8409b4b6d7da0d07997c30e"
   },
   "rtf": {
     "extensions": [
@@ -1914,7 +1914,7 @@
       "shtml"
     ],
     "repo": "https://github.com/kristoff-it/superhtml",
-    "rev": "1faf4ed4dc8f13d2ba37501523a63860bb58996b"
+    "rev": "2d31eed7eccb3a885db1c20ea90eddd8352d9f80"
   },
   "svelte": {
     "branch": "master",
@@ -1937,7 +1937,7 @@
     ],
     "generate": true,
     "repo": "https://github.com/alex-pinkus/tree-sitter-swift",
-    "rev": "d42e9bb24646c4dbf1f5ec476a35b96d817da448"
+    "rev": "73fefe1211ad5e389aaf3c9337c66691ac058c81"
   },
   "systemverilog": {
     "ambiguous": {
@@ -2292,13 +2292,13 @@
       "ziggy"
     ],
     "repo": "https://github.com/kristoff-it/ziggy",
-    "rev": "e3ae67e14d0c7cfe50082aac208461f0d467e683"
+    "rev": "0c2ae8a81b26c4bb7a8024df4ba86174fac56c5a"
   },
   "ziggy_schema": {
     "directory": "tree-sitter-ziggy-schema",
     "extensions": [],
     "repo": "https://github.com/kristoff-it/ziggy",
-    "rev": "e3ae67e14d0c7cfe50082aac208461f0d467e683"
+    "rev": "0c2ae8a81b26c4bb7a8024df4ba86174fac56c5a"
   },
   "zsh": {
     "extensions": [
