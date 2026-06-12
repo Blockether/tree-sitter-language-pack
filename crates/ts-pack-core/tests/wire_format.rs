@@ -14,9 +14,9 @@
 
 use insta::assert_json_snapshot;
 use tree_sitter_language_pack::{
-    ChunkContext, CodeChunk, CommentInfo, CommentKind, Diagnostic, DiagnosticSeverity, DocSection, DocstringFormat,
-    DocstringInfo, ExportInfo, ExportKind, FileMetrics, ImportInfo, ProcessConfig, ProcessResult, Span, StructureItem,
-    StructureKind, SymbolInfo, SymbolKind,
+    ChunkContext, CodeChunk, CommentInfo, CommentKind, DataAttribute, DataNode, DataNodeKind, Diagnostic,
+    DiagnosticSeverity, DocSection, DocstringFormat, DocstringInfo, ExportInfo, ExportKind, FileMetrics, ImportInfo,
+    ProcessConfig, ProcessResult, Span, StructureItem, StructureKind, SymbolInfo, SymbolKind,
 };
 
 fn span() -> Span {
@@ -279,6 +279,7 @@ fn process_config_shape() {
         symbols: false,
         diagnostics: false,
         chunk_max_size: None,
+        data_extraction: false,
     });
 }
 
@@ -314,5 +315,71 @@ fn process_result_shape() {
         symbols: vec![],
         diagnostics: vec![],
         chunks: vec![],
+        data: None,
+    });
+}
+
+// -- Data extraction types --
+
+#[test]
+fn data_node_kind_serializes_as_bare_string() {
+    assert_json_snapshot!(DataNodeKind::KeyValue);
+    assert_json_snapshot!(DataNodeKind::Element);
+    assert_json_snapshot!(DataNodeKind::Sequence);
+}
+
+#[test]
+fn data_attribute_shape() {
+    assert_json_snapshot!(DataAttribute {
+        name: "class".to_string(),
+        value: "highlight".to_string(),
+        span: span(),
+    });
+}
+
+#[test]
+fn data_node_leaf_shape() {
+    assert_json_snapshot!(DataNode {
+        kind: DataNodeKind::KeyValue,
+        key: Some("host".to_string()),
+        value: Some("localhost".to_string()),
+        attributes: vec![],
+        children: vec![],
+        span: span(),
+    });
+}
+
+#[test]
+fn data_node_container_shape() {
+    assert_json_snapshot!(DataNode {
+        kind: DataNodeKind::KeyValue,
+        key: None,
+        value: None,
+        attributes: vec![],
+        children: vec![DataNode {
+            kind: DataNodeKind::KeyValue,
+            key: Some("port".to_string()),
+            value: Some("8080".to_string()),
+            attributes: vec![],
+            children: vec![],
+            span: span(),
+        }],
+        span: span(),
+    });
+}
+
+#[test]
+fn data_node_element_shape() {
+    assert_json_snapshot!(DataNode {
+        kind: DataNodeKind::Element,
+        key: Some("server".to_string()),
+        value: None,
+        attributes: vec![DataAttribute {
+            name: "id".to_string(),
+            value: "main".to_string(),
+            span: span(),
+        }],
+        children: vec![],
+        span: span(),
     });
 }

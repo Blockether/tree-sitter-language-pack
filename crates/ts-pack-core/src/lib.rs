@@ -77,9 +77,9 @@ pub mod download;
 pub use error::Error;
 pub use extensions::{detect_language_from_content, detect_language_from_extension, detect_language_from_path};
 pub use intel::types::{
-    ChunkContext, CodeChunk, CommentInfo, CommentKind, Diagnostic, DiagnosticSeverity, DocSection, DocstringFormat,
-    DocstringInfo, ExportInfo, ExportKind, FileMetrics, ImportInfo, ProcessResult, Span, StructureItem, StructureKind,
-    SymbolInfo, SymbolKind,
+    ChunkContext, CodeChunk, CommentInfo, CommentKind, DataAttribute, DataNode, DataNodeKind, Diagnostic,
+    DiagnosticSeverity, DocSection, DocstringFormat, DocstringInfo, ExportInfo, ExportKind, FileMetrics, ImportInfo,
+    ProcessResult, Span, StructureItem, StructureKind, SymbolInfo, SymbolKind,
 };
 pub use pack_config::{PackConfig, TlsRootsMode};
 pub use parsing::{ByteRange, Node, Parser, Point, Tree, TreeCursor};

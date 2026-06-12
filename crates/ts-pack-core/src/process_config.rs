@@ -47,6 +47,26 @@ pub struct ProcessConfig {
     /// Maximum chunk size in bytes. `None` disables chunking.
     #[cfg_attr(feature = "serde", serde(default))]
     pub chunk_max_size: Option<usize>,
+    /// Extract hierarchical key/value data tree from data-format files. Default: false.
+    ///
+    /// When `true`, [`ProcessResult::data`](crate::ProcessResult::data) is populated
+    /// with a [`DataNode`](crate::DataNode) tree for supported languages: JSON, YAML,
+    /// TOML, `.properties`, HCL/HOCON, INI, editorconfig, KDL, CUE, CSV, PSV, PO,
+    /// nginx config, Caddy config, XML, and DTD.
+    ///
+    /// For languages outside this set the field is left as `None`.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use tree_sitter_language_pack::{ProcessConfig, process};
+    ///
+    /// let config = ProcessConfig::new("json").with_data_extraction(true);
+    /// let result = process(r#"{"host": "localhost"}"#, &config).unwrap();
+    /// assert!(result.data.is_some());
+    /// ```
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub data_extraction: bool,
 }
 
 #[cfg(feature = "serde")]
@@ -66,6 +86,7 @@ impl Default for ProcessConfig {
             symbols: false,
             diagnostics: false,
             chunk_max_size: None,
+            data_extraction: false,
         }
     }
 }
@@ -106,6 +127,15 @@ impl ProcessConfig {
         self.docstrings = false;
         self.symbols = false;
         self.diagnostics = false;
+        self
+    }
+
+    /// Enable or disable hierarchical data extraction for data-format files.
+    ///
+    /// When `true`, [`ProcessResult::data`](crate::ProcessResult::data) is
+    /// populated with a key/value tree for supported data-format languages.
+    pub fn with_data_extraction(mut self, enabled: bool) -> Self {
+        self.data_extraction = enabled;
         self
     }
 }

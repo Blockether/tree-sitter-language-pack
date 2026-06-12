@@ -1,3 +1,94 @@
+/// The kind of a data node extracted from a data-format file.
+///
+/// Classifies each node in the hierarchical [`DataNode`] tree returned when
+/// `data_extraction` is enabled on [`crate::ProcessConfig`].
+///
+/// # Wire format (public JSON contract)
+///
+/// Unit variants serialize as a bare string (`"KeyValue"`). DO NOT add
+/// `#[serde(tag = "...")]` or rename variants — every language binding has a
+/// hand-written deserializer matching this exact shape, and any change breaks
+/// all bindings' `process()` tests simultaneously.
+/// Covered by `tests/wire_format.rs`.
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
+pub enum DataNodeKind {
+    #[default]
+    /// A key/value pair or mapping (json/toml/properties/yaml/hcl/cue/kdl pair,
+    /// or a wrapper "object"/"mapping" container).
+    KeyValue,
+    /// An XML element with a tag name in `key` and attributes in `attributes`.
+    Element,
+    /// A positional sequence item (JSON array element, YAML block sequence item,
+    /// CSV/PSV row or cell).
+    Sequence,
+}
+
+/// An XML-style attribute attached to an [`Element`](DataNodeKind::Element) node.
+///
+/// Populated only for `DataNodeKind::Element`; always empty for `KeyValue` and
+/// `Sequence` nodes.
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
+pub struct DataAttribute {
+    /// Attribute name (e.g. `"class"`, `"href"`).
+    pub name: String,
+    /// Attribute value as a raw string (quotes stripped).
+    pub value: String,
+    /// Source span covering the entire `name="value"` attribute token.
+    pub span: Span,
+}
+
+/// A node in the hierarchical data tree produced by data-format extraction.
+///
+/// When [`ProcessConfig::data_extraction`](crate::ProcessConfig::data_extraction) is
+/// `true`, [`ProcessResult::data`] is populated with a root `DataNode` whose
+/// [`children`](DataNode::children) mirror the structure of the parsed file.
+///
+/// The `kind` field determines which other fields are meaningful:
+///
+/// | `kind`     | `key`                    | `value`       | `attributes` | `children` |
+/// |------------|--------------------------|---------------|--------------|------------|
+/// | `KeyValue` | key / mapping key / index | leaf value   | empty        | nested map |
+/// | `Element`  | XML tag name             | text content  | XML attrs    | child elements |
+/// | `Sequence` | positional index (`"0"`) | leaf value   | empty        | sub-items  |
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::{ProcessConfig, process};
+///
+/// let config = ProcessConfig::new("json").with_data_extraction(true);
+/// let result = process(r#"{"host": "localhost", "port": 8080}"#, &config).unwrap();
+/// if let Some(root) = &result.data {
+///     for child in &root.children {
+///         println!("{} = {:?}", child.key.as_deref().unwrap_or("?"), child.value);
+///     }
+/// }
+/// ```
+#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
+pub struct DataNode {
+    /// Whether this node is a key/value pair, XML element, or sequence item.
+    pub kind: DataNodeKind,
+    /// Key, attribute name, tag name, or positional index (`"0"`, `"1"`, …).
+    /// `None` at the document root.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
+    pub key: Option<String>,
+    /// Leaf scalar value, if any. `None` for containers (objects, arrays, XML elements
+    /// with child elements).
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
+    pub value: Option<String>,
+    /// Attributes on element-shape nodes (XML `STag` attributes). Empty for all other kinds.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Vec::is_empty"))]
+    pub attributes: Vec<DataAttribute>,
+    /// Children for nested containers and XML element bodies.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Vec::is_empty"))]
+    pub children: Vec<DataNode>,
+    /// Source span covering this node in the original source file.
+    pub span: Span,
+}
+
 /// Byte and line/column range in source code.
 ///
 /// Represents both byte offsets (for slicing) and human-readable line/column
@@ -68,6 +159,15 @@ pub struct ProcessResult {
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Vec::is_empty", default))]
     /// Syntax-aware code chunks produced when chunking is enabled.
     pub chunks: Vec<CodeChunk>,
+    /// Hierarchical data tree extracted when `config.data_extraction` is `true`.
+    ///
+    /// Populated for supported data-format languages (JSON, YAML, TOML, properties,
+    /// HCL, INI, XML, CSV, and more). `None` when `data_extraction` is `false` (the
+    /// default) or when the language is not a recognised data format.
+    ///
+    /// See [`DataNode`] for the shape of the returned tree.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
+    pub data: Option<DataNode>,
 }
 
 /// Aggregate metrics for a source file.
