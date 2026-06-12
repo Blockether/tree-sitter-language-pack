@@ -34,6 +34,55 @@ typedef struct TS_PACKCommentInfo TS_PACKCommentInfo;
  */
 typedef struct TS_PACKCommentKind TS_PACKCommentKind;
 /**
+ * An XML-style attribute attached to an `Element` (DataNodeKind::Element) node.
+ *
+ * Populated only for `DataNodeKind::Element`; always empty for `KeyValue` and
+ * `Sequence` nodes.
+ */
+typedef struct TS_PACKDataAttribute TS_PACKDataAttribute;
+/**
+ * A node in the hierarchical data tree produced by data-format extraction.
+ *
+ * When `ProcessConfig::data_extraction` (crate::ProcessConfig::data_extraction) is
+ * `true`, `ProcessResult.data` is populated with a root `DataNode` whose
+ * `children` (DataNode::children) mirror the structure of the parsed file.
+ *
+ * The `kind` field determines which other fields are meaningful:
+ *
+ * | `kind`     | `key`                    | `value`       | `attributes` | `children` |
+ * |------------|--------------------------|---------------|--------------|------------|
+ * | `KeyValue` | key / mapping key / index | leaf value   | empty        | nested map |
+ * | `Element`  | XML tag name             | text content  | XML attrs    | child elements |
+ * | `Sequence` | positional index (`"0"`) | leaf value   | empty        | sub-items  |
+ * \code
+ * use tree_sitter_language_pack::{ProcessConfig, process};
+ *
+ * let config = ProcessConfig::new("json").with_data_extraction(true);
+ * let result = process(r#"{"host": "localhost", "port": 8080}"#, &config).unwrap();
+ * if let Some(root) = &result.data {
+ *     for child in &root.children {
+ *         println!("{} = {:?}", child.key.as_deref().unwrap_or("?"), child.value);
+ *     }
+ * }
+ * \endcode
+ */
+typedef struct TS_PACKDataNode TS_PACKDataNode;
+/**
+ * The kind of a data node extracted from a data-format file.
+ *
+ * Classifies each node in the hierarchical `DataNode` tree returned when
+ * `data_extraction` is enabled on `ProcessConfig`.
+ *
+ * # Wire format (public JSON contract)
+ *
+ * Unit variants serialize as a bare string (`"KeyValue"`). DO NOT add
+ * `#[serde(tag = "...")]` or rename variants â every language binding has a
+ * hand-written deserializer matching this exact shape, and any change breaks
+ * all bindings' `process()` tests simultaneously.
+ * Covered by `tests/wire_format.rs`.
+ */
+typedef struct TS_PACKDataNodeKind TS_PACKDataNodeKind;
+/**
  * A diagnostic (syntax error, missing node, etc.) from parsing.
  */
 typedef struct TS_PACKDiagnostic TS_PACKDiagnostic;
@@ -53,6 +102,12 @@ typedef struct TS_PACKDocSection TS_PACKDocSection;
  *
  * Identifies the docstring convention used, which varies by language
  * (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
+ *
+ * # Wire format (public JSON contract)
+ *
+ * Unit variants serialize as a bare string (`"JSDoc"`); the `Other`
+ * variant serializes as a single-keyed object (`{"Other": "rst"}`). DO
+ * NOT add `#[serde(tag = "...")]`. Covered by `tests/wire_format.rs`.
  */
 typedef struct TS_PACKDocstringFormat TS_PACKDocstringFormat;
 /**
@@ -199,6 +254,15 @@ typedef struct TS_PACKStructureItem TS_PACKStructureItem;
  * Categorizes top-level and nested declarations such as functions, classes,
  * structs, enums, traits, and more. Use `Other` (StructureKind::Other) for
  * language-specific constructs that do not fit a standard category.
+ *
+ * # Wire format (public JSON contract)
+ *
+ * Unit variants serialize as a bare string (`"Function"`); the `Other`
+ * variant serializes as a single-keyed object (`{"Other": "macro"}`). DO
+ * NOT add `#[serde(tag = "...")]` or rename variants â every language
+ * binding has a hand-written deserializer matching this exact shape, and
+ * any change breaks all bindings' `process()` tests simultaneously.
+ * Covered by `tests/wire_format.rs`.
  */
 typedef struct TS_PACKStructureKind TS_PACKStructureKind;
 /**
@@ -210,6 +274,12 @@ typedef struct TS_PACKSymbolInfo TS_PACKSymbolInfo;
  *
  * Categorizes symbol definitions such as variables, constants, functions,
  * classes, types, interfaces, enums, and modules.
+ *
+ * # Wire format (public JSON contract)
+ *
+ * Unit variants serialize as a bare string (`"Function"`); the `Other`
+ * variant serializes as a single-keyed object (`{"Other": "macro"}`). DO
+ * NOT add `#[serde(tag = "...")]`. Covered by `tests/wire_format.rs`.
  */
 typedef struct TS_PACKSymbolKind TS_PACKSymbolKind;
 /**
@@ -264,6 +334,115 @@ void ts_pack_free_bytes(uint8_t *ptr,
  * Returned pointers must be freed with the appropriate free function.
  */
 const char *ts_pack_version(void);
+
+/**
+ * Create a `DataAttribute` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_data_attribute_free`.
+ */
+TS_PACKDataAttribute *ts_pack_data_attribute_from_json(const char *json);
+
+/**
+ * Serialize a `DataAttribute` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_data_attribute_to_json(const TS_PACKDataAttribute *ptr);
+
+/**
+ * Free a `DataAttribute` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_data_attribute_free(TS_PACKDataAttribute *ptr);
+
+/**
+ * Get the `name` field from a `DataAttribute`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_data_attribute_name(const TS_PACKDataAttribute *ptr);
+
+/**
+ * Get the `value` field from a `DataAttribute`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_data_attribute_value(const TS_PACKDataAttribute *ptr);
+
+/**
+ * Get the `span` field from a `DataAttribute`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKSpan *ts_pack_data_attribute_span(const TS_PACKDataAttribute *ptr);
+
+/**
+ * Create a `DataNode` from a JSON string. Returns null on failure.
+ * # Safety
+ * JSON string must be valid UTF-8 and null-terminated.
+ * Returned handle must be freed with `ts_pack_data_node_free`.
+ */
+TS_PACKDataNode *ts_pack_data_node_from_json(const char *json);
+
+/**
+ * Serialize a `DataNode` to a JSON string. Returns null on failure.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_data_node_to_json(const TS_PACKDataNode *ptr);
+
+/**
+ * Free a `DataNode` handle.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_data_node_free(TS_PACKDataNode *ptr);
+
+/**
+ * Get the `kind` field from a `DataNode`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKDataNodeKind *ts_pack_data_node_kind(const TS_PACKDataNode *ptr);
+
+/**
+ * Get the `key` field from a `DataNode`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_data_node_key(const TS_PACKDataNode *ptr);
+
+/**
+ * Get the `value` field from a `DataNode`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_data_node_value(const TS_PACKDataNode *ptr);
+
+/**
+ * Get the `attributes` field from a `DataNode`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_data_node_attributes(const TS_PACKDataNode *ptr);
+
+/**
+ * Get the `children` field from a `DataNode`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+char *ts_pack_data_node_children(const TS_PACKDataNode *ptr);
+
+/**
+ * Get the `span` field from a `DataNode`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKSpan *ts_pack_data_node_span(const TS_PACKDataNode *ptr);
 
 /**
  * Create a `Span` from a JSON string. Returns null on failure.
@@ -422,6 +601,13 @@ char *ts_pack_process_result_diagnostics(const TS_PACKProcessResult *ptr);
  * Pointer must be a valid handle returned by this library.
  */
 char *ts_pack_process_result_chunks(const TS_PACKProcessResult *ptr);
+
+/**
+ * Get the `data` field from a `ProcessResult`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+TS_PACKDataNode *ts_pack_process_result_data(const TS_PACKProcessResult *ptr);
 
 /**
  * Create a `FileMetrics` from a JSON string. Returns null on failure.
@@ -1579,6 +1765,13 @@ int32_t ts_pack_process_config_diagnostics(const TS_PACKProcessConfig *ptr);
 uintptr_t ts_pack_process_config_chunk_max_size(const TS_PACKProcessConfig *ptr);
 
 /**
+ * Get the `data_extraction` field from a `ProcessConfig`.
+ * # Safety
+ * Pointer must be a valid handle returned by this library.
+ */
+int32_t ts_pack_process_config_data_extraction(const TS_PACKProcessConfig *ptr);
+
+/**
  * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
  * freed with the appropriate free function.
  */
@@ -1605,6 +1798,17 @@ TS_PACKProcessConfig *ts_pack_process_config_all(TS_PACKProcessConfig *this_);
  * freed with the appropriate free function.
  */
 TS_PACKProcessConfig *ts_pack_process_config_minimal(TS_PACKProcessConfig *this_);
+
+/**
+ * Enable or disable hierarchical data extraction for data-format files.
+ *
+ * When `true`, `ProcessResult::data` (crate::ProcessResult::data) is
+ * populated with a key/value tree for supported data-format languages.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+TS_PACKProcessConfig *ts_pack_process_config_with_data_extraction(TS_PACKProcessConfig *this_,
+                                                                  int32_t enabled);
 
 /**
  * Free a `LanguageRegistry` handle.
@@ -1745,6 +1949,21 @@ int32_t ts_pack_download_manager_clean_cache(const TS_PACKDownloadManager *this_
 void ts_pack_language_free(TS_PACKLanguage *ptr);
 
 /**
+ * Convert an integer to a `DataNodeKind` variant. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure all pointer arguments are valid or null.
+ * Returned pointers must be freed with the appropriate free function.
+ */
+int32_t ts_pack_data_node_kind_from_i32(int32_t value);
+
+/**
+ * Convert a `DataNodeKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * # Safety
+ * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
+ */
+int32_t ts_pack_data_node_kind_from_str(const char *name);
+
+/**
  * Convert an integer to a `StructureKind` variant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure all pointer arguments are valid or null.
@@ -1833,6 +2052,31 @@ int32_t ts_pack_diagnostic_severity_from_i32(int32_t value);
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
 int32_t ts_pack_diagnostic_severity_from_str(const char *name);
+
+/**
+ * Free a heap-allocated `DataNodeKind` returned by a pointer-returning FFI function.
+ * # Safety
+ * Pointer must have been returned by this library, or be null.
+ */
+void ts_pack_data_node_kind_free(TS_PACKDataNodeKind *ptr);
+
+/**
+ * Serialize a heap-allocated `DataNodeKind` to a JSON string.
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_data_node_kind_to_json(const TS_PACKDataNodeKind *ptr);
+
+/**
+ * Render a heap-allocated `DataNodeKind` as its string representation
+ * (the unit-variant name as serialized by serde — e.g. `"completed"`,
+ * without surrounding JSON quotes).
+ * # Safety
+ * `ptr` must be a valid, non-null pointer returned by a `ts_pack` function.
+ * The returned string must be freed with `ts_pack_free_string`.
+ */
+char *ts_pack_data_node_kind_to_string(const TS_PACKDataNodeKind *ptr);
 
 /**
  * Free a heap-allocated `StructureKind` returned by a pointer-returning FFI function.

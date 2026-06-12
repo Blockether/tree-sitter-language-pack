@@ -8,7 +8,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'lib.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 /// Detect language name from a file extension (without leading dot).
 ///
@@ -242,6 +242,12 @@ Future<void> cleanCache() => RustLib.instance.api.crateCleanCache();
 ///
 /// Returns an error if the system cache directory cannot be determined.
 Future<String> cacheDir() => RustLib.instance.api.crateCacheDir();
+
+Future<DataAttribute> createDataAttributeFromJson({required String json}) =>
+    RustLib.instance.api.crateCreateDataAttributeFromJson(json: json);
+
+Future<DataNode> createDataNodeFromJson({required String json}) =>
+    RustLib.instance.api.crateCreateDataNodeFromJson(json: json);
 
 Future<Span> createSpanFromJson({required String json}) =>
     RustLib.instance.api.crateCreateSpanFromJson(json: json);
@@ -607,6 +613,143 @@ enum CommentKind {
 
   /// A documentation comment such as `/// ...` or slash-double-star block.
   doc,
+}
+
+/// An XML-style attribute attached to an [`Element`](DataNodeKind::Element) node.
+///
+/// Populated only for `DataNodeKind::Element`; always empty for `KeyValue` and
+/// `Sequence` nodes.
+class DataAttribute {
+  /// Attribute name (e.g. `"class"`, `"href"`).
+  final String name;
+
+  /// Attribute value as a raw string (quotes stripped).
+  final String value;
+
+  /// Source span covering the entire `name="value"` attribute token.
+  final Span span;
+
+  const DataAttribute({
+    required this.name,
+    required this.value,
+    required this.span,
+  });
+
+  @override
+  int get hashCode => name.hashCode ^ value.hashCode ^ span.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DataAttribute &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          value == other.value &&
+          span == other.span;
+}
+
+/// A node in the hierarchical data tree produced by data-format extraction.
+///
+/// When [`ProcessConfig::data_extraction`](crate::ProcessConfig::data_extraction) is
+/// `true`, [`ProcessResult::data`] is populated with a root `DataNode` whose
+/// [`children`](DataNode::children) mirror the structure of the parsed file.
+///
+/// The `kind` field determines which other fields are meaningful:
+///
+/// | `kind`     | `key`                    | `value`       | `attributes` | `children` |
+/// |------------|--------------------------|---------------|--------------|------------|
+/// | `KeyValue` | key / mapping key / index | leaf value   | empty        | nested map |
+/// | `Element`  | XML tag name             | text content  | XML attrs    | child elements |
+/// | `Sequence` | positional index (`"0"`) | leaf value   | empty        | sub-items  |
+///
+/// # Example
+///
+/// ```no_run
+/// use tree_sitter_language_pack::{ProcessConfig, process};
+///
+/// let config = ProcessConfig::new("json").with_data_extraction(true);
+/// let result = process(r#"{"host": "localhost", "port": 8080}"#, &config).unwrap();
+/// if let Some(root) = &result.data {
+///     for child in &root.children {
+///         println!("{} = {:?}", child.key.as_deref().unwrap_or("?"), child.value);
+///     }
+/// }
+/// ```
+class DataNode {
+  /// Whether this node is a key/value pair, XML element, or sequence item.
+  final DataNodeKind kind;
+
+  /// Key, attribute name, tag name, or positional index (`"0"`, `"1"`, …).
+  /// `None` at the document root.
+  final String? key;
+
+  /// Leaf scalar value, if any. `None` for containers (objects, arrays, XML elements
+  /// with child elements).
+  final String? value;
+
+  /// Attributes on element-shape nodes (XML `STag` attributes). Empty for all other kinds.
+  final List<DataAttribute> attributes;
+
+  /// Children for nested containers and XML element bodies.
+  final List<DataNode> children;
+
+  /// Source span covering this node in the original source file.
+  final Span span;
+
+  const DataNode({
+    required this.kind,
+    this.key,
+    this.value,
+    required this.attributes,
+    required this.children,
+    required this.span,
+  });
+
+  @override
+  int get hashCode =>
+      kind.hashCode ^
+      key.hashCode ^
+      value.hashCode ^
+      attributes.hashCode ^
+      children.hashCode ^
+      span.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DataNode &&
+          runtimeType == other.runtimeType &&
+          kind == other.kind &&
+          key == other.key &&
+          value == other.value &&
+          attributes == other.attributes &&
+          children == other.children &&
+          span == other.span;
+}
+
+/// The kind of a data node extracted from a data-format file.
+///
+/// Classifies each node in the hierarchical [`DataNode`] tree returned when
+/// `data_extraction` is enabled on `ProcessConfig`.
+///
+/// # Wire format (public JSON contract)
+///
+/// Unit variants serialize as a bare string (`"KeyValue"`). DO NOT add
+/// `#[serde(tag = "...")]` or rename variants — every language binding has a
+/// hand-written deserializer matching this exact shape, and any change breaks
+/// all bindings' `process()` tests simultaneously.
+/// Covered by `tests/wire_format.rs`.
+enum DataNodeKind {
+  /// A key/value pair or mapping (json/toml/properties/yaml/hcl/cue/kdl pair,
+  /// or a wrapper "object"/"mapping" container).
+  keyValue,
+
+  /// An XML element with a tag name in `key` and attributes in `attributes`.
+  element,
+
+  /// A positional sequence item (JSON array element, YAML block sequence item,
+  /// CSV/PSV row or cell).
+  sequence,
 }
 
 /// A diagnostic (syntax error, missing node, etc.) from parsing.
@@ -1065,6 +1208,26 @@ class ProcessConfig {
   /// Maximum chunk size in bytes. `None` disables chunking.
   final PlatformInt64? chunkMaxSize;
 
+  /// Extract hierarchical key/value data tree from data-format files. Default: false.
+  ///
+  /// When `true`, [`ProcessResult::data`](crate::ProcessResult::data) is populated
+  /// with a [`DataNode`](crate::DataNode) tree for supported languages: JSON, YAML,
+  /// TOML, `.properties`, HCL/HOCON, INI, editorconfig, KDL, CUE, CSV, PSV, PO,
+  /// nginx config, Caddy config, XML, and DTD.
+  ///
+  /// For languages outside this set the field is left as `None`.
+  ///
+  /// # Example
+  ///
+  /// ```no_run
+  /// use tree_sitter_language_pack::{ProcessConfig, process};
+  ///
+  /// let config = ProcessConfig::new("json").with_data_extraction(true);
+  /// let result = process(r#"{"host": "localhost"}"#, &config).unwrap();
+  /// assert!(result.data.is_some());
+  /// ```
+  final bool dataExtraction;
+
   const ProcessConfig({
     required this.language,
     required this.structure,
@@ -1075,6 +1238,7 @@ class ProcessConfig {
     required this.symbols,
     required this.diagnostics,
     this.chunkMaxSize,
+    required this.dataExtraction,
   });
 
   @override
@@ -1087,7 +1251,8 @@ class ProcessConfig {
       docstrings.hashCode ^
       symbols.hashCode ^
       diagnostics.hashCode ^
-      chunkMaxSize.hashCode;
+      chunkMaxSize.hashCode ^
+      dataExtraction.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -1102,7 +1267,8 @@ class ProcessConfig {
           docstrings == other.docstrings &&
           symbols == other.symbols &&
           diagnostics == other.diagnostics &&
-          chunkMaxSize == other.chunkMaxSize;
+          chunkMaxSize == other.chunkMaxSize &&
+          dataExtraction == other.dataExtraction;
 }
 
 /// Complete analysis result from processing a source file.
@@ -1154,6 +1320,15 @@ class ProcessResult {
   /// Syntax-aware code chunks produced when chunking is enabled.
   final List<CodeChunk> chunks;
 
+  /// Hierarchical data tree extracted when `config.data_extraction` is `true`.
+  ///
+  /// Populated for supported data-format languages (JSON, YAML, TOML, properties,
+  /// HCL, INI, XML, CSV, and more). `None` when `data_extraction` is `false` (the
+  /// default) or when the language is not a recognised data format.
+  ///
+  /// See [`DataNode`] for the shape of the returned tree.
+  final DataNode? data;
+
   const ProcessResult({
     required this.language,
     required this.metrics,
@@ -1165,6 +1340,7 @@ class ProcessResult {
     required this.symbols,
     required this.diagnostics,
     required this.chunks,
+    this.data,
   });
 
   @override
@@ -1178,7 +1354,8 @@ class ProcessResult {
       docstrings.hashCode ^
       symbols.hashCode ^
       diagnostics.hashCode ^
-      chunks.hashCode;
+      chunks.hashCode ^
+      data.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -1194,7 +1371,8 @@ class ProcessResult {
           docstrings == other.docstrings &&
           symbols == other.symbols &&
           diagnostics == other.diagnostics &&
-          chunks == other.chunks;
+          chunks == other.chunks &&
+          data == other.data;
 }
 
 /// Byte and line/column range in source code.

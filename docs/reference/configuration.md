@@ -6,6 +6,48 @@ title: "Configuration Reference"
 
 This page documents all configuration types and their defaults across all languages.
 
+### DataAttribute
+
+An XML-style attribute attached to an `Element` node.
+
+Populated only for `DataNodeKind.Element`; always empty for `KeyValue` and
+`Sequence` nodes.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `name` | `str` | — | Attribute name (e.g. `"class"`, `"href"`). |
+| `value` | `str` | — | Attribute value as a raw string (quotes stripped). |
+| `span` | `Span` | — | Source span covering the entire `name="value"` attribute token. |
+
+---
+
+### DataNode
+
+A node in the hierarchical data tree produced by data-format extraction.
+
+When `ProcessConfig.data_extraction` is
+`True`, `ProcessResult.data` is populated with a root `DataNode` whose
+`children` mirror the structure of the parsed file.
+
+The `kind` field determines which other fields are meaningful:
+
+| `kind`     | `key`                    | `value`       | `attributes` | `children` |
+|------------|--------------------------|---------------|--------------|------------|
+| `KeyValue` | key / mapping key / index | leaf value   | empty        | nested map |
+| `Element`  | XML tag name             | text content  | XML attrs    | child elements |
+| `Sequence` | positional index (`"0"`) | leaf value   | empty        | sub-items  |
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `kind` | `DataNodeKind` | `DataNodeKind.KEY_VALUE` | Whether this node is a key/value pair, XML element, or sequence item. |
+| `key` | `str \| None` | `None` | Key, attribute name, tag name, or positional index (`"0"`, `"1"`, …). `None` at the document root. |
+| `value` | `str \| None` | `None` | Leaf scalar value, if any. `None` for containers (objects, arrays, XML elements with child elements). |
+| `attributes` | `list[DataAttribute]` | `[]` | Attributes on element-shape nodes (XML `STag` attributes). Empty for all other kinds. |
+| `children` | `list[DataNode]` | `[]` | Children for nested containers and XML element bodies. |
+| `span` | `Span` | — | Source span covering this node in the original source file. |
+
+---
+
 ### Span
 
 Byte and line/column range in source code.
@@ -44,6 +86,7 @@ Fields are populated based on the `ProcessConfig` flags.
 | `symbols` | `list[SymbolInfo]` | `[]` | Symbol definitions (variables, types, functions) extracted from the source. |
 | `diagnostics` | `list[Diagnostic]` | `[]` | Parse diagnostics (syntax errors, missing nodes) from tree-sitter. |
 | `chunks` | `list[CodeChunk]` | `[]` | Syntax-aware code chunks produced when chunking is enabled. |
+| `data` | `DataNode \| None` | `None` | Hierarchical data tree extracted when `config.data_extraction` is `True`. Populated for supported data-format languages (JSON, YAML, TOML, properties, HCL, INI, XML, CSV, and more). `None` when `data_extraction` is `False` (the default) or when the language is not a recognised data format. See `DataNode` for the shape of the returned tree. |
 
 ---
 
@@ -239,6 +282,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `bool` | `False` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `False` | Include parse diagnostics. Default: false. |
 | `chunk_max_size` | `int \| None` | `None` | Maximum chunk size in bytes. `None` disables chunking. |
+| `data_extraction` | `bool` | `False` | Extract hierarchical key/value data tree from data-format files. Default: false. When `True`, `ProcessResult.data` is populated with a `DataNode` tree for supported languages: JSON, YAML, TOML, `.properties`, HCL/HOCON, INI, editorconfig, KDL, CUE, CSV, PSV, PO, nginx config, Caddy config, XML, and DTD. For languages outside this set the field is left as `None`. |
 
 ---
 
@@ -256,6 +300,29 @@ and documentation comments.
 | `Line` | A single-line comment (e.g., `// ...` or `# ...`). |
 | `Block` | A block or multi-line comment using slash-star delimiters. |
 | `Doc` | A documentation comment such as `/// ...` or slash-double-star block. |
+
+---
+
+#### DataNodeKind
+
+The kind of a data node extracted from a data-format file.
+
+Classifies each node in the hierarchical `DataNode` tree returned when
+`data_extraction` is enabled on `ProcessConfig`.
+
+### Wire format (public JSON contract)
+
+Unit variants serialize as a bare string (`"KeyValue"`). DO NOT add
+`#[serde(tag = "...")]` or rename variants — every language binding has a
+hand-written deserializer matching this exact shape, and any change breaks
+all bindings' `process()` tests simultaneously.
+Covered by `tests/wire_format.rs`.
+
+| Variant | Description |
+|---------|-------------|
+| `KeyValue` | A key/value pair or mapping (json/toml/properties/yaml/hcl/cue/kdl pair, or a wrapper "object"/"mapping" container). |
+| `Element` | An XML element with a tag name in `key` and attributes in `attributes`. |
+| `Sequence` | A positional sequence item (JSON array element, YAML block sequence item, CSV/PSV row or cell). |
 
 ---
 
@@ -280,6 +347,12 @@ The format of a docstring extracted from source code.
 
 Identifies the docstring convention used, which varies by language
 (e.g., Python triple-quoted strings, JSDoc, Rustdoc `///` comments).
+
+### Wire format (public JSON contract)
+
+Unit variants serialize as a bare string (`"JSDoc"`); the `Other`
+variant serializes as a single-keyed object (`{"Other": "rst"}`). DO
+NOT add `#[serde(tag = "...")]`. Covered by `tests/wire_format.rs`.
 
 | Variant | Description |
 |---------|-------------|
@@ -314,6 +387,15 @@ Categorizes top-level and nested declarations such as functions, classes,
 structs, enums, traits, and more. Use `Other` for
 language-specific constructs that do not fit a standard category.
 
+### Wire format (public JSON contract)
+
+Unit variants serialize as a bare string (`"Function"`); the `Other`
+variant serializes as a single-keyed object (`{"Other": "macro"}`). DO
+NOT add `#[serde(tag = "...")]` or rename variants — every language
+binding has a hand-written deserializer matching this exact shape, and
+any change breaks all bindings' `process()` tests simultaneously.
+Covered by `tests/wire_format.rs`.
+
 | Variant | Description |
 |---------|-------------|
 | `Function` | A free-standing or associated function. |
@@ -336,6 +418,12 @@ The kind of a symbol definition found in source code.
 
 Categorizes symbol definitions such as variables, constants, functions,
 classes, types, interfaces, enums, and modules.
+
+### Wire format (public JSON contract)
+
+Unit variants serialize as a bare string (`"Function"`); the `Other`
+variant serializes as a single-keyed object (`{"Other": "macro"}`). DO
+NOT add `#[serde(tag = "...")]`. Covered by `tests/wire_format.rs`.
 
 | Variant | Description |
 |---------|-------------|

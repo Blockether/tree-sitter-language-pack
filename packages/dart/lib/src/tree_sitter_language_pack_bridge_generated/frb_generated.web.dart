@@ -191,6 +191,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  DataNode dco_decode_box_autoadd_data_node(dynamic raw);
+
+  @protected
   PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
 
   @protected
@@ -216,6 +219,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CommentKind dco_decode_comment_kind(dynamic raw);
+
+  @protected
+  DataAttribute dco_decode_data_attribute(dynamic raw);
+
+  @protected
+  DataNode dco_decode_data_node(dynamic raw);
+
+  @protected
+  DataNodeKind dco_decode_data_node_kind(dynamic raw);
 
   @protected
   Diagnostic dco_decode_diagnostic(dynamic raw);
@@ -263,6 +275,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<CommentInfo> dco_decode_list_comment_info(dynamic raw);
 
   @protected
+  List<DataAttribute> dco_decode_list_data_attribute(dynamic raw);
+
+  @protected
+  List<DataNode> dco_decode_list_data_node(dynamic raw);
+
+  @protected
   List<Diagnostic> dco_decode_list_diagnostic(dynamic raw);
 
   @protected
@@ -303,6 +321,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTree(
     dynamic raw,
   );
+
+  @protected
+  DataNode? dco_decode_opt_box_autoadd_data_node(dynamic raw);
 
   @protected
   PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
@@ -494,6 +515,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  DataNode sse_decode_box_autoadd_data_node(SseDeserializer deserializer);
+
+  @protected
   PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
 
   @protected
@@ -521,6 +545,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CommentKind sse_decode_comment_kind(SseDeserializer deserializer);
+
+  @protected
+  DataAttribute sse_decode_data_attribute(SseDeserializer deserializer);
+
+  @protected
+  DataNode sse_decode_data_node(SseDeserializer deserializer);
+
+  @protected
+  DataNodeKind sse_decode_data_node_kind(SseDeserializer deserializer);
 
   @protected
   Diagnostic sse_decode_diagnostic(SseDeserializer deserializer);
@@ -570,6 +603,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<CommentInfo> sse_decode_list_comment_info(SseDeserializer deserializer);
 
   @protected
+  List<DataAttribute> sse_decode_list_data_attribute(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<DataNode> sse_decode_list_data_node(SseDeserializer deserializer);
+
+  @protected
   List<Diagnostic> sse_decode_list_diagnostic(SseDeserializer deserializer);
 
   @protected
@@ -614,6 +655,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTree(
     SseDeserializer deserializer,
   );
+
+  @protected
+  DataNode? sse_decode_opt_box_autoadd_data_node(SseDeserializer deserializer);
 
   @protected
   PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
@@ -828,6 +872,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_data_node(
+    DataNode self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_i_64(
     PlatformInt64 self,
     SseSerializer serializer,
@@ -862,6 +912,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_comment_kind(CommentKind self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_data_attribute(DataAttribute self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_data_node(DataNode self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_data_node_kind(DataNodeKind self, SseSerializer serializer);
 
   @protected
   void sse_encode_diagnostic(Diagnostic self, SseSerializer serializer);
@@ -919,6 +978,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     List<CommentInfo> self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_list_data_attribute(
+    List<DataAttribute> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_data_node(List<DataNode> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_diagnostic(
@@ -985,6 +1053,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
   sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTree(
     Tree? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_data_node(
+    DataNode? self,
     SseSerializer serializer,
   );
 

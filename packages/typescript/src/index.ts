@@ -1,5 +1,6 @@
 export {
 	CommentKind,
+	DataNodeKind,
 	DiagnosticSeverity,
 	DownloadManager,
 	ExportKind,
@@ -38,6 +39,8 @@ export type {
 	ChunkContext,
 	CodeChunk,
 	CommentInfo,
+	DataAttribute,
+	DataNode,
 	Diagnostic,
 	DocSection,
 	DocstringFormat,
