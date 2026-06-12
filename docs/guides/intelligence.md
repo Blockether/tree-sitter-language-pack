@@ -119,6 +119,7 @@ Pass `language` plus any of these fields:
 | `docstrings`     | `False` | Docstrings attached to declarations (requires `structure=True`)   |
 | `symbols`        | `False` | Deduplicated list of all identifiers, for search indexing         |
 | `diagnostics`    | `False` | Syntax error nodes from the parse                                 |
+| `data_extraction` | `False` | Hierarchical key-value tree for structured data formats           |
 | `chunk_max_size` | `None`  | Maximum chunk size in bytes; see [Chunking for LLMs](chunking.md) |
 
 Enable everything at once: `ProcessConfig.all("python")`.
@@ -222,6 +223,140 @@ print(f"{m['total_lines']} lines total, {m['code_lines']} code, {m['comment_line
 ### `chunks`
 
 When `chunk_max_size` has a value, `result["chunks"]` contains syntax-aware splits ready for LLM ingestion. See [Chunking for LLMs](chunking.md) for full documentation.
+
+## Data extraction
+
+Set `data_extraction = true` on `ProcessConfig` to extract a hierarchical `DataNode` tree from structured-data languages. Instead of parsing code, this returns a nested key-value structure preserving the original document's hierarchy.
+
+Supported languages (17 formats):
+
+**Key-value pair shape:** `json`, `hjson`, `json5`, `toml`, `properties`, `cue`, `hcl`, `hocon`, `kdl`, `yaml`, `ini`, `editorconfig`, `po`, `nginx`, `caddy`
+
+**Element shape (XML):** `xml`, `dtd`
+
+**Sequence shape (CSV/PSV):** `csv`, `psv`, plus array/sequence containers in key-value grammars
+
+### DataNode shape
+
+Each node contains:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `kind` | `KeyValue` \| `Element` \| `Sequence` | Node type: key-value pair, XML element, or sequence item |
+| `key` | string \| None | Key name, attribute name, tag name, or positional index ("0", "1", …). `None` at document root. |
+| `value` | string \| None | Leaf value if present. `None` for containers (objects, arrays, XML elements with children). |
+| `attributes` | array | Attributes on XML elements; empty for other node types. |
+| `children` | array | Nested child nodes for containers and XML element bodies. |
+| `span` | object | Source location (`start_byte`, `end_byte`, `start_line`, `end_line`, `start_col`, `end_col`). |
+
+### Examples
+
+**JSON nested object:**
+
+```python
+result = process('''
+{
+  "server": {
+    "host": "localhost",
+    "port": 8080
+  }
+}
+''', ProcessConfig(language="json", data_extraction=True))
+
+# result["data"] = {
+#   "kind": "KeyValue",
+#   "key": None,
+#   "value": None,
+#   "children": [
+#     {
+#       "kind": "KeyValue",
+#       "key": "server",
+#       "value": None,
+#       "children": [
+#         {"kind": "KeyValue", "key": "host", "value": "localhost", ...},
+#         {"kind": "KeyValue", "key": "port", "value": "8080", ...}
+#       ]
+#     }
+#   ]
+# }
+```
+
+**Properties flat key-value (issue #136):**
+
+```java
+// configuration.properties:
+// database.url=jdbc:postgres://localhost
+// database.port=5432
+// cache.ttl=3600
+
+result = process(propertiesSource, ProcessConfig.builder()
+    .language("properties")
+    .dataExtraction(true)
+    .build());
+
+// Iterate key-value pairs:
+for (DataNode pair : result.getData().getChildren()) {
+    String key = pair.getKey();
+    String value = pair.getValue();
+    System.out.println(key + " = " + value);
+}
+```
+
+**YAML with nested mapping:**
+
+```python
+result = process('''
+database:
+  primary:
+    host: db.example.com
+    user: admin
+  replica:
+    host: db-replica.example.com
+    user: readonly
+''', ProcessConfig(language="yaml", data_extraction=True))
+
+# result["data"]["children"][0]["key"] = "database"
+# result["data"]["children"][0]["children"][0]["key"] = "primary"
+# result["data"]["children"][0]["children"][0]["children"][0]["key"] = "host"
+```
+
+**TOML sections:**
+
+```python
+result = process('''
+[build]
+name = "my-app"
+version = "1.0"
+''', ProcessConfig(language="toml", data_extraction=True))
+
+# result["data"]["children"][0]["key"] = "build"
+# result["data"]["children"][0]["children"] = [
+#   {"key": "name", "value": "my-app", ...},
+#   {"key": "version", "value": "1.0", ...}
+# ]
+```
+
+**XML elements with attributes:**
+
+```python
+result = process('''
+<config>
+  <server host="localhost" port="8080">
+    <ssl enabled="true"/>
+  </server>
+</config>
+''', ProcessConfig(language="xml", data_extraction=True))
+
+# result["data"]["children"][0]["kind"] = "Element"
+# result["data"]["children"][0]["key"] = "server"
+# result["data"]["children"][0]["attributes"] = [
+#   {"name": "host", "value": "localhost"},
+#   {"name": "port", "value": "8080"}
+# ]
+# result["data"]["children"][0]["children"] = [
+#   {"kind": "Element", "key": "ssl", "attributes": [...], ...}
+# ]
+```
 
 ## Next steps
 
