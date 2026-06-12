@@ -3064,8 +3064,8 @@ const _: fn() = || {
         crate::DocstringFormat::Rustdoc => {}
         crate::DocstringFormat::GoDoc => {}
         crate::DocstringFormat::JavaDoc => {}
-        crate::DocstringFormat::Other { value } => {
-            let _: String = value;
+        crate::DocstringFormat::Other { field0 } => {
+            let _: String = field0;
         }
     }
     {
@@ -3207,8 +3207,8 @@ const _: fn() = || {
         crate::StructureKind::Trait => {}
         crate::StructureKind::Impl => {}
         crate::StructureKind::Namespace => {}
-        crate::StructureKind::Other { value } => {
-            let _: String = value;
+        crate::StructureKind::Other { field0 } => {
+            let _: String = field0;
         }
     }
     {
@@ -3228,8 +3228,8 @@ const _: fn() = || {
         crate::SymbolKind::Interface => {}
         crate::SymbolKind::Enum => {}
         crate::SymbolKind::Module => {}
-        crate::SymbolKind::Other { value } => {
-            let _: String = value;
+        crate::SymbolKind::Other { field0 } => {
+            let _: String = field0;
         }
     }
 };
@@ -3544,8 +3544,8 @@ impl SseDecode for crate::DocstringFormat {
                 return crate::DocstringFormat::JavaDoc;
             }
             5 => {
-                let mut var_value = <String>::sse_decode(deserializer);
-                return crate::DocstringFormat::Other { value: var_value };
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::DocstringFormat::Other { field0: var_field0 };
             }
             _ => {
                 unimplemented!("");
@@ -4080,8 +4080,8 @@ impl SseDecode for crate::StructureKind {
                 return crate::StructureKind::Namespace;
             }
             10 => {
-                let mut var_value = <String>::sse_decode(deserializer);
-                return crate::StructureKind::Other { value: var_value };
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::StructureKind::Other { field0: var_field0 };
             }
             _ => {
                 unimplemented!("");
@@ -4138,8 +4138,8 @@ impl SseDecode for crate::SymbolKind {
                 return crate::SymbolKind::Module;
             }
             8 => {
-                let mut var_value = <String>::sse_decode(deserializer);
-                return crate::SymbolKind::Other { value: var_value };
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::SymbolKind::Other { field0: var_field0 };
             }
             _ => {
                 unimplemented!("");
@@ -4532,7 +4532,9 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::DocstringFormat> {
             crate::DocstringFormat::Rustdoc => [2.into_dart()].into_dart(),
             crate::DocstringFormat::GoDoc => [3.into_dart()].into_dart(),
             crate::DocstringFormat::JavaDoc => [4.into_dart()].into_dart(),
-            crate::DocstringFormat::Other { value } => [5.into_dart(), value.into_into_dart().into_dart()].into_dart(),
+            crate::DocstringFormat::Other { field0 } => {
+                [5.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
             _ => {
                 unimplemented!("");
             }
@@ -4814,7 +4816,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::StructureKind> {
             crate::StructureKind::Trait => [7.into_dart()].into_dart(),
             crate::StructureKind::Impl => [8.into_dart()].into_dart(),
             crate::StructureKind::Namespace => [9.into_dart()].into_dart(),
-            crate::StructureKind::Other { value } => [10.into_dart(), value.into_into_dart().into_dart()].into_dart(),
+            crate::StructureKind::Other { field0 } => [10.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
             _ => {
                 unimplemented!("");
             }
@@ -4858,7 +4860,7 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::SymbolKind> {
             crate::SymbolKind::Interface => [5.into_dart()].into_dart(),
             crate::SymbolKind::Enum => [6.into_dart()].into_dart(),
             crate::SymbolKind::Module => [7.into_dart()].into_dart(),
-            crate::SymbolKind::Other { value } => [8.into_dart(), value.into_into_dart().into_dart()].into_dart(),
+            crate::SymbolKind::Other { field0 } => [8.into_dart(), field0.into_into_dart().into_dart()].into_dart(),
             _ => {
                 unimplemented!("");
             }
@@ -5135,9 +5137,9 @@ impl SseEncode for crate::DocstringFormat {
             crate::DocstringFormat::JavaDoc => {
                 <i32>::sse_encode(4, serializer);
             }
-            crate::DocstringFormat::Other { value } => {
+            crate::DocstringFormat::Other { field0 } => {
                 <i32>::sse_encode(5, serializer);
-                <String>::sse_encode(value, serializer);
+                <String>::sse_encode(field0, serializer);
             }
             _ => {
                 unimplemented!("");
@@ -5561,9 +5563,9 @@ impl SseEncode for crate::StructureKind {
             crate::StructureKind::Namespace => {
                 <i32>::sse_encode(9, serializer);
             }
-            crate::StructureKind::Other { value } => {
+            crate::StructureKind::Other { field0 } => {
                 <i32>::sse_encode(10, serializer);
-                <String>::sse_encode(value, serializer);
+                <String>::sse_encode(field0, serializer);
             }
             _ => {
                 unimplemented!("");
@@ -5611,9 +5613,9 @@ impl SseEncode for crate::SymbolKind {
             crate::SymbolKind::Module => {
                 <i32>::sse_encode(7, serializer);
             }
-            crate::SymbolKind::Other { value } => {
+            crate::SymbolKind::Other { field0 } => {
                 <i32>::sse_encode(8, serializer);
-                <String>::sse_encode(value, serializer);
+                <String>::sse_encode(field0, serializer);
             }
             _ => {
                 unimplemented!("");
