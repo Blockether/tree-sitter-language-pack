@@ -2354,10 +2354,14 @@ jobs:
                   fetch-depth: 0
 
             - name: Setup Elixir
+              # REVISIT: pinned to OTP 26.2 / Elixir 1.16 because OTP 27.x
+              # rejects the current Let's Encrypt YR2 intermediate cert chain
+              # used by hex.pm (TLS key_usage_mismatch). Lift back to current
+              # once hex.pm or LE rotate the chain.
               uses: erlef/setup-elixir@v1.24.0
               with:
-                  elixir-version: "1.17"
-                  otp-version: "27.2"
+                  elixir-version: "1.16"
+                  otp-version: "26.2"
                   version-type: strict
 
             - name: Install Hex and Rebar
