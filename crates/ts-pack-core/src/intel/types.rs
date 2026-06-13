@@ -312,13 +312,15 @@ pub enum DocstringFormat {
     #[default]
     /// Python triple-quoted string docstring (`"""..."""`).
     PythonTripleQuote,
-    /// JavaScript/TypeScript JSDoc comment (`/** ... */`).
+    /// JavaScript/TypeScript JSDoc block comment (opens with two stars, closes
+    /// with star-slash).
     JSDoc,
     /// Rust `///` or `//!` doc comment.
     Rustdoc,
     /// Go doc comment (a comment block immediately preceding a declaration).
     GoDoc,
-    /// Java Javadoc comment (`/** ... */`).
+    /// Java Javadoc block comment (opens with two stars, closes with
+    /// star-slash).
     JavaDoc,
     /// A language-specific docstring format not covered by the standard variants.
     Other(String),
