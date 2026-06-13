@@ -158,7 +158,11 @@ fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path,
     let mut cmd = compiler.to_command();
 
     if is_msvc {
-        // MSVC flags
+        // MSVC flags. Use `/Tc<file>` per C source and `/Tp<file>` for the C++
+        // scanner so each file is compiled in the correct language — `/TC`/`/TP`
+        // are *global* and would force parser.c to compile as C++, breaking C99
+        // designated initializers (`[sym_X] = …`) which MSVC parses as C++
+        // lambdas (C3260/C3480).
         cmd.arg("/std:c11");
         cmd.arg("/utf-8");
         cmd.arg("/O2");
@@ -169,12 +173,10 @@ fn compile_parser_dynamic(name: &str, c_symbol: Option<&str>, parser_dir: &Path,
             cmd.arg(format!("/I{}", inc.display()));
         }
         for src in &c_sources {
-            cmd.arg(src);
+            cmd.arg(format!("/Tc{}", src.display()));
         }
-        // C++ scanner for MSVC
         if scanner_cc.exists() {
-            cmd.arg("/TP"); // Treat next file as C++
-            cmd.arg(&scanner_cc);
+            cmd.arg(format!("/Tp{}", scanner_cc.display()));
         }
         cmd.arg("/LD"); // Create DLL
         cmd.arg(format!("/Fe:{}", output_path.display()));
@@ -853,6 +855,62 @@ fn try_clone_vendors_locally(project_root: &Path, parsers_dir: &Path, selected: 
     false
 }
 
+/// In-place fixups for vendored grammar sources that don't compile under MSVC.
+///
+/// MSVC rejects two C99/GCC-isms tree-sitter scanners commonly use:
+///   * Variable-length arrays (crystal scanner.c:1307).
+///   * `__attribute__((unused))` parameter annotations (sml scanner.c).
+///
+/// The substitutions below are equivalent on every compiler — the array bound
+/// `MAX_HEREDOC_WORD_SIZE + 4` is the same compile-time constant the runtime
+/// already caps `max_word_size` at (lines 1303-1305), and dropping the unused-
+/// attribute keeps the parameter signatures intact.
+///
+/// A sentinel comment is written on the first run so subsequent build.rs
+/// invocations short-circuit without re-reading or re-writing the source.
+fn apply_msvc_compat_patches(parsers_dir: &Path) {
+    let patches: &[(&str, &str, &[(&str, &str)])] = &[
+        (
+            "crystal",
+            "src/scanner.c",
+            &[(
+                "uint8_t word[max_word_size + 4];",
+                "uint8_t word[MAX_HEREDOC_WORD_SIZE + 4]; /* TSLP_MSVC_PATCH: VLA → fixed bound */",
+            )],
+        ),
+        (
+            "sml",
+            "src/scanner.c",
+            &[(
+                "__attribute__ ((unused))",
+                "/* TSLP_MSVC_PATCH: dropped __attribute__((unused)) for MSVC */",
+            )],
+        ),
+    ];
+
+    for (lang, rel_path, subs) in patches {
+        let path = parsers_dir.join(lang).join(rel_path);
+        let Ok(original) = fs::read_to_string(&path) else {
+            continue;
+        };
+        if original.contains("TSLP_MSVC_PATCH") {
+            continue;
+        }
+        let mut patched = original.clone();
+        for (from, to) in *subs {
+            patched = patched.replace(from, to);
+        }
+        if patched != original
+            && let Err(e) = fs::write(&path, patched)
+        {
+            println!(
+                "cargo:warning=Failed to apply MSVC compat patch to {} ({lang}): {e}",
+                path.display()
+            );
+        }
+    }
+}
+
 /// Resolve grammar sources for the build. Order of preference:
 /// 1. Workspace `parsers/` tree is already populated → use it as-is.
 /// 2. `TSLP_OFFLINE=1` → return the empty workspace dir; downstream code falls
@@ -1042,6 +1100,7 @@ fn main() {
     // fetch them from the release artifact and use the extracted copy. This
     // is the fix for #122.
     let parsers_dir = ensure_parser_sources(&workspace_parsers_dir, &selected, &out_dir);
+    apply_msvc_compat_patches(&parsers_dir);
 
     let mut static_compiled = Vec::new();
     let mut dynamic_compiled = Vec::new();
