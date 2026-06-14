@@ -89,7 +89,7 @@ fn strip_quotes(s: &str) -> &str {
 /// Collect the first named child of a given `kind` from `node`.
 fn named_child_of_kind<'a>(node: &Node<'a>, kind: &str) -> Option<Node<'a>> {
     let mut cursor = node.walk();
-    node.named_children(&mut cursor).find(|c| c.kind() == kind).map(|c| c)
+    node.named_children(&mut cursor).find(|c| c.kind() == kind)
 }
 
 // ── Bucket A: JSON / HJSON / JSON5 ───────────────────────────────────────────
