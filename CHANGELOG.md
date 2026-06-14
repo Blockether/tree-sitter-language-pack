@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`publish-release`: read `.tar.zst` parser archives via `zstandard`.** Python's
+  `tarfile.open(path, 'r:*')` only supports `.gz`, `.bz2`, `.xz`, and uncompressed
+  `.tar` — not `.tar.zst`. The `Generate parsers.json manifest` step was failing
+  with `tarfile.ReadError: not a gzip file / not a bzip2 file / not an lzma file /
+  invalid header`, blocking parsers.json + parsers-*.tar.zst upload to the release
+  and breaking every downstream consumer at runtime with
+  `Failed to fetch manifest from .../parsers.json: http status: 404`. The step
+  now `pip install --user zstandard` then opens each archive via
+  `ZstdDecompressor().stream_reader()` and `tarfile.open(fileobj=..., mode='r|')`.
+
 ## [1.9.0-rc.42] - 2026-06-14
 
 ### Changed
