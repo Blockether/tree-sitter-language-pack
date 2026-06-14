@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0-rc.45] - 2026-06-14
+
+### Changed
+
+- **Cross-major dependency upgrade** via `task upgrade`. Rust + Python + Node + Java + Elixir + PHP + Ruby dep trees rebased to their latest semver-compatible heads; lockfiles re-resolved (`Cargo.lock`, `e2e/rust/Cargo.lock`, `composer.lock`, `pnpm-lock.yaml`, `mix.lock`, `uv.lock`, `packages/php/composer.lock`). `sources/language_definitions.json` regenerated.
+- **Bumped `alef` pin 0.25.0 → 0.25.1.** Picks up the `assertions.rs:227` C-e2e codegen hardening (panic-on-missing-`fields_c_types` rather than the silent PascalCase fallback that produced `TS_PACKData` instead of `TS_PACKDataNode` in rc.43).
+- **All cargo invocations across `.github/workflows/` and `.task/` now pass `--locked`.** Sweep applied in a separate commit (`130627437`) ahead of this regen to keep the manifest-normalisation fix isolated; this rc carries it forward. Same motivation as the actions-side v1.8.68 sweep: a broken upstream release (recent `brotli-decompressor 5.0.1`) can no longer silently override the committed lockfile during CI.
+
 ## [1.9.0-rc.44] - 2026-06-14
 
 ### Fixed

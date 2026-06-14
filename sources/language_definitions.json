@@ -790,7 +790,7 @@
       "plt"
     ],
     "repo": "https://github.com/dpezto/tree-sitter-gnuplot",
-    "rev": "cccf7a6893dfddc7eb3784870960982acf476a9d"
+    "rev": "072c737e981729e0e6f53fcf3ec9b1612f98fca0"
   },
   "go": {
     "branch": "master",
@@ -2292,13 +2292,13 @@
       "ziggy"
     ],
     "repo": "https://github.com/kristoff-it/ziggy",
-    "rev": "28858736fa0a166a839743960a5c9b4c2386f20c"
+    "rev": "b38c2480b409a4530fc51d8280098644a9615aa1"
   },
   "ziggy_schema": {
     "directory": "tree-sitter-ziggy-schema",
     "extensions": [],
     "repo": "https://github.com/kristoff-it/ziggy",
-    "rev": "28858736fa0a166a839743960a5c9b4c2386f20c"
+    "rev": "b38c2480b409a4530fc51d8280098644a9615aa1"
   },
   "zsh": {
     "extensions": [
