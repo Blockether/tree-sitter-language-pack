@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0-rc.46] - 2026-06-14
+
+### Changed
+
+- **Bumped `alef` pin 0.25.1 → 0.25.2.** Picks up two source-build publish-prepare fixes:
+  - `publish prepare` now strips workspace-member `[[package]]` entries from the seeded `Cargo.lock` before per-member `cargo update -p`. Without this strip the path-source seed entry collides with the rewritten registry-source dep and `cargo metadata --locked` validation fails.
+  - `publish prepare` disambiguates the per-member `cargo update -p` spec by using the full `registry+https://github.com/rust-lang/crates.io-index#NAME@VERSION` package id when the member version is known. Both fixes are required to unblock Ruby gem + Elixir NIF + PHP extension matrix builds on rc.46 (rc.45 failed Ruby macos-x86_64 / linux-aarch64 + Elixir linux-aarch64 / macos-x86_64 on this exact path).
+
 ## [1.9.0-rc.45] - 2026-06-14
 
 ### Changed
