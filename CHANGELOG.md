@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0-rc.43] - 2026-06-14
+
 ### Fixed
 
 - **`publish-release`: read `.tar.zst` parser archives via `zstandard`.** Python's
