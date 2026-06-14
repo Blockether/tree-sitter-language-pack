@@ -33,8 +33,8 @@ let package = Package(
     // sibling RustBridge target below and link against this binary.
     .binaryTarget(
       name: "RustBridgeBinary",
-      url: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v__ALEF_SWIFT_VERSION__/TreeSitterLanguagePack-rs.artifactbundle.zip",
-      checksum: "__ALEF_SWIFT_CHECKSUM__"
+      url: "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v1.9.0-rc.43/TreeSitterLanguagePack-rs.artifactbundle.zip",
+      checksum: "a315a8570f3b533c1827b654bb42b652348f065883c113ad9ed5be28b912c1d6"
     ),
     // RustBridge: Swift wrapper module owning the swift-bridge generated
     // sources. Depends on RustBridgeC for C type declarations and on
