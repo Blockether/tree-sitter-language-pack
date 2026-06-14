@@ -769,9 +769,6 @@ name = "deranged"
 version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7cd812cc2bc1d69d4764bd80df88b4317eaef9e773c75226407d9bc0876b211c"
-dependencies = [
- "powerfmt",
-]
 
 [[package]]
 name = "digest"
@@ -814,7 +811,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -852,7 +849,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -1580,9 +1577,9 @@ dependencies = [
 
 [[package]]
 name = "napi"
-version = "3.9.1"
+version = "3.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad513ff22558f1830b595ea6eb4091da48145d09a222ce157e781896f78be0b9"
+checksum = "26d3c7dd60231116a47854321c9ac8df6f13435d11aa3a59d8533a76e07a3730"
 dependencies = [
  "bitflags",
  "ctor",
@@ -2133,7 +2130,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2190,7 +2187,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2569,7 +2566,7 @@ dependencies = [
  "getrandom 0.4.2",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2623,9 +2620,9 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.47"
+version = "0.3.49"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "743bd48c283afc0388f9b8827b976905fb217ad9e647fae3a379a9283c4def2c"
+checksum = "711a53c2d47bbd818258c498c8dbfe186a2526c631495cfe7e078567f86b8469"
 dependencies = [
  "deranged",
  "js-sys",
@@ -2637,9 +2634,9 @@ dependencies = [
 
 [[package]]
 name = "time-core"
-version = "0.1.8"
+version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7694e1cfe791f8d31026952abf09c69ca6f6fa4e1a1229e18988f06a04a12dca"
+checksum = "9e1c906769ad99c88eaa54e728060edef082f8e358ff32030cb7c7d315e81109"
 
 [[package]]
 name = "tiny-keccak"
@@ -2773,7 +2770,7 @@ checksum = "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
 
 [[package]]
 name = "tree-sitter-language-pack"
-version = "1.9.0-rc.44"
+version = "1.9.0-rc.45"
 dependencies = [
  "ahash",
  "cc",
@@ -2797,7 +2794,7 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter-language-pack-dart"
-version = "1.9.0-rc.44"
+version = "1.9.0-rc.45"
 dependencies = [
  "flutter_rust_bridge",
  "serde_json",
@@ -2806,7 +2803,7 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter-language-pack-jni"
-version = "1.9.0-rc.44"
+version = "1.9.0-rc.45"
 dependencies = [
  "base64",
  "futures-util",
@@ -2818,7 +2815,7 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter-language-pack-swift"
-version = "1.9.0-rc.44"
+version = "1.9.0-rc.45"
 dependencies = [
  "ahash",
  "async-trait",
@@ -2833,7 +2830,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-cli"
-version = "1.9.0-rc.44"
+version = "1.9.0-rc.45"
 dependencies = [
  "clap",
  "clap_complete",
@@ -2844,7 +2841,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-ffi"
-version = "1.9.0-rc.44"
+version = "1.9.0-rc.45"
 dependencies = [
  "ahash",
  "cbindgen",
@@ -2856,7 +2853,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-node"
-version = "1.9.0-rc.44"
+version = "1.9.0-rc.45"
 dependencies = [
  "napi",
  "napi-build",
@@ -2868,7 +2865,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-php"
-version = "1.9.0-rc.44"
+version = "1.9.0-rc.45"
 dependencies = [
  "ext-php-rs",
  "serde",
@@ -2879,7 +2876,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-py"
-version = "1.9.0-rc.44"
+version = "1.9.0-rc.45"
 dependencies = [
  "pyo3",
  "pyo3-async-runtimes",
@@ -2890,7 +2887,7 @@ dependencies = [
 
 [[package]]
 name = "ts-pack-core-wasm"
-version = "1.9.0-rc.44"
+version = "1.9.0-rc.45"
 dependencies = [
  "futures",
  "futures-util",
@@ -3179,7 +3176,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
