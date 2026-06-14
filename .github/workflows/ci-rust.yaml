@@ -139,7 +139,7 @@ jobs:
               uses: kreuzberg-dev/actions/install-alef@v1
 
             - name: Run workspace tests
-              run: cargo test --workspace --exclude ts-pack-core-wasm
+              run: cargo test --locked --workspace --exclude ts-pack-core-wasm
 
             - name: Run Rust E2E tests
               run: task rust:e2e:test

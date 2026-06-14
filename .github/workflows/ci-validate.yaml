@@ -179,7 +179,7 @@ jobs:
               run: cargo fmt --check
 
             - name: Run clippy
-              run: cargo clippy --workspace --exclude ts-pack-core-wasm -- -D warnings
+              run: cargo clippy --locked --workspace --exclude ts-pack-core-wasm -- -D warnings
               env:
                   PROJECT_ROOT: ${{ github.workspace }}
                   TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"

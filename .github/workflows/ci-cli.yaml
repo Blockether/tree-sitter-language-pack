@@ -121,7 +121,7 @@ jobs:
 
             - name: Build CLI (release)
               shell: bash
-              run: cargo build --release --package ts-pack-cli
+              run: cargo build --release --locked --package ts-pack-cli
               env:
                   PROJECT_ROOT: ${{ github.workspace }}
                   TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json"

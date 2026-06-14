@@ -8,7 +8,7 @@ tasks:
             TSLP_LINK_MODE: '{{default "static" .TSLP_LINK_MODE}}'
             TSLP_LANGUAGES: "{{default .FFI_TEST_LANGUAGES .TSLP_LANGUAGES}}"
         cmds:
-            - cargo build -p ts-pack-core-ffi --release
+            - cargo build --locked -p ts-pack-core-ffi --release
 
     build:
         desc: Build Go bindings (requires FFI built first)

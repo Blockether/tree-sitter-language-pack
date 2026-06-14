@@ -11,7 +11,7 @@ tasks:
         desc: Install WASM build tools
         cmds:
             - rustup target add wasm32-unknown-unknown
-            - which wasm-pack || cargo install wasm-pack
+            - which wasm-pack || cargo install --locked wasm-pack
             - brew list wasi-libc >/dev/null 2>&1 || brew install wasi-libc
             - brew list llvm >/dev/null 2>&1 || brew install llvm
 

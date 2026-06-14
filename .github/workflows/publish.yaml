@@ -383,7 +383,7 @@ jobs:
                   echo "names=$LANGS" >> "$GITHUB_OUTPUT"
 
             - name: Build all parsers
-              run: cargo build -p tree-sitter-language-pack --release
+              run: cargo build --locked -p tree-sitter-language-pack --release
               env:
                   PROJECT_ROOT: ${{ github.workspace }}
                   TSLP_LINK_MODE: dynamic
@@ -973,7 +973,7 @@ jobs:
               run: |
                   set -euo pipefail
                   # Build the FFI library for this target
-                  cargo build --release --target ${{ matrix.target }} -p ts-pack-core-ffi
+                  cargo build --release --locked --target ${{ matrix.target }} -p ts-pack-core-ffi
 
                   # Package with alef for distribution
                   alef publish build --lang ffi --target ${{ matrix.target }}
@@ -1210,7 +1210,7 @@ jobs:
 
             - name: Build Elixir NIF
               working-directory: packages/elixir/native/tree_sitter_language_pack_nif
-              run: cargo build --release --target ${{ matrix.target }}
+              run: cargo build --release --locked --target ${{ matrix.target }}
               env:
                   PROJECT_ROOT: ${{ github.workspace }}
                   CARGO_BUILD_TARGET: ${{ matrix.target }}
@@ -3002,7 +3002,7 @@ jobs:
               run: |
                   set -euo pipefail
                   # Build the FFI library for this target
-                  cargo build --release --target ${{ matrix.target }} -p ts-pack-core-ffi
+                  cargo build --release --locked --target ${{ matrix.target }} -p ts-pack-core-ffi
 
                   # Package with alef for distribution
                   alef publish build --lang ffi --target ${{ matrix.target }}
@@ -3216,7 +3216,7 @@ jobs:
                   echo "names=$LANGS" >> "$GITHUB_OUTPUT"
 
             - name: Build CLI
-              run: cargo build --release -p ts-pack-cli --target ${{ matrix.target }}
+              run: cargo build --release --locked -p ts-pack-cli --target ${{ matrix.target }}
               env:
                   PROJECT_ROOT: ${{ github.workspace }}
                   TSLP_LANGUAGES: ${{ steps.langs.outputs.names }}
