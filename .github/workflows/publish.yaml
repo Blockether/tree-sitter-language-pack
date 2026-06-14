@@ -1691,11 +1691,14 @@ jobs:
                   path: dist/parsers
                   merge-multiple: true
 
+            - name: Install zstandard for tar.zst parsing
+              run: python3 -m pip install --user zstandard
+
             - name: Generate parsers.json manifest
               id: generate-manifest
               run: |
                   python3 -c "
-                  import json, hashlib, os, sys, tarfile
+                  import json, hashlib, os, sys, tarfile, zstandard
 
                   version = '${{ needs.prepare.outputs.version }}'
                   base_url = 'https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v' + version
@@ -1724,13 +1727,18 @@ jobs:
                           'size': size,
                       }
                       langs = set()
-                      with tarfile.open(path, 'r:*') as tar:
-                          for member in tar.getmembers():
-                              base = os.path.basename(member.name)
-                              for ext in PARSER_EXTS:
-                                  if base.endswith(ext):
-                                      langs.add(base[:-len(ext)])
-                                      break
+                      # tarfile.open does not natively support .zst; decompress
+                      # in-memory via zstandard.ZstdDecompressor.stream_reader.
+                      with open(path, 'rb') as zf:
+                          dctx = zstandard.ZstdDecompressor()
+                          with dctx.stream_reader(zf) as reader:
+                              with tarfile.open(fileobj=reader, mode='r|') as tar:
+                                  for member in tar:
+                                      base = os.path.basename(member.name)
+                                      for ext in PARSER_EXTS:
+                                          if base.endswith(ext):
+                                              langs.add(base[:-len(ext)])
+                                              break
                       per_platform_langs[label] = langs
 
                   if not per_platform_langs:
