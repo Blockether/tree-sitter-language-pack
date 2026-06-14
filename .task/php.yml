@@ -6,14 +6,14 @@ tasks:
         env:
             PROJECT_ROOT: "{{.PROJECT_ROOT}}"
         cmds:
-            - cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml
+            - cargo build --release --locked --manifest-path crates/ts-pack-core-php/Cargo.toml
 
     build:dev:
         desc: Build PHP extension in debug mode
         env:
             PROJECT_ROOT: "{{.PROJECT_ROOT}}"
         cmds:
-            - cargo build --manifest-path crates/ts-pack-core-php/Cargo.toml
+            - cargo build --locked --manifest-path crates/ts-pack-core-php/Cargo.toml
 
     test:
         desc: Run PHP smoke test

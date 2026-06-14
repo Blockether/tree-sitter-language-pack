@@ -13,7 +13,7 @@ tasks:
             TSLP_LINK_MODE: static
             TSLP_LANGUAGES: "{{.FFI_TEST_LANGUAGES}}"
         cmds:
-            - cargo build -p ts-pack-core-ffi --release
+            - cargo build --locked -p ts-pack-core-ffi --release
 
     build:
         desc: Build FFI library and C# package

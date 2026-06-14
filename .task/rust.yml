@@ -16,7 +16,7 @@ tasks:
     install:cargo-machete:
         desc: Install cargo-machete for unused dependency detection
         cmds:
-            - cargo-machete --version 2>/dev/null || cargo install cargo-machete
+            - cargo-machete --version 2>/dev/null || cargo install --locked cargo-machete
         ignore_error: true
 
     build:
@@ -25,7 +25,7 @@ tasks:
             PROJECT_ROOT: "{{.PROJECT_ROOT}}"
             TSLP_LINK_MODE: "{{.LINK_MODE}}"
         cmds:
-            - cargo build --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
+            - cargo build --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
 
     build:dev:
         desc: Build with a small set of languages for fast iteration
@@ -34,7 +34,7 @@ tasks:
             TSLP_LANGUAGES: "{{.DEV_LANGUAGES}}"
             TSLP_LINK_MODE: "{{.LINK_MODE}}"
         cmds:
-            - cargo build --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
+            - cargo build --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
 
     build:release:
         desc: Build in release mode (optimized)
@@ -42,7 +42,7 @@ tasks:
             PROJECT_ROOT: "{{.PROJECT_ROOT}}"
             TSLP_LINK_MODE: "{{.LINK_MODE}}"
         cmds:
-            - cargo build --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm --release
+            - cargo build --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm --release
 
     test:
         desc: Run all Rust tests
@@ -50,7 +50,7 @@ tasks:
             PROJECT_ROOT: "{{.PROJECT_ROOT}}"
             TSLP_LINK_MODE: "{{.LINK_MODE}}"
         cmds:
-            - cargo test --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
+            - cargo test --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
 
     test:quick:
         desc: Run tests with a small set of languages
@@ -59,7 +59,7 @@ tasks:
             TSLP_LANGUAGES: "{{.DEV_LANGUAGES}}"
             TSLP_LINK_MODE: "{{.LINK_MODE}}"
         cmds:
-            - cargo test --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
+            - cargo test --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm
 
     lint:
         desc: Auto-fix Rust code linting (cargo fmt + clippy)
@@ -69,7 +69,7 @@ tasks:
             TSLP_LINK_MODE: static
         cmds:
             - cargo fmt --all
-            - cargo clippy --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm --fix --allow-dirty --allow-staged -- -D warnings
+            - cargo clippy --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm --fix --allow-dirty --allow-staged -- -D warnings
 
     lint:check:
         desc: Check Rust code linting without modifications
@@ -79,7 +79,7 @@ tasks:
             TSLP_LINK_MODE: static
         cmds:
             - cargo fmt --all -- --check
-            - cargo clippy --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm -- -D warnings
+            - cargo clippy --locked --workspace --exclude ts-pack-ruby --exclude ts-pack-php --exclude ts-pack-wasm -- -D warnings
 
     format:
         desc: Format all Rust code
@@ -165,7 +165,7 @@ tasks:
             TSLP_LINK_MODE: static
             TSLP_LANGUAGES: "python,rust,javascript,typescript,go,html,css,json,bash,c,cpp,java,ruby,swift,kotlin"
         cmds:
-            - cargo test --manifest-path e2e/rust/Cargo.toml
+            - cargo test --locked --manifest-path e2e/rust/Cargo.toml
 
     e2e:verify:
         desc: Regenerate and validate Rust E2E suite (generate + format + test)

@@ -104,7 +104,7 @@ jobs:
               with:
                   cache-key-prefix: ci-zig-${{ matrix.os }}
             - name: Build ts-pack-core-ffi
-              run: cargo build --release -p ts-pack-core-ffi
+              run: cargo build --release --locked -p ts-pack-core-ffi
             - uses: kreuzberg-dev/actions/setup-zig@v1
               with:
                   version: "0.16.0"

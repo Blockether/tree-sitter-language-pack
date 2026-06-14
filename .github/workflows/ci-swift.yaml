@@ -102,7 +102,7 @@ jobs:
             - name: Show Swift version
               run: swift --version
             - name: Build tree-sitter-language-pack-swift Rust crate
-              run: cargo build --release -p tree-sitter-language-pack-swift
+              run: cargo build --release --locked -p tree-sitter-language-pack-swift
             - name: Wire swift-bridge generated sources
               run: bash scripts/setup-swift-bridge.sh release
             - name: Build Swift package

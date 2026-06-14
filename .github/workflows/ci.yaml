@@ -259,7 +259,7 @@ jobs:
               run: cargo fmt --check
 
             - name: Run clippy
-              run: cargo clippy --workspace --exclude ts-pack-core-wasm -- -D warnings
+              run: cargo clippy --locked --workspace --exclude ts-pack-core-wasm -- -D warnings
               env:
                   PROJECT_ROOT: ${{ github.workspace }}
                   TSLP_LANGUAGES: "all"
@@ -434,7 +434,7 @@ jobs:
               uses: kreuzberg-dev/actions/install-alef@v1
 
             - name: Run workspace tests
-              run: cargo test --workspace --exclude ts-pack-core-wasm
+              run: cargo test --locked --workspace --exclude ts-pack-core-wasm
 
             - name: Run Rust E2E tests
               run: task rust:e2e:test
@@ -479,7 +479,7 @@ jobs:
                   install-llvm-cov: "false"
 
             - name: Build FFI library
-              run: cargo build --release -p ts-pack-core-ffi
+              run: cargo build --release --locked -p ts-pack-core-ffi
 
             - name: Upload FFI artifacts
               uses: actions/upload-artifact@v7
@@ -1077,7 +1077,7 @@ jobs:
               uses: kreuzberg-dev/actions/install-task@v1
 
             - name: Build FFI library
-              run: cargo build -p ts-pack-core-ffi --release
+              run: cargo build --locked -p ts-pack-core-ffi --release
 
             - name: Setup .NET
               uses: actions/setup-dotnet@v5
@@ -1253,7 +1253,7 @@ jobs:
                   fi
 
             - name: Build PHP extension
-              run: cargo build --release --manifest-path crates/ts-pack-core-php/Cargo.toml
+              run: cargo build --release --locked --manifest-path crates/ts-pack-core-php/Cargo.toml
 
             - name: Create PHP extension ini
               if: matrix.os == 'ubuntu-latest'
