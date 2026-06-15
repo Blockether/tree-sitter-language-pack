@@ -30,6 +30,7 @@ This guide walks you from install to parsing, code intelligence, and LLM chunkin
 === "CLI"
 
     ```bash
+    brew trust kreuzberg-dev/tap
     brew install kreuzberg-dev/tap/ts-pack
     ```
 
