@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0-rc.50] - 2026-06-15
+
+### Changed
+
+- **Bumped `alef` pin 0.25.11 → 0.25.14.** Regenerated all bindings via `task alef:sync` + `task alef:generate`. Picks up the accumulated fixes:
+  - **0.25.12 — (java): bind `${classifier}` property to maven-jar-plugin config so native JARs are emitted with the correct classifier.** Resolves rc.49 Maven Central regression where `tree-sitter-language-pack-java-1.9.0-rc.49.jar` was published without classifier (missing `/natives/{rid}/libts_pack_core_ffi.dylib`), causing `UnsatisfiedLinkError` at JNI init.
+  - **0.25.12 — (dart): copy `.framework` directories recursively in publish workflow assemble step.** The `find` predicate matched only `*.so`/`*.dylib`/`*.dll` files and skipped macOS `.framework/` bundles; pub.dev rc.49 was missing `tree_sitter_language_pack_dart.framework/`.
+  - **0.25.12 — (php): always stage PIE extension as `.so` on Unix.** PIE 1.4.5 probes for `.so` on all Unix platforms including macOS; the previous OS-branching produced rc.49 prebuilt archives missing the `.so` (PIE extracted source but found no binary).
+  - **0.25.12 — Swift wrapper-type cfg union postprocess.** Wrapper structs whose fields reference cfg-gated upstream types now inherit the union cfg gate, fixing swift-bridge-build `Type must be declared with 'type X'` panics.
+  - **0.25.13 — Swift function cfg union postprocess.** Free helper functions taking cfg-gated wrapper struct references now inherit the union cfg gate, complementing the wrapper-type fix.
+  - **0.25.14 — Swift binding Cargo.toml lists every forwarded cfg-feature in `default = [...]`.** Prevents `error[E0425]: cannot find type 'DownloadManager' in this scope` on regen consumers when the wrapper struct is cfg-gated but free helper functions referencing it are not — the binding's default profile now matches what its core dep already pulls in via `features = [..., "download"]`.
+- **Bumped tslp `1.9.0-rc.49` → `1.9.0-rc.50`** propagated via `task alef:sync`.
+
 ## [1.9.0-rc.49] - 2026-06-15
 
 ### Changed

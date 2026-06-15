@@ -461,18 +461,6 @@ void* __swift_bridge__$Vec_LanguageRegistry$get_mut(void* vec_ptr, uintptr_t ind
 uintptr_t __swift_bridge__$Vec_LanguageRegistry$len(void* vec_ptr);
 void* __swift_bridge__$Vec_LanguageRegistry$as_ptr(void* vec_ptr);
 
-typedef struct DownloadManager DownloadManager;
-void __swift_bridge__$DownloadManager$_free(void* self);
-
-void* __swift_bridge__$Vec_DownloadManager$new(void);
-void __swift_bridge__$Vec_DownloadManager$drop(void* vec_ptr);
-void __swift_bridge__$Vec_DownloadManager$push(void* vec_ptr, void* item_ptr);
-void* __swift_bridge__$Vec_DownloadManager$pop(void* vec_ptr);
-void* __swift_bridge__$Vec_DownloadManager$get(void* vec_ptr, uintptr_t index);
-void* __swift_bridge__$Vec_DownloadManager$get_mut(void* vec_ptr, uintptr_t index);
-uintptr_t __swift_bridge__$Vec_DownloadManager$len(void* vec_ptr);
-void* __swift_bridge__$Vec_DownloadManager$as_ptr(void* vec_ptr);
-
 typedef struct Language Language;
 void __swift_bridge__$Language$_free(void* self);
 
@@ -729,9 +717,6 @@ bool __swift_bridge__$language_registry_has_parser(void* client, void* name);
 bool __swift_bridge__$language_registry_has_language(void* client, void* name);
 uintptr_t __swift_bridge__$language_registry_language_count(void* client);
 struct __private__ResultPtrAndPtr __swift_bridge__$language_registry_process(void* client, void* source, void* config);
-void* __swift_bridge__$download_manager_installed_languages(void* client);
-struct __swift_bridge__$ResultUIntAndString __swift_bridge__$download_manager_download_all_best_effort(void* client);
-void* __swift_bridge__$download_manager_clean_cache(void* client);
 void* __swift_bridge__$DataNodeKind$to_string(void* self);
 void* __swift_bridge__$StructureKind$to_string(void* self);
 void* __swift_bridge__$CommentKind$to_string(void* self);
@@ -753,15 +738,6 @@ void* __swift_bridge__$available_languages(void);
 bool __swift_bridge__$has_language(void* name);
 uintptr_t __swift_bridge__$language_count(void);
 struct __private__ResultPtrAndPtr __swift_bridge__$process(void* source, void* config);
-void* __swift_bridge__$init_(void* config);
-void* __swift_bridge__$configure(void* config);
-struct __swift_bridge__$ResultUIntAndString __swift_bridge__$download(void* names);
-struct __swift_bridge__$ResultUIntAndString __swift_bridge__$download_all(void);
-struct __swift_bridge__$ResultUIntAndString __swift_bridge__$download_group(void* name);
-struct __private__ResultPtrAndPtr __swift_bridge__$manifest_languages(void);
-void* __swift_bridge__$downloaded_languages(void);
-void* __swift_bridge__$clean_cache(void);
-struct __private__ResultPtrAndPtr __swift_bridge__$cache_dir(void);
 struct __private__ResultPtrAndPtr __swift_bridge__$pack_config_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$process_config_from_json(void* json);
 struct __private__ResultPtrAndPtr __swift_bridge__$data_attribute_from_json(void* json);
@@ -812,7 +788,6 @@ void* __swift_bridge__$__alef_phantom_vec_node(void);
 void* __swift_bridge__$__alef_phantom_vec_tree_cursor(void);
 void* __swift_bridge__$__alef_phantom_vec_process_config(void);
 void* __swift_bridge__$__alef_phantom_vec_language_registry(void);
-void* __swift_bridge__$__alef_phantom_vec_download_manager(void);
 void* __swift_bridge__$__alef_phantom_vec_language(void);
 void* __swift_bridge__$__alef_phantom_vec_data_node_kind(void);
 void* __swift_bridge__$__alef_phantom_vec_structure_kind(void);
@@ -821,9 +796,6 @@ void* __swift_bridge__$__alef_phantom_vec_docstring_format(void);
 void* __swift_bridge__$__alef_phantom_vec_export_kind(void);
 void* __swift_bridge__$__alef_phantom_vec_symbol_kind(void);
 void* __swift_bridge__$__alef_phantom_vec_diagnostic_severity(void);
-typedef enum __swift_bridge__$ResultUIntAndString$Tag {__swift_bridge__$ResultUIntAndString$ResultOk, __swift_bridge__$ResultUIntAndString$ResultErr} __swift_bridge__$ResultUIntAndString$Tag;
-union __swift_bridge__$ResultUIntAndString$Fields {uintptr_t ok; void* err;};
-typedef struct __swift_bridge__$ResultUIntAndString{__swift_bridge__$ResultUIntAndString$Tag tag; union __swift_bridge__$ResultUIntAndString$Fields payload;} __swift_bridge__$ResultUIntAndString;
 
 
 #endif /* RUST_BRIDGE_C_H */
