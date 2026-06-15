@@ -46,15 +46,13 @@
 - [Errors](https://docs.tree-sitter-language-pack.kreuzberg.dev/reference/errors/): Error categories and handling patterns.
 - [Supported Languages](https://docs.tree-sitter-language-pack.kreuzberg.dev/languages/): The full list of 306 supported grammars.
 
-## Ecosystem
+## Kreuzberg Ecosystem
 
-Part of the [kreuzberg.dev](https://kreuzberg.dev) family of Rust-core, polyglot-bindings libraries:
-
-- [Kreuzberg](https://docs.kreuzberg.dev/) — Document intelligence: PDF, Office, images, HTML, email, with OCR. Consumes tree-sitter-language-pack for code-intelligence extraction from source files.
-- [Kreuzberg Cloud](https://docs.kreuzberg.cloud/) — Managed document extraction API.
-- [html-to-markdown](https://docs.html-to-markdown.kreuzberg.dev/) — Fast HTML to Markdown conversion.
-- [kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev/) — Polite, resumable web crawler.
-- [liter-llm](https://docs.liter-llm.kreuzberg.dev/) — Universal LLM API client.
+- [Kreuzberg](https://docs.kreuzberg.dev): Document intelligence: text, tables, metadata from 91+ formats with optional OCR
+- [Kreuzberg Cloud](https://docs.kreuzberg.cloud): Managed extraction API with SDKs, dashboards, and observability
+- [kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev): Web crawling and scraping with HTML to Markdown and headless-Chrome fallback
+- [html-to-markdown](https://docs.html-to-markdown.kreuzberg.dev): Fast, lossless HTML to Markdown engine
+- [liter-llm](https://docs.liter-llm.kreuzberg.dev): Universal LLM API client with native bindings for 14 languages and 143 providers
 
 ## Optional
 

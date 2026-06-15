@@ -17,6 +17,7 @@ description: "CLI reference for ts-pack — download parsers, parse source code,
 === "Homebrew (macOS / Linux)"
 
     ```bash
+    brew trust kreuzberg-dev/tap
     brew install kreuzberg-dev/tap/ts-pack
     ```
 

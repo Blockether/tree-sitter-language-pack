@@ -45,10 +45,14 @@ nav = [
       { "Rust" = "reference/api-rust.md" },
       { "Go" = "reference/api-go.md" },
       { "Java" = "reference/api-java.md" },
+      { "Kotlin (Android)" = "reference/api-kotlin-android.md" },
       { "C#" = "reference/api-csharp.md" },
       { "Ruby" = "reference/api-ruby.md" },
       { "PHP" = "reference/api-php.md" },
       { "Elixir" = "reference/api-elixir.md" },
+      { "Dart" = "reference/api-dart.md" },
+      { "Swift" = "reference/api-swift.md" },
+      { "Zig" = "reference/api-zig.md" },
       { "WebAssembly" = "reference/api-wasm.md" },
       { "C / FFI" = "reference/api-c.md" },
     ] },
@@ -62,9 +66,8 @@ nav = [
     { "Contributing" = "contributing.md" },
     { "CI / CD" = "contributing/ci.md" },
     { "Changelog" = "CHANGELOG.md" },
+    { "Ecosystem" = "ecosystem.md" },
   ] },
-
-  { "Ecosystem" = "ecosystem.md" },
 ]
 
 [project.theme]

@@ -15,6 +15,7 @@ You can use it in CI pipelines, automation scripts, or to explore and experiment
 === ":fontawesome-brands-apple: Homebrew"
 
     ```bash
+    brew trust kreuzberg-dev/tap
     brew install kreuzberg-dev/tap/ts-pack
     ```
 
