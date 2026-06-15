@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0-rc.48] - 2026-06-15
+
+### Changed
+
+- **Bumped `alef` pin 0.25.6 → 0.25.9.** Regenerated all bindings via `alef sync-versions --skip-swift-checksum` + `task alef:generate`. Picks up the accumulated 0.25.6/0.25.7/0.25.8/0.25.9 fixes:
+  - **0.25.6 — Java codegen.** `NativeLib` downcall fallback chain now emits in the single-line shape that palantir-java-format produces, so the regenerated `NativeLib.java` no longer triggers a post-regen formatter rewrite (the diff that broke rc.47's `Validate Lint & Format` job).
+  - **0.25.6 — publish vendor `cargo --locked` paradox.** `alef publish prepare` was running `cargo update -p <crate>` with `--locked` passed via `CARGO_BUILD_LOCKED`, which made cargo refuse to update the lockfile. The Python sdist + all 4 Ruby gem + all 4 Elixir NIF + all 18 PHP PIE jobs on rc.47 failed with "cannot update the lock file ... because --locked was passed". Fix: `vendor.rs` now `.env_remove("CARGO_BUILD_LOCKED")` before both cargo invocations and drops the `--locked` flag from `cargo metadata`. Regression test `scrub_lock_succeeds_for_non_workspace_binding_crate_with_incomplete_seed` covers the path.
+  - **0.25.8 — Dart mirror enum cfg-strip.** `emit_mirror_enum` no longer propagates `variant.cfg` into the generated mirror enum body. The mirror is a DTO/wire type that `flutter_rust_bridge_codegen` references unconditionally from `frb_generated.rs` — gating a variant out via `#[cfg]` left the unconditional reference dangling with `E0599 no variant named 'Heif' found for enum 'ImageOutputFormat'` when the binding crate didn't declare the upstream feature. The catch-all `_ => unreachable!()` arm in the `From<CoreType>` impl (introduced earlier) handles runtime safety.
+  - **0.25.9 — Dart check-cfg allow-list + mirror dead-code cleanup + publish current_dir.** Resolves the v0.25.8 build regression where the 0.25.8 cfg-strip patch orphaned the `emit_variant_cfg_open`/`emit_variant_cfg_close` helpers, tripping `-D warnings` on all 4 alef publish jobs (3× Build CLI + crates.io). Also widens the dart check-cfg allow-list and tightens `publish` current-dir handling.
+  - **alef-side accumulated fixes (released as 0.25.9 alongside the above).** Direct-deps replacement for the no-op `[patch.crates-io]` block alef 0.25.8 emitted in the Elixir NIF `Cargo.toml` (cargo refused with "patch points to the same source"). Direct deps with `=` constraints + matching `package.metadata.cargo-machete.ignored` entries pin `alloc-no-stdlib`/`alloc-stdlib`/`brotli-decompressor` transitively. YARD doc-coverage hook fixed via a documented `GEMSPEC` constant in the generated `packages/ruby/Rakefile` and a matching docstring in the in-tree stale `packages/ruby/ext/ts_pack_core_rb/src/Rakefile` (the latter file is hand-maintained and not regenerated; cleanup deferred).
+
 ## [1.9.0-rc.46] - 2026-06-14
 
 ### Changed
