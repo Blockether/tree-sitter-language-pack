@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	moduleVersion = "1.9.0-rc.50"
+	moduleVersion = "1.9.0-rc.51"
 	repoURL       = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 	assetPrefix   = "tree-sitter-language-pack"
 )
