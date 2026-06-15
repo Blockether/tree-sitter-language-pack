@@ -5,6 +5,7 @@ Bundler::GemHelper.install_tasks name: "tree_sitter_language_pack"
 require "rake/extensiontask"
 require "rspec/core/rake_task"
 
+# Loaded gemspec used by Rake::ExtensionTask to compile the native extension.
 GEMSPEC = Gem::Specification.load(File.expand_path("tree_sitter_language_pack.gemspec", __dir__))
 
 Rake::ExtensionTask.new("ts_pack_core_rb", GEMSPEC) do |ext|
