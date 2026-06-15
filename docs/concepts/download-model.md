@@ -3,7 +3,9 @@ title: Download Model
 description: "How tree-sitter-language-pack downloads, caches, and manages parser binaries on demand."
 ---
 
-Tree-sitter-language-pack does not bundle parser binaries into the package. Instead, the pack fetches parsers on first use and caches them locally. This keeps install sizes small and gives you control over which languages are available.
+Native tree-sitter-language-pack runtimes fetch parsers on first use and cache them locally. This keeps install sizes small and gives you control over which languages are available.
+
+The WebAssembly package is different: it ships a curated static subset of parsers inside the `.wasm` module and does not expose native download/cache helpers.
 
 ---
 
@@ -93,7 +95,7 @@ The manifest is a JSON file (`parsers.json`) hosted on each GitHub release. It h
 
 ```json
 {
-  "version": "1.8.1",
+  "version": "1.9.0-rc.49",
   "platforms": {
     "linux-x64": {
       "url": "https://github.com/.../parsers-linux-x64.tar.zst",

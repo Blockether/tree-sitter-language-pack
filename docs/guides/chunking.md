@@ -38,9 +38,9 @@ Set `chunk_max_size` in `ProcessConfig` to enable chunking:
         structure=True,        # include structure metadata
     ))
 
-    for i, chunk in enumerate(result["chunks"]):
-        print(f"Chunk {i + 1}: lines {chunk['start_line']}-{chunk['end_line']} "
-              f"({chunk['end_byte'] - chunk['start_byte']} bytes)")
+    for i, chunk in enumerate(result.chunks):
+        print(f"Chunk {i + 1}: lines {chunk.start_line}-{chunk.end_line} "
+              f"({chunk.end_byte - chunk.start_byte} bytes)")
     ```
 
 === "Node.js"
@@ -124,15 +124,15 @@ config = ProcessConfig(
 result = process(source, config)
 
 documents = []
-for chunk in result["chunks"]:
+for chunk in result.chunks:
     documents.append({
-        "content": chunk["content"],
+        "content": chunk.content,
         "metadata": {
             "language": "python",
-            "start_line": chunk["start_line"],
-            "end_line": chunk["end_line"],
-            "node_types": chunk["node_types"],
-            "size_bytes": chunk["end_byte"] - chunk["start_byte"],
+            "start_line": chunk.start_line,
+            "end_line": chunk.end_line,
+            "node_types": chunk.node_types,
+            "size_bytes": chunk.end_byte - chunk.start_byte,
         }
     })
 ```
@@ -176,15 +176,15 @@ def chunk_repository(repo_path: str, chunk_size: int = 800) -> list[dict]:
                 docstrings=True,
             ))
 
-            for chunk in result["chunks"]:
+            for chunk in result.chunks:
                 chunks.append({
-                    "content": chunk["content"],
+                    "content": chunk.content,
                     "file": filepath,
-                    "start_line": chunk["start_line"],
-                    "end_line": chunk["end_line"],
+                    "start_line": chunk.start_line,
+                    "end_line": chunk.end_line,
                     "language": language,
-                    "node_types": chunk["node_types"],
-                    "size_bytes": chunk["end_byte"] - chunk["start_byte"],
+                    "node_types": chunk.node_types,
+                    "size_bytes": chunk.end_byte - chunk.start_byte,
                 })
     return chunks
 

@@ -19,12 +19,16 @@ graph TD
         PHP["PHP<br/>(ext-php-rs)"]
         WASM["WebAssembly<br/>(wasm-bindgen)"]
         FFI["C FFI<br/>(cbindgen)"]
+        DART["Dart<br/>(flutter_rust_bridge)"]
+        SWIFT["Swift<br/>(swift-bridge)"]
     end
 
     subgraph FFIConsumers["FFI Consumers"]
         GO["Go<br/>(cgo)"]
         JAVA["Java<br/>(Panama FFM)"]
         CS["C# / .NET<br/>(P/Invoke)"]
+        KOTLIN["Kotlin Android<br/>(JNI / AAR)"]
+        ZIG["Zig<br/>(C ABI)"]
     end
 
     subgraph Core["Rust Core (ts-pack-core)"]
@@ -46,10 +50,14 @@ graph TD
     EL --> Core
     PHP --> Core
     WASM --> Core
+    DART --> Core
+    SWIFT --> Core
     FFI --> Core
     GO --> FFI
     JAVA --> FFI
     CS --> FFI
+    KOTLIN --> FFI
+    ZIG --> FFI
 
     DL -->|"HTTPS download"| MANIFEST
     DL -->|"fetch binary"| BIN
@@ -67,7 +75,7 @@ All logic lives in a single crate: `crates/ts-pack-core`.
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | **Download Manager**         | Resolves the remote manifest, fetches platform-specific parser binaries, stores them in the local cache.                    |
 | **Parser Cache**             | Maps language names to loaded `tree_sitter::Language` values. Once loaded, a parser is reused without re-reading from disk. |
-| **Code Intelligence Engine** | Runs tree-sitter queries against a parsed tree to extract structure, imports, exports, symbols, comments, and docstrings.   |
+| **Code Intelligence Engine** | Walks parsed ASTs to extract structure, imports, exports, symbols, comments, docstrings, data trees, diagnostics, and chunks. |
 | **Chunker**                  | Walks the syntax tree and splits source code at natural boundaries, respecting a configurable token budget.                 |
 
 The core has no language-specific code. It calls tree-sitter through its stable C ABI using dynamically loaded parser binaries.
@@ -96,18 +104,24 @@ Binding crates contain no parsing logic, no query definitions, and no chunking c
 | `packages/go`              | cgo              | Go modules           |
 | `packages/java`            | Panama FFM       | Maven Central        |
 | `packages/csharp`          | P/Invoke         | NuGet                |
+| `packages/dart`            | flutter_rust_bridge | pub.dev           |
+| `packages/kotlin-android`  | JNI / Android AAR | Maven Central       |
+| `packages/swift`           | swift-bridge     | SwiftPM              |
+| `packages/zig`             | C ABI wrapper    | Zig package          |
 
 ---
 
 ## Parser Binaries
 
-Tree-sitter parsers are **not** compiled into the package. Instead:
+Native packages do not compile the full parser set into the package. Instead:
 
 1. A `parsers.json` manifest (on GitHub releases) lists one bundle per target platform plus per-language metadata for all 306 grammars.
 2. On first use, the matching platform bundle downloads and extracts to the local cache directory.
 3. The runtime opens the relevant grammar binary via `dlopen` / `LoadLibrary` and resolves the `tree_sitter_<language>` symbol.
 
 This keeps installation fast and download sizes minimal. See [Download Model](download-model.md) for the full detail.
+
+The WebAssembly package is the exception: it uses a curated static parser subset compiled into the `.wasm` module and does not expose native download/cache helpers.
 
 ---
 
@@ -122,7 +136,7 @@ tree-sitter-language-pack/
 │   ├── ts-pack-core-node/  # Node.js (NAPI-RS) binding
 │   ├── ts-pack-core-php/   # PHP (ext-php-rs) extension
 │   ├── ts-pack-core-wasm/  # WebAssembly (wasm-bindgen) binding
-│   └── ts-pack-core-ffi/   # C FFI for Go / Java / C#
+│   └── ts-pack-core-ffi/   # C FFI for native-package consumers
 ├── packages/
 │   ├── python/             # Python package wrapper
 │   ├── typescript/         # TypeScript / Node.js package
@@ -132,6 +146,10 @@ tree-sitter-language-pack/
 │   ├── go/                 # Go module (cgo wrapper)
 │   ├── java/               # Java package (Panama FFM)
 │   ├── csharp/             # C# / .NET package (P/Invoke)
+│   ├── dart/               # Dart / Flutter package
+│   ├── kotlin-android/     # Android AAR package
+│   ├── swift/              # SwiftPM package
+│   ├── zig/                # Zig package
 │   └── wasm/               # WebAssembly npm package
 ├── sources/
 │   └── language_definitions.json  # Grammar source registry
@@ -150,5 +168,5 @@ capability.
 
 - **Single source of truth** — All parsing and intelligence logic lives in `ts-pack-core`. Binding crates are pure glue.
 - **On-demand downloads** — Parsers do not ship in the package. The pack fetches and caches them per-platform on first use.
-- **ABI stability** — The C FFI layer (`ts-pack-core-ffi`) follows strict semantic versioning. Go, Java, and C# bindings depend on a stable C ABI, not Rust internals.
-- **Zero duplication** — Query definitions, chunking strategies, and intelligence extraction are each written once in Rust and reused across all 11 language surfaces.
+- **ABI stability** — The C FFI layer (`ts-pack-core-ffi`) follows strict semantic versioning. Native bindings depend on stable ABI handles, not Rust internals.
+- **Zero duplication** — Parser loading, chunking strategies, and intelligence extraction are each written once in Rust and reused across all generated language surfaces.

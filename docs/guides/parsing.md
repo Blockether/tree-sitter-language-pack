@@ -4,9 +4,9 @@ description: "Parse source code with the Rust API or CLI and inspect tree-sitter
 
 # Parsing code
 
-The stable public API for low-level syntax-tree parsing is `get_parser()`. It returns a tree-sitter parser configured for one of the bundled languages.
+The stable public API for low-level syntax-tree parsing is `get_parser()`. It returns the package's `Parser` wrapper configured for one of the bundled languages.
 
-Language bindings expose higher-level APIs such as `process()` and `extract()` for structured analysis. Use those APIs unless you need a raw tree-sitter syntax tree.
+Language bindings expose `process()` for structured analysis. Use `process()` unless you need a raw syntax tree or a manual AST walk.
 
 === "Rust"
 
@@ -15,10 +15,7 @@ Language bindings expose higher-level APIs such as `process()` and `extract()` f
 
     let mut parser = get_parser("python")?;
     let tree = parser
-        .parse(
-            b"def greet(name: str) -> str:\n    return f\"Hello {name}\"\n",
-            None,
-        )
+        .parse("def greet(name: str) -> str:\n    return f\"Hello {name}\"\n")
         .ok_or("failed to parse source")?;
 
     let root = tree.root_node();
@@ -47,7 +44,7 @@ Every parse returns a `Tree` with a single root node. Its kind is the top-level 
 ```rust
 let mut parser = get_parser("python")?;
 let tree = parser
-    .parse(b"def foo(): pass\ndef bar(): pass", None)
+    .parse("def foo(): pass\ndef bar(): pass")
     .ok_or("failed to parse source")?;
 let root = tree.root_node();
 
@@ -66,7 +63,7 @@ Grammars assign named fields to semantically meaningful children. A Python `func
 ```rust
 let mut parser = get_parser("python")?;
 let tree = parser
-    .parse(b"def add(a, b):\n    return a + b", None)
+    .parse("def add(a, b):\n    return a + b")
     .ok_or("failed to parse source")?;
 let root = tree.root_node();
 let func = root.child(0).ok_or("missing function")?;
@@ -101,7 +98,7 @@ Tree-sitter does not raise on malformed syntax. It marks problem areas with `ERR
 ```rust
 let mut parser = get_parser("python")?;
 let tree = parser
-    .parse(b"def broken(", None)
+    .parse("def broken(")
     .ok_or("failed to parse source")?;
 
 println!("{}", tree.root_node().has_error()); // true
@@ -134,15 +131,20 @@ println!("{}", tree.root_node().has_error()); // true
 | Rust    | `tree_sitter::Language`                       | `tree_sitter::Parser::set_language` | Same crate as the runtime.                                                                    |
 | Python  | `tree_sitter.Language` (via PyCapsule)        | `tree_sitter.Parser(language)`      | Configured under `[crates.python.capsule_types]`.                                             |
 | Node    | `Language` from the `tree-sitter` npm package | `new Parser().setLanguage(lang)`    | Configured under `[crates.node.capsule_types]`; `tree-sitter` is an optional peer dependency. |
-| Ruby    | opaque handle                                 | n/a                                 | `ruby_tree_sitter` only loads by path.                                                        |
-| Go      | opaque handle                                 | n/a                                 | Pointer constructor exists upstream; passthrough planned.                                     |
-| Java    | opaque handle                                 | n/a                                 | No upstream library accepts raw pointers.                                                     |
-| C#      | opaque handle                                 | n/a                                 | No shipping upstream library.                                                                 |
+| Ruby    | opaque handle                                 | n/a                                 | Use this package's `Parser` wrapper or `process()`.                                           |
+| Go      | opaque handle                                 | n/a                                 | Use this package's `Parser` wrapper or `Process`.                                             |
+| Java    | opaque handle                                 | n/a                                 | Use this package's `Parser` wrapper or `process`.                                             |
+| C#      | opaque handle                                 | n/a                                 | Use this package's `Parser` wrapper or `Process`.                                             |
+| Dart    | opaque handle                                 | n/a                                 | Use this package's generated parser wrapper.                                                   |
+| Kotlin Android | opaque handle                          | n/a                                 | Android AAR only; use this package's generated parser wrapper.                                |
+| Swift   | opaque handle                                 | n/a                                 | Use this package's generated parser wrapper.                                                   |
+| Zig     | opaque handle                                 | n/a                                 | Use this package's generated parser wrapper.                                                   |
+| C FFI   | opaque handle                                 | n/a                                 | Use the exported FFI parser functions and handles.                                            |
 | PHP     | opaque handle                                 | n/a                                 | `talbergs/php-tree-sitter` exposes no `FFI\CData` ingress.                                    |
 | Elixir  | opaque handle                                 | n/a                                 | `ResourceArc<T>` is NIF-private; cross-NIF impossible.                                        |
 | WASM    | opaque handle                                 | n/a                                 | `web-tree-sitter` runs in a separate WASM memory space.                                       |
 
-For the bindings marked "opaque handle", use the higher-level APIs (`process()`, `extract()`, `getParser()`-returned methods) rather than reaching for the ecosystem's tree-sitter library.
+For the bindings marked "opaque handle", use the higher-level APIs (`process()` or this package's `getParser()`-returned methods) rather than reaching for the ecosystem's tree-sitter library.
 
 ## Next steps
 

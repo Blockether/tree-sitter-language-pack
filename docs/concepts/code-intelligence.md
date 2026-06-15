@@ -3,7 +3,7 @@ title: Code Intelligence
 description: "What tree-sitter-language-pack extracts from source code: structure, imports, exports, comments, docstrings, and chunks."
 ---
 
-The `process` function goes beyond raw syntax trees. It runs tree-sitter queries against the parsed AST to extract structured information useful for code analysis, search, documentation, and LLM ingestion.
+The `process` function goes beyond raw syntax trees. It parses source, then the Rust core walks the AST to extract structured information useful for code analysis, search, documentation, and LLM ingestion. Bundled query helpers return query source strings; arbitrary query execution is left to host-language tree-sitter APIs.
 
 ---
 
@@ -67,12 +67,12 @@ Use `.all()` in Rust or `ProcessConfig.all("python")` in Python to enable everyt
 A list of top-level code constructs with their names, kinds, ranges, and optionally their docstrings.
 
 ```python
-for item in result["structure"]:
-    print(item["kind"])       # "function" | "class" | "method" | "interface" | ...
-    print(item["name"])       # "greet"
-    print(item["start_line"]) # 3
-    print(item["end_line"])   # 6
-    print(item["docstring"])  # "Greet a user by name."  (if docstrings=True)
+for item in result.structure:
+    print(item.kind)       # "function" | "class" | "method" | "interface" | ...
+    print(item.name)       # "greet"
+    print(item.start_line) # 3
+    print(item.end_line)   # 6
+    print(item.docstring)  # "Greet a user by name."  (if docstrings=True)
 ```
 
 Supported kinds vary by language:
@@ -98,10 +98,10 @@ Supported kinds vary by language:
 All import declarations with their source module and imported names.
 
 ```python
-for imp in result["imports"]:
-    print(imp["source"])    # "os"  or  "pathlib"
-    print(imp["names"])     # ["path", "getcwd"]  (empty = wildcard or bare import)
-    print(imp["start_line"])
+for imp in result.imports:
+    print(imp.source)    # "os"  or  "pathlib"
+    print(imp.names)     # ["path", "getcwd"]  (empty = wildcard or bare import)
+    print(imp.start_line)
 ```
 
 Example output as JSON:
@@ -121,9 +121,9 @@ Example output as JSON:
 Symbols that are part of the module's public API.
 
 ```python
-for exp in result["exports"]:
-    print(exp["name"])  # "readFile"
-    print(exp["kind"])  # "function" | "class" | "const" | ...
+for exp in result.exports:
+    print(exp.name)  # "readFile"
+    print(exp.kind)  # "function" | "class" | "const" | ...
 ```
 
 !!! Note Export detection is language-specific. For Python, everything defined at module level counts as exported unless prefixed with `_`. For JavaScript/TypeScript, explicit `export` declarations determine what the module exposes.
@@ -135,10 +135,10 @@ for exp in result["exports"]:
 All comments in the file with their text and location.
 
 ```python
-for comment in result["comments"]:
-    print(comment["text"])       # "// TODO: handle edge case"
-    print(comment["start_line"]) # 42
-    print(comment["is_block"])   # False
+for comment in result.comments:
+    print(comment.text)       # "// TODO: handle edge case"
+    print(comment.start_line) # 42
+    print(comment.is_block)   # False
 ```
 
 ---
@@ -148,8 +148,8 @@ for comment in result["comments"]:
 Docstrings appear under their parent construct in `structure`. When `docstrings=True`, each `structure` item gains a `docstring` field:
 
 ```python
-func = result["structure"][0]
-print(func["docstring"])
+func = result.structure[0]
+print(func.docstring)
 # "Read and return the contents of a file.\n\nArgs:\n    path: Path to the file."
 ```
 
@@ -172,7 +172,7 @@ Docstring extraction understands language-specific conventions:
 A deduplicated list of all identifiers referenced in the file, useful for search indexing.
 
 ```python
-print(result["symbols"])
+print(result.symbols)
 # ["os", "Path", "read_file", "FileManager", "base_dir", "get", ...]
 ```
 
@@ -183,10 +183,10 @@ print(result["symbols"])
 Tree-sitter produces partial trees for malformed code, marking error nodes. `diagnostics` surfaces these:
 
 ```python
-for error in result["diagnostics"]:
-    print(error["message"])    # "Unexpected token"
-    print(error["start_line"])
-    print(error["start_col"])
+for error in result.diagnostics:
+    print(error.message)    # "Unexpected token"
+    print(error.start_line)
+    print(error.start_col)
 ```
 
 !!! Tip A non-empty `diagnostics` list does not mean the file is unparsable — tree-sitter recovers and continues. Use it to detect broken syntax rather than to gate parsing.
@@ -198,13 +198,13 @@ for error in result["diagnostics"]:
 When `chunk_max_size > 0`, the `chunks` field contains the file split into byte-budget segments. See [Chunking for LLMs](../guides/chunking.md) for full documentation.
 
 ```python
-for chunk in result["chunks"]:
-    print(chunk["content"])      # the source code text
-    print(chunk["start_byte"])   # start byte offset
-    print(chunk["end_byte"])     # end byte offset
-    print(chunk["start_line"])   # first line of chunk
-    print(chunk["end_line"])     # last line of chunk
-    print(chunk["node_types"])   # ["function_definition", "class_definition"]
+for chunk in result.chunks:
+    print(chunk.content)      # the source code text
+    print(chunk.start_byte)   # start byte offset
+    print(chunk.end_byte)     # end byte offset
+    print(chunk.start_line)   # first line of chunk
+    print(chunk.end_line)     # last line of chunk
+    print(chunk.node_types)   # ["function_definition", "class_definition"]
 ```
 
 ---
@@ -214,12 +214,12 @@ for chunk in result["chunks"]:
 Basic metrics about the file:
 
 ```python
-m = result["metrics"]
-print(m["total_lines"])       # 120
-print(m["code_lines"])        # 95   (non-blank, non-comment lines)
-print(m["comment_lines"])     # 18
-print(m["blank_lines"])       # 7
-print(m["max_depth"])         # maximum nesting depth of the syntax tree
+m = result.metrics
+print(m.total_lines)       # 120
+print(m.code_lines)        # 95   (non-blank, non-comment lines)
+print(m.comment_lines)     # 18
+print(m.blank_lines)       # 7
+print(m.max_depth)         # maximum nesting depth of the syntax tree
 ```
 
 ---
@@ -273,8 +273,8 @@ config = ProcessConfig(
 result = process(source, config)
 
 # Structure
-for item in result["structure"]:
-    print(f"{item['kind']:12} {item['name']:20} lines {item['start_line']}-{item['end_line']}")
+for item in result.structure:
+    print(f"{item.kind:12} {item.name:20} lines {item.start_line}-{item.end_line}")
 
 # Output:
 # function     read_file            lines 6-20
@@ -283,9 +283,9 @@ for item in result["structure"]:
 # method       get                  lines 30-33
 
 # Imports
-for imp in result["imports"]:
-    names = ", ".join(imp["names"]) or "*"
-    print(f"from {imp['source']} import {names}")
+for imp in result.imports:
+    names = ", ".join(imp.names) or "*"
+    print(f"from {imp.source} import {names}")
 
 # Output:
 # from os import *
@@ -293,16 +293,16 @@ for imp in result["imports"]:
 # from typing import Optional
 
 # Docstrings
-func = result["structure"][0]
-print(f"\n{func['name']} docstring:\n{func['docstring']}")
+func = result.structure[0]
+print(f"\n{func.name} docstring:\n{func.docstring}")
 
 # Metrics
-m = result["metrics"]
-print(f"\nLines: {m['total_lines']} total, {m['code_lines']} code, {m['comment_lines']} comments")
+m = result.metrics
+print(f"\nLines: {m.total_lines} total, {m.code_lines} code, {m.comment_lines} comments")
 ```
 
 ---
 
 ## Custom Queries
 
-Custom query extraction helpers are not part of the v1.8 public API. In Rust, call `get_parser()` and use the `tree-sitter` query APIs directly when the built-in `process()` fields are not enough.
+Custom query execution helpers are not part of the v1.9 public API. Use `get_highlights_query`, `get_injections_query`, `get_locals_query`, or `get_tags_query` <span class="version-badge">Available by v1.9</span> to retrieve bundled query source, then run host-language tree-sitter query APIs or walk the AST manually when `process()` fields are not enough.

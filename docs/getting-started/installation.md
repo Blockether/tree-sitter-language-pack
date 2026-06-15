@@ -1,16 +1,16 @@
 ---
 title: Installation
-description: "Install tree-sitter-language-pack in Python, Node.js, Rust, Go, Java, Ruby, Elixir, PHP, WebAssembly, or via the CLI."
+description: "Install tree-sitter-language-pack in Python, Node.js, Rust, Go, Java, C#, Ruby, Elixir, PHP, Dart, Kotlin Android, Swift, Zig, C FFI, WebAssembly, or via the CLI."
 ---
 
 ## Install using the CLI
 
 The `ts-pack` CLI allows you to manage parsers and run code analysis directly from your terminal.
-You can use it in CI pipelines, automation scripts, or to explore and experiment with **300+ supported languages**.
+You can use it in CI pipelines, automation scripts, or to explore and experiment with **306 supported languages** <span class="version-badge">Available by v1.9</span>.
 
 <div class="install-cli-hero" markdown>
 
-## :material-console-line: CLI
+## :material-console-line: CLI <span class="version-badge">Homebrew bundles available by v1.9</span>
 
 === ":fontawesome-brands-apple: Homebrew"
 
@@ -44,9 +44,15 @@ Tree-sitter-language-pack is available for every major ecosystem. All packages s
 [Rust](#rust){ .lang-pill }
 [Go](#go){ .lang-pill }
 [Java](#java){ .lang-pill }
+[C#](#c){ .lang-pill }
 [Ruby](#ruby){ .lang-pill }
 [Elixir](#elixir){ .lang-pill }
 [PHP](#php){ .lang-pill }
+[Dart](#dart){ .lang-pill }
+[Kotlin Android](#kotlin-android){ .lang-pill }
+[Swift](#swift){ .lang-pill }
+[Zig](#zig){ .lang-pill }
+[C FFI](#c-ffi){ .lang-pill }
 [WebAssembly](#webassembly){ .lang-pill }
 </div>
 
@@ -169,7 +175,7 @@ Requires JDK 25+ (uses Panama FFM API).
     <dependency>
         <groupId>dev.kreuzberg.treesitterlanguagepack</groupId>
         <artifactId>tree-sitter-language-pack</artifactId>
-        <version>1.8.1</version>
+        <version>1.9.0-rc.49</version>
     </dependency>
     ```
 
@@ -177,7 +183,7 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```kotlin
     dependencies {
-        implementation("dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.8.1")
+        implementation("dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.9.0-rc.49")
     }
     ```
 
@@ -185,7 +191,7 @@ Requires JDK 25+ (uses Panama FFM API).
 
     ```groovy
     dependencies {
-        implementation 'dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.8.1'
+        implementation 'dev.kreuzberg.treesitterlanguagepack:tree-sitter-language-pack:1.9.0-rc.49'
     }
     ```
 
@@ -203,6 +209,26 @@ public class Main {
 
 ---
 
+### C# <span class="version-badge">Available by v1.9</span> {#c}
+
+Requires .NET 10.
+
+```bash
+dotnet add package TreeSitterLanguagePack --version 1.9.0-rc.49
+```
+
+Verify:
+
+```csharp
+using TreeSitterLanguagePack;
+
+Console.WriteLine(TreeSitterLanguagePackConverter.LanguageCount()); // 306
+```
+
+The NuGet package includes native runtime assets for Windows, Linux, and macOS.
+
+---
+
 ### Ruby
 
 Requires Ruby 3.2+.
@@ -216,7 +242,7 @@ Requires Ruby 3.2+.
 === "Gemfile"
 
     ```ruby
-    gem "tree_sitter_language_pack", "~> 1.8"
+    gem "tree_sitter_language_pack", "~> 1.9"
     ```
 
     ```bash
@@ -242,7 +268,7 @@ Requires Elixir 1.14+ and OTP 25+.
     ```elixir
     defp deps do
       [
-        {:tree_sitter_language_pack, "~> 1.8"}
+        {:tree_sitter_language_pack, "~> 1.9"}
       ]
     end
     ```
@@ -281,7 +307,7 @@ composer require mlocati/php-extension-installer
     {
         "require": {
             "mlocati/php-extension-installer": "^2.0",
-            "kreuzberg-dev/tree-sitter-language-pack": "^1.0"
+            "kreuzberg-dev/tree-sitter-language-pack": "^1.9"
         }
     }
     ```
@@ -292,6 +318,59 @@ Verify:
 <?php
 echo \ts_pack_language_count(); // 306
 ```
+
+---
+
+### Dart
+
+Requires Dart 3.11+.
+
+```bash
+dart pub add tree_sitter_language_pack
+```
+
+---
+
+### Kotlin Android <span class="version-badge">Available by v1.9</span> {#kotlin-android}
+
+Requires Android minSdk 21 and Java 17 bytecode.
+
+```kotlin
+implementation("dev.kreuzberg.tslp.android:tree-sitter-language-pack-android:1.9.0-rc.49")
+```
+
+This is an Android AAR. Kotlin/JVM users should use the Java artifact.
+
+---
+
+### Swift
+
+Requires Swift 6.0+.
+
+```swift
+.package(
+    url: "https://github.com/kreuzberg-dev/tree-sitter-language-pack",
+    exact: "1.9.0-rc.49"
+)
+```
+
+---
+
+### Zig
+
+Requires Zig 0.16+.
+
+```bash
+zig fetch --save <release tarball url>
+```
+
+The package name is `tree_sitter_language_pack`.
+
+---
+
+### C FFI
+
+Download the shared library and generated C header from GitHub Releases. The C FFI is the stable native contract used by the generated native packages.
 
 ---
 
@@ -320,6 +399,8 @@ Use from any JavaScript environment — browsers, Deno, and Cloudflare Workers.
     import { availableLanguages, parseString } from "npm:@kreuzberg/tree-sitter-language-pack-wasm";
     console.log(availableLanguages());
     ```
+
+The WASM package is a static curated subset of parsers compiled into the module. It does not expose the native download/cache helpers.
 
 ---
 

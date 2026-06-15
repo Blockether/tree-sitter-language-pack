@@ -34,7 +34,7 @@ This guide walks you from install to parsing, code intelligence, and LLM chunkin
     brew install kreuzberg-dev/tap/ts-pack
     ```
 
-!!! Tip "Other ecosystems" Go, Java, Ruby, Elixir, PHP, and WebAssembly are also supported. See [Installation](installation.md) for the full list.
+!!! Tip "Other ecosystems" Go, Java, C#, Ruby, Elixir, PHP, Dart, Kotlin Android, Swift, Zig, C FFI, and WebAssembly are also supported. See [Installation](installation.md) for the full list.
 
 ---
 
@@ -360,42 +360,34 @@ Go beyond the raw syntax tree. Extract functions, classes, imports, docstrings, 
 
 ---
 
-## 5. Run Extraction Queries
+## 5. Inspect Query Sources
 
-Use `extract` to run custom tree-sitter queries and get structured results with captured text and metadata.
+`process()` covers the built-in intelligence fields. There is no public `extract()` helper for arbitrary query execution. For custom analysis, fetch bundled query source with helpers such as `get_tags_query()` <span class="version-badge">Available by v1.9</span>, then run tree-sitter query APIs yourself or walk the AST manually.
 
 === "Python"
 
     ```python
-    import tree_sitter_language_pack as tslp
+    from tree_sitter_language_pack import get_tags_query
 
-    source = """
-    def greet(name: str) -> str:
-        return f"Hello, {name}!"
+    tags_query = get_tags_query("python")
+    if tags_query is not None:
+        print(tags_query.splitlines()[0])
+    ```
 
-    def farewell(name: str) -> str:
-        return f"Goodbye, {name}!"
-    """
+=== "Rust"
 
-    result = tslp.extract(source, {
-        "language": "python",
-        "patterns": {
-            "functions": {
-                "query": "(function_definition name: (identifier) @name)",
-                "capture_output": "Text",
-            }
-        }
-    })
+    ```rust
+    use tree_sitter_language_pack::{get_parser, get_tags_query};
 
-    for match in result["results"]["functions"]["matches"]:
-        print(match["captures"][0]["text"])
-    # greet
-    # farewell
+    let query_source = get_tags_query("rust");
+    let mut parser = get_parser("rust")?;
+    let tree = parser.parse("fn main() {}").ok_or("failed to parse")?;
+    println!("{}", tree.root_node().kind());
     ```
 
 ---
 
-## 7. Chunk for LLMs
+## 6. Chunk for LLMs
 
 Split code at natural boundaries so language models receive coherent, complete units which is ideal for embedding pipelines and context windows.
 
@@ -414,9 +406,9 @@ Split code at natural boundaries so language models receive coherent, complete u
     )
     result = process(source, config)
 
-    for i, chunk in enumerate(result["chunks"]):
-        print(f"Chunk {i}: lines {chunk['start_line']}-{chunk['end_line']} "
-              f"({chunk['end_byte'] - chunk['start_byte']} bytes)")
+    for i, chunk in enumerate(result.chunks):
+        print(f"Chunk {i}: lines {chunk.start_line}-{chunk.end_line} "
+              f"({chunk.end_byte - chunk.start_byte} bytes)")
     ```
 
 === "Node.js"
@@ -448,7 +440,7 @@ Split code at natural boundaries so language models receive coherent, complete u
 
 ---
 
-You now have the full workflow. You can now install, download, parse, extract intelligence, run queries, and chunk for LLMs.
+You now have the full workflow. You can now install, download, parse, extract intelligence, inspect query sources, and chunk for LLMs.
 Go further with the following guides:
 
 - [:material-arrow-right: Parsing guide](../guides/parsing.md) — syntax trees, error handling, and incremental parsing
