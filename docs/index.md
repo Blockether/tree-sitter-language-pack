@@ -22,7 +22,7 @@ A Rust core that bundles 306 [tree-sitter](https://tree-sitter.github.io/tree-si
 
 <div class="grid cards" markdown>
 
-- :material-code-tags:{ .lg .middle } **306 Languages**
+- :material-code-tags:{ .lg .middle } **306 Languages** <span class="version-badge">Available by v1.9</span>
 
   One pack covers every mainstream language and most niche ones — Python, Rust, Go, Java, TypeScript, C++, Kotlin, Swift, Zig, Elixir, Haskell, Julia, R, and 290+ more.
 
@@ -42,9 +42,9 @@ A Rust core that bundles 306 [tree-sitter](https://tree-sitter.github.io/tree-si
 
   Split source at natural boundaries (functions, classes, blocks) so chunks stay semantically intact for embeddings and prompt windows.
 
-- :material-translate:{ .lg .middle } **14 Language Bindings + CLI**
+- :material-translate:{ .lg .middle } **15 Language Surfaces + CLI**
 
-  The same Rust core ships as a PyPI wheel, an npm module, a crate, a Go module, a Maven JAR, an Android AAR (Maven), a NuGet package, a gem, a Composer package, a Hex package, a pub.dev package, a SwiftPM package, a Zig tarball, a WASM module, and a static-binary CLI.
+  The same Rust core ships as a PyPI wheel, an npm module, a crate, a Go module, a Maven JAR, an Android AAR (Maven), a NuGet package, a gem, a Composer package, a Hex package, a pub.dev package, a SwiftPM package, a Zig tarball, a C FFI library, a WASM module, and a static-binary CLI.
 
 </div>
 
@@ -64,8 +64,8 @@ A Rust core that bundles 306 [tree-sitter](https://tree-sitter.github.io/tree-si
 | **PHP**                  | `composer require kreuzberg-dev/tree-sitter-language-pack`                                                     | [API Reference](reference/api-php.md)            |
 | **Elixir**               | `{:tree_sitter_language_pack, "~> 1.9"}`                                                                       | [API Reference](reference/api-elixir.md)         |
 | **Dart / Flutter**       | `dart pub add tree_sitter_language_pack`                                                                       | [API Reference](reference/api-dart.md)           |
-| **Kotlin (Android)**     | `implementation("dev.kreuzberg.tslp:tslp-android:1.9.0")`                                                      | [API Reference](reference/api-kotlin-android.md) |
-| **Swift**                | `.package(url: "https://github.com/kreuzberg-dev/tree-sitter-language-pack-swift", from: "1.9.0")`             | [API Reference](reference/api-swift.md)          |
+| **Kotlin (Android)**     | `implementation("dev.kreuzberg.tslp.android:tree-sitter-language-pack-android:1.9.0-rc.49")`                  | [API Reference](reference/api-kotlin-android.md) |
+| **Swift**                | `.package(url: "https://github.com/kreuzberg-dev/tree-sitter-language-pack", exact: "1.9.0-rc.49")`           | [API Reference](reference/api-swift.md)          |
 | **Zig**                  | `zig fetch --save <release tarball url>`                                                                       | [API Reference](reference/api-zig.md)            |
 | **WebAssembly**          | `npm install @kreuzberg/tree-sitter-language-pack-wasm`                                                        | [API Reference](reference/api-wasm.md)           |
 | **C (FFI)**              | Shared library + header                                                                                        | [API Reference](reference/api-c.md)              |

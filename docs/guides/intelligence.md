@@ -4,7 +4,7 @@ description: "Extract functions, imports, docstrings, and other structured infor
 
 # Code intelligence
 
-`process()` runs built-in tree-sitter queries against a file and returns structured data: the functions and classes defined in it, what it imports, its docstrings, comments, and more. You configure what to extract; the library handles the queries.
+`process()` parses a file and walks the AST to return structured data: the functions and classes defined in it, what it imports, its docstrings, comments, and more. You configure what to extract; the Rust core handles the manual extraction. It does not expose a built-in arbitrary query execution API.
 
 Here's what a typical result looks like:
 
@@ -39,20 +39,20 @@ Here's what a typical result looks like:
         docstrings=True,
     ))
 
-    for item in result["structure"]:
-        doc = f" — {item['docstring']}" if item.get("docstring") else ""
-        print(f"{item['kind']:8} {item['name']:20} lines {item['start_line']}-{item['end_line']}{doc}")
+    for item in result.structure:
+        doc = f" - {item.docstring}" if item.docstring else ""
+        print(f"{item.kind:8} {item.name:20} lines {item.start_line}-{item.end_line}{doc}")
 
     print()
-    for imp in result["imports"]:
-        names = ", ".join(imp["names"]) or "*"
-        print(f"from {imp['source']} import {names}")
+    for imp in result.imports:
+        names = ", ".join(imp.names) or "*"
+        print(f"from {imp.source} import {names}")
     ```
 
     Output:
     ```
-    function read_file            lines 5-7  — Read and return file contents.
-    class    FileCache             lines 9-18 — Cache for file contents.
+    function read_file            lines 5-7  - Read and return file contents.
+    class    FileCache             lines 9-18 - Cache for file contents.
     method   __init__              lines 12-13
     method   get                   lines 15-17 — Return cached file contents.
 
@@ -119,7 +119,7 @@ Pass `language` plus any of these fields:
 | `docstrings`     | `False` | Docstrings attached to declarations (requires `structure=True`)   |
 | `symbols`        | `False` | Deduplicated list of all identifiers, for search indexing         |
 | `diagnostics`    | `False` | Syntax error nodes from the parse                                 |
-| `data_extraction` | `False` | Hierarchical key-value tree for structured data formats           |
+| `data_extraction` | `False` | Hierarchical key-value tree for structured data formats <span class="version-badge">Available by v1.9</span> |
 | `chunk_max_size` | `None`  | Maximum chunk size in bytes; see [Chunking for LLMs](chunking.md) |
 
 Enable everything at once: `ProcessConfig.all("python")`.
@@ -188,7 +188,7 @@ A deduplicated list of all identifiers in the file. Useful for search indexing:
 
 ```python
 result = process(source, ProcessConfig(language="python", symbols=True))
-print(sorted(result["symbols"])[:10])
+print(sorted(result.symbols)[:10])
 # ['FileCache', 'Path', 'get', 'name', 'os', 'path', 'read_file', 'root', 'str']
 ```
 
@@ -198,8 +198,8 @@ Syntax error nodes. A non-empty list does not mean the file has a parse error �
 
 ```python
 result = process(source, ProcessConfig(language="python", diagnostics=True))
-for err in result["diagnostics"]:
-    print(f"Line {err['start_line']}, col {err['start_col']}: {err['message']}")
+for err in result.diagnostics:
+    print(f"Line {err.start_line}, col {err.start_col}: {err.message}")
 ```
 
 ### `metrics`
@@ -216,25 +216,23 @@ File-level statistics, independent of the other fields:
 
 ```python
 result = process(source, ProcessConfig(language="python"))
-m = result["metrics"]
-print(f"{m['total_lines']} lines total, {m['code_lines']} code, {m['comment_lines']} comments")
+m = result.metrics
+print(f"{m.total_lines} lines total, {m.code_lines} code, {m.comment_lines} comments")
 ```
 
 ### `chunks`
 
-When `chunk_max_size` has a value, `result["chunks"]` contains syntax-aware splits ready for LLM ingestion. See [Chunking for LLMs](chunking.md) for full documentation.
+When `chunk_max_size` has a value, `result.chunks` contains syntax-aware splits ready for LLM ingestion. See [Chunking for LLMs](chunking.md) for full documentation.
 
-## Data extraction
+## Data extraction <span class="version-badge">Available by v1.9</span>
 
 Set `data_extraction = true` on `ProcessConfig` to extract a hierarchical `DataNode` tree from structured-data languages. Instead of parsing code, this returns a nested key-value structure preserving the original document's hierarchy.
 
-Supported languages (17 formats):
+This is available through the `process()` API and generated bindings. The `ts-pack process` CLI does not expose a `data_extraction` flag.
 
-**Key-value pair shape:** `json`, `hjson`, `json5`, `toml`, `properties`, `cue`, `hcl`, `hocon`, `kdl`, `yaml`, `ini`, `editorconfig`, `po`, `nginx`, `caddy`
+Supported identifiers (19):
 
-**Element shape (XML):** `xml`, `dtd`
-
-**Sequence shape (CSV/PSV):** `csv`, `psv`, plus array/sequence containers in key-value grammars
+`json`, `hjson`, `json5`, `toml`, `properties`, `hcl`, `hocon`, `kdl`, `cue`, `yaml`, `ini`, `editorconfig`, `csv`, `psv`, `po`, `nginx`, `caddy`, `xml`, `dtd`.
 
 ### DataNode shape
 
@@ -263,22 +261,13 @@ result = process('''
 }
 ''', ProcessConfig(language="json", data_extraction=True))
 
-# result["data"] = {
-#   "kind": "KeyValue",
-#   "key": None,
-#   "value": None,
-#   "children": [
-#     {
-#       "kind": "KeyValue",
-#       "key": "server",
-#       "value": None,
-#       "children": [
-#         {"kind": "KeyValue", "key": "host", "value": "localhost", ...},
-#         {"kind": "KeyValue", "key": "port", "value": "8080", ...}
-#       ]
-#     }
-#   ]
-# }
+# result.data.kind = "KeyValue"
+# result.data.key = None
+# result.data.children[0].key = "server"
+# result.data.children[0].children[0].key = "host"
+# result.data.children[0].children[0].value = "localhost"
+# result.data.children[0].children[1].key = "port"
+# result.data.children[0].children[1].value = "8080"
 ```
 
 **Properties flat key-value (issue #136):**
@@ -315,9 +304,9 @@ database:
     user: readonly
 ''', ProcessConfig(language="yaml", data_extraction=True))
 
-# result["data"]["children"][0]["key"] = "database"
-# result["data"]["children"][0]["children"][0]["key"] = "primary"
-# result["data"]["children"][0]["children"][0]["children"][0]["key"] = "host"
+# result.data.children[0].key = "database"
+# result.data.children[0].children[0].key = "primary"
+# result.data.children[0].children[0].children[0].key = "host"
 ```
 
 **TOML sections:**
@@ -329,8 +318,8 @@ name = "my-app"
 version = "1.0"
 ''', ProcessConfig(language="toml", data_extraction=True))
 
-# result["data"]["children"][0]["key"] = "build"
-# result["data"]["children"][0]["children"] = [
+# result.data.children[0].key = "build"
+# result.data.children[0].children = [
 #   {"key": "name", "value": "my-app", ...},
 #   {"key": "version", "value": "1.0", ...}
 # ]
@@ -347,13 +336,13 @@ result = process('''
 </config>
 ''', ProcessConfig(language="xml", data_extraction=True))
 
-# result["data"]["children"][0]["kind"] = "Element"
-# result["data"]["children"][0]["key"] = "server"
-# result["data"]["children"][0]["attributes"] = [
+# result.data.children[0].kind = "Element"
+# result.data.children[0].key = "server"
+# result.data.children[0].attributes = [
 #   {"name": "host", "value": "localhost"},
 #   {"name": "port", "value": "8080"}
 # ]
-# result["data"]["children"][0]["children"] = [
+# result.data.children[0].children = [
 #   {"kind": "Element", "key": "ssl", "attributes": [...], ...}
 # ]
 ```
