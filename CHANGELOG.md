@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0-rc.51] - 2026-06-15
+
+### Changed
+
+- **Bumped `alef` pin 0.25.14 → 0.25.15.** Regenerated all bindings via `task alef:sync` + `task alef:generate`. Picks up the swift cfg-postprocess revert:
+  - **0.25.15 — revert(swift): drop cfg-union postprocessing passes (c89926d5e, 4313b6e1d).** The wrapper-type and function cfg-union propagation passes introduced in 0.25.12/0.25.13 caused downstream binding regressions; reverted in favour of the 0.25.14 default-features approach in the swift binding Cargo.toml.
+- **Bumped tslp `1.9.0-rc.50` → `1.9.0-rc.51`** propagated via `task alef:sync`.
+
 ## [1.9.0-rc.50] - 2026-06-15
 
 ### Changed
