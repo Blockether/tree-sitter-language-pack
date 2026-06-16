@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0-rc.53] - 2026-06-16
+
+### Changed
+
+- **Bumped `alef` pin 0.25.18 → 0.25.20.** Regenerated all bindings via `task alef:generate`. Picks up:
+  - **0.25.19** — magnus binding `Cargo.toml` `[features]` block (fixes rc.52 Ruby gem build under `-D warnings`), elixir NIF `Cargo.toml` `[lints.rust]` ordering (fixes CI `Check version sync`), ruby Rakefile yard-coverage hook, FFI opaque-pointer call-site `.clone()` for service-API codegen, `binding_excluded` field fallthrough that preserves bespoke core `Default::default()` semantics, csharp e2e csproj arm64 RID branching.
+  - **0.25.20** — dart loader absolutize defensive improvement, zig opaque method error decoding (`_first_error` → `_error_with_message`), `language_pages.rs` modularization under 1000-LOC cap.
+
+### Fixed
+
+- **Ruby gem publish (rc.52 regression).** All four `Build Ruby gem` matrix jobs failed at rc.52 — the magnus binding's `Cargo.toml` lacked the `[features]` table forwarding `download` to the core crate, so 18× `#[cfg(feature = "download")]` arms triggered `error: unexpected cfg condition value: download` under `-D warnings`. The skipped `Publish Ruby gems` step meant rc.52 never reached `rubygems.org` (test-apps:ruby failed with `Could not find gem 'tree_sitter_language_pack ~> 1.9.0.pre.rc.52'`). Picked up via alef 0.25.19.
+- **CI `Check version sync` red on `main`.** The elixir NIF `Cargo.toml` emitted `[lints.rust]` before `[dependencies]`; consumers' `prek run --all-files` runs cargo-sort which reorders the block to the file end, producing a perpetual diff. The CI version-sync step does NOT run cargo-sort, so it reported "Versions are out of sync" on every release tag. Picked up via alef 0.25.19.
+- **Dart publish pipeline native staging (rc.52 regression).** The `assemble-dart-package` job in `.github/workflows/publish.yaml` used `download-artifact@v8` with `merge-multiple: true`, flattening every `dart-native-<rid>` artifact's contents directly under `dart-natives/`. The subsequent RID inference (`basename "$(dirname "$f")"`) then resolved to the literal string `dart-natives` for every file, causing all four native libraries to be skipped with `Warning: unrecognized rid 'dart-natives'`. The published rc.52 pub.dev tarball contained no `lib/src/native/<rid>/` directory; the FRB loader fell through to the default relative-path dlopen which macOS hardened-runtime rejected with "relative path not allowed in hardened program". Fix: drop `merge-multiple: true` so each artifact extracts to its own `dart-natives/dart-native-<rid>/` directory, and derive the RID by stripping the `dart-native-` prefix from the artifact directory name.
+
 ## [1.9.0-rc.52] - 2026-06-16
 
 ### Changed

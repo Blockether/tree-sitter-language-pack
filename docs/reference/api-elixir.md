@@ -2,7 +2,7 @@
 title: "Elixir API Reference"
 ---
 
-## Elixir API Reference <span class="version-badge">v1.9.0-rc.52</span>
+## Elixir API Reference <span class="version-badge">v1.9.0-rc.53</span>
 
 ### Functions
 
@@ -431,7 +431,7 @@ def process(source, config)
 **Example:**
 
 ```elixir
-{:ok, result} = process("value", %{{}})
+{:ok, result} = process("value", %{})
 ```
 
 **Parameters:**
@@ -469,7 +469,7 @@ def init(config)
 **Example:**
 
 ```elixir
-:ok = init(%{{}})
+:ok = init(%{})
 ```
 
 **Parameters:**
@@ -507,7 +507,7 @@ def configure(config)
 **Example:**
 
 ```elixir
-:ok = configure(%{{}})
+:ok = configure(%{})
 ```
 
 **Parameters:**
@@ -1143,16 +1143,6 @@ parsers are compiled in.
 Use this when you need to distinguish "we know the language name" from
 "we can actually parse files in that language right now".
 
-```no_run
-use tree_sitter_language_pack::{detect_language_from_extension, LanguageRegistry};
-
-let registry = LanguageRegistry::new();
-// Extension detection uses the static table — independent of compiled parsers.
-let lang = detect_language_from_extension("feature"); // always returns Some("gherkin")
-// Parser availability depends on which grammars were compiled in.
-let can_parse = lang.map(|name| registry.has_parser(name)).unwrap_or(false);
-```
-
 **Signature:**
 
 ```elixir
@@ -1231,7 +1221,7 @@ def process(source, config)
 **Example:**
 
 ```elixir
-{:ok, result} = instance.process("value", %{{}})
+{:ok, result} = instance.process("value", %{})
 ```
 
 **Parameters:**

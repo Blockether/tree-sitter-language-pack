@@ -2,7 +2,7 @@
 title: "C API Reference"
 ---
 
-## C API Reference <span class="version-badge">v1.9.0-rc.52</span>
+## C API Reference <span class="version-badge">v1.9.0-rc.53</span>
 
 ### Functions
 
@@ -242,7 +242,7 @@ TsPackLanguage* ts_pack_get_language(const char* name);
 **Example:**
 
 ```c
-TsPackLanguage *result = ts_pack_get_language("value");
+TsPackLanguage result = ts_pack_get_language("value");
 ```
 
 **Parameters:**
@@ -278,7 +278,7 @@ TsPackParser* ts_pack_get_parser(const char* name);
 **Example:**
 
 ```c
-TsPackParser *result = ts_pack_get_parser("value");
+TsPackParser result = ts_pack_get_parser("value");
 ```
 
 **Parameters:**
@@ -417,7 +417,7 @@ TsPackProcessResult* ts_pack_process(const char* source, TsPackProcessConfig con
 **Example:**
 
 ```c
-TsPackProcessResult *result = ts_pack_process("value", NULL);
+TsPackProcessResult result = ts_pack_process("value", NULL);
 ```
 
 **Parameters:**
@@ -885,7 +885,7 @@ TsPackDownloadManager ts_pack_new(const char* version);
 **Example:**
 
 ```c
-TsPackDownloadManager *result = ts_pack_new("value");
+TsPackDownloadManager result = ts_pack_new("value");
 ```
 
 **Parameters:**
@@ -1046,7 +1046,7 @@ TsPackLanguageRegistry ts_pack_new();
 **Example:**
 
 ```c
-TsPackLanguageRegistry *result = ts_pack_new();
+TsPackLanguageRegistry result = ts_pack_new();
 ```
 
 **Returns:** `TsPackLanguageRegistry`
@@ -1073,7 +1073,7 @@ TsPackLanguage ts_pack_get_language(const char* name);
 **Example:**
 
 ```c
-TsPackLanguage *result = ts_pack_get_language(instance, "value");
+TsPackLanguage result = ts_pack_get_language(instance, "value");
 ```
 
 **Parameters:**
@@ -1119,16 +1119,6 @@ parsers are compiled in.
 
 Use this when you need to distinguish "we know the language name" from
 "we can actually parse files in that language right now".
-
-```no_run
-use tree_sitter_language_pack::{detect_language_from_extension, LanguageRegistry};
-
-let registry = LanguageRegistry::new();
-// Extension detection uses the static table — independent of compiled parsers.
-let lang = detect_language_from_extension("feature"); // always returns Some("gherkin")
-// Parser availability depends on which grammars were compiled in.
-let can_parse = lang.map(|name| registry.has_parser(name)).unwrap_or(false);
-```
 
 **Signature:**
 
@@ -1208,7 +1198,7 @@ TsPackProcessResult ts_pack_process(const char* source, TsPackProcessConfig conf
 **Example:**
 
 ```c
-TsPackProcessResult *result = ts_pack_process(instance, "value", NULL);
+TsPackProcessResult result = ts_pack_process(instance, "value", NULL);
 ```
 
 **Parameters:**
@@ -1233,7 +1223,7 @@ TsPackLanguageRegistry ts_pack_default();
 **Example:**
 
 ```c
-TsPackLanguageRegistry *result = ts_pack_default();
+TsPackLanguageRegistry result = ts_pack_default();
 ```
 
 **Returns:** `TsPackLanguageRegistry`
@@ -1260,7 +1250,7 @@ TsPackNode ts_pack_clone();
 **Example:**
 
 ```c
-TsPackNode *result = ts_pack_clone(instance);
+TsPackNode result = ts_pack_clone(instance);
 ```
 
 **Returns:** `TsPackNode`
@@ -1357,7 +1347,7 @@ TsPackByteRange ts_pack_byte_range();
 **Example:**
 
 ```c
-TsPackByteRange *result = ts_pack_byte_range(instance);
+TsPackByteRange result = ts_pack_byte_range(instance);
 ```
 
 **Returns:** `TsPackByteRange`
@@ -1375,7 +1365,7 @@ TsPackPoint ts_pack_start_position();
 **Example:**
 
 ```c
-TsPackPoint *result = ts_pack_start_position(instance);
+TsPackPoint result = ts_pack_start_position(instance);
 ```
 
 **Returns:** `TsPackPoint`
@@ -1393,7 +1383,7 @@ TsPackPoint ts_pack_end_position();
 **Example:**
 
 ```c
-TsPackPoint *result = ts_pack_end_position(instance);
+TsPackPoint result = ts_pack_end_position(instance);
 ```
 
 **Returns:** `TsPackPoint`
@@ -1645,7 +1635,7 @@ TsPackTreeCursor ts_pack_walk();
 **Example:**
 
 ```c
-TsPackTreeCursor *result = ts_pack_walk(instance);
+TsPackTreeCursor result = ts_pack_walk(instance);
 ```
 
 **Returns:** `TsPackTreeCursor`
@@ -1689,7 +1679,7 @@ TsPackParser ts_pack_new();
 **Example:**
 
 ```c
-TsPackParser *result = ts_pack_new();
+TsPackParser result = ts_pack_new();
 ```
 
 **Returns:** `TsPackParser`
@@ -1808,7 +1798,7 @@ TsPackParser ts_pack_default();
 **Example:**
 
 ```c
-TsPackParser *result = ts_pack_default();
+TsPackParser result = ts_pack_default();
 ```
 
 **Returns:** `TsPackParser`
@@ -1858,7 +1848,7 @@ TsPackProcessConfig ts_pack_default();
 **Example:**
 
 ```c
-TsPackProcessConfig *result = ts_pack_default();
+TsPackProcessConfig result = ts_pack_default();
 ```
 
 **Returns:** `TsPackProcessConfig`
@@ -1876,7 +1866,7 @@ TsPackProcessConfig ts_pack_with_chunking(uintptr_t max_size);
 **Example:**
 
 ```c
-TsPackProcessConfig *result = ts_pack_with_chunking(instance, 42);
+TsPackProcessConfig result = ts_pack_with_chunking(instance, 42);
 ```
 
 **Parameters:**
@@ -1900,7 +1890,7 @@ TsPackProcessConfig ts_pack_all();
 **Example:**
 
 ```c
-TsPackProcessConfig *result = ts_pack_all(instance);
+TsPackProcessConfig result = ts_pack_all(instance);
 ```
 
 **Returns:** `TsPackProcessConfig`
@@ -1918,7 +1908,7 @@ TsPackProcessConfig ts_pack_minimal();
 **Example:**
 
 ```c
-TsPackProcessConfig *result = ts_pack_minimal(instance);
+TsPackProcessConfig result = ts_pack_minimal(instance);
 ```
 
 **Returns:** `TsPackProcessConfig`
@@ -1939,7 +1929,7 @@ TsPackProcessConfig ts_pack_with_data_extraction(bool enabled);
 **Example:**
 
 ```c
-TsPackProcessConfig *result = ts_pack_with_data_extraction(instance, true);
+TsPackProcessConfig result = ts_pack_with_data_extraction(instance, true);
 ```
 
 **Parameters:**
@@ -2045,7 +2035,7 @@ TsPackNode ts_pack_root_node();
 **Example:**
 
 ```c
-TsPackNode *result = ts_pack_root_node(instance);
+TsPackNode result = ts_pack_root_node(instance);
 ```
 
 **Returns:** `TsPackNode`
@@ -2063,7 +2053,7 @@ TsPackTreeCursor ts_pack_walk();
 **Example:**
 
 ```c
-TsPackTreeCursor *result = ts_pack_walk(instance);
+TsPackTreeCursor result = ts_pack_walk(instance);
 ```
 
 **Returns:** `TsPackTreeCursor`
@@ -2089,7 +2079,7 @@ TsPackNode ts_pack_node();
 **Example:**
 
 ```c
-TsPackNode *result = ts_pack_node(instance);
+TsPackNode result = ts_pack_node(instance);
 ```
 
 **Returns:** `TsPackNode`

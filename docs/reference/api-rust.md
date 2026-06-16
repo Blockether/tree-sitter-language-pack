@@ -2,7 +2,7 @@
 title: "Rust API Reference"
 ---
 
-## Rust API Reference <span class="version-badge">v1.9.0-rc.52</span>
+## Rust API Reference <span class="version-badge">v1.9.0-rc.53</span>
 
 ### Functions
 
@@ -251,8 +251,8 @@ the parser from GitHub releases if not found locally.
 
 **Errors:**
 
-Returns `Error.LanguageNotFound` if the language is not recognized,
-or `Error.Download` if auto-download fails.
+Returns `Error::LanguageNotFound` if the language is not recognized,
+or `Error::Download` if auto-download fails.
 
 **Signature:**
 
@@ -294,8 +294,8 @@ a new parser in one step.
 
 **Errors:**
 
-Returns `Error.LanguageNotFound` if the language is not recognized, or
-`Error.ParserSetup` if the language cannot be applied to the parser.
+Returns `Error::LanguageNotFound` if the language is not recognized, or
+`Error::ParserSetup` if the language cannot be applied to the parser.
 
 **Signature:**
 
@@ -877,7 +877,7 @@ A comment extracted from source code.
 
 An XML-style attribute attached to an `Element` node.
 
-Populated only for `DataNodeKind.Element`; always empty for `KeyValue` and
+Populated only for `DataNodeKind::Element`; always empty for `KeyValue` and
 `Sequence` nodes.
 
 | Field | Type | Default | Description |
@@ -892,8 +892,8 @@ Populated only for `DataNodeKind.Element`; always empty for `KeyValue` and
 
 A node in the hierarchical data tree produced by data-format extraction.
 
-When `ProcessConfig.data_extraction` is
-`true`, `ProcessResult.data` is populated with a root `DataNode` whose
+When `ProcessConfig::data_extraction` is
+`true`, `ProcessResult::data` is populated with a root `DataNode` whose
 `children` mirror the structure of the parsed file.
 
 The `kind` field determines which other fields are meaningful:
@@ -1007,7 +1007,7 @@ let result = instance.installed_languages();
 
 Download the platform bundle and extract every library file it contains.
 
-Unlike `Self.ensure_languages`, this does not check the manifest language list
+Unlike `Self::ensure_languages`, this does not check the manifest language list
 against archive contents — it simply extracts all `.so`/`.dylib`/`.dll` files
 from the bundle. Languages in the manifest that are missing from the archive
 are silently ignored rather than returning an error.
@@ -1097,7 +1097,7 @@ An import statement extracted from source code.
 | `source` | `String` | — | The module or path being imported from. |
 | `items` | `Vec<String>` | `vec![]` | Specific names imported from the source module. |
 | `alias` | `Option<String>` | `Default::default()` | Alias assigned to the import (e.g., `import numpy as np`). |
-| `is_wildcard` | `bool` | — | Whether this is a wildcard import (e.g., `import *` or `use foo.*`). |
+| `is_wildcard` | `bool` | — | Whether this is a wildcard import (e.g., `import *` or `use foo::*`). |
 | `span` | `Span` | — | Source span covering the import statement. |
 
 ---
@@ -1111,7 +1111,7 @@ An import statement extracted from source code.
 Thread-safe registry of tree-sitter language parsers.
 
 Manages both statically compiled and dynamically loaded language grammars.
-Use `LanguageRegistry.new()` for the default registry, or access the
+Use `LanguageRegistry::new()` for the default registry, or access the
 global instance via the module-level convenience functions
 (`get_language`, `available_languages`, etc.).
 
@@ -1148,7 +1148,7 @@ feature is enabled, falls back to loading a shared library on demand.
 
 **Errors:**
 
-Returns `Error.LanguageNotFound` if the name (after alias resolution)
+Returns `Error::LanguageNotFound` if the name (after alias resolution)
 does not match any known grammar.
 
 **Signature:**
@@ -1206,16 +1206,6 @@ parsers are compiled in.
 
 Use this when you need to distinguish "we know the language name" from
 "we can actually parse files in that language right now".
-
-```no_run
-use tree_sitter_language_pack::{detect_language_from_extension, LanguageRegistry};
-
-let registry = LanguageRegistry::new();
-// Extension detection uses the static table — independent of compiled parsers.
-let lang = detect_language_from_extension("feature"); // always returns Some("gherkin")
-// Parser availability depends on which grammars were compiled in.
-let can_parse = lang.map(|name| registry.has_parser(name)).unwrap_or(false);
-```
 
 **Signature:**
 
@@ -1765,7 +1755,7 @@ A tree-sitter parser configured for one language at a time.
 
 Construct a new parser with no language set.
 
-Call `Parser.set_language` before parsing.
+Call `Parser::set_language` before parsing.
 
 **Signature:**
 
@@ -1790,8 +1780,8 @@ if necessary, when the `download` feature is enabled.
 
 **Errors:**
 
-Returns `Error.LanguageNotFound` if the language is not recognized,
-or `Error.ParserSetup` if the language ABI is incompatible.
+Returns `Error::LanguageNotFound` if the language is not recognized,
+or `Error::ParserSetup` if the language ABI is incompatible.
 
 **Signature:**
 
@@ -1930,7 +1920,7 @@ Controls which analysis features are enabled and whether chunking is performed.
 | `symbols` | `bool` | `false` | Extract symbol definitions. Default: false. |
 | `diagnostics` | `bool` | `false` | Include parse diagnostics. Default: false. |
 | `chunk_max_size` | `Option<usize>` | `None` | Maximum chunk size in bytes. `None` disables chunking. |
-| `data_extraction` | `bool` | `false` | Extract hierarchical key/value data tree from data-format files. Default: false. When `true`, `ProcessResult.data` is populated with a `DataNode` tree for supported languages: JSON, YAML, TOML, `.properties`, HCL/HOCON, INI, editorconfig, KDL, CUE, CSV, PSV, PO, nginx config, Caddy config, XML, and DTD. For languages outside this set the field is left as `None`. |
+| `data_extraction` | `bool` | `false` | Extract hierarchical key/value data tree from data-format files. Default: false. When `true`, `ProcessResult::data` is populated with a `DataNode` tree for supported languages: JSON, YAML, TOML, `.properties`, HCL/HOCON, INI, editorconfig, KDL, CUE, CSV, PSV, PO, nginx config, Caddy config, XML, and DTD. For languages outside this set the field is left as `None`. |
 
 ##### Methods
 
@@ -2014,7 +2004,7 @@ let result = instance.minimal();
 
 Enable or disable hierarchical data extraction for data-format files.
 
-When `true`, `ProcessResult.data` is
+When `true`, `ProcessResult::data` is
 populated with a key/value tree for supported data-format languages.
 
 **Signature:**

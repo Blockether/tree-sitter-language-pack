@@ -2756,7 +2756,6 @@ jobs:
               with:
                   pattern: dart-native-*
                   path: dart-natives
-                  merge-multiple: true
             - name: Stage natives into Dart package
               shell: bash
               run: |
@@ -2764,13 +2763,13 @@ jobs:
                   lib_dir="packages/dart/lib/src/native"
                   mkdir -p "$lib_dir"
 
-                  # upload-artifact@v7 preserves the path prefix relative to
-                  # $GITHUB_WORKSPACE, so files uploaded as `dart-natives/<label>/<file>`
-                  # land at `dart-natives/dart-natives/<label>/<file>` after
-                  # `merge-multiple: true` download. Walk the tree and route each
-                  # file to its rid by inferring the rid from the parent directory
-                  # name (the last component before the file). Fail loudly if no
-                  # natives are found — same defensive pattern as stage-go-ffi.
+                  # download-artifact@v8 (without merge-multiple) extracts each
+                  # artifact to `dart-natives/<artifact-name>/`. The artifact
+                  # name is `dart-native-<rid>`, so each native lands at
+                  # `dart-natives/dart-native-<rid>/<file>`. Derive rid from
+                  # the parent dir name by stripping the `dart-native-` prefix.
+                  # Fail loudly if no natives are found — same defensive
+                  # pattern as stage-go-ffi.
                   mapfile -t natives < <(find dart-natives -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \))
                   if [[ ${#natives[@]} -eq 0 ]]; then
                     echo "ERROR: no native libraries found under dart-natives/" >&2
@@ -2780,11 +2779,12 @@ jobs:
 
                   staged_rids=()
                   for f in "${natives[@]}"; do
-                    rid="$(basename "$(dirname "$f")")"
+                    artifact_dir="$(basename "$(dirname "$f")")"
+                    rid="${artifact_dir#dart-native-}"
                     case "$rid" in
                       linux-x64|linux-arm64|macos-arm64|macos-x64|windows-x64|windows-arm64) ;;
                       *)
-                        echo "Warning: unrecognized rid '$rid' for $f; skipping"
+                        echo "Warning: unrecognized rid '$rid' (from artifact '$artifact_dir') for $f; skipping"
                         continue
                         ;;
                     esac
