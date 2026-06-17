@@ -7,7 +7,7 @@ set -euo pipefail
 
 # Version override: pass as $1 to test an arbitrary tag; defaults to the
 # alef-pinned version from `[crates.e2e.registry.packages.php].version`.
-VERSION="${1:-1.9.0-rc.54}"
+VERSION="${1:-1.9.0-rc.55}"
 
 # PIE >= 1.3.7 supports the array-form `php-ext.download-url-method`
 # our composer.json emits; 1.4.0+ is preferred. Download PIE if we don't
@@ -42,7 +42,7 @@ fi
 # binary cleanly. The php.ini-append guard below prevents duplicate `extension=`
 # lines so the verification step doesn't trip on "Module already loaded".
 EXT_DIR="$(php -r 'echo ini_get("extension_dir");')"
-"$PIE" install "kreuzberg-dev/tree-sitter-language-pack:$VERSION" --skip-enable-extension
+"$PIE" install --version "$VERSION" "kreuzberg-dev/tree-sitter-language-pack" --skip-enable-extension
 
 # Verify the .so/.dylib/.dll exists after install (or was already present).
 test -f "$EXT_DIR/tree_sitter_language_pack.so" || test -f "$EXT_DIR/tree_sitter_language_pack.dylib" || test -f "$EXT_DIR/tree_sitter_language_pack.dll"
