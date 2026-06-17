@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0-rc.55] - 2026-06-17
+
+### Changed
+
+- **Bumped `alef` pin 0.25.24 → 0.25.28.** Regenerated all bindings via `task alef:generate`. Picks up alef 0.25.25–0.25.28: scaffold `excluded_default_features` for dart/swift wrappers, publish/vendor retry on crates.io registry-index propagation lag, e2e/codegen wasm `[crates.e2e.env]` block, e2e/codegen php PIE invocation syntax for v1.4.5, backends/swift `RustBridgeC` import + Vec skip on already-declared types, docs heading demotion, e2e/codegen typescript `SsrfPolicy.denyPrivate=false` for WASM e2e, backends/ffi shared extractor → FFI same-name fn dedup, and **backends/dart FRB primitive bridge return-value type cast restoration** (`.map(|v| v as i64)` regression that blocked rc.55 regen).
+
 ### Fixed
 
 - **Elixir Hex install OTP 27.2 TLS `key_usage_mismatch` against `builds.hex.pm`.** Switched test-elixir jobs in `ci.yaml` and `ci-e2e.yaml` to `kreuzberg-dev/actions/setup-elixir@v1` wrapper which routes through `cdn.hex.pm` to bypass OTP 27.2 TLS cert-chain rejection against `builds.hex.pm`.
