@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-06-18
+
+### Changed
+
+- **Bumped `alef` pin 0.25.28 → 0.25.38 and regenerated all bindings.** Picks up alef 0.25.29–0.25.38: enum associated (static factory) methods surfaced across backends, the swift opaque no-op shim so `$_free` is synthesised for handle types with no visible methods (e.g. `Language`), swift streaming-owner `already_declared` re-declaration, java `marshal_optional_bytes` template registration, and java `@Nullable` type-use placement on qualified types.
+- **Upgraded all dependencies to their latest versions (cross-major).** Ran `task upgrade` across every language workspace; lock files regenerated and committed.
+- **Repo hygiene.** Ignore the machine-local `packages/kotlin-android/.gradle/` cache and the `.basemind/` index (untracking the accidentally-committed Gradle cache files), and exclude the deterministic `.ai-rulez/.generated-manifest.json` from the `oxfmt` pre-commit hook so it no longer fights the `ai-rulez-generate` hook.
+
+### Fixed
+
+- **Java: dropped throwing `UnsupportedOperationException` stubs for `Self`-returning DTO/enum methods.** There is no JNI/FFM symbol for DTO methods yet, so the throwing stubs compiled but misled callers and broke any path that reached them. The Java backend now skips these methods until marshaling lands.
+- **Java: restored the `true` default for boxed `@Nullable Boolean` `#[serde(default)]` record fields.** A non-optional `#[serde(default)] bool = true` field is boxed to `@Nullable Boolean`, so JSON that omitted it deserialised to `null` and the accessor returned `null` instead of `true`.
+
 ## [1.9.0-rc.55] - 2026-06-17
 
 ### Changed

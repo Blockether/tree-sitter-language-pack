@@ -473,18 +473,6 @@ void* __swift_bridge__$Vec_DownloadManager$get_mut(void* vec_ptr, uintptr_t inde
 uintptr_t __swift_bridge__$Vec_DownloadManager$len(void* vec_ptr);
 void* __swift_bridge__$Vec_DownloadManager$as_ptr(void* vec_ptr);
 
-typedef struct Language Language;
-void __swift_bridge__$Language$_free(void* self);
-
-void* __swift_bridge__$Vec_Language$new(void);
-void __swift_bridge__$Vec_Language$drop(void* vec_ptr);
-void __swift_bridge__$Vec_Language$push(void* vec_ptr, void* item_ptr);
-void* __swift_bridge__$Vec_Language$pop(void* vec_ptr);
-void* __swift_bridge__$Vec_Language$get(void* vec_ptr, uintptr_t index);
-void* __swift_bridge__$Vec_Language$get_mut(void* vec_ptr, uintptr_t index);
-uintptr_t __swift_bridge__$Vec_Language$len(void* vec_ptr);
-void* __swift_bridge__$Vec_Language$as_ptr(void* vec_ptr);
-
 typedef struct DataNodeKind DataNodeKind;
 void __swift_bridge__$DataNodeKind$_free(void* self);
 
@@ -568,6 +556,18 @@ void* __swift_bridge__$Vec_DiagnosticSeverity$get(void* vec_ptr, uintptr_t index
 void* __swift_bridge__$Vec_DiagnosticSeverity$get_mut(void* vec_ptr, uintptr_t index);
 uintptr_t __swift_bridge__$Vec_DiagnosticSeverity$len(void* vec_ptr);
 void* __swift_bridge__$Vec_DiagnosticSeverity$as_ptr(void* vec_ptr);
+
+typedef struct Language Language;
+void __swift_bridge__$Language$_free(void* self);
+
+void* __swift_bridge__$Vec_Language$new(void);
+void __swift_bridge__$Vec_Language$drop(void* vec_ptr);
+void __swift_bridge__$Vec_Language$push(void* vec_ptr, void* item_ptr);
+void* __swift_bridge__$Vec_Language$pop(void* vec_ptr);
+void* __swift_bridge__$Vec_Language$get(void* vec_ptr, uintptr_t index);
+void* __swift_bridge__$Vec_Language$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_Language$len(void* vec_ptr);
+void* __swift_bridge__$Vec_Language$as_ptr(void* vec_ptr);
 
 void* __swift_bridge__$DataAttribute$new(void* name, void* value, void* span);
 void* __swift_bridge__$DataAttribute$name(void* self);
@@ -739,6 +739,7 @@ void* __swift_bridge__$DocstringFormat$to_string(void* self);
 void* __swift_bridge__$ExportKind$to_string(void* self);
 void* __swift_bridge__$SymbolKind$to_string(void* self);
 void* __swift_bridge__$DiagnosticSeverity$to_string(void* self);
+void __swift_bridge__$language_noop(void* client);
 void* __swift_bridge__$detect_language_from_extension(void* ext);
 void* __swift_bridge__$detect_language_from_path(void* path);
 void* __swift_bridge__$detect_language_from_content(void* content);
