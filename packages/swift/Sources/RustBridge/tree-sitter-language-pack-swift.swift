@@ -124,6 +124,9 @@ public func downloadManagerDownloadAllBestEffort(_ client: DownloadManagerRef) t
 public func downloadManagerCleanCache(_ client: DownloadManagerRef) throws -> () {
     try { let val = __swift_bridge__$download_manager_clean_cache(client.ptr); if val != nil { throw RustString(ptr: val!) } else { return } }()
 }
+public func language_noop(_ client: LanguageRef) {
+    __swift_bridge__$language_noop(client.ptr)
+}
 public func detectLanguageFromExtension<GenericIntoRustString: IntoRustString>(_ ext: GenericIntoRustString) -> RustString {
     RustString(ptr: __swift_bridge__$detect_language_from_extension({ let rustString = ext.intoRustString(); rustString.isOwned = false; return rustString.ptr }()))
 }
@@ -2772,81 +2775,6 @@ extension DownloadManager: Vectorizable {
 }
 
 
-public class Language: LanguageRefMut {
-    public var isOwned: Bool = true
-
-    public override init(ptr: UnsafeMutableRawPointer) {
-        super.init(ptr: ptr)
-    }
-
-    deinit {
-        if isOwned {
-            __swift_bridge__$Language$_free(ptr)
-        }
-    }
-}
-public class LanguageRefMut: LanguageRef {
-    public override init(ptr: UnsafeMutableRawPointer) {
-        super.init(ptr: ptr)
-    }
-}
-public class LanguageRef {
-    public var ptr: UnsafeMutableRawPointer
-
-    public init(ptr: UnsafeMutableRawPointer) {
-        self.ptr = ptr
-    }
-}
-extension Language: Vectorizable {
-    public static func vecOfSelfNew() -> UnsafeMutableRawPointer {
-        __swift_bridge__$Vec_Language$new()
-    }
-
-    public static func vecOfSelfFree(vecPtr: UnsafeMutableRawPointer) {
-        __swift_bridge__$Vec_Language$drop(vecPtr)
-    }
-
-    public static func vecOfSelfPush(vecPtr: UnsafeMutableRawPointer, value: Language) {
-        __swift_bridge__$Vec_Language$push(vecPtr, {value.isOwned = false; return value.ptr;}())
-    }
-
-    public static func vecOfSelfPop(vecPtr: UnsafeMutableRawPointer) -> Optional<Self> {
-        let pointer = __swift_bridge__$Vec_Language$pop(vecPtr)
-        if pointer == nil {
-            return nil
-        } else {
-            return (Language(ptr: pointer!) as! Self)
-        }
-    }
-
-    public static func vecOfSelfGet(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<LanguageRef> {
-        let pointer = __swift_bridge__$Vec_Language$get(vecPtr, index)
-        if pointer == nil {
-            return nil
-        } else {
-            return LanguageRef(ptr: pointer!)
-        }
-    }
-
-    public static func vecOfSelfGetMut(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<LanguageRefMut> {
-        let pointer = __swift_bridge__$Vec_Language$get_mut(vecPtr, index)
-        if pointer == nil {
-            return nil
-        } else {
-            return LanguageRefMut(ptr: pointer!)
-        }
-    }
-
-    public static func vecOfSelfAsPtr(vecPtr: UnsafeMutableRawPointer) -> UnsafePointer<LanguageRef> {
-        UnsafePointer<LanguageRef>(OpaquePointer(__swift_bridge__$Vec_Language$as_ptr(vecPtr)))
-    }
-
-    public static func vecOfSelfLen(vecPtr: UnsafeMutableRawPointer) -> UInt {
-        __swift_bridge__$Vec_Language$len(vecPtr)
-    }
-}
-
-
 public class DataNodeKind: DataNodeKindRefMut {
     public var isOwned: Bool = true
 
@@ -3403,5 +3331,80 @@ extension DiagnosticSeverity: Vectorizable {
 
     public static func vecOfSelfLen(vecPtr: UnsafeMutableRawPointer) -> UInt {
         __swift_bridge__$Vec_DiagnosticSeverity$len(vecPtr)
+    }
+}
+
+
+public class Language: LanguageRefMut {
+    public var isOwned: Bool = true
+
+    public override init(ptr: UnsafeMutableRawPointer) {
+        super.init(ptr: ptr)
+    }
+
+    deinit {
+        if isOwned {
+            __swift_bridge__$Language$_free(ptr)
+        }
+    }
+}
+public class LanguageRefMut: LanguageRef {
+    public override init(ptr: UnsafeMutableRawPointer) {
+        super.init(ptr: ptr)
+    }
+}
+public class LanguageRef {
+    public var ptr: UnsafeMutableRawPointer
+
+    public init(ptr: UnsafeMutableRawPointer) {
+        self.ptr = ptr
+    }
+}
+extension Language: Vectorizable {
+    public static func vecOfSelfNew() -> UnsafeMutableRawPointer {
+        __swift_bridge__$Vec_Language$new()
+    }
+
+    public static func vecOfSelfFree(vecPtr: UnsafeMutableRawPointer) {
+        __swift_bridge__$Vec_Language$drop(vecPtr)
+    }
+
+    public static func vecOfSelfPush(vecPtr: UnsafeMutableRawPointer, value: Language) {
+        __swift_bridge__$Vec_Language$push(vecPtr, {value.isOwned = false; return value.ptr;}())
+    }
+
+    public static func vecOfSelfPop(vecPtr: UnsafeMutableRawPointer) -> Optional<Self> {
+        let pointer = __swift_bridge__$Vec_Language$pop(vecPtr)
+        if pointer == nil {
+            return nil
+        } else {
+            return (Language(ptr: pointer!) as! Self)
+        }
+    }
+
+    public static func vecOfSelfGet(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<LanguageRef> {
+        let pointer = __swift_bridge__$Vec_Language$get(vecPtr, index)
+        if pointer == nil {
+            return nil
+        } else {
+            return LanguageRef(ptr: pointer!)
+        }
+    }
+
+    public static func vecOfSelfGetMut(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<LanguageRefMut> {
+        let pointer = __swift_bridge__$Vec_Language$get_mut(vecPtr, index)
+        if pointer == nil {
+            return nil
+        } else {
+            return LanguageRefMut(ptr: pointer!)
+        }
+    }
+
+    public static func vecOfSelfAsPtr(vecPtr: UnsafeMutableRawPointer) -> UnsafePointer<LanguageRef> {
+        UnsafePointer<LanguageRef>(OpaquePointer(__swift_bridge__$Vec_Language$as_ptr(vecPtr)))
+    }
+
+    public static func vecOfSelfLen(vecPtr: UnsafeMutableRawPointer) -> UInt {
+        __swift_bridge__$Vec_Language$len(vecPtr)
     }
 }

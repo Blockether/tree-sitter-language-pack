@@ -48,9 +48,6 @@
 				"data_extraction": true
 			}
 		},
-		"assertions": [
-			{ "type": "not_error" },
-			{ "type": "is_true", "field": "data" }
-		]
+		"assertions": [{ "type": "not_error" }, { "type": "is_true", "field": "data" }]
 	}
 ]

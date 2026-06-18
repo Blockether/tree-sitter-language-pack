@@ -14,7 +14,7 @@ repos:
             stages:
                 - commit-msg
     - repo: https://github.com/kreuzberg-dev/pre-commit-hooks
-      rev: v2.1.12
+      rev: v2.2.0
       hooks:
           # Alef verification
           - id: alef-verify
@@ -190,9 +190,12 @@ repos:
             # napi-rs bootstrap shim is re-emitted by alef in
             # 2-space form; oxfmt's tab/single-line auto-format would diverge,
             # breaking the `git diff --exit-code` check in CI Validate.
+            # The ai-rulez manifest is owned by the ai-rulez-generate hook and is
+            # deterministic; oxfmt would reformat it and fight that generator.
             exclude: |
                 (?x)^(
                   fixtures/bench/|
+                  \.ai-rulez/\.generated-manifest\.json$|
                   crates/ts-pack-core-node/index\.js$
                 )
           - id: go-fmt
