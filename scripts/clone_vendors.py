@@ -226,6 +226,23 @@ async def handle_generate(language_name: str, directory: str | None, abi_version
         else (vendor_directory / language_name).resolve()
     )
 
+    # Some grammar.js files `require()` JS dependencies — a shared `dsl`/helper
+    # package, or a sibling grammar they extend (e.g. cpp→tree-sitter-c,
+    # templ→tree-sitter-go). `tree-sitter generate` loads grammar.js with Node,
+    # so those deps must be installed first. Install at the repo root (where
+    # package.json lives) when present; a no-op for self-contained grammars.
+    npm_root = vendor_directory / language_name
+    if which("npm") and (npm_root / "package.json").exists():
+        # `--ignore-scripts` skips the dependencies' native `node-gyp` builds
+        # (which can fail and are irrelevant here) — generate only needs the JS
+        # grammar modules a `require()` pulls in (e.g. tree-sitter-cpp/-go).
+        npm_args = ["install", "--no-audit", "--no-fund", "--ignore-scripts"]
+        npm_cmd = ["cmd", "/c", "npm", *npm_args] if platform.system() == "Windows" else ["npm", *npm_args]
+        try:
+            await run_process(npm_cmd, cwd=str(npm_root), check=False)
+        except Exception as e:  # noqa: BLE001 - npm deps are best-effort; generate reports the real failure
+            print(f"npm install for {language_name} failed (continuing): {e}")
+
     if platform.system() == "Windows":
         cmd = ["cmd", "/c", "tree-sitter", "generate", "--abi", str(abi_version)]
     else:
