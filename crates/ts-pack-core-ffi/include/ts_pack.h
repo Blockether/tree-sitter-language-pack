@@ -2441,7 +2441,7 @@ uintptr_t ts_pack_get_tags_query_len(const char *_language);
  * # Ok::<(), tree_sitter_language_pack::Error>(())
  * \endcode
  */
-const TS_PACKTSLanguage *ts_pack_get_language(const char *name);
+const TSLanguage *ts_pack_get_language(const char *name);
 
 /**
  * Get a `Parser` pre-configured for the given language.
