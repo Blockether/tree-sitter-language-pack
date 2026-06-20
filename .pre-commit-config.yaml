@@ -64,7 +64,7 @@ repos:
             exclude: ^packages/kotlin-android/gradlew$
 
           - id: markdownlint-rumdl-strict
-            exclude: ^(docs/reference/.*|packages/.*/README\.md|crates/.*/README\.md|README\.md|CHANGELOG\.md)$
+            exclude: ^(docs/reference/.*|packages/.*/README\.md|crates/.*/README\.md|templates/readme/.*|README\.md|CHANGELOG\.md)$
           - id: textlint
             files: ^docs/.*\.md$
             exclude: ^docs/(CHANGELOG|snippets/|reference/|api-|migration/)
