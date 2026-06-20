@@ -78,12 +78,6 @@
 	</a>
 </div>
 
-<div align="center" style="margin: 24px 0 0">
-	<a href="https://kreuzberg.dev">
-		<img alt="tree-sitter-language-pack" src="https:&#x2f;&#x2f;github.com&#x2f;user-attachments&#x2f;assets&#x2f;478a83da-237b-446b-b3a8-e564c13e00a8" />
-	</a>
-</div>
-
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 28px 0 24px">
 	<a href="https://discord.gg/xt9WY3GnKR">
 		<img
