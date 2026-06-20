@@ -103,4 +103,9 @@ tasks:
     e2e:test:
         desc: Run Java E2E tests
         cmds:
+            # jtreesitter dlopen's a standalone libtree-sitter at runtime to resolve
+            # ts_parser_*/ts_node_* for the host-native Language passthrough (#143).
+            # Build it into target/release, which the generated e2e pom already puts
+            # on java.library.path.
+            - python3 {{.PROJECT_ROOT}}/scripts/ci/build_libtree_sitter.py
             - alef test --lang java --e2e --jobs 1
