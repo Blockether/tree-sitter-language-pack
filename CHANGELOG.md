@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.1] - 2026-06-20
+
+### Fixed
+
+- **Java: fixed a JVM crash (`EXCEPTION_ACCESS_VIOLATION`) when traversing a parsed tree via opaque
+  handles (#146).** `Parser.parse`, `Tree.walk`, `Tree.rootNode`, `Node.parent`/`child`, and
+  `TreeCursor.node` freed the returned native handle in a `finally` block immediately after wrapping
+  it, so the returned `Tree`/`Node`/`TreeCursor` referenced already-freed memory and the next native
+  call dereferenced it and crashed. The wrapper now owns the handle and frees it once on `close()`.
+  Fixed in the alef Java backend and picked up by the 0.25.55 regen; value/DTO returns
+  (`byteRange`/`startPosition`/`process`) still correctly free the FFI temporary after reading it.
+
 ### Changed
 
 - **chore(precommit,alef): standardize kotlin-android formatting on ktfmt --kotlinlang-style.** Drop the conflicting prek ktlint hook, scope detekt/ktfmt to `packages/kotlin-android`, add `--kotlinlang-style` to ktfmt, switch `alef.toml` kotlin format/check from gradle-ktlintFormat to ktfmt so alef and prek agree, and exclude the vendored Gradle wrapper from shellcheck. detekt remains for static analysis. (`.pre-commit-config.yaml`, `alef.toml`)
@@ -20,11 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`jtreesitter.Language`), C# (`TreeSitter.Language`), Kotlin Android (`ktreesitter.Language`),
   and Swift (`SwiftTreeSitter.Language`) — joining the existing Python and Node passthrough. Each
   binding gained a dependency on its host tree-sitter runtime, injected into the generated manifest.
-  Configured via `[crates.*.capsule_types.Language]` in `alef.toml`; regenerated against alef 0.25.49.
+  Configured via `[crates.*.capsule_types.Language]` in `alef.toml`; regenerated against alef 0.25.55.
 
 ### Changed
 
-- **Regenerated all bindings against alef 0.25.49.** The C FFI crate now takes a direct
+- **Regenerated all bindings against alef 0.25.55.** The C FFI crate now takes a direct
   `tree-sitter` dependency so the capsule shim can name `tree_sitter::ffi::TSLanguage` (the pointee
   it casts `value.into_raw()` to), and the zig `build.zig.zon` carries the resolved `zig-tree-sitter`
   content hash.

@@ -11,11 +11,11 @@ let package = Package(
     .macOS(.v13),
     .iOS(.v16),
   ],
-  dependencies: [
-    .package(url: "https://github.com/tree-sitter/swift-tree-sitter", from: "0.25.0"),
-  ],
   products: [
     .library(name: "TreeSitterLanguagePack", targets: ["TreeSitterLanguagePack"])
+  ],
+  dependencies: [
+    .package(url: "https://github.com/tree-sitter/swift-tree-sitter", from: "0.25.0")
   ],
   targets: [
     // RustBridgeC: pure C/headers target. Swift files in RustBridge import this

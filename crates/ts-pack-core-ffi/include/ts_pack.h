@@ -1451,6 +1451,12 @@ TS_PACKTree *ts_pack_parser_parse_bytes(TS_PACKParser *this_,
 void ts_pack_parser_reset(TS_PACKParser *this_);
 
 /**
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+TS_PACKParser *ts_pack_parser_default(void);
+
+/**
  * Free a `Tree` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.
@@ -1899,6 +1905,12 @@ TS_PACKProcessResult *ts_pack_language_registry_process(const TS_PACKLanguageReg
                                                         const TS_PACKProcessConfig *config);
 
 /**
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ */
+TS_PACKLanguageRegistry *ts_pack_language_registry_default(void);
+
+/**
  * Free a `DownloadManager` handle.
  * # Safety
  * Pointer must have been returned by this library, or be null.
@@ -1958,7 +1970,7 @@ void ts_pack_language_free(TS_PACKLanguage *ptr);
 int32_t ts_pack_data_node_kind_from_i32(int32_t value);
 
 /**
- * Convert a `DataNodeKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `DataNodeKind` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -1973,7 +1985,7 @@ int32_t ts_pack_data_node_kind_from_str(const char *name);
 int32_t ts_pack_structure_kind_from_i32(int32_t value);
 
 /**
- * Convert a `StructureKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `StructureKind` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -1988,7 +2000,7 @@ int32_t ts_pack_structure_kind_from_str(const char *name);
 int32_t ts_pack_comment_kind_from_i32(int32_t value);
 
 /**
- * Convert a `CommentKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `CommentKind` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -2003,7 +2015,7 @@ int32_t ts_pack_comment_kind_from_str(const char *name);
 int32_t ts_pack_docstring_format_from_i32(int32_t value);
 
 /**
- * Convert a `DocstringFormat` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `DocstringFormat` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -2018,7 +2030,7 @@ int32_t ts_pack_docstring_format_from_str(const char *name);
 int32_t ts_pack_export_kind_from_i32(int32_t value);
 
 /**
- * Convert a `ExportKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `ExportKind` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -2033,7 +2045,7 @@ int32_t ts_pack_export_kind_from_str(const char *name);
 int32_t ts_pack_symbol_kind_from_i32(int32_t value);
 
 /**
- * Convert a `SymbolKind` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `SymbolKind` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */
@@ -2048,7 +2060,7 @@ int32_t ts_pack_symbol_kind_from_str(const char *name);
 int32_t ts_pack_diagnostic_severity_from_i32(int32_t value);
 
 /**
- * Convert a `DiagnosticSeverity` variant name (C string) to its integer value. Returns -1 on invalid input.
+ * Convert a `DiagnosticSeverity` serde wire value (C string) to its integer discriminant. Returns -1 on invalid input.
  * # Safety
  * Caller must ensure `ptr` is a valid pointer to a `c_char` or null.
  */

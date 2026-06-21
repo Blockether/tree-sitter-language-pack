@@ -1,5 +1,5 @@
 [workspace]
-alef_version = "0.25.52"
+alef_version = "0.25.58"
 languages = [
   "python",
   "node",
@@ -259,6 +259,7 @@ package_name = "tspack"
 host_type = "*tree_sitter.Language"
 package = "github.com/tree-sitter/go-tree-sitter"
 package_version = "v0.24.0"
+construct_expr = "tree_sitter.NewLanguage(unsafe.Pointer({ptr}))"
 
 [crates.java]
 package = "dev.kreuzberg.treesitterlanguagepack"
@@ -358,6 +359,7 @@ languages = [
 host_type = "?*const tree_sitter.Language"
 package = "https://github.com/tree-sitter/zig-tree-sitter/archive/refs/tags/v0.26.0.tar.gz"
 package_version = "tree_sitter-0.26.0-8heIf3CaAQDeVTQc0DMSBhbQAEx5aF-dTen4_LPxMgrv"
+construct_expr = "tree_sitter.Language.fromRaw(@ptrCast({ptr}))"
 
 [crates.output]
 python = "crates/ts-pack-core-py/src/"
@@ -678,6 +680,29 @@ result_fields = [
 # every regen.
 [crates.e2e.harness_extras.node]
 dev_dependencies = { "tree-sitter" = "^0.25.0" }
+
+# Host-native Language passthrough e2e for the C-ABI family. Each hand-written
+# `capsule_passthrough` test imports the ecosystem's upstream tree-sitter package
+# and feeds `get_language`'s result into its native parser. These entries re-inject
+# the upstream dependency into the generated e2e manifest on every regen (otherwise
+# `alef e2e generate` strips it). Versions match each binding's own host package.
+[crates.e2e.harness_extras.go]
+dependencies = { "github.com/tree-sitter/go-tree-sitter" = "v0.24.0" }
+
+[crates.e2e.harness_extras.java]
+dev_dependencies = { "io.github.tree-sitter:jtreesitter" = "0.26.0" }
+
+[crates.e2e.harness_extras.csharp]
+dependencies = { "TreeSitter.DotNet" = "1.3.0" }
+
+# Swift: repo identity `swift-tree-sitter` exposes the product `SwiftTreeSitter`,
+# so the `product` key overrides the URL-derived name in `.product(name:package:)`.
+[crates.e2e.harness_extras.swift]
+dependencies = { "swift-tree-sitter" = { url = "https://github.com/tree-sitter/swift-tree-sitter", version = "0.25.0", product = "SwiftTreeSitter" } }
+
+# Zig: zon dependencies need a content hash; module import name is `tree_sitter`.
+[crates.e2e.harness_extras.zig]
+dependencies = { "tree_sitter" = { url = "https://github.com/tree-sitter/zig-tree-sitter/archive/refs/tags/v0.26.0.tar.gz", hash = "tree_sitter-0.26.0-8heIf3CaAQDeVTQc0DMSBhbQAEx5aF-dTen4_LPxMgrv" } }
 
 [crates.e2e.fields_c_types]
 "process_result.metrics" = "FileMetrics"
@@ -1120,52 +1145,52 @@ github_repo = "https://github.com/kreuzberg-dev/tree-sitter-language-pack"
 
 [crates.e2e.registry.packages.rust]
 name = "tree-sitter-language-pack"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.python]
 name = "tree-sitter-language-pack"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.node]
 name = "@kreuzberg/tree-sitter-language-pack"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.go]
 module = "github.com/kreuzberg-dev/tree-sitter-language-pack/packages/go"
-version = "v1.10.0"
+version = "v1.10.1"
 
 [crates.e2e.registry.packages.java]
 group_id = "dev.kreuzberg.treesitterlanguagepack"
 artifact_id = "tree-sitter-language-pack"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.csharp]
 name = "TreeSitterLanguagePack"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.ruby]
 name = "tree_sitter_language_pack"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.c]
 name = "tree-sitter-language-pack-ffi"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.wasm]
 name = "@kreuzberg/tree-sitter-language-pack-wasm"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.elixir]
 name = "tree_sitter_language_pack"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.php]
 name = "kreuzberg-dev/tree-sitter-language-pack"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.zig]
 name = "tree_sitter_language_pack"
-version = "1.10.0"
+version = "1.10.1"
 # Per-platform hashes — alef publish only produces per-platform zig tarballs
 # (no generic-name tarball). Placeholders trigger network auto-fetch at regen
 # time via `zig fetch <url>`, resolving to the real published hash.
@@ -1179,15 +1204,15 @@ version = "1.10.0"
 
 [crates.e2e.registry.packages.swift]
 name = "TreeSitterLanguagePack"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.dart]
 name = "tree_sitter_language_pack"
-version = "1.10.0"
+version = "1.10.1"
 
 [crates.e2e.registry.packages.kotlin_android]
 name = "dev.kreuzberg:tree-sitter-language-pack-android"
-version = "1.10.0"
+version = "1.10.1"
 
 # JNI test app reuses the kotlin_android Gradle scaffold (`buildHostJni` +
 # `copyHostJni` → JUnit tests loading the JNI cdylib via JNA on the host JVM).
