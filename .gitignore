@@ -16,6 +16,8 @@ wheelhouse/
 *.egg-info/
 *$py.class
 *.py[cod]
+.rumdl_cache/
+.playwright-mcp/
 __pycache__/
 _build/
 deps/
@@ -136,6 +138,11 @@ bin/
 # executable — and `dart run <pkg>:download_libs` fails on every consumer.
 !packages/dart/bin/
 !packages/dart/bin/**
+# The cli-proxy npm package ships `bin/ts-pack.js` as its `package.json` `bin`
+# launcher (downloads + execs the native ts-pack binary). The generic `bin/`
+# rule above would otherwise drop it and publish a package with no executable.
+!cli-proxy/npm/bin/
+!cli-proxy/npm/bin/**
 obj/
 *.nupkg
 

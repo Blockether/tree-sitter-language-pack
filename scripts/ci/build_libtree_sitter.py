@@ -47,11 +47,7 @@ def repo_root() -> Path:
 
 def tree_sitter_source(root: Path) -> Path:
     """Locate the tree-sitter crate source via cargo metadata (no hard-coded path)."""
-    meta = json.loads(
-        subprocess.check_output(
-            ["cargo", "metadata", "--format-version", "1"], cwd=root
-        )
-    )
+    meta = json.loads(subprocess.check_output(["cargo", "metadata", "--format-version", "1"], cwd=root))
     candidates = [p for p in meta["packages"] if p["name"] == "tree-sitter"]
     if not candidates:
         sys.exit("error: tree-sitter crate not found in cargo metadata")

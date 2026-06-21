@@ -7,10 +7,10 @@
     <img src="https://img.shields.io/crates/v/tree-sitter-language-pack?label=Rust&color=007ec6" alt="Rust">
   </a>  <a href="https://pypi.org/project/tree-sitter-language-pack/">
     <img src="https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6" alt="Python">
-  </a>  <a href="https://www.npmjs.com/package/@kreuzberg-dev/tree-sitter-language-pack">
-    <img src="https://img.shields.io/npm/v/@kreuzberg-dev/tree-sitter-language-pack?label=Node.js&color=007ec6" alt="Node">
-  </a>  <a href="https://www.npmjs.com/package/@kreuzberg-dev/tree-sitter-language-pack-wasm">
-    <img src="https://img.shields.io/npm/v/@kreuzberg-dev/tree-sitter-language-pack-wasm?label=WASM&color=007ec6" alt="Wasm">
+  </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack">
+    <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack?label=Node.js&color=007ec6" alt="Node">
+  </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm">
+    <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack-wasm?label=WASM&color=007ec6" alt="Wasm">
   </a>  <a href="https://central.sonatype.com/artifact/dev.kreuzberg-dev/tree-sitter-language-pack">
     <img src="https://img.shields.io/maven-central/v/dev.kreuzberg-dev/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
   </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go">
