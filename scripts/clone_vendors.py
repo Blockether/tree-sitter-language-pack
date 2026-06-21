@@ -26,12 +26,25 @@ from git import Repo
 # TSLP_NO_CACHE     — Set to "1" or "true" to force a full re-clone, ignoring
 #                      the cache manifest.
 # TSLP_VENDOR_DIR   — Override the default vendor directory location.
+# TSLP_CLONE_CONCURRENCY    — Max concurrent repo clones (default 16). Clones are
+#                      network/IO-bound and memory-light.
+# TSLP_GENERATE_CONCURRENCY — Max concurrent `tree-sitter generate` runs
+#                      (default 3). Generation is memory-heavy; running too many
+#                      in parallel exhausts the 7 GB RAM on GitHub-hosted runners
+#                      and gets the job OOM-killed (SIGTERM), so it is capped well
+#                      below the clone concurrency independently.
 # ---------------------------------------------------------------------------
 
 _project_root = Path(__file__).parent.parent
 
 vendor_directory = Path(os.environ.get("TSLP_VENDOR_DIR", _project_root / "vendor"))
 parsers_directory = Path(os.environ.get("TSLP_CACHE_DIR", _project_root / "parsers"))
+
+# Concurrency limits. `tree-sitter generate` peaks at ~1 GB+ RSS for large
+# grammars, so a high generate fan-out OOM-kills the 7 GB CI runners; clones are
+# cheap and stay wide. Both are env-tunable for constrained environments.
+CLONE_CONCURRENCY = int(os.environ.get("TSLP_CLONE_CONCURRENCY", "16"))
+GENERATE_CONCURRENCY = int(os.environ.get("TSLP_GENERATE_CONCURRENCY", "3"))
 
 CACHE_MANIFEST_FILE = parsers_directory / ".cache_manifest.json"
 
@@ -205,13 +218,19 @@ async def clone_repository(repo_url: str, branch: str | None, language_name: str
                 raise RuntimeError(f"failed to clone repo {repo_url} error: {e}") from e
 
 
-async def handle_generate(language_name: str, directory: str | None, abi_version: int) -> None:
+async def handle_generate(
+    language_name: str,
+    directory: str | None,
+    abi_version: int,
+    generate_semaphore: asyncio.Semaphore,
+) -> None:
     """Handle the generation of a language.
 
     Args:
         language_name: The name of the language.
         directory: The directory to generate the language in.
         abi_version: The ABI version to use.
+        generate_semaphore: Caps concurrent generation to bound peak memory.
 
     Raises:
         RuntimeError: if generate fails.
@@ -219,40 +238,44 @@ async def handle_generate(language_name: str, directory: str | None, abi_version
     Returns:
         None
     """
-    print(f"Generating {language_name} using tree-sitter-cli")
     target_dir = (
         (vendor_directory / language_name / directory).resolve()
         if directory
         else (vendor_directory / language_name).resolve()
     )
 
-    # Some grammar.js files `require()` JS dependencies — a shared `dsl`/helper
-    # package, or a sibling grammar they extend (e.g. cpp→tree-sitter-c,
-    # templ→tree-sitter-go). `tree-sitter generate` loads grammar.js with Node,
-    # so those deps must be installed first. Install at the repo root (where
-    # package.json lives) when present; a no-op for self-contained grammars.
-    npm_root = vendor_directory / language_name
-    if which("npm") and (npm_root / "package.json").exists():
-        # `--ignore-scripts` skips the dependencies' native `node-gyp` builds
-        # (which can fail and are irrelevant here) — generate only needs the JS
-        # grammar modules a `require()` pulls in (e.g. tree-sitter-cpp/-go).
-        npm_args = ["install", "--no-audit", "--no-fund", "--ignore-scripts"]
-        npm_cmd = ["cmd", "/c", "npm", *npm_args] if platform.system() == "Windows" else ["npm", *npm_args]
+    # `npm install` + `tree-sitter generate` are the memory-heavy steps; hold the
+    # generate semaphore across both so at most GENERATE_CONCURRENCY run at once
+    # (a wide fan-out OOM-kills 7 GB CI runners). Clones already finished outside.
+    async with generate_semaphore:
+        print(f"Generating {language_name} using tree-sitter-cli")
+        # Some grammar.js files `require()` JS dependencies — a shared `dsl`/helper
+        # package, or a sibling grammar they extend (e.g. cpp→tree-sitter-c,
+        # templ→tree-sitter-go). `tree-sitter generate` loads grammar.js with Node,
+        # so those deps must be installed first. Install at the repo root (where
+        # package.json lives) when present; a no-op for self-contained grammars.
+        npm_root = vendor_directory / language_name
+        if which("npm") and (npm_root / "package.json").exists():
+            # `--ignore-scripts` skips the dependencies' native `node-gyp` builds
+            # (which can fail and are irrelevant here) — generate only needs the JS
+            # grammar modules a `require()` pulls in (e.g. tree-sitter-cpp/-go).
+            npm_args = ["install", "--no-audit", "--no-fund", "--ignore-scripts"]
+            npm_cmd = ["cmd", "/c", "npm", *npm_args] if platform.system() == "Windows" else ["npm", *npm_args]
+            try:
+                await run_process(npm_cmd, cwd=str(npm_root), check=False)
+            except Exception as e:  # noqa: BLE001 - npm deps are best-effort; generate reports the real failure
+                print(f"npm install for {language_name} failed (continuing): {e}")
+
+        if platform.system() == "Windows":
+            cmd = ["cmd", "/c", "tree-sitter", "generate", "--abi", str(abi_version)]
+        else:
+            cmd = ["tree-sitter", "generate", "--abi", str(abi_version)]
+
         try:
-            await run_process(npm_cmd, cwd=str(npm_root), check=False)
-        except Exception as e:  # noqa: BLE001 - npm deps are best-effort; generate reports the real failure
-            print(f"npm install for {language_name} failed (continuing): {e}")
-
-    if platform.system() == "Windows":
-        cmd = ["cmd", "/c", "tree-sitter", "generate", "--abi", str(abi_version)]
-    else:
-        cmd = ["tree-sitter", "generate", "--abi", str(abi_version)]
-
-    try:
-        await run_process(cmd, cwd=str(target_dir), check=False)
-        print(f"Generated {language_name} parser successfully")
-    except Exception as e:
-        raise RuntimeError(f"failed to clone {language_name} due to an exception: {e}") from e
+            await run_process(cmd, cwd=str(target_dir), check=False)
+            print(f"Generated {language_name} parser successfully")
+        except Exception as e:
+            raise RuntimeError(f"failed to clone {language_name} due to an exception: {e}") from e
 
 
 async def move_src_folder(language_name: str, directory: str | None) -> None:
@@ -315,12 +338,17 @@ async def move_src_folder(language_name: str, directory: str | None) -> None:
         print(f"Copied {language_name} queries successfully")
 
 
-async def process_repo(language_name: str, language_definition: LanguageDict) -> None:
+async def process_repo(
+    language_name: str,
+    language_definition: LanguageDict,
+    generate_semaphore: asyncio.Semaphore,
+) -> None:
     """Process a repository.
 
     Args:
         language_name: The name of the language.
         language_definition: The language definition.
+        generate_semaphore: Caps concurrent generation to bound peak memory.
 
     Returns:
         None
@@ -336,12 +364,27 @@ async def process_repo(language_name: str, language_definition: LanguageDict) ->
             language_name=language_name,
             directory=language_definition.get("directory"),
             abi_version=language_definition.get("abi_version", 14),
+            generate_semaphore=generate_semaphore,
         )
     await move_src_folder(language_name=language_name, directory=language_definition.get("directory"))
+
+    # Free the vendor clone immediately: its parser src/common/queries are now in
+    # parsers/, leaving only the .git history, grammar.js, and node_modules (the
+    # bulk). Without this, all 306 clones + ~140 node_modules accumulate to ~8 GB
+    # and crowd the ~14 GB CI runner disk; deleting per-grammar keeps the peak to
+    # the in-flight working set.
+    clone_dir = vendor_directory / language_name
+    if await AsyncPath(clone_dir).exists():
+        await run_sync(partial(rmtree, ignore_errors=True), clone_dir)
 
 
 async def main() -> None:
     """Main function."""
+    # Line-buffer stdout so per-grammar progress is visible live in CI logs
+    # (block buffering otherwise hides all progress until exit — useless when a
+    # run is killed mid-way and the buffer is lost).
+    sys.stdout.reconfigure(line_buffering=True)
+
     parsers_directory.mkdir(exist_ok=True, parents=True)
 
     language_definitions, language_names = get_language_definitions()
@@ -364,12 +407,19 @@ async def main() -> None:
 
     print(f"Processing {len(to_process)} language(s)...")
 
-    # Limit concurrent clones to avoid GitHub rate-limiting and resource exhaustion
-    semaphore = asyncio.Semaphore(16)
+    # Clones are wide (network-bound); generation is throttled separately because
+    # it is memory-heavy and a wide fan-out OOM-kills the 7 GB CI runners.
+    semaphore = asyncio.Semaphore(CLONE_CONCURRENCY)
+    generate_semaphore = asyncio.Semaphore(GENERATE_CONCURRENCY)
+    print(f"Concurrency: clone={CLONE_CONCURRENCY}, generate={GENERATE_CONCURRENCY}")
 
     async def bounded_process(name: str, defn: LanguageDict) -> None:
         async with semaphore:
-            await process_repo(language_name=name, language_definition=defn)
+            await process_repo(
+                language_name=name,
+                language_definition=defn,
+                generate_semaphore=generate_semaphore,
+            )
 
     await asyncio.gather(
         *[
