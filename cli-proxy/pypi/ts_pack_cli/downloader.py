@@ -19,6 +19,7 @@ import tarfile
 import tempfile
 import zipfile
 from pathlib import Path, PurePosixPath
+from typing import Any, cast
 from urllib.error import URLError
 from urllib.parse import quote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
@@ -60,7 +61,7 @@ def _binary_name() -> str:
 class _HttpsOnlyRedirectHandler(HTTPRedirectHandler):
     """Reject any redirect whose target is not https (downgrade/SSRF guard)."""
 
-    def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[no-untyped-def]
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[no-untyped-def]  # noqa: ANN001, ANN202, PLR0913
         if urlsplit(newurl).scheme.lower() != "https":
             raise URLError(f"refusing non-https redirect to: {newurl}")
         return super().redirect_request(req, fp, code, msg, headers, newurl)
@@ -75,12 +76,12 @@ def _http_get(url: str, accept: str | None = None) -> bytes:
     headers = {"User-Agent": _USER_AGENT}
     if accept:
         headers["Accept"] = accept
-    request = Request(url, headers=headers)
+    request = Request(url, headers=headers)  # noqa: S310 - scheme validated https-only above
     try:
         with _opener.open(request, timeout=60) as response:
             if response.status != 200:
                 raise RuntimeError(f"HTTP {response.status} for {url}")
-            return response.read()
+            return cast("bytes", response.read())
     except URLError as exc:
         raise RuntimeError(f"failed to fetch {url}: {exc}") from exc
 
@@ -95,7 +96,7 @@ def _asset_score(name: str) -> int:
     return score
 
 
-def _resolve_release() -> tuple[str, dict, dict | None]:
+def _resolve_release() -> tuple[str, dict[str, Any], dict[str, Any] | None]:
     """Return (tag, archive_asset, checksums_asset_or_none) for this platform."""
     triple = _target_triple()
     pinned = os.getenv(VERSION_ENV)
@@ -137,7 +138,7 @@ def _expected_digest(text: str, asset_name: str) -> str | None:
     return None
 
 
-def _verify_or_warn(archive_path: Path, asset_name: str, checksums: dict | None) -> None:
+def _verify_or_warn(archive_path: Path, asset_name: str, checksums: dict[str, Any] | None) -> None:
     if not checksums:
         print(
             f"WARNING: no SHA256SUMS asset found for {asset_name}; "
@@ -192,12 +193,12 @@ def _safe_extract(archive_path: Path, asset_name: str, dest: Path) -> None:
 
     if asset_name.lower().endswith(".zip"):
         with zipfile.ZipFile(archive_path) as zf:
-            for member in zf.namelist():
-                _reject_unsafe_member(member)
-                if not _is_within(dest, dest / member):
-                    raise RuntimeError(f"refusing archive entry escaping dest: {member}")
-            for member in zf.namelist():
-                zf.extract(member, dest)
+            for entry in zf.namelist():
+                _reject_unsafe_member(entry)
+                if not _is_within(dest, dest / entry):
+                    raise RuntimeError(f"refusing archive entry escaping dest: {entry}")
+            for entry in zf.namelist():
+                zf.extract(entry, dest)
     else:
         with tarfile.open(archive_path, "r:gz") as tf:
             for member in tf.getmembers():
