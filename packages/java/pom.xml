@@ -96,11 +96,12 @@
     </dependencies>
 
     <build>
-        <!-- The alef Java backend emits source files at the package root
-             (e.g. packages/java/dev/<group>/<artifact>/Foo.java), not under
-             the Maven-default `src/main/java/` layout. Point sourceDirectory
-             at the package root so `mvn package` finds them. -->
-        <sourceDirectory>${project.basedir}</sourceDirectory>
+        <!-- The alef Java backend emits sources under the standard
+             src/main/java layout (matching build.clj's :src-dirs). Point
+             sourceDirectory there explicitly: using ${project.basedir} would
+             also sweep src/test/java into the MAIN compile, so JUnit tests
+             would be compiled without their test-scope dependencies. -->
+        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -233,13 +234,11 @@
                     <failOnWarning>true</failOnWarning>
                     <show>protected</show>
                     <additionalOptions>--enable-preview</additionalOptions>
-                    <!-- sourcepath MUST match <sourceDirectory> above (which is
-                         ${project.basedir} for the flat layout alef emits) — the
-                         Maven-default `src/main/java/` does not exist in our tree,
-                         so attach-javadocs found no sources and skipped jar
-                         creation, which Sonatype Central rejected as
-                         "Javadocs must be provided but not found in entries". -->
-                    <sourcepath>${project.basedir}</sourcepath>
+                    <!-- sourcepath MUST match <sourceDirectory> above. Using
+                         ${project.basedir} would also scan src/test/java, whose
+                         doclint warnings would fail the build (failOnWarning).
+                         Restrict to the main sources alef emits. -->
+                    <sourcepath>${project.basedir}/src/main/java</sourcepath>
                 </configuration>
                 <executions>
                     <execution>
