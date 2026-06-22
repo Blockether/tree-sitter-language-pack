@@ -1,0 +1,74 @@
+name: CI
+
+# Build the native FFI lib and run the JVM binding's JUnit tests on every push
+# / PR. The deploy workflow (tag-triggered) javac-compiles the same sources, so
+# a green run here means the binding the release ships is tested. Grammar
+# sources mirror the deploy workflow: upstream's curated bundle with the
+# `clojure` grammar overridden by our fork.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The tests exercise the python + clojure grammars (StructuralApi doc ops);
+  # a small set keeps the native build fast. Widen if tests grow.
+  TSLP_LANGUAGES: clojure,python,java,javascript,typescript,go,rust
+  TSLP_LINK_MODE: static
+  PARSER_BUNDLE_URL: https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v1.10.3/parser-sources-1.10.3.tar.zst
+  CLOJURE_FORK: https://github.com/Blockether/tree-sitter-clojure
+
+jobs:
+  java-tests:
+    name: build native + JUnit (StructuralApi)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install zstd
+        run: sudo apt-get update && sudo apt-get install -y zstd
+
+      - name: Assemble parser sources (bundle + our clojure fork)
+        run: |
+          curl -fsSL -o /tmp/ps.tar.zst "$PARSER_BUNDLE_URL"
+          tar --zstd -xf /tmp/ps.tar.zst   # extracts ./parsers/<lang>/...
+          REV=$(python3 -c "import json;print(json.load(open('sources/language_definitions.json'))['clojure']['rev'])")
+          git clone "$CLOJURE_FORK" /tmp/clj
+          git -C /tmp/clj checkout "$REV"
+          rm -rf parsers/clojure && mkdir -p parsers/clojure
+          cp -r /tmp/clj/src parsers/clojure/src
+          cp -r /tmp/clj/queries parsers/clojure/queries
+          test -f parsers/clojure/src/parser.c && test -f parsers/python/src/parser.c
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build FFI library (TSLP_LANGUAGES=${{ env.TSLP_LANGUAGES }})
+        run: cargo build --locked -p ts-pack-core-ffi --release
+
+      - name: Verify native lib for surefire (java.library.path -> target/release)
+        run: test -f target/release/libts_pack_core_ffi.so
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      # Run only the JUnit suite — checkstyle/pmd/spotless are style gates the
+      # tag-deploy build does not run, so they must not fail the test gate here.
+      - name: Run JUnit tests
+        working-directory: packages/java
+        run: >-
+          mvn -B test
+          -Dcheckstyle.skip=true -Dpmd.skip=true
+          -Dspotless.check.skip=true -Dspotless.skip=true
+          -Denforcer.skip=true -Djacoco.skip=true

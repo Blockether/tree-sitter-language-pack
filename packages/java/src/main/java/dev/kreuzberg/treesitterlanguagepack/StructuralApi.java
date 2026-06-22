@@ -388,6 +388,20 @@ public final class StructuralApi {
         throw new EditException("No def-form named '" + target + "' to add a doc string to.");
       }
       result = spliceBytes(source, at, at, " " + code);
+    } else if (DOC_IN_BODY.contains(language) && target == null) {
+      // Module-level docstring: the first statement of the file. It may follow a
+      // shebang and/or comments (those are not statements), so insert after a
+      // leading shebang line; otherwise at the very top.
+      int ins = 0;
+      if (src.length >= 2 && src[0] == '#' && src[1] == '!') {
+        while (ins < src.length && src[ins] != '\n') {
+          ins++;
+        }
+        if (ins < src.length) {
+          ins++; // past the newline
+        }
+      }
+      result = spliceBytes(source, ins, ins, code + "\n\n");
     } else {
       final DefSpans def = locateDef(source, language, target);
       if (DOC_IN_BODY.contains(language)) {
@@ -395,8 +409,28 @@ public final class StructuralApi {
           throw new EditException("'" + target + "' has no body to place a doc string in.");
         }
         final int at = def.bodyStartByte();
-        final String indent = indentAt(src, startOfLine(src, at));
-        result = spliceBytes(source, at, at, code + "\n" + indent);
+        // An inline suite (`def f(): return 1`) has its body on the SAME line as
+        // the header. Splicing the doc before the body would dedent the body to
+        // column 0 — tree-sitter still parses it, but Python rejects it
+        // ('return' outside function). Rewrite the suite onto an indented block.
+        boolean inline = true;
+        for (int i = def.startByte(); i < at; i++) {
+          if (src[i] == '\n') {
+            inline = false;
+            break;
+          }
+        }
+        if (inline && def.bodyEndByte() > at) {
+          final String baseIndent = indentAt(src, startOfLine(src, def.startByte()));
+          final String bodyIndent = baseIndent + "    ";
+          final String bodyText =
+              new String(src, at, def.bodyEndByte() - at, StandardCharsets.UTF_8);
+          result = spliceBytes(source, at, def.bodyEndByte(),
+              "\n" + bodyIndent + code + "\n" + bodyIndent + bodyText);
+        } else {
+          final String indent = indentAt(src, startOfLine(src, at));
+          result = spliceBytes(source, at, at, code + "\n" + indent);
+        }
       } else {
         // comment-before: insert the comment line above the definition,
         // matching its indentation.
@@ -414,8 +448,8 @@ public final class StructuralApi {
     return result;
   }
 
-  /** Start byte of the definition and of its body (-1 if no body). */
-  private record DefSpans(int startByte, int bodyStartByte) {}
+  /** Start byte of the definition and the [start, end) of its body (-1 if no body). */
+  private record DefSpans(int startByte, int bodyStartByte, int bodyEndByte) {}
 
   private static DefSpans locateDef(final String source, final String language,
       final @Nullable String target) throws TreeSitterLanguagePackRsException {
@@ -440,7 +474,8 @@ public final class StructuralApi {
     for (final StructureItem it : items) {
       if (Objects.equals(it.name(), target)) {
         final int body = it.bodySpan() == null ? -1 : (int) it.bodySpan().startByte();
-        out.add(new DefSpans((int) it.span().startByte(), body));
+        final int bodyEnd = it.bodySpan() == null ? -1 : (int) it.bodySpan().endByte();
+        out.add(new DefSpans((int) it.span().startByte(), body, bodyEnd));
       }
       collectDefSpans(it.children(), target, out);
     }
