@@ -18,9 +18,9 @@ import org.jspecify.annotations.Nullable;
  * structural editors (e.g. a Clojure-only rewrite-clj path): the same
  * locate-by-name editing for any supported language, with parse validation.
  */
-public final class StructuralEdit {
+public final class StructuralApi {
 
-  private StructuralEdit() {}
+  private StructuralApi() {}
 
   /** What to do at the located definition. */
   public enum Op {
@@ -254,13 +254,15 @@ public final class StructuralEdit {
         ? new long[] {0L, Long.MAX_VALUE}
         : targetByteSpan(source, language, target, kind);
     final byte[] srcBytes = source.getBytes(StandardCharsets.UTF_8);
-    final int needleLen = needle.getBytes(StandardCharsets.UTF_8).length;
+    // Fuzzy match: compare whitespace-normalised text, so the snippet need not
+    // reproduce the file's exact indentation / line breaks.
+    final String normNeedle = normalizeWs(needle);
     final List<int[]> hits = new ArrayList<>();
     try (Parser parser = TreeSitterLanguagePack.getParser(language);
         Tree tree = parser.parse(source).orElseThrow(
             () -> new EditException("could not parse " + language + " source"));
         Node root = tree.rootNode()) {
-      collectMatches(root, srcBytes, needle, needleLen, scope[0], scope[1], hits);
+      collectMatches(root, srcBytes, normNeedle, scope[0], scope[1], hits);
     }
     if (hits.isEmpty()) {
       throw new EditException("No node matching the snippet"
@@ -281,13 +283,13 @@ public final class StructuralEdit {
     return result;
   }
 
-  private static void collectMatches(final Node node, final byte[] src, final String needle,
-      final int needleLen, final long start, final long end, final List<int[]> hits)
+  private static void collectMatches(final Node node, final byte[] src, final String normNeedle,
+      final long start, final long end, final List<int[]> hits)
       throws TreeSitterLanguagePackRsException {
     final int sb = (int) node.startByte();
     final int eb = (int) node.endByte();
-    if (sb >= start && eb <= end && (eb - sb) == needleLen
-        && new String(src, sb, eb - sb, StandardCharsets.UTF_8).strip().equals(needle)) {
+    if (sb >= start && eb <= end
+        && normalizeWs(new String(src, sb, eb - sb, StandardCharsets.UTF_8)).equals(normNeedle)) {
       hits.add(new int[] {sb, eb});
       return; // a matched node's children can't be a distinct match of the same text
     }
@@ -296,10 +298,15 @@ public final class StructuralEdit {
       final java.util.Optional<Node> child = node.child((int) i);
       if (child.isPresent()) {
         try (Node c = child.get()) {
-          collectMatches(c, src, needle, needleLen, start, end, hits);
+          collectMatches(c, src, normNeedle, start, end, hits);
         }
       }
     }
+  }
+
+  /** Trim and collapse internal whitespace runs to a single space (fuzzy match). */
+  private static String normalizeWs(final String s) {
+    return s.strip().replaceAll("\\s+", " ");
   }
 
   private static long[] targetByteSpan(final String source, final String language,
@@ -541,5 +548,118 @@ public final class StructuralEdit {
       }
     }
     return errors;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Symbol-aware operations (reuse the same parse tree — no new parsing).
+  // ---------------------------------------------------------------------------
+
+  /** One occurrence of an identifier: byte range plus 1-based line / 0-based column. */
+  public record ReferenceHit(int startByte, int endByte, int line, int column) {}
+
+  /**
+   * Every occurrence of the identifier {@code name} in {@code source} — leaf
+   * tokens whose text equals {@code name}, so matches sit at real identifier
+   * boundaries (never inside a larger token, string, or comment). Reuses the
+   * pack's parse tree; no scope resolution, so shadowed / unrelated same-named
+   * identifiers are included too.
+   *
+   * @param source   file contents
+   * @param language tree-sitter language name
+   * @param name     identifier to find
+   * @return occurrences in source order
+   * @throws TreeSitterLanguagePackRsException on a native processing error
+   */
+  public static List<ReferenceHit> findReferences(final String source, final String language,
+      final String name) throws TreeSitterLanguagePackRsException {
+    if (name == null || name.isBlank()) {
+      throw new EditException("findReferences requires a non-blank name");
+    }
+    final String needle = name.strip();
+    final byte[] src = source.getBytes(StandardCharsets.UTF_8);
+    final int len = needle.getBytes(StandardCharsets.UTF_8).length;
+    final List<ReferenceHit> hits = new ArrayList<>();
+    try (Parser parser = TreeSitterLanguagePack.getParser(language);
+        Tree tree = parser.parse(source).orElseThrow(
+            () -> new EditException("could not parse " + language + " source"));
+        Node root = tree.rootNode()) {
+      collectRefs(root, src, needle, len, hits);
+    }
+    return hits;
+  }
+
+  private static void collectRefs(final Node node, final byte[] src, final String needle,
+      final int len, final List<ReferenceHit> hits) throws TreeSitterLanguagePackRsException {
+    final long childCount = node.childCount();
+    if (childCount == 0) {
+      // Leaf token — the granularity at which identifiers live.
+      final String kind = node.kind();
+      if (!"string".equals(kind) && !"comment".equals(kind)) {
+        final int sb = (int) node.startByte();
+        final int eb = (int) node.endByte();
+        if (eb - sb == len && new String(src, sb, eb - sb, StandardCharsets.UTF_8).equals(needle)) {
+          hits.add(new ReferenceHit(sb, eb, lineOf(src, sb), columnOf(src, sb)));
+        }
+      }
+      return;
+    }
+    for (long i = 0; i < childCount; i++) {
+      final java.util.Optional<Node> child = node.child((int) i);
+      if (child.isPresent()) {
+        try (Node c = child.get()) {
+          collectRefs(c, src, needle, len, hits);
+        }
+      }
+    }
+  }
+
+  private static int lineOf(final byte[] src, final int pos) {
+    int line = 1;
+    for (int i = 0; i < pos && i < src.length; i++) {
+      if (src[i] == '\n') {
+        line++;
+      }
+    }
+    return line;
+  }
+
+  private static int columnOf(final byte[] src, final int pos) {
+    return pos - startOfLine(src, pos);
+  }
+
+  /**
+   * Rename every occurrence of the identifier {@code oldName} to {@code newName}
+   * (text/identifier based — see {@link #findReferences}). Refuses when there is
+   * nothing to rename; the result is re-parsed and rejected on any syntax error.
+   *
+   * @param source   file contents
+   * @param language tree-sitter language name
+   * @param oldName  identifier to rename
+   * @param newName  replacement identifier
+   * @return the new file contents
+   * @throws EditException                    no occurrences, or syntax-broken result
+   * @throws TreeSitterLanguagePackRsException on a native processing error
+   */
+  public static String rename(final String source, final String language, final String oldName,
+      final String newName) throws TreeSitterLanguagePackRsException {
+    if (newName == null || newName.isBlank()) {
+      throw new EditException("rename requires a non-blank newName");
+    }
+    final List<ReferenceHit> hits = findReferences(source, language, oldName);
+    if (hits.isEmpty()) {
+      throw new EditException("No occurrences of '" + oldName + "' to rename.");
+    }
+    // Splice right-to-left so earlier byte offsets stay valid.
+    String result = source;
+    for (int i = hits.size() - 1; i >= 0; i--) {
+      final ReferenceHit h = hits.get(i);
+      result = spliceBytes(result, h.startByte(), h.endByte(), newName);
+    }
+    final List<Diagnostic> errors = errorDiagnostics(result, language);
+    if (!errors.isEmpty()) {
+      throw new EditException("rename rejected: it introduces " + errors.size()
+          + " syntax error(s); the file was not changed.");
+    }
+    return result;
   }
 }
