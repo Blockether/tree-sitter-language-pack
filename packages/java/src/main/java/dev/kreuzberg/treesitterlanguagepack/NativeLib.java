@@ -79,7 +79,11 @@ final class NativeLib {
     // Clojars and point us straight at the extracted library, so consumers add
     // a single dependency and the right platform native is selected at runtime.
     // Honoured before the bundled-resource and java.library.path paths.
-    String explicitPath = System.getProperty("dev.kreuzberg.treesitterlanguagepack.native.path");
+    String explicitPath = System.getProperty("com.blockether.treesitterlanguagepack.native.path");
+    if (explicitPath == null || explicitPath.isEmpty()) {
+      // Back-compat alias.
+      explicitPath = System.getProperty("dev.kreuzberg.treesitterlanguagepack.native.path");
+    }
     if (explicitPath == null || explicitPath.isEmpty()) {
       explicitPath = System.getenv("TSLP_NATIVE_PATH");
     }
@@ -134,14 +138,35 @@ final class NativeLib {
     }
 
     try {
-      Path tempDir = extractOrReuseNativeDirectory(nativesDir);
-      Path libPath = tempDir.resolve(libName + libExt);
-      if (!Files.exists(libPath)) {
-        throw new UnsatisfiedLinkError("Missing extracted native library: " + libPath);
+      // Copy the library straight from whichever classpath entry provides the
+      // resource — it may live in a SEPARATE com.blockether/...-native-<rid>
+      // jar, not NativeLib's own jar — then load it by absolute path. (The old
+      // code-source-based extraction only looked inside NativeLib's own jar and
+      // so failed for the split main/native jar layout.)
+      synchronized (NATIVE_EXTRACT_LOCK) {
+        if (cachedExtractDir != null && resourcePath.equals(cachedExtractKey)) {
+          Path cached = cachedExtractDir.resolve(libName + libExt).toAbsolutePath();
+          if (Files.exists(cached)) {
+            System.load(cached.toString());
+            return cached;
+          }
+        }
+        Path tempDir = Files.createTempDirectory("ts_pack_core_ffi_native");
+        tempDir.toFile().deleteOnExit();
+        Path libPath = tempDir.resolve(libName + libExt);
+        try (java.io.InputStream in = NativeLib.class.getResourceAsStream(resourcePath)) {
+          if (in == null) {
+            return null;
+          }
+          Files.copy(in, libPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+        libPath.toFile().deleteOnExit();
+        Path absPath = libPath.toAbsolutePath();
+        System.load(absPath.toString());
+        cachedExtractKey = resourcePath;
+        cachedExtractDir = tempDir;
+        return absPath;
       }
-      Path absPath = libPath.toAbsolutePath();
-      System.load(absPath.toString());
-      return absPath;
     } catch (Exception | Error e) {
       System.err.println("[NativeLib] Failed to extract and load native library from resources: "
           + e.getMessage());
