@@ -78,26 +78,37 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Same matrix shape as Blockether/clj-fff & rift-clojure: every platform
+          # builds with an explicit --target, and the Intel-mac dylib is
+          # CROSS-BUILT on the Apple-Silicon runner (macos-14) — Xcode's SDK is
+          # universal — instead of the slow/scarce/deprecated macos-13 Intel runner.
           - os: ubuntu-latest
             rid: linux-x86_64
+            target: x86_64-unknown-linux-gnu
             lib: libts_pack_core_ffi.so
           - os: ubuntu-24.04-arm
             rid: linux-aarch64
+            target: aarch64-unknown-linux-gnu
             lib: libts_pack_core_ffi.so
           - os: macos-14
             rid: macos-arm64
+            target: aarch64-apple-darwin
             lib: libts_pack_core_ffi.dylib
-          - os: macos-13
+          - os: macos-14
             rid: macos-x86_64
+            target: x86_64-apple-darwin
             lib: libts_pack_core_ffi.dylib
           - os: windows-latest
             rid: windows-x86_64
+            target: x86_64-pc-windows-msvc
             lib: ts_pack_core_ffi.dll
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
 
       - uses: Swatinem/rust-cache@v2
 
@@ -107,15 +118,22 @@ jobs:
           name: parser-sources
           path: parsers
 
-      - name: Build FFI library (TSLP_LANGUAGES=${{ env.TSLP_LANGUAGES }})
-        run: cargo build --locked -p ts-pack-core-ffi --release
+      - name: Build FFI library (${{ matrix.target }}, TSLP_LANGUAGES=${{ env.TSLP_LANGUAGES }})
+        run: cargo build --locked -p ts-pack-core-ffi --release --target ${{ matrix.target }}
 
       - name: Stage native lib under its rid
         shell: bash
         run: |
           mkdir -p "out/${{ matrix.rid }}"
-          cp "target/release/${{ matrix.lib }}" "out/${{ matrix.rid }}/${{ matrix.lib }}"
+          cp "target/${{ matrix.target }}/release/${{ matrix.lib }}" "out/${{ matrix.rid }}/${{ matrix.lib }}"
           ls -la "out/${{ matrix.rid }}"
+
+      - name: Verify macOS dylib architecture
+        if: startsWith(matrix.rid, 'macos-')
+        run: |
+          echo "expected rid: ${{ matrix.rid }}"
+          lipo -archs "out/${{ matrix.rid }}/${{ matrix.lib }}"
+          file "out/${{ matrix.rid }}/${{ matrix.lib }}"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -124,7 +142,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    name: Assemble fat jar & deploy to Clojars
+    name: Deploy native jars + main jar to Clojars
     needs: natives
     runs-on: ubuntu-latest
     steps:
