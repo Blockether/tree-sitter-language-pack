@@ -73,6 +73,28 @@ final class NativeLib {
       libExt = ".so";
     }
 
+    // Explicit override (rift-style): a resolver — e.g. the Clojure
+    // com.blockether.tree-sitter-language-pack namespace — can download the
+    // matching com.blockether/tree-sitter-language-pack-native-<rid> jar from
+    // Clojars and point us straight at the extracted library, so consumers add
+    // a single dependency and the right platform native is selected at runtime.
+    // Honoured before the bundled-resource and java.library.path paths.
+    String explicitPath = System.getProperty("dev.kreuzberg.treesitterlanguagepack.native.path");
+    if (explicitPath == null || explicitPath.isEmpty()) {
+      explicitPath = System.getenv("TSLP_NATIVE_PATH");
+    }
+    if (explicitPath != null && !explicitPath.isEmpty()) {
+      Path explicit = Paths.get(explicitPath);
+      if (Files.isDirectory(explicit)) {
+        explicit = explicit.resolve(libName + libExt);
+      }
+      if (Files.exists(explicit)) {
+        Path abs = explicit.toAbsolutePath();
+        System.load(abs.toString());
+        return abs;
+      }
+    }
+
     String nativesRid = resolveNativesRid(osName, osArch);
     String nativesDir = NATIVES_RESOURCE_ROOT + "/" + nativesRid;
 
