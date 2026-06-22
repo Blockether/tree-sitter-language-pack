@@ -44,6 +44,10 @@ public enum DocstringFormat {
    */
   JavaDoc("javadoc"),
   /**
+   * A plain string docstring (e.g. a Clojure {@code defn} doc string).
+   */
+  Plain("plain"),
+  /**
    * A language-specific docstring format not covered by the standard variants.
    */
   Other("other");
