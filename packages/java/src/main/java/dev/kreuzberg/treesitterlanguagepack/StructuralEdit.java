@@ -1,5 +1,6 @@
 package dev.kreuzberg.treesitterlanguagepack;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -203,13 +204,132 @@ public final class StructuralEdit {
           + "'. Add one by replacing the whole definition (struct_edit replace) with code that includes the doc.");
     }
     final Span s = match.span();
-    final String result = source.substring(0, (int) s.startByte()) + code + source.substring((int) s.endByte());
+    final String result = spliceBytes(source, (int) s.startByte(), (int) s.endByte(), code);
     final List<Diagnostic> errors = errorDiagnostics(result, language);
     if (!errors.isEmpty()) {
       throw new EditException("Doc replacement rejected: it introduces " + errors.size()
           + " syntax error(s); the file was not changed.");
     }
     return result;
+  }
+
+  /**
+   * Structurally replace a sub-expression: find the unique syntax node whose
+   * text equals {@code match} (optionally scoped to definition {@code target}),
+   * and replace it with {@code code}. Unlike a raw-text patch this matches a
+   * whole node at a real syntax boundary (never inside a string/comment or a
+   * partial token), and refuses to act if the match is not unique.
+   *
+   * @param source   current file contents
+   * @param language tree-sitter language name
+   * @param match    the snippet identifying the node to replace (end-trimmed)
+   * @param code     replacement source
+   * @param target   optional definition name to scope the search within
+   * @param kind     optional kind filter for {@code target}
+   * @return the new file contents
+   * @throws EditException                    no match, ambiguous match, or syntax-broken result
+   * @throws TreeSitterLanguagePackRsException on a native processing error
+   */
+  public static String replaceNode(final String source, final String language, final String match,
+      final String code, final @Nullable String target, final @Nullable String kind)
+      throws TreeSitterLanguagePackRsException {
+    if (match == null || code == null) {
+      throw new EditException("replaceNode requires both match and code");
+    }
+    final String needle = match.strip();
+    if (needle.isEmpty()) {
+      throw new EditException("replaceNode match must be non-blank");
+    }
+    final long[] scope = target == null
+        ? new long[] {0L, Long.MAX_VALUE}
+        : targetByteSpan(source, language, target, kind);
+    final byte[] srcBytes = source.getBytes(StandardCharsets.UTF_8);
+    final int needleLen = needle.getBytes(StandardCharsets.UTF_8).length;
+    final List<int[]> hits = new ArrayList<>();
+    try (Parser parser = TreeSitterLanguagePack.getParser(language);
+        Tree tree = parser.parse(source).orElseThrow(
+            () -> new EditException("could not parse " + language + " source"));
+        Node root = tree.rootNode()) {
+      collectMatches(root, srcBytes, needle, needleLen, scope[0], scope[1], hits);
+    }
+    if (hits.isEmpty()) {
+      throw new EditException("No node matching the snippet"
+          + (target == null ? "" : " inside '" + target + "'") + " was found.");
+    }
+    if (hits.size() > 1) {
+      throw new EditException(hits.size() + " nodes match the snippet"
+          + (target == null ? " — scope it with target, or" : " inside '" + target + "' —")
+          + " make the snippet more specific. Refusing to guess.");
+    }
+    final int[] hit = hits.get(0);
+    final String result = spliceBytes(source, hit[0], hit[1], code);
+    final List<Diagnostic> errors = errorDiagnostics(result, language);
+    if (!errors.isEmpty()) {
+      throw new EditException("Edit rejected: it introduces " + errors.size()
+          + " syntax error(s); the file was not changed.");
+    }
+    return result;
+  }
+
+  private static void collectMatches(final Node node, final byte[] src, final String needle,
+      final int needleLen, final long start, final long end, final List<int[]> hits)
+      throws TreeSitterLanguagePackRsException {
+    final int sb = (int) node.startByte();
+    final int eb = (int) node.endByte();
+    if (sb >= start && eb <= end && (eb - sb) == needleLen
+        && new String(src, sb, eb - sb, StandardCharsets.UTF_8).strip().equals(needle)) {
+      hits.add(new int[] {sb, eb});
+      return; // a matched node's children can't be a distinct match of the same text
+    }
+    final long count = node.childCount();
+    for (long i = 0; i < count; i++) {
+      final java.util.Optional<Node> child = node.child((int) i);
+      if (child.isPresent()) {
+        try (Node c = child.get()) {
+          collectMatches(c, src, needle, needleLen, start, end, hits);
+        }
+      }
+    }
+  }
+
+  private static long[] targetByteSpan(final String source, final String language,
+      final String target, final @Nullable String kind) throws TreeSitterLanguagePackRsException {
+    final ProcessConfig cfg = ProcessConfig.builder().withLanguage(language).withStructure(true).build();
+    final ProcessResult res = TreeSitterLanguagePack.process(source, cfg);
+    final List<long[]> spans = new ArrayList<>();
+    findSpans(res.structure(), target, kind, spans);
+    if (spans.isEmpty()) {
+      throw new EditException("No definition named '" + target + "' to scope within.");
+    }
+    if (spans.size() > 1) {
+      throw new EditException(spans.size() + " definitions named '" + target
+          + "' — pass kind to scope the search.");
+    }
+    return spans.get(0);
+  }
+
+  private static void findSpans(final @Nullable List<StructureItem> items, final String target,
+      final @Nullable String kind, final List<long[]> out) {
+    if (items == null) {
+      return;
+    }
+    for (final StructureItem it : items) {
+      final String k = it.kind() == null ? "" : it.kind().getValue();
+      if (Objects.equals(it.name(), target) && (kind == null || kind.equalsIgnoreCase(k))) {
+        final Span s = it.span();
+        out.add(new long[] {s.startByte(), s.endByte()});
+      }
+      findSpans(it.children(), target, kind, out);
+    }
+  }
+
+  /** Replace the UTF-8 byte range [start, end) of {@code source} with {@code code}. */
+  private static String spliceBytes(final String source, final int startByte, final int endByte,
+      final String code) {
+    final byte[] bytes = source.getBytes(StandardCharsets.UTF_8);
+    final String before = new String(bytes, 0, startByte, StandardCharsets.UTF_8);
+    final String after = new String(bytes, endByte, bytes.length - endByte, StandardCharsets.UTF_8);
+    return before + code + after;
   }
 
   private static List<Diagnostic> errorDiagnostics(final String source, final String language)
