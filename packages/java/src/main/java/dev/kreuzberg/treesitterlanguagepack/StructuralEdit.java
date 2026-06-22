@@ -36,7 +36,14 @@ public final class StructuralEdit {
      * Replace the existing doc string of the target definition. {@code code} is
      * the full replacement doc literal (e.g. {@code "\"New doc.\""}).
      */
-    REPLACE_DOC
+    REPLACE_DOC,
+    /**
+     * Add a doc string to a definition that has none. {@code code} is the doc
+     * literal; it is placed at the language's idiomatic spot (e.g. after a
+     * Clojure {@code defn} name). Refuses if a doc already exists (use
+     * {@link #REPLACE_DOC}) or for languages without a wired placement.
+     */
+    ADD_DOC
   }
 
   /** A located definition: name, kind, and 1-based inclusive line span. */
@@ -106,6 +113,9 @@ public final class StructuralEdit {
     }
     if (op == Op.REPLACE_DOC) {
       return replaceDoc(source, language, target, code);
+    }
+    if (op == Op.ADD_DOC) {
+      return addDoc(source, language, target, code);
     }
     final List<String> lines = new ArrayList<>(Arrays.asList(source.split("\n", -1)));
     final int start;
@@ -331,6 +341,110 @@ public final class StructuralEdit {
     final String after = new String(bytes, endByte, bytes.length - endByte, StandardCharsets.UTF_8);
     return before + code + after;
   }
+
+  /**
+   * Add a doc string to {@code target} when it has none. Placement is
+   * language-specific; currently wired for Clojure (after the def-form name).
+   * Refuses when a doc already exists (use {@link Op#REPLACE_DOC}).
+   */
+  private static String addDoc(final String source, final String language,
+      final @Nullable String target, final String code) throws TreeSitterLanguagePackRsException {
+    // Refuse if there is already a doc — adding would duplicate it.
+    final ProcessConfig dcfg = ProcessConfig.builder().withLanguage(language).withDocstrings(true).build();
+    final ProcessResult dres = TreeSitterLanguagePack.process(source, dcfg);
+    if (dres.docstrings() != null) {
+      for (final DocstringInfo d : dres.docstrings()) {
+        if (Objects.equals(d.associatedItem(), target)) {
+          throw new EditException("'" + target + "' already has a doc string — use replace_doc to change it.");
+        }
+      }
+    }
+    if (!"clojure".equals(language)) {
+      throw new EditException("add_doc is not wired for '" + language
+          + "' yet — replace the whole definition (replace) with code that includes the doc.");
+    }
+    final int insertAt = clojureNameEndByte(source, target);
+    if (insertAt < 0) {
+      throw new EditException("No def-form named '" + target + "' to add a doc string to.");
+    }
+    final String result = spliceBytes(source, insertAt, insertAt, " " + code);
+    final List<Diagnostic> errors = errorDiagnostics(result, language);
+    if (!errors.isEmpty()) {
+      throw new EditException("add_doc rejected: it introduces " + errors.size()
+          + " syntax error(s); the file was not changed.");
+    }
+    return result;
+  }
+
+  /**
+   * End byte of the NAME symbol of the Clojure def-form named {@code target}
+   * (the insertion point for a doc string), or -1 if not found.
+   */
+  private static int clojureNameEndByte(final String source, final @Nullable String target)
+      throws TreeSitterLanguagePackRsException {
+    final byte[] src = source.getBytes(StandardCharsets.UTF_8);
+    try (Parser parser = TreeSitterLanguagePack.getParser("clojure");
+        Tree tree = parser.parse(source).orElseThrow(
+            () -> new EditException("could not parse clojure source"));
+        Node root = tree.rootNode()) {
+      return findClojureNameEnd(root, src, target);
+    }
+  }
+
+  private static int findClojureNameEnd(final Node node, final byte[] src, final @Nullable String target)
+      throws TreeSitterLanguagePackRsException {
+    if ("list_lit".equals(node.kind())) {
+      final List<Node> syms = new ArrayList<>();
+      final long named = node.namedChildCount();
+      for (long i = 0; i < named; i++) {
+        final java.util.Optional<Node> ch = node.namedChild((int) i);
+        if (ch.isPresent()) {
+          final Node c = ch.get();
+          if ("sym_lit".equals(c.kind())) {
+            syms.add(c);
+          } else {
+            c.close();
+          }
+        }
+      }
+      try {
+        if (syms.size() >= 2) {
+          final String head = byteText(src, syms.get(0));
+          final String name = byteText(src, syms.get(1));
+          if (DEF_FORMS.contains(head) && name.equals(target)) {
+            return (int) syms.get(1).endByte();
+          }
+        }
+      } finally {
+        for (final Node s : syms) {
+          s.close();
+        }
+      }
+    }
+    final long count = node.childCount();
+    for (long i = 0; i < count; i++) {
+      final java.util.Optional<Node> child = node.child((int) i);
+      if (child.isPresent()) {
+        try (Node c = child.get()) {
+          final int hit = findClojureNameEnd(c, src, target);
+          if (hit >= 0) {
+            return hit;
+          }
+        }
+      }
+    }
+    return -1;
+  }
+
+  private static String byteText(final byte[] src, final Node node)
+      throws TreeSitterLanguagePackRsException {
+    final int sb = (int) node.startByte();
+    final int eb = (int) node.endByte();
+    return new String(src, sb, eb - sb, StandardCharsets.UTF_8);
+  }
+
+  private static final java.util.Set<String> DEF_FORMS =
+      java.util.Set.of("defn", "defn-", "defmacro", "def", "defonce");
 
   private static List<Diagnostic> errorDiagnostics(final String source, final String language)
       throws TreeSitterLanguagePackRsException {
