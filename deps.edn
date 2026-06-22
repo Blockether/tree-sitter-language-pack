@@ -14,7 +14,7 @@
  ;; org.clojure/clojure transitively (fine for the Clojure host this targets);
  ;; build.clj keeps clojure off the published pom (charred's own pom declares it).
  :deps {org.jspecify/jspecify                            {:mvn/version "1.0.0"}
-        com.fasterxml.jackson.core/jackson-annotations   {:mvn/version "2.21.2"}
+        com.fasterxml.jackson.core/jackson-annotations   {:mvn/version "2.21"}
         com.cnuernber/charred                            {:mvn/version "1.038"}
         io.github.tree-sitter/jtreesitter                {:mvn/version "0.26.0"}}
 
