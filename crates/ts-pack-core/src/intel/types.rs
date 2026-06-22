@@ -338,6 +338,8 @@ pub enum DocstringFormat {
     /// Java Javadoc block comment (opens with two stars, closes with
     /// star-slash).
     JavaDoc,
+    /// A plain string docstring (e.g. a Clojure `defn` doc string).
+    Plain,
     /// A language-specific docstring format not covered by the standard variants.
     Other(String),
 }

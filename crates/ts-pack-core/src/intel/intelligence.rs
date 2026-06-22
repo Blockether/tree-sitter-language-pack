@@ -173,6 +173,32 @@ fn collect_docstrings(node: &tree_sitter::Node, source: &str, language: &str, do
                 }
             }
         }
+        "clojure" => {
+            // A Clojure doc string is the str_lit right after the name in a
+            // def-form, e.g. `(defn f "doc" [x] …)`. It is only a docstring when
+            // a form follows it (otherwise `(def x "v")` would misread the value).
+            if node.kind() == "list_lit" {
+                let mut cursor = node.walk();
+                let kids: Vec<tree_sitter::Node> = node.named_children(&mut cursor).collect();
+                if kids.len() > 3
+                    && kids[0].kind() == "sym_lit"
+                    && kids[1].kind() == "sym_lit"
+                    && kids[2].kind() == "str_lit"
+                    && matches!(
+                        node_text(&kids[0], source),
+                        "defn" | "defn-" | "defmacro" | "def" | "defonce"
+                    )
+                {
+                    docstrings.push(DocstringInfo {
+                        text: node_text(&kids[2], source).to_string(),
+                        format: DocstringFormat::Plain,
+                        span: span_from_node(&kids[2]),
+                        associated_item: Some(node_text(&kids[1], source).to_string()),
+                        parsed_sections: Vec::new(),
+                    });
+                }
+            }
+        }
         _ => {
             // For other languages, doc comments are already captured in extract_comments
         }

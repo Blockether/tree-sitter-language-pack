@@ -30,7 +30,12 @@ public final class StructuralEdit {
     /** Insert {@code code} immediately after the definition. */
     INSERT_AFTER,
     /** Append {@code code} at end of file (ignores the target). */
-    APPEND
+    APPEND,
+    /**
+     * Replace the existing doc string of the target definition. {@code code} is
+     * the full replacement doc literal (e.g. {@code "\"New doc.\""}).
+     */
+    REPLACE_DOC
   }
 
   /** A located definition: name, kind, and 1-based inclusive line span. */
@@ -97,6 +102,9 @@ public final class StructuralEdit {
       throws TreeSitterLanguagePackRsException {
     if (code == null) {
       throw new EditException("structural edit requires non-null code");
+    }
+    if (op == Op.REPLACE_DOC) {
+      return replaceDoc(source, language, target, code);
     }
     final List<String> lines = new ArrayList<>(Arrays.asList(source.split("\n", -1)));
     final int start;
@@ -170,6 +178,38 @@ public final class StructuralEdit {
       default -> throw new EditException("Unknown op: " + op);
     }
     return String.join("\n", out);
+  }
+
+  /**
+   * Replace the existing doc string of {@code target} (byte-precise, so inline
+   * docs are handled). Throws if the definition has no doc string to replace.
+   */
+  private static String replaceDoc(final String source, final String language,
+      final @Nullable String target, final String code) throws TreeSitterLanguagePackRsException {
+    final ProcessConfig cfg = ProcessConfig.builder().withLanguage(language).withDocstrings(true).build();
+    final ProcessResult res = TreeSitterLanguagePack.process(source, cfg);
+    final List<DocstringInfo> docs = res.docstrings();
+    DocstringInfo match = null;
+    if (docs != null) {
+      for (final DocstringInfo d : docs) {
+        if (Objects.equals(d.associatedItem(), target)) {
+          match = d;
+          break;
+        }
+      }
+    }
+    if (match == null) {
+      throw new EditException("No existing doc string for '" + target
+          + "'. Add one by replacing the whole definition (struct_edit replace) with code that includes the doc.");
+    }
+    final Span s = match.span();
+    final String result = source.substring(0, (int) s.startByte()) + code + source.substring((int) s.endByte());
+    final List<Diagnostic> errors = errorDiagnostics(result, language);
+    if (!errors.isEmpty()) {
+      throw new EditException("Doc replacement rejected: it introduces " + errors.size()
+          + " syntax error(s); the file was not changed.");
+    }
+    return result;
   }
 
   private static List<Diagnostic> errorDiagnostics(final String source, final String language)
