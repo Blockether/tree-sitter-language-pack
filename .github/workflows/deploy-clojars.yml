@@ -107,8 +107,13 @@ jobs:
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
+
+      # The repo pins channel 1.95 via rust-toolchain.toml; cargo uses THAT
+      # toolchain, not dtolnay's `stable`. Add the (cross-)target to the pinned
+      # toolchain so x86_64-apple-darwin etc. have a std library (E0463 otherwise).
+      # Run inside the checkout so the rust-toolchain.toml override applies.
+      - name: Add Rust target to pinned toolchain
+        run: rustup target add ${{ matrix.target }}
 
       - uses: Swatinem/rust-cache@v2
 
