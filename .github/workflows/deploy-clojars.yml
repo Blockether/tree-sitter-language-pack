@@ -105,10 +105,9 @@ jobs:
     needs: natives
     runs-on: ubuntu-latest
     steps:
+      # Check out the triggering ref (the tag for v* pushes) so the deployed
+      # artifact corresponds to the tag, not to whatever is currently on main.
       - uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 1
 
       - name: Set up JDK 25
         uses: actions/setup-java@v4
@@ -142,20 +141,38 @@ jobs:
         run: |
           dest=packages/java/src/main/resources/natives
           mkdir -p "$dest"
-          # download-artifact lays out: natives-staging/native-<rid>/<lib>
+          # download-artifact extracts each artifact under
+          # natives-staging/native-<rid>/... (subdirs may be preserved), so locate
+          # the actual library file recursively rather than globbing the top level.
           for d in natives-staging/native-*; do
+            [ -d "$d" ] || continue
             rid="${d#natives-staging/native-}"
             mkdir -p "$dest/$rid"
-            cp "$d"/* "$dest/$rid/"
+            find "$d" -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) \
+              -exec cp {} "$dest/$rid/" \;
           done
           echo "=== bundled natives ==="
           find "$dest" -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) | sort
 
+      # Compute the deploy version once and reuse it everywhere. For tag pushes
+      # this is the tag minus the leading `v`; for manual runs github.ref_name is
+      # a branch (e.g. main), so fall back to a unique manual marker.
+      - name: Compute deploy version
+        id: version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            V="${GITHUB_REF_NAME#v}"
+          else
+            V="manual-${GITHUB_RUN_ID}"
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "Deploy version: $V"
+
       - name: Check if version exists on Clojars
         id: check-clojars
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          [ -z "$VERSION" ] && VERSION="manual-$GITHUB_RUN_ID"
+          VERSION="${{ steps.version.outputs.version }}"
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             "https://repo.clojars.org/com/blockether/tree-sitter-language-pack/$VERSION/tree-sitter-language-pack-$VERSION.jar")
           if [ "$STATUS" = "200" ]; then
@@ -168,7 +185,7 @@ jobs:
       - name: Build & Deploy to Clojars
         if: steps.check-clojars.outputs.exists != 'true'
         env:
-          VERSION: ${{ github.ref_name }}
+          VERSION: ${{ steps.version.outputs.version }}
           CLOJARS_USERNAME: blockether-deployer
           CLOJARS_PASSWORD: ${{ secrets.CLOJARS_DEPLOY_TOKEN }}
         run: clojure -T:build deploy

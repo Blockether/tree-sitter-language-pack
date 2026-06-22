@@ -14,6 +14,7 @@
     clojure -T:build install                  ; build + install into ~/.m2
     clojure -T:build jar                       ; just build the jar"
   (:require [clojure.tools.build.api :as b]
+            [clojure.java.io :as io]
             [clojure.string :as str]
             [deps-deploy.deps-deploy :as dd]))
 
@@ -80,6 +81,45 @@
                      (filter #(re-find #"libts_pack_core_ffi|ts_pack_core_ffi\.dll" %)))]
     (println "Bundled native libs:" (if (seq natives) (vec natives) "NONE (jar will rely on java.library.path / runtime download)")))
   (println "Built:" jar-file "version:" version))
+
+(defn- current-rid
+  "Runtime identifier matching NativeLib.resolveNativesRid (os-arch)."
+  []
+  (let [os   (str/lower-case (System/getProperty "os.name" ""))
+        arch (str/lower-case (System/getProperty "os.arch" ""))
+        os*  (cond (or (str/includes? os "mac") (str/includes? os "darwin")) "macos"
+                   (str/includes? os "win")                                  "windows"
+                   :else                                                     "linux")
+        arch* (cond (or (str/includes? arch "aarch64") (str/includes? arch "arm64"))
+                    (if (= os* "macos") "arm64" "aarch64")
+                    (or (str/includes? arch "x86_64") (str/includes? arch "amd64")) "x86_64"
+                    :else (str/replace arch #"[^a-z0-9_]+" ""))]
+    (str os* "-" arch*)))
+
+(defn- native-filename []
+  (let [os (str/lower-case (System/getProperty "os.name" ""))]
+    (cond (str/includes? os "win")                                  "ts_pack_core_ffi.dll"
+          (or (str/includes? os "mac") (str/includes? os "darwin")) "libts_pack_core_ffi.dylib"
+          :else                                                     "libts_pack_core_ffi.so")))
+
+(defn stage-natives
+  "Copy the locally built native FFI lib (target/release/<lib>) into
+   packages/java/src/main/resources/natives/<rid>/ for the host platform, so a
+   subsequent `jar`/`install` bundles it. Build the lib first, e.g.:
+     TSLP_LANGUAGES=clojure TSLP_LINK_MODE=static \\
+       cargo build -p ts-pack-core-ffi --release"
+  [_]
+  (let [fname    (native-filename)
+        src      (io/file "target/release" fname)
+        dest-dir (io/file java-resources "natives" (current-rid))
+        dest     (io/file dest-dir fname)]
+    (when-not (.exists src)
+      (throw (ex-info (str "Native lib not found: " src
+                           ". Build it first: cargo build -p ts-pack-core-ffi --release")
+                      {:expected (str src)})))
+    (.mkdirs dest-dir)
+    (b/copy-file {:src (str src) :target (str dest)})
+    (println "Staged" (str src) "->" (str dest))))
 
 (defn deploy [_]
   (jar nil)
