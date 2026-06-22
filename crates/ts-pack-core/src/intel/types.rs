@@ -230,6 +230,22 @@ pub enum StructureKind {
     Impl,
     /// A namespace declaration.
     Namespace,
+    /// A constant / immutable value binding (e.g. Clojure `def`, `const`).
+    Constant,
+    /// A macro definition (e.g. Clojure `defmacro`, Rust `macro_rules!`).
+    Macro,
+    /// A protocol definition (e.g. Clojure `defprotocol`, Swift/Obj-C protocol).
+    Protocol,
+    /// A mutable variable binding.
+    Variable,
+    /// A field of a struct/class/record.
+    Field,
+    /// A type alias or named type (e.g. Clojure `deftype`, `type` alias).
+    Type,
+    /// A property / accessor.
+    Property,
+    /// A constructor.
+    Constructor,
     /// A language-specific construct that does not fit any standard category.
     Other(String),
 }

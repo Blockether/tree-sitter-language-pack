@@ -66,6 +66,38 @@ public enum StructureKind {
    */
   Namespace("namespace"),
   /**
+   * A constant / immutable value binding (e.g. Clojure {@code def}).
+   */
+  Constant("constant"),
+  /**
+   * A macro definition (e.g. Clojure {@code defmacro}).
+   */
+  Macro("macro"),
+  /**
+   * A protocol definition (e.g. Clojure {@code defprotocol}, Swift protocol).
+   */
+  Protocol("protocol"),
+  /**
+   * A mutable variable binding.
+   */
+  Variable("variable"),
+  /**
+   * A field of a struct/class/record.
+   */
+  Field("field"),
+  /**
+   * A type alias or named type (e.g. Clojure {@code deftype}).
+   */
+  Type("type"),
+  /**
+   * A property / accessor.
+   */
+  Property("property"),
+  /**
+   * A constructor.
+   */
+  Constructor("constructor"),
+  /**
    * A language-specific construct that does not fit any standard category.
    */
   Other("other");
