@@ -4,7 +4,7 @@ requires = [ "hatchling" ]
 
 [project]
 name = "tree-sitter-language-pack"
-version = "1.10.1"
+version = "1.10.2"
 description = "Comprehensive collection of 306 tree-sitter language parsers with polyglot bindings"
 readme = "README.md"
 keywords = [
@@ -81,11 +81,11 @@ lint.ignore = [
   "TD",     # we allow todo and fixme comments
   "TRY",    # Try except block, rules are too strict
 ]
-lint.per-file-ignores."options.py" = [ "TC001" ]
-lint.per-file-ignores."scripts/**/*.*" = [ "ASYNC", "D", "S", "T201" ]
 # cli-proxy is a standalone bootstrap downloader (like scripts/): it legitimately
 # prints diagnostics and compares HTTP status codes (S/url-safety handled inline).
-lint.per-file-ignores."cli-proxy/**/*.py" = [ "ASYNC", "D", "T201", "PLR2004" ]
+lint.per-file-ignores."cli-proxy/**/*.py" = [ "ASYNC", "D", "PLR2004", "T201" ]
+lint.per-file-ignores."options.py" = [ "TC001" ]
+lint.per-file-ignores."scripts/**/*.*" = [ "ASYNC", "D", "S", "T201" ]
 lint.isort.known-first-party = [ "scripts" ]
 lint.pydocstyle.convention = "google"
 

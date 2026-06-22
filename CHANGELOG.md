@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.2] - 2026-06-22
+
+### Fixed
+
+- **Generated binding doc comments no longer emit Rust intra-doc link syntax.** alef copied core
+  rustdoc comments verbatim into the per-language binding crates, carrying `[`Type`]` /
+  `[`fn`](crate::fn)` intra-doc links that resolve in the core crate but break `cargo doc` in the
+  binding crates with `rustdoc::broken-intra-doc-links`. The references are now de-linked to plain
+  code spans (`` `Type` ``) during emission, preserving genuine URL/anchor Markdown links. Picked up
+  from the alef 0.25.60 regen.
+
 ## [1.10.1] - 2026-06-20
 
 ### Fixed
