@@ -342,10 +342,23 @@ public final class StructuralEdit {
     return before + code + after;
   }
 
+  /** Languages whose doc string sits as the first statement INSIDE the body. */
+  private static final java.util.Set<String> DOC_IN_BODY = java.util.Set.of("python");
+  /** Lisp-family languages whose doc string sits right AFTER the def name. */
+  private static final java.util.Set<String> DOC_AFTER_NAME = java.util.Set.of("clojure");
+
   /**
-   * Add a doc string to {@code target} when it has none. Placement is
-   * language-specific; currently wired for Clojure (after the def-form name).
-   * Refuses when a doc already exists (use {@link Op#REPLACE_DOC}).
+   * Add a doc string to {@code target} when it has none, at the language's
+   * idiomatic spot:
+   * <ul>
+   *   <li>lisps (Clojure): right after the def-form name;</li>
+   *   <li>Python: as the first statement inside the body;</li>
+   *   <li>everything else: as a comment on the line above the definition —
+   *       {@code code} must be the comment written in that language's own
+   *       comment syntax (a line comment, block comment, or doc comment).</li>
+   * </ul>
+   * Refuses when a doc already exists (use {@link Op#REPLACE_DOC}); the result is
+   * re-parsed and rejected on any syntax error.
    */
   private static String addDoc(final String source, final String language,
       final @Nullable String target, final String code) throws TreeSitterLanguagePackRsException {
@@ -359,21 +372,89 @@ public final class StructuralEdit {
         }
       }
     }
-    if (!"clojure".equals(language)) {
-      throw new EditException("add_doc is not wired for '" + language
-          + "' yet — replace the whole definition (replace) with code that includes the doc.");
+
+    final byte[] src = source.getBytes(StandardCharsets.UTF_8);
+    final String result;
+    if (DOC_AFTER_NAME.contains(language)) {
+      final int at = clojureNameEndByte(source, target);
+      if (at < 0) {
+        throw new EditException("No def-form named '" + target + "' to add a doc string to.");
+      }
+      result = spliceBytes(source, at, at, " " + code);
+    } else {
+      final DefSpans def = locateDef(source, language, target);
+      if (DOC_IN_BODY.contains(language)) {
+        if (def.bodyStartByte() < 0) {
+          throw new EditException("'" + target + "' has no body to place a doc string in.");
+        }
+        final int at = def.bodyStartByte();
+        final String indent = indentAt(src, startOfLine(src, at));
+        result = spliceBytes(source, at, at, code + "\n" + indent);
+      } else {
+        // comment-before: insert the comment line above the definition,
+        // matching its indentation.
+        final int lineStart = startOfLine(src, def.startByte());
+        final String indent = indentAt(src, lineStart);
+        result = spliceBytes(source, lineStart, lineStart, indent + code + "\n");
+      }
     }
-    final int insertAt = clojureNameEndByte(source, target);
-    if (insertAt < 0) {
-      throw new EditException("No def-form named '" + target + "' to add a doc string to.");
-    }
-    final String result = spliceBytes(source, insertAt, insertAt, " " + code);
+
     final List<Diagnostic> errors = errorDiagnostics(result, language);
     if (!errors.isEmpty()) {
       throw new EditException("add_doc rejected: it introduces " + errors.size()
           + " syntax error(s); the file was not changed.");
     }
     return result;
+  }
+
+  /** Start byte of the definition and of its body (-1 if no body). */
+  private record DefSpans(int startByte, int bodyStartByte) {}
+
+  private static DefSpans locateDef(final String source, final String language,
+      final @Nullable String target) throws TreeSitterLanguagePackRsException {
+    final ProcessConfig cfg = ProcessConfig.builder().withLanguage(language).withStructure(true).build();
+    final ProcessResult res = TreeSitterLanguagePack.process(source, cfg);
+    final List<DefSpans> found = new ArrayList<>();
+    collectDefSpans(res.structure(), target, found);
+    if (found.isEmpty()) {
+      throw new EditException("No definition named '" + target + "' to add a doc string to.");
+    }
+    if (found.size() > 1) {
+      throw new EditException(found.size() + " definitions named '" + target + "' — cannot pick one.");
+    }
+    return found.get(0);
+  }
+
+  private static void collectDefSpans(final @Nullable List<StructureItem> items,
+      final @Nullable String target, final List<DefSpans> out) {
+    if (items == null) {
+      return;
+    }
+    for (final StructureItem it : items) {
+      if (Objects.equals(it.name(), target)) {
+        final int body = it.bodySpan() == null ? -1 : (int) it.bodySpan().startByte();
+        out.add(new DefSpans((int) it.span().startByte(), body));
+      }
+      collectDefSpans(it.children(), target, out);
+    }
+  }
+
+  /** Byte index of the first byte of the line containing {@code pos}. */
+  private static int startOfLine(final byte[] src, final int pos) {
+    int i = pos;
+    while (i > 0 && src[i - 1] != '\n') {
+      i--;
+    }
+    return i;
+  }
+
+  /** Leading whitespace (indent) of the line beginning at {@code lineStart}. */
+  private static String indentAt(final byte[] src, final int lineStart) {
+    int i = lineStart;
+    while (i < src.length && (src[i] == ' ' || src[i] == '\t')) {
+      i++;
+    }
+    return new String(src, lineStart, i - lineStart, StandardCharsets.UTF_8);
   }
 
   /**
