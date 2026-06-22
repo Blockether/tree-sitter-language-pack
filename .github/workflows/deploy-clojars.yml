@@ -1,12 +1,15 @@
 name: Release & Deploy to Clojars
 
-# Mirrors Blockether/svar's deploy.yml, adapted for the JVM binding of
-# tree-sitter-language-pack. Builds the native FFI library on every supported
-# platform, assembles ONE fat multi-platform jar (natives/<rid>/<lib> for each
-# platform — NativeLib resolves the rid at runtime), and deploys it to Clojars
-# as com.blockether/tree-sitter-language-pack.
+# Builds the JVM binding of tree-sitter-language-pack for ALL languages and
+# deploys it to Clojars as com.blockether/tree-sitter-language-pack.
 #
-# Required repo secret: CLOJARS_DEPLOY_TOKEN  (a Clojars deploy token for the
+# Grammar sources come from upstream's curated parser-sources bundle (the same
+# set kreuzberg-dev publishes from, which compiles cleanly on every platform —
+# the raw per-repo clones used by clone_vendors.py do NOT, e.g. norg). The
+# `clojure` grammar is then overridden with our own fork
+# (Blockether/tree-sitter-clojure) so the pack uses our fork.
+#
+# Required repo/org secret: CLOJARS_DEPLOY_TOKEN (Clojars deploy token for the
 # `blockether-deployer` account, scoped to the com.blockether group).
 
 on:
@@ -15,24 +18,57 @@ on:
   workflow_dispatch:
     inputs:
       languages:
-        description: 'TSLP_LANGUAGES to statically compile (e.g. "clojure", "clojure,edn", or "all")'
-        default: 'clojure'
+        description: 'TSLP_LANGUAGES to statically compile ("all", or e.g. "clojure,edn")'
+        default: 'all'
         required: true
 
 permissions:
   contents: write
 
 env:
-  # Build only what we need (Clojure) by default. `all` is intentionally NOT the
-  # default: it pulls in every upstream grammar, and some (e.g. `norg`) have C++
-  # scanners that fail to compile on macOS, which would break the whole release.
-  # Override via workflow_dispatch input to widen the set.
-  TSLP_LANGUAGES: ${{ github.event.inputs.languages || 'clojure' }}
+  TSLP_LANGUAGES: ${{ github.event.inputs.languages || 'all' }}
   TSLP_LINK_MODE: static
+  # Upstream's curated, known-to-compile source bundle for v1.10.3.
+  PARSER_BUNDLE_URL: https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v1.10.3/parser-sources-1.10.3.tar.zst
+  CLOJURE_FORK: https://github.com/Blockether/tree-sitter-clojure
 
 jobs:
+  sources:
+    name: Assemble parser sources (upstream bundle + our clojure fork)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install zstd
+        run: sudo apt-get update && sudo apt-get install -y zstd
+
+      - name: Download upstream parser-sources bundle
+        run: |
+          curl -fsSL -o /tmp/ps.tar.zst "$PARSER_BUNDLE_URL"
+          tar --zstd -xf /tmp/ps.tar.zst   # extracts ./parsers/<lang>/...
+          echo "languages in bundle: $(ls parsers | wc -l)"
+          test -f parsers/clojure/src/parser.c
+
+      - name: Override clojure grammar with our fork
+        run: |
+          git clone --depth 1 "$CLOJURE_FORK" /tmp/clj
+          rm -rf parsers/clojure
+          mkdir -p parsers/clojure
+          cp -r /tmp/clj/src parsers/clojure/src
+          cp -r /tmp/clj/queries parsers/clojure/queries
+          echo "=== clojure now sourced from $(git -C /tmp/clj rev-parse HEAD) ==="
+          ls -R parsers/clojure
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parser-sources
+          path: parsers
+          retention-days: 1
+          if-no-files-found: error
+
   natives:
     name: Build native FFI (${{ matrix.rid }})
+    needs: sources
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -61,30 +97,11 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      # The build needs grammar sources in ./parsers. Our fork has no published
-      # parser-sources tarball, so we clone them locally from
-      # sources/language_definitions.json (which points clojure at our fork).
-      - uses: actions/setup-node@v4
+      - name: Download assembled parser sources
+        uses: actions/download-artifact@v4
         with:
-          node-version: '20'
-
-      - name: Install tree-sitter CLI
-        run: npm install -g tree-sitter-cli
-
-      - uses: astral-sh/setup-uv@v5
-
-      - name: Cache parsers
-        uses: actions/cache@v4
-        with:
+          name: parser-sources
           path: parsers
-          key: parsers-${{ hashFiles('sources/language_definitions.json') }}
-          restore-keys: parsers-
-
-      - name: Clone grammar sources (populates ./parsers from our fork)
-        shell: bash
-        run: |
-          mkdir -p parsers
-          uv run --script scripts/clone_vendors.py
 
       - name: Build FFI library (TSLP_LANGUAGES=${{ env.TSLP_LANGUAGES }})
         run: cargo build --locked -p ts-pack-core-ffi --release
