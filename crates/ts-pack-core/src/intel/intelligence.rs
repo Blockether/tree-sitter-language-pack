@@ -316,19 +316,42 @@ fn clojure_def_kind(head: &str) -> Option<StructureKind> {
 }
 
 /// One Clojure structure item from a `list_lit`, or `None` when the list is not
-/// a recognised def-form. Head symbol → kind; the next symbol → name.
+/// a recognised def-form. Head symbol → kind; the next symbol → name. For
+/// `defmethod` the dispatch value is appended to the name (e.g. `area :circle`)
+/// so callers can target one method of a multimethod unambiguously.
 fn clojure_form(node: &tree_sitter::Node, source: &str) -> Option<StructureItem> {
     if node.kind() != "list_lit" {
         return None;
     }
     let mut cursor = node.walk();
-    let syms: Vec<tree_sitter::Node> = node
-        .named_children(&mut cursor)
-        .filter(|c| c.kind() == "sym_lit")
-        .collect();
-    let head = node_text(syms.first()?, source);
+    let named: Vec<tree_sitter::Node> = node.named_children(&mut cursor).collect();
+    // Head symbol identifies the def-form.
+    let head_node = named.first()?;
+    if head_node.kind() != "sym_lit" {
+        return None;
+    }
+    let head = node_text(head_node, source);
     let kind = clojure_def_kind(head)?;
-    let name = syms.get(1).map(|n| node_text(n, source).to_string());
+    // The defined name is the next symbol (skip metadata/reader nodes between).
+    let name_node = named.iter().skip(1).find(|n| n.kind() == "sym_lit");
+    let name = name_node.map(|n| {
+        let base = node_text(n, source).to_string();
+        if head == "defmethod" {
+            // Append the dispatch value (the form right after the name) so two
+            // (defmethod area :circle …) / (defmethod area :rect …) are distinct.
+            let dispatch = named
+                .iter()
+                .skip_while(|x| x.id() != n.id())
+                .nth(1)
+                .map(|d| collapse_ws(node_text(d, source)));
+            match dispatch {
+                Some(d) if !d.is_empty() => format!("{base} {d}"),
+                _ => base,
+            }
+        } else {
+            base
+        }
+    });
     Some(StructureItem {
         kind,
         name,
@@ -340,6 +363,11 @@ fn clojure_form(node: &tree_sitter::Node, source: &str) -> Option<StructureItem>
         signature: None,
         body_span: None,
     })
+}
+
+/// Trim and collapse internal whitespace runs to a single space.
+fn collapse_ws(s: &str) -> String {
+    s.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
 /// Top-level Clojure def-forms, in source order.
