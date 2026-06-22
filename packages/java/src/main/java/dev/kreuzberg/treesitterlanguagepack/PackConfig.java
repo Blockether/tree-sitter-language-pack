@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -16,11 +14,10 @@ import org.jspecify.annotations.Nullable;
  * Can be loaded from a TOML file, constructed programmatically,
  * or passed as a dict/object from language bindings.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record PackConfig(
-    @JsonProperty("cache_dir") java.nio.file.@Nullable Path cacheDir,
-    @Nullable @JsonProperty("languages") List<String> languages,
-    @Nullable @JsonProperty("groups") List<String> groups) {
+    java.nio.file.@Nullable Path cacheDir,
+    @Nullable List<String> languages,
+    @Nullable List<String> groups) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -28,10 +25,8 @@ public record PackConfig(
 
   // CPD-OFF
   /** Jackson builder for PackConfig deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
-    @JsonProperty("cache_dir")
     private java.nio.file.@Nullable Path cacheDir;
 
     @Nullable
@@ -41,21 +36,18 @@ public record PackConfig(
     private List<String> groups;
 
     /** Sets the cacheDir field. */
-    @JsonProperty("cache_dir")
     public Builder withCacheDir(final java.nio.file.@Nullable Path value) {
       this.cacheDir = value;
       return this;
     }
 
     /** Sets the languages field. */
-    @JsonProperty("languages")
     public Builder withLanguages(final @Nullable List<String> value) {
       this.languages = value;
       return this;
     }
 
     /** Sets the groups field. */
-    @JsonProperty("groups")
     public Builder withGroups(final @Nullable List<String> value) {
       this.groups = value;
       return this;

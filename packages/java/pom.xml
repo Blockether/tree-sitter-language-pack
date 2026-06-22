@@ -74,21 +74,14 @@
             <artifactId>jspecify</artifactId>
             <version>1.0.0</version>
         </dependency>
-        <!-- JSON at the FFI boundary is handled by charred (reflection-free,
-             GraalVM-native-friendly) via JsonCodec — NOT Jackson databind. Only
-             the inert jackson-annotations remain, because the alef-generated
-             DTOs still carry @JsonProperty/@JsonInclude metadata; annotations
-             need no reflection config and add no native-image cost. charred
+        <!-- JSON at the FFI boundary is handled entirely by charred
+             (reflection-free, GraalVM-native-friendly) via JsonCodec. Jackson is
+             GONE — no databind and no annotations: JsonCodec builds the DTOs
+             through their generated Builders + enum fromValue factories, so the
+             @JsonProperty metadata was unused and has been stripped. charred
              pulls in org.clojure/clojure transitively (its JSONReader references
              clojure.lang.Keyword); that is fine for the Clojure host this fork
              targets. -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <!-- jackson-annotations tracks major.minor (no .patch); 2.21 is the
-                 2.21.x line that jackson-databind 2.21.2 itself depended on. -->
-            <version>2.21</version>
-        </dependency>
         <dependency>
             <groupId>com.cnuernber</groupId>
             <artifactId>charred</artifactId>

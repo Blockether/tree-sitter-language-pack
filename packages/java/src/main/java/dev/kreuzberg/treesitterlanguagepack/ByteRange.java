@@ -4,15 +4,12 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A byte range — start (inclusive) to end (exclusive).
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record ByteRange(
-    @JsonProperty("start") long start, @JsonProperty("end") long end) {
+    long start, long end) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -20,21 +17,18 @@ public record ByteRange(
 
   // CPD-OFF
   /** Jackson builder for ByteRange deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private long start;
     private long end;
 
     /** Sets the start field. */
-    @JsonProperty("start")
     public Builder withStart(final long value) {
       this.start = value;
       return this;
     }
 
     /** Sets the end field. */
-    @JsonProperty("end")
     public Builder withEnd(final long value) {
       this.end = value;
       return this;

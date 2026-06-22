@@ -4,21 +4,18 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 /**
  * An import statement extracted from source code.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record ImportInfo(
-    @JsonProperty("source") String source,
-    @Nullable @JsonProperty("items") List<String> items,
-    @Nullable @JsonProperty("alias") String alias,
-    @JsonProperty("is_wildcard") boolean isWildcard,
-    @JsonProperty("span") Span span) {
+    String source,
+    @Nullable List<String> items,
+    @Nullable String alias,
+    boolean isWildcard,
+    Span span) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -26,7 +23,6 @@ public record ImportInfo(
 
   // CPD-OFF
   /** Jackson builder for ImportInfo deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private String source;
@@ -37,41 +33,35 @@ public record ImportInfo(
     @Nullable
     private String alias;
 
-    @JsonProperty("is_wildcard")
     private boolean isWildcard;
 
     private Span span;
 
     /** Sets the source field. */
-    @JsonProperty("source")
     public Builder withSource(final String value) {
       this.source = value;
       return this;
     }
 
     /** Sets the items field. */
-    @JsonProperty("items")
     public Builder withItems(final @Nullable List<String> value) {
       this.items = value;
       return this;
     }
 
     /** Sets the alias field. */
-    @JsonProperty("alias")
     public Builder withAlias(final @Nullable String value) {
       this.alias = value;
       return this;
     }
 
     /** Sets the isWildcard field. */
-    @JsonProperty("is_wildcard")
     public Builder withIsWildcard(final boolean value) {
       this.isWildcard = value;
       return this;
     }
 
     /** Sets the span field. */
-    @JsonProperty("span")
     public Builder withSpan(final Span value) {
       this.span = value;
       return this;

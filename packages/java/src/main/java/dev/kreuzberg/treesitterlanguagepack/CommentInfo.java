@@ -4,19 +4,16 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A comment extracted from source code.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record CommentInfo(
-    @JsonProperty("text") String text,
-    @JsonProperty("kind") CommentKind kind,
-    @JsonProperty("span") Span span,
-    @Nullable @JsonProperty("associated_node") String associatedNode) {
+    String text,
+    CommentKind kind,
+    Span span,
+    @Nullable String associatedNode) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -24,40 +21,34 @@ public record CommentInfo(
 
   // CPD-OFF
   /** Jackson builder for CommentInfo deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private String text;
     private CommentKind kind;
     private Span span;
 
-    @JsonProperty("associated_node")
     @Nullable
     private String associatedNode;
 
     /** Sets the text field. */
-    @JsonProperty("text")
     public Builder withText(final String value) {
       this.text = value;
       return this;
     }
 
     /** Sets the kind field. */
-    @JsonProperty("kind")
     public Builder withKind(final CommentKind value) {
       this.kind = value;
       return this;
     }
 
     /** Sets the span field. */
-    @JsonProperty("span")
     public Builder withSpan(final Span value) {
       this.span = value;
       return this;
     }
 
     /** Sets the associatedNode field. */
-    @JsonProperty("associated_node")
     public Builder withAssociatedNode(final @Nullable String value) {
       this.associatedNode = value;
       return this;

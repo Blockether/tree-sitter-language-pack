@@ -4,17 +4,14 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A diagnostic (syntax error, missing node, etc.) from parsing.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record Diagnostic(
-    @JsonProperty("message") String message,
-    @JsonProperty("severity") DiagnosticSeverity severity,
-    @JsonProperty("span") Span span) {
+    String message,
+    DiagnosticSeverity severity,
+    Span span) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -22,7 +19,6 @@ public record Diagnostic(
 
   // CPD-OFF
   /** Jackson builder for Diagnostic deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private String message;
@@ -30,21 +26,18 @@ public record Diagnostic(
     private Span span;
 
     /** Sets the message field. */
-    @JsonProperty("message")
     public Builder withMessage(final String value) {
       this.message = value;
       return this;
     }
 
     /** Sets the severity field. */
-    @JsonProperty("severity")
     public Builder withSeverity(final DiagnosticSeverity value) {
       this.severity = value;
       return this;
     }
 
     /** Sets the span field. */
-    @JsonProperty("span")
     public Builder withSpan(final Span value) {
       this.span = value;
       return this;

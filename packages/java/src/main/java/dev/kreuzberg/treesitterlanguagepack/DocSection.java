@@ -4,18 +4,15 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A section within a docstring (e.g., Args, Returns, Raises).
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record DocSection(
-    @JsonProperty("kind") String kind,
-    @Nullable @JsonProperty("name") String name,
-    @JsonProperty("description") String description) {
+    String kind,
+    @Nullable String name,
+    String description) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -23,7 +20,6 @@ public record DocSection(
 
   // CPD-OFF
   /** Jackson builder for DocSection deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private String kind;
@@ -34,21 +30,18 @@ public record DocSection(
     private String description;
 
     /** Sets the kind field. */
-    @JsonProperty("kind")
     public Builder withKind(final String value) {
       this.kind = value;
       return this;
     }
 
     /** Sets the name field. */
-    @JsonProperty("name")
     public Builder withName(final @Nullable String value) {
       this.name = value;
       return this;
     }
 
     /** Sets the description field. */
-    @JsonProperty("description")
     public Builder withDescription(final String value) {
       this.description = value;
       return this;

@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * The kind of a data node extracted from a data-format file.
@@ -46,13 +44,11 @@ public enum DataNodeKind {
   }
 
   /** Returns the string value. */
-  @JsonValue
   public String getValue() {
     return value;
   }
 
   /** Creates an instance from a string value. */
-  @JsonCreator
   public static DataNodeKind fromValue(final String value) {
     for (DataNodeKind e : values()) {
       if (e.value.equalsIgnoreCase(value)) {

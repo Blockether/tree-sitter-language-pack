@@ -4,20 +4,17 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A chunk of source code with rich metadata.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record CodeChunk(
-    @JsonProperty("content") String content,
-    @JsonProperty("start_byte") long startByte,
-    @JsonProperty("end_byte") long endByte,
-    @JsonProperty("start_line") long startLine,
-    @JsonProperty("end_line") long endLine,
-    @JsonProperty("metadata") ChunkContext metadata) {
+    String content,
+    long startByte,
+    long endByte,
+    long startLine,
+    long endLine,
+    ChunkContext metadata) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -25,62 +22,51 @@ public record CodeChunk(
 
   // CPD-OFF
   /** Jackson builder for CodeChunk deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private String content;
 
-    @JsonProperty("start_byte")
     private long startByte;
 
-    @JsonProperty("end_byte")
     private long endByte;
 
-    @JsonProperty("start_line")
     private long startLine;
 
-    @JsonProperty("end_line")
     private long endLine;
 
     private ChunkContext metadata;
 
     /** Sets the content field. */
-    @JsonProperty("content")
     public Builder withContent(final String value) {
       this.content = value;
       return this;
     }
 
     /** Sets the startByte field. */
-    @JsonProperty("start_byte")
     public Builder withStartByte(final long value) {
       this.startByte = value;
       return this;
     }
 
     /** Sets the endByte field. */
-    @JsonProperty("end_byte")
     public Builder withEndByte(final long value) {
       this.endByte = value;
       return this;
     }
 
     /** Sets the startLine field. */
-    @JsonProperty("start_line")
     public Builder withStartLine(final long value) {
       this.startLine = value;
       return this;
     }
 
     /** Sets the endLine field. */
-    @JsonProperty("end_line")
     public Builder withEndLine(final long value) {
       this.endLine = value;
       return this;
     }
 
     /** Sets the metadata field. */
-    @JsonProperty("metadata")
     public Builder withMetadata(final ChunkContext value) {
       this.metadata = value;
       return this;

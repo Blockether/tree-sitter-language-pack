@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * The kind of a symbol definition found in source code.
@@ -66,13 +64,11 @@ public enum SymbolKind {
   }
 
   /** Returns the string value. */
-  @JsonValue
   public String getValue() {
     return value;
   }
 
   /** Creates an instance from a string value. */
-  @JsonCreator
   public static SymbolKind fromValue(final String value) {
     for (SymbolKind e : values()) {
       if (e.value.equalsIgnoreCase(value)) {

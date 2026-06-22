@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * The format of a docstring extracted from source code.
@@ -60,13 +58,11 @@ public enum DocstringFormat {
   }
 
   /** Returns the string value. */
-  @JsonValue
   public String getValue() {
     return value;
   }
 
   /** Creates an instance from a string value. */
-  @JsonCreator
   public static DocstringFormat fromValue(final String value) {
     for (DocstringFormat e : values()) {
       if (e.value.equalsIgnoreCase(value)) {

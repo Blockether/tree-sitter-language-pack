@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -13,18 +11,17 @@ import org.jspecify.annotations.Nullable;
  *
  * Controls which analysis features are enabled and whether chunking is performed.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record ProcessConfig(
-    @JsonProperty("language") String language,
-    @Nullable @JsonProperty("structure") Boolean structure,
-    @Nullable @JsonProperty("imports") Boolean imports,
-    @Nullable @JsonProperty("exports") Boolean exports,
-    @Nullable @JsonProperty("comments") Boolean comments,
-    @Nullable @JsonProperty("docstrings") Boolean docstrings,
-    @Nullable @JsonProperty("symbols") Boolean symbols,
-    @Nullable @JsonProperty("diagnostics") Boolean diagnostics,
-    @Nullable @JsonProperty("chunk_max_size") Long chunkMaxSize,
-    @Nullable @JsonProperty("data_extraction") Boolean dataExtraction) {
+    String language,
+    @Nullable Boolean structure,
+    @Nullable Boolean imports,
+    @Nullable Boolean exports,
+    @Nullable Boolean comments,
+    @Nullable Boolean docstrings,
+    @Nullable Boolean symbols,
+    @Nullable Boolean diagnostics,
+    @Nullable Long chunkMaxSize,
+    @Nullable Boolean dataExtraction) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -44,7 +41,6 @@ public record ProcessConfig(
 
   // CPD-OFF
   /** Jackson builder for ProcessConfig deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private String language;
@@ -70,79 +66,67 @@ public record ProcessConfig(
     @Nullable
     private Boolean diagnostics;
 
-    @JsonProperty("chunk_max_size")
     @Nullable
     private Long chunkMaxSize;
 
-    @JsonProperty("data_extraction")
     @Nullable
     private Boolean dataExtraction;
 
     /** Sets the language field. */
-    @JsonProperty("language")
     public Builder withLanguage(final String value) {
       this.language = value;
       return this;
     }
 
     /** Sets the structure field. */
-    @JsonProperty("structure")
     public Builder withStructure(final @Nullable Boolean value) {
       this.structure = value;
       return this;
     }
 
     /** Sets the imports field. */
-    @JsonProperty("imports")
     public Builder withImports(final @Nullable Boolean value) {
       this.imports = value;
       return this;
     }
 
     /** Sets the exports field. */
-    @JsonProperty("exports")
     public Builder withExports(final @Nullable Boolean value) {
       this.exports = value;
       return this;
     }
 
     /** Sets the comments field. */
-    @JsonProperty("comments")
     public Builder withComments(final @Nullable Boolean value) {
       this.comments = value;
       return this;
     }
 
     /** Sets the docstrings field. */
-    @JsonProperty("docstrings")
     public Builder withDocstrings(final @Nullable Boolean value) {
       this.docstrings = value;
       return this;
     }
 
     /** Sets the symbols field. */
-    @JsonProperty("symbols")
     public Builder withSymbols(final @Nullable Boolean value) {
       this.symbols = value;
       return this;
     }
 
     /** Sets the diagnostics field. */
-    @JsonProperty("diagnostics")
     public Builder withDiagnostics(final @Nullable Boolean value) {
       this.diagnostics = value;
       return this;
     }
 
     /** Sets the chunkMaxSize field. */
-    @JsonProperty("chunk_max_size")
     public Builder withChunkMaxSize(final @Nullable Long value) {
       this.chunkMaxSize = value;
       return this;
     }
 
     /** Sets the dataExtraction field. */
-    @JsonProperty("data_extraction")
     public Builder withDataExtraction(final @Nullable Boolean value) {
       this.dataExtraction = value;
       return this;

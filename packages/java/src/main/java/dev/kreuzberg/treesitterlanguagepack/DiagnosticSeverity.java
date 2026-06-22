@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Severity level of a diagnostic produced during parsing.
@@ -36,13 +34,11 @@ public enum DiagnosticSeverity {
   }
 
   /** Returns the string value. */
-  @JsonValue
   public String getValue() {
     return value;
   }
 
   /** Creates an instance from a string value. */
-  @JsonCreator
   public static DiagnosticSeverity fromValue(final String value) {
     for (DiagnosticSeverity e : values()) {
       if (e.value.equalsIgnoreCase(value)) {

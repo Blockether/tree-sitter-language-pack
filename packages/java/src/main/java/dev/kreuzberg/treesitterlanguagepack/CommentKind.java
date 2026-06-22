@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * The kind of a comment found in source code.
@@ -36,13 +34,11 @@ public enum CommentKind {
   }
 
   /** Returns the string value. */
-  @JsonValue
   public String getValue() {
     return value;
   }
 
   /** Creates an instance from a string value. */
-  @JsonCreator
   public static CommentKind fromValue(final String value) {
     for (CommentKind e : values()) {
       if (e.value.equalsIgnoreCase(value)) {

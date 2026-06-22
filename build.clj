@@ -31,17 +31,17 @@
                   "macos-x86_64"   "libts_pack_core_ffi.dylib"
                   "windows-x86_64" "ts_pack_core_ffi.dll"})
 
-(defn- cargo-version []
-  (some->> (slurp "Cargo.toml")
-           (re-find #"(?m)^\s*version\s*=\s*\"([^\"]+)\"")
-           second))
-
 (def version
+  "Single, file-tracked release version — mirrors Blockether/rift-clojure and
+   Blockether/svar. The VERSION env (set by CI from the release tag, leading `v`
+   stripped) wins; otherwise the canonical `VERSION` file at the repo root, tagged
+   `-SNAPSHOT` for local builds. (Previously this fell back to Cargo.toml, which
+   carries UPSTREAM's `1.10.3` — wrong for our fork's `-blockether.N` line.)"
   (let [v (System/getenv "VERSION")]
     (cond
       (and v (str/starts-with? v "v")) (subs v 1)
       (and v (seq v))                  v
-      :else                            (or (cargo-version) "0.0.1-SNAPSHOT"))))
+      :else                            (str (str/trim (slurp "VERSION")) "-SNAPSHOT"))))
 
 (def class-dir "target/classes")
 (def jar-file (format "target/%s-%s.jar" (name lib) version))
