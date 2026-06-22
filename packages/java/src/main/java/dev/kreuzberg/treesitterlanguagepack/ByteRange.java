@@ -6,14 +6,11 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * A byte range — start (inclusive) to end (exclusive).
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = ByteRange.Builder.class)
 public record ByteRange(
     @JsonProperty("start") long start, @JsonProperty("end") long end) {
   /** Creates a new Builder for constructing instances of this record. */
@@ -24,7 +21,6 @@ public record ByteRange(
   // CPD-OFF
   /** Jackson builder for ByteRange deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private long start;

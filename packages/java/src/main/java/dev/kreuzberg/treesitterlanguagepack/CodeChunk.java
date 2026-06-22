@@ -6,14 +6,11 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * A chunk of source code with rich metadata.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = CodeChunk.Builder.class)
 public record CodeChunk(
     @JsonProperty("content") String content,
     @JsonProperty("start_byte") long startByte,
@@ -29,7 +26,6 @@ public record CodeChunk(
   // CPD-OFF
   /** Jackson builder for CodeChunk deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private String content;

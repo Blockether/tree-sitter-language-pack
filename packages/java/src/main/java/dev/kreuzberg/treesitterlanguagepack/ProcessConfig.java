@@ -6,8 +6,6 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -16,7 +14,6 @@ import org.jspecify.annotations.Nullable;
  * Controls which analysis features are enabled and whether chunking is performed.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = ProcessConfig.Builder.class)
 public record ProcessConfig(
     @JsonProperty("language") String language,
     @Nullable @JsonProperty("structure") Boolean structure,
@@ -48,7 +45,6 @@ public record ProcessConfig(
   // CPD-OFF
   /** Jackson builder for ProcessConfig deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private String language;

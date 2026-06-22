@@ -6,14 +6,11 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * A diagnostic (syntax error, missing node, etc.) from parsing.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = Diagnostic.Builder.class)
 public record Diagnostic(
     @JsonProperty("message") String message,
     @JsonProperty("severity") DiagnosticSeverity severity,
@@ -26,7 +23,6 @@ public record Diagnostic(
   // CPD-OFF
   /** Jackson builder for Diagnostic deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private String message;

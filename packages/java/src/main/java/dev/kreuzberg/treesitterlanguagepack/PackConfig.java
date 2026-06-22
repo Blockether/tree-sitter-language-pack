@@ -6,8 +6,6 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -19,7 +17,6 @@ import org.jspecify.annotations.Nullable;
  * or passed as a dict/object from language bindings.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = PackConfig.Builder.class)
 public record PackConfig(
     @JsonProperty("cache_dir") java.nio.file.@Nullable Path cacheDir,
     @Nullable @JsonProperty("languages") List<String> languages,
@@ -32,7 +29,6 @@ public record PackConfig(
   // CPD-OFF
   /** Jackson builder for PackConfig deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     @JsonProperty("cache_dir")

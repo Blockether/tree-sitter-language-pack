@@ -6,14 +6,11 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * Aggregate metrics for a source file.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = FileMetrics.Builder.class)
 public record FileMetrics(
     @JsonProperty("total_lines") long totalLines,
     @JsonProperty("code_lines") long codeLines,
@@ -31,7 +28,6 @@ public record FileMetrics(
   // CPD-OFF
   /** Jackson builder for FileMetrics deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     @JsonProperty("total_lines")

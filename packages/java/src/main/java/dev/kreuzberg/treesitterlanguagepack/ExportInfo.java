@@ -6,14 +6,11 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * An export statement extracted from source code.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = ExportInfo.Builder.class)
 public record ExportInfo(
     @JsonProperty("name") String name,
     @JsonProperty("kind") ExportKind kind,
@@ -26,7 +23,6 @@ public record ExportInfo(
   // CPD-OFF
   /** Jackson builder for ExportInfo deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private String name;

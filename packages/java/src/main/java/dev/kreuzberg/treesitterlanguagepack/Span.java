@@ -6,8 +6,6 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * Byte and line/column range in source code.
@@ -16,7 +14,6 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
  * positions (for display and diagnostics).
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = Span.Builder.class)
 public record Span(
     @JsonProperty("start_byte") long startByte,
     @JsonProperty("end_byte") long endByte,
@@ -32,7 +29,6 @@ public record Span(
   // CPD-OFF
   /** Jackson builder for Span deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     @JsonProperty("start_byte")

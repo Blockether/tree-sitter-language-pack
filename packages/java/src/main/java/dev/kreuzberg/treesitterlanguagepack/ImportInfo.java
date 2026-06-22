@@ -6,8 +6,6 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -15,7 +13,6 @@ import org.jspecify.annotations.Nullable;
  * An import statement extracted from source code.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = ImportInfo.Builder.class)
 public record ImportInfo(
     @JsonProperty("source") String source,
     @Nullable @JsonProperty("items") List<String> items,
@@ -30,7 +27,6 @@ public record ImportInfo(
   // CPD-OFF
   /** Jackson builder for ImportInfo deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private String source;

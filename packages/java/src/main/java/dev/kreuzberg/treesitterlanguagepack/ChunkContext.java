@@ -6,15 +6,12 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.List;
 
 /**
  * Metadata for a single chunk of source code.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = ChunkContext.Builder.class)
 public record ChunkContext(
     @JsonProperty("language") String language,
     @JsonProperty("chunk_index") long chunkIndex,
@@ -33,7 +30,6 @@ public record ChunkContext(
   // CPD-OFF
   /** Jackson builder for ChunkContext deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private String language;

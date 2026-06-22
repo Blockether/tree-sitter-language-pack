@@ -4,7 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.util.List;
@@ -155,7 +154,7 @@ public class LanguageRegistry implements AutoCloseable {
     try {
       Arena arena = Arena.ofAuto();
       var cSource = arena.allocateFrom(source);
-      String cConfigJson = STREAM_MAPPER.writeValueAsString(config);
+      String cConfigJson = JsonCodec.writeConfig(config);
       var cConfigJsonSeg = arena.allocateFrom(cConfigJson);
       MemorySegment cConfig =
           (MemorySegment) NativeLib.TS_PACK_PROCESS_CONFIG_FROM_JSON.invoke(cConfigJsonSeg);
@@ -187,7 +186,7 @@ public class LanguageRegistry implements AutoCloseable {
         }
         String json = jsonPtr.reinterpret(Long.MAX_VALUE).getString(0);
         NativeLib.TS_PACK_FREE_STRING.invoke(jsonPtr);
-        return STREAM_MAPPER.readValue(json, ProcessResult.class);
+        return JsonCodec.readProcessResult(json);
       } finally {
         NativeLib.TS_PACK_PROCESS_RESULT_FREE.invoke(resultPtr);
       }
@@ -248,17 +247,4 @@ public class LanguageRegistry implements AutoCloseable {
       throw new TreeSitterLanguagePackRsException("failed to read last error", e);
     }
   }
-
-  private static final ObjectMapper STREAM_MAPPER = createStreamMapper();
-
-  private static ObjectMapper createStreamMapper() {
-    return new ObjectMapper()
-        .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-        .findAndRegisterModules()
-        .setPropertyNamingStrategy(
-            com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-        .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-        .configure(
-            com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true);
-  } // CPD-ON
 }

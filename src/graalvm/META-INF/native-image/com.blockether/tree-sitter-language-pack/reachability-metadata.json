@@ -1,44 +1,7 @@
 {
-  "reflection": [
-    {
-      "type": "com.fasterxml.jackson.databind.deser.Deserializers[]"
-    },
-    {
-      "type": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
-      "type": "com.fasterxml.jackson.databind.ser.Serializers[]"
-    },
-    {
-      "type": "com.fasterxml.jackson.datatype.jdk8.Jdk8Module"
-    },
-    {
-      "type": "java.lang.Class"
-    },
-    {
-      "type": "sun.text.resources.cldr.FormatData"
-    },
-    {
-      "type": "sun.text.resources.cldr.FormatData_en"
-    },
-    {
-      "type": "sun.text.resources.cldr.FormatData_en_US"
-    },
-    {
-      "type": "sun.util.resources.cldr.CalendarData"
-    }
-  ],
-  "resources": [
-    {
-      "glob": "META-INF/services/com.fasterxml.jackson.databind.Module"
-    }
-  ],
+  "comment": "JSON at the FFI boundary is handled by charred (com.cnuernber/charred) via JsonCodec, NOT Jackson databind. charred parses to plain Map/List trees and the DTOs are built through their generated Builders + enum fromValue factories — entirely reflection-free, so no reflection metadata is needed here (the former Jackson databind reflection entries are gone). Only the FFI downcall stubs remain.",
+  "reflection": [],
+  "resources": [],
   "foreign": {
     "downcalls": [
       {
