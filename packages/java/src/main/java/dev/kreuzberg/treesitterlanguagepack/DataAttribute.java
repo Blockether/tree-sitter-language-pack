@@ -6,8 +6,6 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * An XML-style attribute attached to an Element(DataNodeKind.Element) node.
@@ -16,7 +14,6 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
  * {@code Sequence} nodes.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = DataAttribute.Builder.class)
 public record DataAttribute(
     @JsonProperty("name") String name,
     @JsonProperty("value") String value,
@@ -29,7 +26,6 @@ public record DataAttribute(
   // CPD-OFF
   /** Jackson builder for DataAttribute deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private String name;

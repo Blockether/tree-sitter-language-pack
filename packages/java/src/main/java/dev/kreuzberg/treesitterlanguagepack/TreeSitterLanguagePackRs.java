@@ -292,9 +292,7 @@ public final class TreeSitterLanguagePackRs {
   public static List<String> availableLanguages() throws TreeSitterLanguagePackRsException {
     try (var arena = Arena.ofConfined()) {
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_AVAILABLE_LANGUAGES.invoke();
-      return readJsonList(
-          resultPtr,
-          new com.fasterxml.jackson.core.type.TypeReference<java.util.List<String>>() {});
+      return readStringListResult(resultPtr);
     } catch (Throwable e) {
       throw new TreeSitterLanguagePackRsException("FFI call failed", e);
     }
@@ -343,7 +341,7 @@ public final class TreeSitterLanguagePackRs {
       throws TreeSitterLanguagePackRsException {
     try (var arena = Arena.ofConfined()) {
       var csource = arena.allocateFrom(source);
-      var cconfigJson = config != null ? MAPPER.writeValueAsString(config) : null;
+      var cconfigJson = config != null ? JsonCodec.writeConfig(config) : null;
       var cconfigJsonSeg =
           cconfigJson != null ? arena.allocateFrom(cconfigJson) : MemorySegment.NULL;
       var cconfig = cconfigJson != null
@@ -370,7 +368,7 @@ public final class TreeSitterLanguagePackRs {
       }
       String json = jsonPtr.reinterpret(Long.MAX_VALUE).getString(0);
       NativeLib.TS_PACK_FREE_STRING.invoke(jsonPtr);
-      return MAPPER.readValue(json, ProcessResult.class);
+      return JsonCodec.readProcessResult(json);
       // CPD-ON
     } catch (Throwable e) {
       throw new TreeSitterLanguagePackRsException("FFI call failed", e);
@@ -387,7 +385,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static void init(final PackConfig config) throws TreeSitterLanguagePackRsException {
     try (var arena = Arena.ofConfined()) {
-      var cconfigJson = config != null ? MAPPER.writeValueAsString(config) : null;
+      var cconfigJson = config != null ? JsonCodec.writeConfig(config) : null;
       var cconfigJsonSeg =
           cconfigJson != null ? arena.allocateFrom(cconfigJson) : MemorySegment.NULL;
       var cconfig = cconfigJson != null
@@ -418,7 +416,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static void configure(final PackConfig config) throws TreeSitterLanguagePackRsException {
     try (var arena = Arena.ofConfined()) {
-      var cconfigJson = config != null ? MAPPER.writeValueAsString(config) : null;
+      var cconfigJson = config != null ? JsonCodec.writeConfig(config) : null;
       var cconfigJsonSeg =
           cconfigJson != null ? arena.allocateFrom(cconfigJson) : MemorySegment.NULL;
       var cconfig = cconfigJson != null
@@ -448,10 +446,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static long download(final List<String> names) throws TreeSitterLanguagePackRsException {
     try (var arena = Arena.ofConfined()) {
-      var cnamesJson = MAPPER
-          .writerFor(
-              MAPPER.getTypeFactory().constructCollectionType(java.util.List.class, String.class))
-          .writeValueAsString(names);
+      var cnamesJson = JsonCodec.writeStringList(names);
       var cnames = arena.allocateFrom(cnamesJson);
       var primitiveResult = (long) NativeLib.TS_PACK_DOWNLOAD.invoke(cnames);
       checkLastError();
@@ -517,9 +512,7 @@ public final class TreeSitterLanguagePackRs {
   public static List<String> manifestLanguages() throws TreeSitterLanguagePackRsException {
     try (var arena = Arena.ofConfined()) {
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_MANIFEST_LANGUAGES.invoke();
-      return readJsonList(
-          resultPtr,
-          new com.fasterxml.jackson.core.type.TypeReference<java.util.List<String>>() {});
+      return readStringListResult(resultPtr);
     } catch (Throwable e) {
       throw new TreeSitterLanguagePackRsException("FFI call failed", e);
     }
@@ -534,9 +527,7 @@ public final class TreeSitterLanguagePackRs {
   public static List<String> downloadedLanguages() throws TreeSitterLanguagePackRsException {
     try (var arena = Arena.ofConfined()) {
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_DOWNLOADED_LANGUAGES.invoke();
-      return readJsonList(
-          resultPtr,
-          new com.fasterxml.jackson.core.type.TypeReference<java.util.List<String>>() {});
+      return readStringListResult(resultPtr);
     } catch (Throwable e) {
       throw new TreeSitterLanguagePackRsException("FFI call failed", e);
     }
@@ -596,19 +587,6 @@ public final class TreeSitterLanguagePackRs {
     }
   }
 
-  private static com.fasterxml.jackson.databind.ObjectMapper createObjectMapper() {
-    return new com.fasterxml.jackson.databind.ObjectMapper()
-        .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-        .findAndRegisterModules()
-        .setPropertyNamingStrategy(
-            com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-        .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS)
-        .configure(
-            com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true);
-  }
-
-  private static final com.fasterxml.jackson.databind.ObjectMapper MAPPER = createObjectMapper();
-
   private static String readCString(MemorySegment ptr, long byteLen) {
     if (ptr == null || ptr.address() == 0) {
       return null;
@@ -616,9 +594,7 @@ public final class TreeSitterLanguagePackRs {
     return ptr.reinterpret(byteLen + 1).getString(0);
   }
 
-  private static <T> java.util.List<T> readJsonList(
-      MemorySegment resultPtr,
-      com.fasterxml.jackson.core.type.TypeReference<java.util.List<T>> typeRef)
+  private static java.util.List<String> readStringListResult(MemorySegment resultPtr)
       throws TreeSitterLanguagePackRsException {
     try {
       if (resultPtr.equals(MemorySegment.NULL)) {
@@ -627,7 +603,7 @@ public final class TreeSitterLanguagePackRs {
       }
       String json = resultPtr.reinterpret(Long.MAX_VALUE).getString(0);
       NativeLib.TS_PACK_FREE_STRING.invoke(resultPtr);
-      return MAPPER.readValue(json, typeRef);
+      return JsonCodec.readStringList(json);
     } catch (Throwable e) {
       throw new TreeSitterLanguagePackRsException("FFI call failed", e);
     }

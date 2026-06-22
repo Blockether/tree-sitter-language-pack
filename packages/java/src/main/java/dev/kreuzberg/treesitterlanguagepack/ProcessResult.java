@@ -6,8 +6,6 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -32,7 +30,6 @@ import org.jspecify.annotations.Nullable;
  * - {@code chunks} - Chunked code segments (when {@code config.chunk_max_size} is set)
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = ProcessResult.Builder.class)
 public record ProcessResult(
     @JsonProperty("language") String language,
     @JsonProperty("metrics") FileMetrics metrics,
@@ -53,7 +50,6 @@ public record ProcessResult(
   // CPD-OFF
   /** Jackson builder for ProcessResult deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private String language;

@@ -6,8 +6,6 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -15,7 +13,6 @@ import org.jspecify.annotations.Nullable;
  * A structural item (function, class, struct, etc.) in source code.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = StructureItem.Builder.class)
 public record StructureItem(
     @JsonProperty("kind") StructureKind kind,
     @Nullable @JsonProperty("name") String name,
@@ -34,7 +31,6 @@ public record StructureItem(
   // CPD-OFF
   /** Jackson builder for StructureItem deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private StructureKind kind;

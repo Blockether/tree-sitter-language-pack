@@ -4,7 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.util.Optional;
@@ -137,7 +136,7 @@ public class Node implements AutoCloseable {
         }
         String json = jsonPtr.reinterpret(Long.MAX_VALUE).getString(0);
         NativeLib.TS_PACK_FREE_STRING.invoke(jsonPtr);
-        return STREAM_MAPPER.readValue(json, ByteRange.class);
+        return JsonCodec.readByteRange(json);
       } finally {
         NativeLib.TS_PACK_BYTE_RANGE_FREE.invoke(resultPtr);
       }
@@ -169,7 +168,7 @@ public class Node implements AutoCloseable {
         }
         String json = jsonPtr.reinterpret(Long.MAX_VALUE).getString(0);
         NativeLib.TS_PACK_FREE_STRING.invoke(jsonPtr);
-        return STREAM_MAPPER.readValue(json, Point.class);
+        return JsonCodec.readPoint(json);
       } finally {
         NativeLib.TS_PACK_POINT_FREE.invoke(resultPtr);
       }
@@ -201,7 +200,7 @@ public class Node implements AutoCloseable {
         }
         String json = jsonPtr.reinterpret(Long.MAX_VALUE).getString(0);
         NativeLib.TS_PACK_FREE_STRING.invoke(jsonPtr);
-        return STREAM_MAPPER.readValue(json, Point.class);
+        return JsonCodec.readPoint(json);
       } finally {
         NativeLib.TS_PACK_POINT_FREE.invoke(resultPtr);
       }
@@ -473,17 +472,4 @@ public class Node implements AutoCloseable {
       throw new TreeSitterLanguagePackRsException("failed to read last error", e);
     }
   }
-
-  private static final ObjectMapper STREAM_MAPPER = createStreamMapper();
-
-  private static ObjectMapper createStreamMapper() {
-    return new ObjectMapper()
-        .registerModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
-        .findAndRegisterModules()
-        .setPropertyNamingStrategy(
-            com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE)
-        .setSerializationInclusion(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-        .configure(
-            com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true);
-  } // CPD-ON
 }

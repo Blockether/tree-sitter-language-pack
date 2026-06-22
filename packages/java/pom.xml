@@ -66,15 +66,23 @@
             <artifactId>jspecify</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <!-- JSON at the FFI boundary is handled by charred (reflection-free,
+             GraalVM-native-friendly) via JsonCodec — NOT Jackson databind. Only
+             the inert jackson-annotations remain, because the alef-generated
+             DTOs still carry @JsonProperty/@JsonInclude metadata; annotations
+             need no reflection config and add no native-image cost. charred
+             pulls in org.clojure/clojure transitively (its JSONReader references
+             clojure.lang.Keyword); that is fine for the Clojure host this fork
+             targets. -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <artifactId>jackson-annotations</artifactId>
             <version>2.21.2</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jdk8</artifactId>
-            <version>2.21.2</version>
+            <groupId>com.cnuernber</groupId>
+            <artifactId>charred</artifactId>
+            <version>1.038</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

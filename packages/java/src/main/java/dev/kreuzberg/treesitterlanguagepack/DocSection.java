@@ -6,15 +6,12 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A section within a docstring (e.g., Args, Returns, Raises).
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = DocSection.Builder.class)
 public record DocSection(
     @JsonProperty("kind") String kind,
     @Nullable @JsonProperty("name") String name,
@@ -27,7 +24,6 @@ public record DocSection(
   // CPD-OFF
   /** Jackson builder for DocSection deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private String kind;

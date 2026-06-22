@@ -8,9 +8,14 @@
 ;; and located at runtime by NativeLib (see packages/java/.../NativeLib.java).
 {:paths ["packages/java/src/main/resources"]
 
+ ;; JSON at the FFI boundary uses charred (reflection-free, native-image-clean)
+ ;; via JsonCodec — not Jackson databind. Only the inert jackson-annotations
+ ;; remain for the alef-generated DTOs' @JsonProperty metadata. charred brings
+ ;; org.clojure/clojure transitively (fine for the Clojure host this targets);
+ ;; build.clj keeps clojure off the published pom (charred's own pom declares it).
  :deps {org.jspecify/jspecify                            {:mvn/version "1.0.0"}
-        com.fasterxml.jackson.core/jackson-databind      {:mvn/version "2.21.2"}
-        com.fasterxml.jackson.datatype/jackson-datatype-jdk8 {:mvn/version "2.21.2"}
+        com.fasterxml.jackson.core/jackson-annotations   {:mvn/version "2.21.2"}
+        com.cnuernber/charred                            {:mvn/version "1.038"}
         io.github.tree-sitter/jtreesitter                {:mvn/version "0.26.0"}}
 
  :aliases

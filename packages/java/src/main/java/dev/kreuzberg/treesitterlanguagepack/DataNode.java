@@ -6,8 +6,6 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -27,7 +25,6 @@ import org.jspecify.annotations.Nullable;
  * | {@code Sequence} | positional index ({@code "0"}) | leaf value   | empty        | sub-items  |
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = DataNode.Builder.class)
 public record DataNode(
     @JsonProperty("kind") DataNodeKind kind,
     @Nullable @JsonProperty("key") String key,
@@ -43,7 +40,6 @@ public record DataNode(
   // CPD-OFF
   /** Jackson builder for DataNode deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private DataNodeKind kind;

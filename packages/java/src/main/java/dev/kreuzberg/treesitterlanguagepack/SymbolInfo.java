@@ -6,15 +6,12 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A symbol (variable, function, type, etc.) extracted from source code.
  */
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@JsonDeserialize(builder = SymbolInfo.Builder.class)
 public record SymbolInfo(
     @JsonProperty("name") String name,
     @JsonProperty("kind") SymbolKind kind,
@@ -29,7 +26,6 @@ public record SymbolInfo(
   // CPD-OFF
   /** Jackson builder for SymbolInfo deserialization. */
   @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPOJOBuilder(withPrefix = "with", buildMethodName = "build")
   public static final class Builder {
 
     private String name;
