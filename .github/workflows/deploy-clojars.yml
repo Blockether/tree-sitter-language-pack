@@ -1,0 +1,180 @@
+name: Release & Deploy to Clojars
+
+# Mirrors Blockether/svar's deploy.yml, adapted for the JVM binding of
+# tree-sitter-language-pack. Builds the native FFI library on every supported
+# platform, assembles ONE fat multi-platform jar (natives/<rid>/<lib> for each
+# platform — NativeLib resolves the rid at runtime), and deploys it to Clojars
+# as com.blockether/tree-sitter-language-pack.
+#
+# Required repo secret: CLOJARS_DEPLOY_TOKEN  (a Clojars deploy token for the
+# `blockether-deployer` account, scoped to the com.blockether group).
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      languages:
+        description: 'TSLP_LANGUAGES to statically compile (e.g. "all" or "clojure,edn")'
+        default: 'all'
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  # `all` matches the upstream Maven Central publish; narrow it (e.g. "clojure")
+  # for a smaller, faster, Clojure-focused build.
+  TSLP_LANGUAGES: ${{ github.event.inputs.languages || 'all' }}
+  TSLP_LINK_MODE: static
+
+jobs:
+  natives:
+    name: Build native FFI (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-x86_64
+            lib: libts_pack_core_ffi.so
+          - os: ubuntu-24.04-arm
+            rid: linux-aarch64
+            lib: libts_pack_core_ffi.so
+          - os: macos-14
+            rid: macos-arm64
+            lib: libts_pack_core_ffi.dylib
+          - os: macos-13
+            rid: macos-x86_64
+            lib: libts_pack_core_ffi.dylib
+          - os: windows-latest
+            rid: windows-x86_64
+            lib: ts_pack_core_ffi.dll
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      # The build needs grammar sources in ./parsers. Our fork has no published
+      # parser-sources tarball, so we clone them locally from
+      # sources/language_definitions.json (which points clojure at our fork).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Cache parsers
+        uses: actions/cache@v4
+        with:
+          path: parsers
+          key: parsers-${{ hashFiles('sources/language_definitions.json') }}
+          restore-keys: parsers-
+
+      - name: Clone grammar sources (populates ./parsers from our fork)
+        shell: bash
+        run: |
+          mkdir -p parsers
+          uv run --script scripts/clone_vendors.py
+
+      - name: Build FFI library (TSLP_LANGUAGES=${{ env.TSLP_LANGUAGES }})
+        run: cargo build --locked -p ts-pack-core-ffi --release
+
+      - name: Stage native lib under its rid
+        shell: bash
+        run: |
+          mkdir -p "out/${{ matrix.rid }}"
+          cp "target/release/${{ matrix.lib }}" "out/${{ matrix.rid }}/${{ matrix.lib }}"
+          ls -la "out/${{ matrix.rid }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-${{ matrix.rid }}
+          path: out/${{ matrix.rid }}/${{ matrix.lib }}
+          if-no-files-found: error
+
+  release:
+    name: Assemble fat jar & deploy to Clojars
+    needs: natives
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - uses: DeLaGuardo/setup-clojure@13.6.1
+        with:
+          cli: latest
+
+      - name: Cache Clojure deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.clojure/.cpcache
+          key: deps-${{ runner.os }}-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+            deps-${{ runner.os }}-
+
+      - name: Download native libs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: native-*
+          path: natives-staging
+
+      - name: Stage natives into resources
+        shell: bash
+        run: |
+          dest=packages/java/src/main/resources/natives
+          mkdir -p "$dest"
+          # download-artifact lays out: natives-staging/native-<rid>/<lib>
+          for d in natives-staging/native-*; do
+            rid="${d#natives-staging/native-}"
+            mkdir -p "$dest/$rid"
+            cp "$d"/* "$dest/$rid/"
+          done
+          echo "=== bundled natives ==="
+          find "$dest" -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) | sort
+
+      - name: Check if version exists on Clojars
+        id: check-clojars
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          [ -z "$VERSION" ] && VERSION="manual-$GITHUB_RUN_ID"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://repo.clojars.org/com/blockether/tree-sitter-language-pack/$VERSION/tree-sitter-language-pack-$VERSION.jar")
+          if [ "$STATUS" = "200" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Version $VERSION already exists on Clojars — skipping deploy"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build & Deploy to Clojars
+        if: steps.check-clojars.outputs.exists != 'true'
+        env:
+          VERSION: ${{ github.ref_name }}
+          CLOJARS_USERNAME: blockether-deployer
+          CLOJARS_PASSWORD: ${{ secrets.CLOJARS_DEPLOY_TOKEN }}
+        run: clojure -T:build deploy
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v3
+        with:
+          generate_release_notes: true
