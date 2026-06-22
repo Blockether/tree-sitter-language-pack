@@ -159,10 +159,10 @@ jobs:
           pattern: native-*
           path: natives-staging
 
-      - name: Stage natives into resources
+      - name: Stage natives for per-rid native jars
         shell: bash
         run: |
-          dest=packages/java/src/main/resources/natives
+          dest=target/native-staging
           mkdir -p "$dest"
           # download-artifact extracts each artifact under
           # natives-staging/native-<rid>/... (subdirs may be preserved), so locate
@@ -174,7 +174,7 @@ jobs:
             find "$d" -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) \
               -exec cp {} "$dest/$rid/" \;
           done
-          echo "=== bundled natives ==="
+          echo "=== staged per-rid natives (each ships in its OWN jar) ==="
           find "$dest" -type f \( -name '*.so' -o -name '*.dylib' -o -name '*.dll' \) | sort
 
       # Compute the deploy version once and reuse it everywhere. For tag pushes
@@ -205,7 +205,19 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build & Deploy to Clojars
+      - name: Build & Deploy per-platform native jars to Clojars
+        if: steps.check-clojars.outputs.exists != 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          CLOJARS_USERNAME: blockether-deployer
+          CLOJARS_PASSWORD: ${{ secrets.CLOJARS_DEPLOY_TOKEN }}
+        run: |
+          set -euo pipefail
+          for rid in linux-x86_64 linux-aarch64 macos-arm64 macos-x86_64 windows-x86_64; do
+            clojure -T:build deploy-native :rid "$rid"
+          done
+
+      - name: Build & Deploy main jar to Clojars
         if: steps.check-clojars.outputs.exists != 'true'
         env:
           VERSION: ${{ steps.version.outputs.version }}
