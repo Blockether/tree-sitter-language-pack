@@ -249,8 +249,71 @@ fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, expor
 }
 
 pub(crate) fn extract_structure(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<StructureItem> {
+    // Clojure (incl. cljs/cljc/bb — all reported as "clojure") parses as generic
+    // s-expressions (`list_lit`/`sym_lit`), so there are no `*_definition` node
+    // kinds to match on. Structure is SEMANTIC: a top-level list whose head
+    // symbol is a def-form (`defn`, `ns`, `defrecord`, …) is the definition.
+    if language == "clojure" {
+        return extract_clojure_structure(root, source);
+    }
     let mut items = Vec::with_capacity(32);
     collect_structure(root, source, language, &mut items);
+    items
+}
+
+/// Map a Clojure def-form head symbol to a structure kind. Non-def-form heads
+/// return `None` (the list is not a definition).
+fn clojure_def_kind(head: &str) -> Option<StructureKind> {
+    match head {
+        "defn" | "defn-" | "definline" => Some(StructureKind::Function),
+        "defmacro" => Some(StructureKind::Macro),
+        "def" | "defonce" => Some(StructureKind::Constant),
+        "defmulti" | "defmethod" => Some(StructureKind::Method),
+        "defprotocol" => Some(StructureKind::Protocol),
+        "definterface" => Some(StructureKind::Interface),
+        "defrecord" => Some(StructureKind::Struct),
+        "deftype" => Some(StructureKind::Type),
+        "ns" => Some(StructureKind::Namespace),
+        _ => None,
+    }
+}
+
+/// One Clojure structure item from a `list_lit`, or `None` when the list is not
+/// a recognised def-form. Head symbol → kind; the next symbol → name.
+fn clojure_form(node: &tree_sitter::Node, source: &str) -> Option<StructureItem> {
+    if node.kind() != "list_lit" {
+        return None;
+    }
+    let mut cursor = node.walk();
+    let syms: Vec<tree_sitter::Node> = node
+        .named_children(&mut cursor)
+        .filter(|c| c.kind() == "sym_lit")
+        .collect();
+    let head = node_text(syms.first()?, source);
+    let kind = clojure_def_kind(head)?;
+    let name = syms.get(1).map(|n| node_text(n, source).to_string());
+    Some(StructureItem {
+        kind,
+        name,
+        visibility: None,
+        span: span_from_node(node),
+        children: Vec::new(),
+        decorators: Vec::new(),
+        doc_comment: None,
+        signature: None,
+        body_span: None,
+    })
+}
+
+/// Top-level Clojure def-forms, in source order.
+fn extract_clojure_structure(root: &tree_sitter::Node, source: &str) -> Vec<StructureItem> {
+    let mut items = Vec::with_capacity(32);
+    let mut cursor = root.walk();
+    for child in root.named_children(&mut cursor) {
+        if let Some(item) = clojure_form(&child, source) {
+            items.push(item);
+        }
+    }
     items
 }
 
