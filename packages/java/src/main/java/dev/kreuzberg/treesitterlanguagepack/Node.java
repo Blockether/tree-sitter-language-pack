@@ -378,7 +378,7 @@ public class Node implements AutoCloseable {
       throws TreeSitterLanguagePackRsException {
     java.util.Objects.requireNonNull(name, "name must not be null");
     try {
-      Arena arena = Arena.ofShared();
+      Arena arena = Arena.ofAuto();
       var cName = arena.allocateFrom(name);
       // CPD-OFF — FFI opaque-handle return, no JSON deserialization needed.
       // The returned pointer is owned by the new wrapper, which frees it in

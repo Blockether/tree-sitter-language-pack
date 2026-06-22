@@ -28,7 +28,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static Optional<String> detectLanguageFromExtension(final String ext)
       throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var cext = arena.allocateFrom(ext);
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_DETECT_LANGUAGE_FROM_EXTENSION.invoke(cext);
       if (resultPtr.equals(MemorySegment.NULL)) {
@@ -59,7 +59,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static Optional<String> detectLanguageFromPath(final String path)
       throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var cpath = arena.allocateFrom(path);
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_DETECT_LANGUAGE_FROM_PATH.invoke(cpath);
       if (resultPtr.equals(MemorySegment.NULL)) {
@@ -101,7 +101,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static Optional<String> detectLanguageFromContent(final String content)
       throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var ccontent = arena.allocateFrom(content);
       var resultPtr =
           (MemorySegment) NativeLib.TS_PACK_DETECT_LANGUAGE_FROM_CONTENT.invoke(ccontent);
@@ -126,7 +126,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static Optional<String> getHighlightsQuery(final String language)
       throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var clanguage = arena.allocateFrom(language);
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_GET_HIGHLIGHTS_QUERY.invoke(clanguage);
       if (resultPtr.equals(MemorySegment.NULL)) {
@@ -150,7 +150,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static Optional<String> getInjectionsQuery(final String language)
       throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var clanguage = arena.allocateFrom(language);
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_GET_INJECTIONS_QUERY.invoke(clanguage);
       if (resultPtr.equals(MemorySegment.NULL)) {
@@ -174,7 +174,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static Optional<String> getLocalsQuery(final String language)
       throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var clanguage = arena.allocateFrom(language);
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_GET_LOCALS_QUERY.invoke(clanguage);
       if (resultPtr.equals(MemorySegment.NULL)) {
@@ -198,7 +198,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static Optional<String> getTagsQuery(final String language)
       throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var clanguage = arena.allocateFrom(language);
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_GET_TAGS_QUERY.invoke(clanguage);
       if (resultPtr.equals(MemorySegment.NULL)) {
@@ -225,7 +225,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static io.github.treesitter.jtreesitter.Language getLanguage(final String name)
       throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var cname = arena.allocateFrom(name);
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_GET_LANGUAGE.invoke(cname);
       if (resultPtr.equals(MemorySegment.NULL)) {
@@ -247,7 +247,7 @@ public final class TreeSitterLanguagePackRs {
    * Error.ParserSetup if the language cannot be applied to the parser.
    */
   public static Parser getParser(final String name) throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var cname = arena.allocateFrom(name);
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_GET_PARSER.invoke(cname);
       if (resultPtr.equals(MemorySegment.NULL)) {
@@ -267,7 +267,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static Optional<String> detectLanguage(final String path)
       throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var cpath = arena.allocateFrom(path);
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_DETECT_LANGUAGE.invoke(cpath);
       if (resultPtr.equals(MemorySegment.NULL)) {
@@ -290,7 +290,7 @@ public final class TreeSitterLanguagePackRs {
    * plus any configured aliases.
    */
   public static List<String> availableLanguages() throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_AVAILABLE_LANGUAGES.invoke();
       return readJsonList(
           resultPtr,
@@ -307,7 +307,7 @@ public final class TreeSitterLanguagePackRs {
    * dynamically available, or a known alias for one of these).
    */
   public static boolean hasLanguage(final String name) throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var cname = arena.allocateFrom(name);
       var primitiveResult = (int) NativeLib.TS_PACK_HAS_LANGUAGE.invoke(cname);
       return primitiveResult != 0;
@@ -323,7 +323,7 @@ public final class TreeSitterLanguagePackRs {
    * and aliases.
    */
   public static long languageCount() throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var primitiveResult = (long) NativeLib.TS_PACK_LANGUAGE_COUNT.invoke();
       return primitiveResult;
     } catch (Throwable e) {
@@ -341,7 +341,7 @@ public final class TreeSitterLanguagePackRs {
    */
   public static ProcessResult process(final String source, final ProcessConfig config)
       throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var csource = arena.allocateFrom(source);
       var cconfigJson = config != null ? MAPPER.writeValueAsString(config) : null;
       var cconfigJsonSeg =
@@ -386,7 +386,7 @@ public final class TreeSitterLanguagePackRs {
    * {@literal @}throws TreeSitterLanguagePackRsException Returns an error if configuration cannot be applied or if downloads fail.
    */
   public static void init(final PackConfig config) throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var cconfigJson = config != null ? MAPPER.writeValueAsString(config) : null;
       var cconfigJsonSeg =
           cconfigJson != null ? arena.allocateFrom(cconfigJson) : MemorySegment.NULL;
@@ -417,7 +417,7 @@ public final class TreeSitterLanguagePackRs {
    * {@literal @}throws TreeSitterLanguagePackRsException Returns an error if the lock cannot be acquired.
    */
   public static void configure(final PackConfig config) throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var cconfigJson = config != null ? MAPPER.writeValueAsString(config) : null;
       var cconfigJsonSeg =
           cconfigJson != null ? arena.allocateFrom(cconfigJson) : MemorySegment.NULL;
@@ -447,7 +447,7 @@ public final class TreeSitterLanguagePackRs {
    * the download fails.
    */
   public static long download(final List<String> names) throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var cnamesJson = MAPPER
           .writerFor(
               MAPPER.getTypeFactory().constructCollectionType(java.util.List.class, String.class))
@@ -474,7 +474,7 @@ public final class TreeSitterLanguagePackRs {
    * {@literal @}throws TreeSitterLanguagePackRsException Returns an error if the manifest cannot be fetched or the bundle download fails.
    */
   public static long downloadAll() throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var primitiveResult = (long) NativeLib.TS_PACK_DOWNLOAD_ALL.invoke();
       checkLastError();
       return primitiveResult;
@@ -496,7 +496,7 @@ public final class TreeSitterLanguagePackRs {
    * or any constituent language fails to download.
    */
   public static long downloadGroup(final String name) throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var cname = arena.allocateFrom(name);
       var primitiveResult = (long) NativeLib.TS_PACK_DOWNLOAD_GROUP.invoke(cname);
       checkLastError();
@@ -515,7 +515,7 @@ public final class TreeSitterLanguagePackRs {
    * {@literal @}throws TreeSitterLanguagePackRsException Returns an error if the manifest cannot be fetched.
    */
   public static List<String> manifestLanguages() throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_MANIFEST_LANGUAGES.invoke();
       return readJsonList(
           resultPtr,
@@ -532,7 +532,7 @@ public final class TreeSitterLanguagePackRs {
    * cache directory does not exist or cannot be read.
    */
   public static List<String> downloadedLanguages() throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_DOWNLOADED_LANGUAGES.invoke();
       return readJsonList(
           resultPtr,
@@ -550,7 +550,7 @@ public final class TreeSitterLanguagePackRs {
    * {@literal @}throws TreeSitterLanguagePackRsException Returns an error if the cache directory cannot be removed.
    */
   public static void cleanCache() throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       NativeLib.TS_PACK_CLEAN_CACHE.invoke();
       checkLastError();
     } catch (Throwable e) {
@@ -566,7 +566,7 @@ public final class TreeSitterLanguagePackRs {
    * {@literal @}throws TreeSitterLanguagePackRsException Returns an error if the system cache directory cannot be determined.
    */
   public static String cacheDir() throws TreeSitterLanguagePackRsException {
-    try (var arena = Arena.ofShared()) {
+    try (var arena = Arena.ofConfined()) {
       var resultPtr = (MemorySegment) NativeLib.TS_PACK_CACHE_DIR.invoke();
       if (resultPtr.equals(MemorySegment.NULL)) {
         checkLastError();

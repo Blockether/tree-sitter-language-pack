@@ -40,7 +40,7 @@ public class LanguageRegistry implements AutoCloseable {
   public Language getLanguage(final String name) throws TreeSitterLanguagePackRsException {
     java.util.Objects.requireNonNull(name, "name must not be null");
     try {
-      Arena arena = Arena.ofShared();
+      Arena arena = Arena.ofAuto();
       var cName = arena.allocateFrom(name);
       // CPD-OFF — FFI opaque-handle return, no JSON deserialization needed.
       // The returned pointer is owned by the new wrapper, which frees it in
@@ -102,7 +102,7 @@ public class LanguageRegistry implements AutoCloseable {
   public boolean hasParser(final String name) throws TreeSitterLanguagePackRsException {
     java.util.Objects.requireNonNull(name, "name must not be null");
     try {
-      Arena arena = Arena.ofShared();
+      Arena arena = Arena.ofAuto();
       var cName = arena.allocateFrom(name);
       var result = (int) NativeLib.TS_PACK_LANGUAGE_REGISTRY_HAS_PARSER.invoke(this.handle, cName);
       return result != 0;
@@ -121,7 +121,7 @@ public class LanguageRegistry implements AutoCloseable {
   public boolean hasLanguage(final String name) throws TreeSitterLanguagePackRsException {
     java.util.Objects.requireNonNull(name, "name must not be null");
     try {
-      Arena arena = Arena.ofShared();
+      Arena arena = Arena.ofAuto();
       var cName = arena.allocateFrom(name);
       var result =
           (int) NativeLib.TS_PACK_LANGUAGE_REGISTRY_HAS_LANGUAGE.invoke(this.handle, cName);
@@ -153,7 +153,7 @@ public class LanguageRegistry implements AutoCloseable {
     java.util.Objects.requireNonNull(source, "source must not be null");
     java.util.Objects.requireNonNull(config, "config must not be null");
     try {
-      Arena arena = Arena.ofShared();
+      Arena arena = Arena.ofAuto();
       var cSource = arena.allocateFrom(source);
       String cConfigJson = STREAM_MAPPER.writeValueAsString(config);
       var cConfigJsonSeg = arena.allocateFrom(cConfigJson);
