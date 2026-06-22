@@ -55,12 +55,16 @@ jobs:
 
       - name: Override clojure grammar with our fork
         run: |
-          git clone --depth 1 "$CLOJURE_FORK" /tmp/clj
+          # Pin to the exact rev recorded in language_definitions.json so the
+          # build is reproducible (not floating on the fork's master).
+          REV=$(python3 -c "import json;print(json.load(open('sources/language_definitions.json'))['clojure']['rev'])")
+          git clone "$CLOJURE_FORK" /tmp/clj
+          git -C /tmp/clj checkout "$REV"
           rm -rf parsers/clojure
           mkdir -p parsers/clojure
           cp -r /tmp/clj/src parsers/clojure/src
           cp -r /tmp/clj/queries parsers/clojure/queries
-          echo "=== clojure now sourced from $(git -C /tmp/clj rev-parse HEAD) ==="
+          echo "=== clojure now sourced from $(git -C /tmp/clj rev-parse HEAD) (pinned $REV) ==="
           ls -R parsers/clojure
 
       - uses: actions/upload-artifact@v4
