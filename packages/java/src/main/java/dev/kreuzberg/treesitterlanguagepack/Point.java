@@ -4,15 +4,12 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A source position — row + column, zero-indexed.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record Point(
-    @JsonProperty("row") long row, @JsonProperty("column") long column) {
+    long row, long column) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -20,21 +17,18 @@ public record Point(
 
   // CPD-OFF
   /** Jackson builder for Point deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private long row;
     private long column;
 
     /** Sets the row field. */
-    @JsonProperty("row")
     public Builder withRow(final long value) {
       this.row = value;
       return this;
     }
 
     /** Sets the column field. */
-    @JsonProperty("column")
     public Builder withColumn(final long value) {
       this.column = value;
       return this;

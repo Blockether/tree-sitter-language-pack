@@ -4,20 +4,17 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A symbol (variable, function, type, etc.) extracted from source code.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record SymbolInfo(
-    @JsonProperty("name") String name,
-    @JsonProperty("kind") SymbolKind kind,
-    @JsonProperty("span") Span span,
-    @Nullable @JsonProperty("type_annotation") String typeAnnotation,
-    @Nullable @JsonProperty("doc") String doc) {
+    String name,
+    SymbolKind kind,
+    Span span,
+    @Nullable String typeAnnotation,
+    @Nullable String doc) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -25,14 +22,12 @@ public record SymbolInfo(
 
   // CPD-OFF
   /** Jackson builder for SymbolInfo deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private String name;
     private SymbolKind kind;
     private Span span;
 
-    @JsonProperty("type_annotation")
     @Nullable
     private String typeAnnotation;
 
@@ -40,35 +35,30 @@ public record SymbolInfo(
     private String doc;
 
     /** Sets the name field. */
-    @JsonProperty("name")
     public Builder withName(final String value) {
       this.name = value;
       return this;
     }
 
     /** Sets the kind field. */
-    @JsonProperty("kind")
     public Builder withKind(final SymbolKind value) {
       this.kind = value;
       return this;
     }
 
     /** Sets the span field. */
-    @JsonProperty("span")
     public Builder withSpan(final Span value) {
       this.span = value;
       return this;
     }
 
     /** Sets the typeAnnotation field. */
-    @JsonProperty("type_annotation")
     public Builder withTypeAnnotation(final @Nullable String value) {
       this.typeAnnotation = value;
       return this;
     }
 
     /** Sets the doc field. */
-    @JsonProperty("doc")
     public Builder withDoc(final @Nullable String value) {
       this.doc = value;
       return this;

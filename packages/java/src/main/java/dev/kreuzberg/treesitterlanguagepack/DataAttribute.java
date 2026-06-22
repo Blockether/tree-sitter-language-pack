@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * An XML-style attribute attached to an Element(DataNodeKind.Element) node.
@@ -13,11 +11,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Populated only for {@code DataNodeKind.Element}; always empty for {@code KeyValue} and
  * {@code Sequence} nodes.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record DataAttribute(
-    @JsonProperty("name") String name,
-    @JsonProperty("value") String value,
-    @JsonProperty("span") Span span) {
+    String name,
+    String value,
+    Span span) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -25,7 +22,6 @@ public record DataAttribute(
 
   // CPD-OFF
   /** Jackson builder for DataAttribute deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private String name;
@@ -33,21 +29,18 @@ public record DataAttribute(
     private Span span;
 
     /** Sets the name field. */
-    @JsonProperty("name")
     public Builder withName(final String value) {
       this.name = value;
       return this;
     }
 
     /** Sets the value field. */
-    @JsonProperty("value")
     public Builder withValue(final String value) {
       this.value = value;
       return this;
     }
 
     /** Sets the span field. */
-    @JsonProperty("span")
     public Builder withSpan(final Span value) {
       this.span = value;
       return this;

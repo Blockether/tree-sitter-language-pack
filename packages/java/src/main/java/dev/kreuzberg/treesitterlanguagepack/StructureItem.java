@@ -4,25 +4,22 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A structural item (function, class, struct, etc.) in source code.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record StructureItem(
-    @JsonProperty("kind") StructureKind kind,
-    @Nullable @JsonProperty("name") String name,
-    @Nullable @JsonProperty("visibility") String visibility,
-    @JsonProperty("span") Span span,
-    @Nullable @JsonProperty("children") List<StructureItem> children,
-    @Nullable @JsonProperty("decorators") List<String> decorators,
-    @Nullable @JsonProperty("doc_comment") String docComment,
-    @Nullable @JsonProperty("signature") String signature,
-    @Nullable @JsonProperty("body_span") Span bodySpan) {
+    StructureKind kind,
+    @Nullable String name,
+    @Nullable String visibility,
+    Span span,
+    @Nullable List<StructureItem> children,
+    @Nullable List<String> decorators,
+    @Nullable String docComment,
+    @Nullable String signature,
+    @Nullable Span bodySpan) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -30,7 +27,6 @@ public record StructureItem(
 
   // CPD-OFF
   /** Jackson builder for StructureItem deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private StructureKind kind;
@@ -49,75 +45,64 @@ public record StructureItem(
     @Nullable
     private List<String> decorators;
 
-    @JsonProperty("doc_comment")
     @Nullable
     private String docComment;
 
     @Nullable
     private String signature;
 
-    @JsonProperty("body_span")
     @Nullable
     private Span bodySpan;
 
     /** Sets the kind field. */
-    @JsonProperty("kind")
     public Builder withKind(final StructureKind value) {
       this.kind = value;
       return this;
     }
 
     /** Sets the name field. */
-    @JsonProperty("name")
     public Builder withName(final @Nullable String value) {
       this.name = value;
       return this;
     }
 
     /** Sets the visibility field. */
-    @JsonProperty("visibility")
     public Builder withVisibility(final @Nullable String value) {
       this.visibility = value;
       return this;
     }
 
     /** Sets the span field. */
-    @JsonProperty("span")
     public Builder withSpan(final Span value) {
       this.span = value;
       return this;
     }
 
     /** Sets the children field. */
-    @JsonProperty("children")
     public Builder withChildren(final @Nullable List<StructureItem> value) {
       this.children = value;
       return this;
     }
 
     /** Sets the decorators field. */
-    @JsonProperty("decorators")
     public Builder withDecorators(final @Nullable List<String> value) {
       this.decorators = value;
       return this;
     }
 
     /** Sets the docComment field. */
-    @JsonProperty("doc_comment")
     public Builder withDocComment(final @Nullable String value) {
       this.docComment = value;
       return this;
     }
 
     /** Sets the signature field. */
-    @JsonProperty("signature")
     public Builder withSignature(final @Nullable String value) {
       this.signature = value;
       return this;
     }
 
     /** Sets the bodySpan field. */
-    @JsonProperty("body_span")
     public Builder withBodySpan(final @Nullable Span value) {
       this.bodySpan = value;
       return this;

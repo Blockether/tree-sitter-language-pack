@@ -9,12 +9,11 @@
 {:paths ["packages/java/src/main/resources"]
 
  ;; JSON at the FFI boundary uses charred (reflection-free, native-image-clean)
- ;; via JsonCodec — not Jackson databind. Only the inert jackson-annotations
- ;; remain for the alef-generated DTOs' @JsonProperty metadata. charred brings
- ;; org.clojure/clojure transitively (fine for the Clojure host this targets);
- ;; build.clj keeps clojure off the published pom (charred's own pom declares it).
+ ;; via JsonCodec — Jackson is fully gone (no databind, no annotations): the DTOs
+ ;; are built through their Builders + enum fromValue, so @JsonProperty metadata
+ ;; was stripped. charred brings org.clojure/clojure transitively (fine for the
+ ;; Clojure host this targets); build.clj keeps clojure off the published pom.
  :deps {org.jspecify/jspecify                            {:mvn/version "1.0.0"}
-        com.fasterxml.jackson.core/jackson-annotations   {:mvn/version "2.21"}
         com.cnuernber/charred                            {:mvn/version "1.038"}
         io.github.tree-sitter/jtreesitter                {:mvn/version "0.26.0"}}
 

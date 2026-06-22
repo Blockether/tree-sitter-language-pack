@@ -214,7 +214,7 @@ jobs:
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             V="${GITHUB_REF_NAME#v}"
           else
-            V="manual-${GITHUB_RUN_ID}"
+            V="$(tr -d '[:space:]' < VERSION)"
           fi
           echo "version=$V" >> "$GITHUB_OUTPUT"
           echo "Deploy version: $V"

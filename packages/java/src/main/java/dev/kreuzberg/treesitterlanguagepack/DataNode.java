@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -24,14 +22,13 @@ import org.jspecify.annotations.Nullable;
  * | {@code Element}  | XML tag name             | text content  | XML attrs    | child elements |
  * | {@code Sequence} | positional index ({@code "0"}) | leaf value   | empty        | sub-items  |
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record DataNode(
-    @JsonProperty("kind") DataNodeKind kind,
-    @Nullable @JsonProperty("key") String key,
-    @Nullable @JsonProperty("value") String value,
-    @Nullable @JsonProperty("attributes") List<DataAttribute> attributes,
-    @Nullable @JsonProperty("children") List<DataNode> children,
-    @JsonProperty("span") Span span) {
+    DataNodeKind kind,
+    @Nullable String key,
+    @Nullable String value,
+    @Nullable List<DataAttribute> attributes,
+    @Nullable List<DataNode> children,
+    Span span) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -39,7 +36,6 @@ public record DataNode(
 
   // CPD-OFF
   /** Jackson builder for DataNode deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private DataNodeKind kind;
@@ -59,42 +55,36 @@ public record DataNode(
     private Span span;
 
     /** Sets the kind field. */
-    @JsonProperty("kind")
     public Builder withKind(final DataNodeKind value) {
       this.kind = value;
       return this;
     }
 
     /** Sets the key field. */
-    @JsonProperty("key")
     public Builder withKey(final @Nullable String value) {
       this.key = value;
       return this;
     }
 
     /** Sets the value field. */
-    @JsonProperty("value")
     public Builder withValue(final @Nullable String value) {
       this.value = value;
       return this;
     }
 
     /** Sets the attributes field. */
-    @JsonProperty("attributes")
     public Builder withAttributes(final @Nullable List<DataAttribute> value) {
       this.attributes = value;
       return this;
     }
 
     /** Sets the children field. */
-    @JsonProperty("children")
     public Builder withChildren(final @Nullable List<DataNode> value) {
       this.children = value;
       return this;
     }
 
     /** Sets the span field. */
-    @JsonProperty("span")
     public Builder withSpan(final Span value) {
       this.span = value;
       return this;

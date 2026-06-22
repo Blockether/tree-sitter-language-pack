@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Byte and line/column range in source code.
@@ -13,14 +11,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Represents both byte offsets (for slicing) and human-readable line/column
  * positions (for display and diagnostics).
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record Span(
-    @JsonProperty("start_byte") long startByte,
-    @JsonProperty("end_byte") long endByte,
-    @JsonProperty("start_line") long startLine,
-    @JsonProperty("start_column") long startColumn,
-    @JsonProperty("end_line") long endLine,
-    @JsonProperty("end_column") long endColumn) {
+    long startByte,
+    long endByte,
+    long startLine,
+    long startColumn,
+    long endLine,
+    long endColumn) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -28,64 +25,51 @@ public record Span(
 
   // CPD-OFF
   /** Jackson builder for Span deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
-    @JsonProperty("start_byte")
     private long startByte;
 
-    @JsonProperty("end_byte")
     private long endByte;
 
-    @JsonProperty("start_line")
     private long startLine;
 
-    @JsonProperty("start_column")
     private long startColumn;
 
-    @JsonProperty("end_line")
     private long endLine;
 
-    @JsonProperty("end_column")
     private long endColumn;
 
     /** Sets the startByte field. */
-    @JsonProperty("start_byte")
     public Builder withStartByte(final long value) {
       this.startByte = value;
       return this;
     }
 
     /** Sets the endByte field. */
-    @JsonProperty("end_byte")
     public Builder withEndByte(final long value) {
       this.endByte = value;
       return this;
     }
 
     /** Sets the startLine field. */
-    @JsonProperty("start_line")
     public Builder withStartLine(final long value) {
       this.startLine = value;
       return this;
     }
 
     /** Sets the startColumn field. */
-    @JsonProperty("start_column")
     public Builder withStartColumn(final long value) {
       this.startColumn = value;
       return this;
     }
 
     /** Sets the endLine field. */
-    @JsonProperty("end_line")
     public Builder withEndLine(final long value) {
       this.endLine = value;
       return this;
     }
 
     /** Sets the endColumn field. */
-    @JsonProperty("end_column")
     public Builder withEndColumn(final long value) {
       this.endColumn = value;
       return this;

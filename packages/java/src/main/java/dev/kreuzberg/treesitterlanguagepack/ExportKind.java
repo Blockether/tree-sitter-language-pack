@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * The kind of an export statement found in source code.
@@ -35,13 +33,11 @@ public enum ExportKind {
   }
 
   /** Returns the string value. */
-  @JsonValue
   public String getValue() {
     return value;
   }
 
   /** Creates an instance from a string value. */
-  @JsonCreator
   public static ExportKind fromValue(final String value) {
     for (ExportKind e : values()) {
       if (e.value.equalsIgnoreCase(value)) {

@@ -4,21 +4,18 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A docstring extracted from source code.
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record DocstringInfo(
-    @JsonProperty("text") String text,
-    @JsonProperty("format") DocstringFormat format,
-    @JsonProperty("span") Span span,
-    @Nullable @JsonProperty("associated_item") String associatedItem,
-    @Nullable @JsonProperty("parsed_sections") List<DocSection> parsedSections) {
+    String text,
+    DocstringFormat format,
+    Span span,
+    @Nullable String associatedItem,
+    @Nullable List<DocSection> parsedSections) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -26,51 +23,43 @@ public record DocstringInfo(
 
   // CPD-OFF
   /** Jackson builder for DocstringInfo deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private String text;
     private DocstringFormat format;
     private Span span;
 
-    @JsonProperty("associated_item")
     @Nullable
     private String associatedItem;
 
-    @JsonProperty("parsed_sections")
     @Nullable
     private List<DocSection> parsedSections;
 
     /** Sets the text field. */
-    @JsonProperty("text")
     public Builder withText(final String value) {
       this.text = value;
       return this;
     }
 
     /** Sets the format field. */
-    @JsonProperty("format")
     public Builder withFormat(final DocstringFormat value) {
       this.format = value;
       return this;
     }
 
     /** Sets the span field. */
-    @JsonProperty("span")
     public Builder withSpan(final Span value) {
       this.span = value;
       return this;
     }
 
     /** Sets the associatedItem field. */
-    @JsonProperty("associated_item")
     public Builder withAssociatedItem(final @Nullable String value) {
       this.associatedItem = value;
       return this;
     }
 
     /** Sets the parsedSections field. */
-    @JsonProperty("parsed_sections")
     public Builder withParsedSections(final @Nullable List<DocSection> value) {
       this.parsedSections = value;
       return this;

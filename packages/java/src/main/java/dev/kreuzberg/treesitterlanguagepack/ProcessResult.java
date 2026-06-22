@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -29,19 +27,18 @@ import org.jspecify.annotations.Nullable;
  * - {@code diagnostics} - Parse errors (when {@code config.diagnostics = true})
  * - {@code chunks} - Chunked code segments (when {@code config.chunk_max_size} is set)
  */
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record ProcessResult(
-    @JsonProperty("language") String language,
-    @JsonProperty("metrics") FileMetrics metrics,
-    @Nullable @JsonProperty("structure") List<StructureItem> structure,
-    @Nullable @JsonProperty("imports") List<ImportInfo> imports,
-    @Nullable @JsonProperty("exports") List<ExportInfo> exports,
-    @Nullable @JsonProperty("comments") List<CommentInfo> comments,
-    @Nullable @JsonProperty("docstrings") List<DocstringInfo> docstrings,
-    @Nullable @JsonProperty("symbols") List<SymbolInfo> symbols,
-    @Nullable @JsonProperty("diagnostics") List<Diagnostic> diagnostics,
-    @Nullable @JsonProperty("chunks") List<CodeChunk> chunks,
-    @Nullable @JsonProperty("data") DataNode data) {
+    String language,
+    FileMetrics metrics,
+    @Nullable List<StructureItem> structure,
+    @Nullable List<ImportInfo> imports,
+    @Nullable List<ExportInfo> exports,
+    @Nullable List<CommentInfo> comments,
+    @Nullable List<DocstringInfo> docstrings,
+    @Nullable List<SymbolInfo> symbols,
+    @Nullable List<Diagnostic> diagnostics,
+    @Nullable List<CodeChunk> chunks,
+    @Nullable DataNode data) {
   /** Creates a new Builder for constructing instances of this record. */
   public static Builder builder() {
     return new Builder();
@@ -49,7 +46,6 @@ public record ProcessResult(
 
   // CPD-OFF
   /** Jackson builder for ProcessResult deserialization. */
-  @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
   public static final class Builder {
 
     private String language;
@@ -83,77 +79,66 @@ public record ProcessResult(
     private DataNode data;
 
     /** Sets the language field. */
-    @JsonProperty("language")
     public Builder withLanguage(final String value) {
       this.language = value;
       return this;
     }
 
     /** Sets the metrics field. */
-    @JsonProperty("metrics")
     public Builder withMetrics(final FileMetrics value) {
       this.metrics = value;
       return this;
     }
 
     /** Sets the structure field. */
-    @JsonProperty("structure")
     public Builder withStructure(final @Nullable List<StructureItem> value) {
       this.structure = value;
       return this;
     }
 
     /** Sets the imports field. */
-    @JsonProperty("imports")
     public Builder withImports(final @Nullable List<ImportInfo> value) {
       this.imports = value;
       return this;
     }
 
     /** Sets the exports field. */
-    @JsonProperty("exports")
     public Builder withExports(final @Nullable List<ExportInfo> value) {
       this.exports = value;
       return this;
     }
 
     /** Sets the comments field. */
-    @JsonProperty("comments")
     public Builder withComments(final @Nullable List<CommentInfo> value) {
       this.comments = value;
       return this;
     }
 
     /** Sets the docstrings field. */
-    @JsonProperty("docstrings")
     public Builder withDocstrings(final @Nullable List<DocstringInfo> value) {
       this.docstrings = value;
       return this;
     }
 
     /** Sets the symbols field. */
-    @JsonProperty("symbols")
     public Builder withSymbols(final @Nullable List<SymbolInfo> value) {
       this.symbols = value;
       return this;
     }
 
     /** Sets the diagnostics field. */
-    @JsonProperty("diagnostics")
     public Builder withDiagnostics(final @Nullable List<Diagnostic> value) {
       this.diagnostics = value;
       return this;
     }
 
     /** Sets the chunks field. */
-    @JsonProperty("chunks")
     public Builder withChunks(final @Nullable List<CodeChunk> value) {
       this.chunks = value;
       return this;
     }
 
     /** Sets the data field. */
-    @JsonProperty("data")
     public Builder withData(final @Nullable DataNode value) {
       this.data = value;
       return this;

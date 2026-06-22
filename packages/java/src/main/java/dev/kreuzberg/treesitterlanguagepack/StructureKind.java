@@ -4,8 +4,6 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * The kind of structural item found in source code.
@@ -110,13 +108,11 @@ public enum StructureKind {
   }
 
   /** Returns the string value. */
-  @JsonValue
   public String getValue() {
     return value;
   }
 
   /** Creates an instance from a string value. */
-  @JsonCreator
   public static StructureKind fromValue(final String value) {
     for (StructureKind e : values()) {
       if (e.value.equalsIgnoreCase(value)) {
