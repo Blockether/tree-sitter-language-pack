@@ -168,6 +168,7 @@
 	"slackhq/tree-sitter-hack": "MIT",
 	"smoeding/tree-sitter-postscript": "BSD-2-Clause",
 	"sogaiu/tree-sitter-clojure": "CC0-1.0",
+	"Blockether/tree-sitter-clojure": "CC0-1.0",
 	"sourcegraph/tree-sitter-jsonnet": "MIT",
 	"stadelmanma/tree-sitter-fortran": "MIT",
 	"stsewd/tree-sitter-comment": "MIT",

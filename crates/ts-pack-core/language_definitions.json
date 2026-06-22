@@ -234,7 +234,7 @@
 	"clojure": {
 		"branch": "master",
 		"extensions": ["clj", "cljs", "cljc"],
-		"repo": "https://github.com/sogaiu/tree-sitter-clojure",
+		"repo": "https://github.com/Blockether/tree-sitter-clojure",
 		"rev": "e43eff80d17cf34852dcd92ca5e6986d23a7040f"
 	},
 	"cmake": {
