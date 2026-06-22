@@ -47,6 +47,9 @@
 (def jar-file (format "target/%s-%s.jar" (name lib) version))
 (def java-src "packages/java/src/main/java")
 (def java-resources "packages/java/src/main/resources")
+;; Clojure native-resolver source (com.blockether.tree-sitter-language-pack),
+;; shipped in the main jar so requiring it auto-selects the platform native.
+(def clj-src "src/clj")
 ;; Per-platform native libs are staged here as <rid>/<lib> (by CI from the
 ;; native build artifacts, or locally via cargo + manual copy).
 (def native-staging "target/native-staging")
@@ -89,7 +92,10 @@
                 :basis @basis
                 :src-dirs [java-src]
                 :pom-data (pom-data "Pre-compiled tree-sitter grammars — JVM binding, consumable from Clojure. Add a com.blockether/tree-sitter-language-pack-native-<rid> jar for your platform's native library.")})
-  (b/copy-dir {:src-dirs [java-resources] :target-dir class-dir})
+  (b/copy-dir {:src-dirs [java-resources clj-src] :target-dir class-dir})
+  ;; Version resource read by the Clojure resolver to locate the matching
+  ;; per-rid native jar on Clojars.
+  (spit (io/file class-dir "tslp-version") version)
   ;; Guard: the main jar must never carry a native library.
   (doseq [ext ["so" "dylib" "dll"]
           f (->> (io/file class-dir) file-seq (filter #(.isFile ^java.io.File %)))
