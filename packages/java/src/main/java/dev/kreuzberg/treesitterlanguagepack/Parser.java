@@ -33,7 +33,7 @@ public class Parser implements AutoCloseable {
   public void setLanguage(final String name) throws TreeSitterLanguagePackRsException {
     java.util.Objects.requireNonNull(name, "name must not be null");
     try {
-      Arena arena = Arena.ofShared();
+      Arena arena = Arena.ofAuto();
       var cName = arena.allocateFrom(name);
       NativeLib.TS_PACK_PARSER_SET_LANGUAGE.invoke(this.handle, cName);
       checkLastFfiError();
@@ -50,7 +50,7 @@ public class Parser implements AutoCloseable {
   public Optional<Tree> parse(final String source) throws TreeSitterLanguagePackRsException {
     java.util.Objects.requireNonNull(source, "source must not be null");
     try {
-      Arena arena = Arena.ofShared();
+      Arena arena = Arena.ofAuto();
       var cSource = arena.allocateFrom(source);
       // CPD-OFF — FFI opaque-handle return, no JSON deserialization needed.
       // The returned pointer is owned by the new wrapper, which frees it in

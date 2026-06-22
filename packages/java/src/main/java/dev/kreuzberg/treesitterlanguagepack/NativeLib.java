@@ -34,7 +34,7 @@ final class NativeLib {
   static {
     Path loadedLibraryPath = loadNativeLibrary();
     try {
-      Arena arena = Arena.ofShared();
+      Arena arena = Arena.ofAuto();
       // Try the loaded library path (for System.load() with absolute path)
       if (loadedLibraryPath != null) {
         try {

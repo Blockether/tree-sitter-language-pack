@@ -84,7 +84,7 @@ public class DownloadManager implements AutoCloseable {
       throws TreeSitterLanguagePackRsException {
     java.util.Objects.requireNonNull(version, "version must not be null");
     try {
-      Arena arena = Arena.ofShared();
+      Arena arena = Arena.ofAuto();
       var cVersion = arena.allocateFrom(version);
       var handle = (MemorySegment) NativeLib.TS_PACK_DOWNLOAD_MANAGER_NEW.invoke(cVersion);
       if (handle == null || handle.equals(MemorySegment.NULL)) {
