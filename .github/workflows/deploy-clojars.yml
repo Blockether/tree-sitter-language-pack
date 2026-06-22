@@ -15,17 +15,19 @@ on:
   workflow_dispatch:
     inputs:
       languages:
-        description: 'TSLP_LANGUAGES to statically compile (e.g. "all" or "clojure,edn")'
-        default: 'all'
+        description: 'TSLP_LANGUAGES to statically compile (e.g. "clojure", "clojure,edn", or "all")'
+        default: 'clojure'
         required: true
 
 permissions:
   contents: write
 
 env:
-  # `all` matches the upstream Maven Central publish; narrow it (e.g. "clojure")
-  # for a smaller, faster, Clojure-focused build.
-  TSLP_LANGUAGES: ${{ github.event.inputs.languages || 'all' }}
+  # Build only what we need (Clojure) by default. `all` is intentionally NOT the
+  # default: it pulls in every upstream grammar, and some (e.g. `norg`) have C++
+  # scanners that fail to compile on macOS, which would break the whole release.
+  # Override via workflow_dispatch input to widen the set.
+  TSLP_LANGUAGES: ${{ github.event.inputs.languages || 'clojure' }}
   TSLP_LINK_MODE: static
 
 jobs:
@@ -33,7 +35,7 @@ jobs:
     name: Build native FFI (${{ matrix.rid }})
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
