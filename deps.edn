@@ -1,0 +1,19 @@
+;; Clojure/Clojars deploy harness for the JVM binding of tree-sitter-language-pack.
+;; Mirrors the approach used in Blockether/svar: tools.build + deps-deploy publish
+;; a `com.blockether/tree-sitter-language-pack` jar to Clojars.
+;;
+;; The Java sources live under packages/java/src/main/java (alef-generated FFM
+;; bindings, --release 25 --enable-preview). The single native FFI library
+;; (libts_pack_core_ffi.{dylib,so,dll}) is bundled under resources/natives/<rid>/
+;; and located at runtime by NativeLib (see packages/java/.../NativeLib.java).
+{:paths ["packages/java/src/main/resources"]
+
+ :deps {org.jspecify/jspecify                            {:mvn/version "1.0.0"}
+        com.fasterxml.jackson.core/jackson-databind      {:mvn/version "2.21.2"}
+        com.fasterxml.jackson.datatype/jackson-datatype-jdk8 {:mvn/version "2.21.2"}
+        io.github.tree-sitter/jtreesitter                {:mvn/version "0.26.0"}}
+
+ :aliases
+ {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.13"}
+                 slipset/deps-deploy           {:mvn/version "0.2.2"}}
+          :ns-default build}}}
