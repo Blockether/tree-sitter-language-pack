@@ -31,7 +31,7 @@
 
 (set! *warn-on-reflection* true)
 
-(def ^:private native-prop "dev.kreuzberg.treesitterlanguagepack.native.path")
+(def ^:private native-prop "com.blockether.treesitterlanguagepack.native.path")
 (def ^:private clojars-root "https://repo.clojars.org")
 (def ^:private no-link-options (make-array LinkOption 0))
 (def ^:private no-file-attributes (make-array FileAttribute 0))
@@ -128,5 +128,10 @@
             (System/setProperty native-prop abs)
             abs))))))
 
-;; Resolve on load so simply requiring this namespace is enough.
-(ensure-native!)
+;; Resolve on load so simply requiring this namespace is enough on a normal JVM.
+;; Skipped during AOT compilation (Clojure binds *compile-files* true) so a
+;; GraalVM native-image build does NOT perform a build-time download; under
+;; native-image, call `ensure-native!` yourself at runtime (e.g. at the top of
+;; -main) before touching the Java API.
+(when-not *compile-files*
+  (ensure-native!))
