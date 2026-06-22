@@ -59,12 +59,12 @@ tasks:
         desc: Update PHP dependencies within current major versions (non-breaking)
         cmds:
             - echo "Updating root composer.json dependencies (within-major)..."
-            - composer update --with || true
+            - composer update -w || true
             - echo "Updating packages/php dependencies (within-major)..."
-            - cd packages/php && composer update --with
+            - cd packages/php && composer update -w
             - cd packages/php && echo "Checking remaining outdated dependencies..." && composer outdated --direct || true
             - echo "Updating e2e/php dependencies (within-major)..."
-            - cd e2e/php && composer update --with || true
+            - cd e2e/php && composer update -w || true
             - cd e2e/php && echo "Checking remaining outdated dependencies..." && composer outdated --direct || true
 
     upgrade:
