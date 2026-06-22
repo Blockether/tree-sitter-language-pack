@@ -235,7 +235,7 @@
 		"branch": "master",
 		"extensions": ["clj", "cljs", "cljc"],
 		"repo": "https://github.com/Blockether/tree-sitter-clojure",
-		"rev": "4dc3a1d11b359b12e231771824f3579c74350ba2"
+		"rev": "ef4a0b6fa5351734874f7b2ed4a26e3f3be4a9cc"
 	},
 	"cmake": {
 		"branch": "master",
