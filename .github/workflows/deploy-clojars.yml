@@ -18,15 +18,19 @@ on:
   workflow_dispatch:
     inputs:
       languages:
-        description: 'TSLP_LANGUAGES to statically compile ("all", or e.g. "clojure,edn")'
-        default: 'all'
+        description: 'TSLP_LANGUAGES to statically compile (curated default; pass "all" for every grammar)'
+        default: 'clojure,java,kotlin,scala,python,javascript,typescript,tsx,go,rust,c,cpp,csharp,ruby,php,swift,lua,bash,html,css,scss,json,yaml,toml,xml,sql,markdown,markdown_inline,dockerfile,regex'
         required: true
 
 permissions:
   contents: write
 
 env:
-  TSLP_LANGUAGES: ${{ github.event.inputs.languages || 'all' }}
+  # Curated set of the most popular languages (+ JVM/web/data formats a
+  # Clojure shop parses). ~52MB native lib vs ~410MB for `all`. Override via the
+  # workflow_dispatch input (e.g. "all") to widen. clojure always comes from
+  # our fork (see the `sources` job).
+  TSLP_LANGUAGES: ${{ github.event.inputs.languages || 'clojure,java,kotlin,scala,python,javascript,typescript,tsx,go,rust,c,cpp,csharp,ruby,php,swift,lua,bash,html,css,scss,json,yaml,toml,xml,sql,markdown,markdown_inline,dockerfile,regex' }}
   TSLP_LINK_MODE: static
   # Upstream's curated, known-to-compile source bundle for v1.10.3.
   PARSER_BUNDLE_URL: https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v1.10.3/parser-sources-1.10.3.tar.zst
