@@ -13,9 +13,16 @@
  ;; are built through their Builders + enum fromValue, so @JsonProperty metadata
  ;; was stripped. charred brings org.clojure/clojure transitively (fine for the
  ;; Clojure host this targets); build.clj keeps clojure off the published pom.
+ ;; tools.deps powers the runtime native-jar resolution in
+ ;; com.blockether.tree-sitter-language-pack/resolve-native-jar — the same
+ ;; resolver the clojure CLI uses, so :mvn/repos, mirrors and settings.xml are
+ ;; honoured instead of a hand-rolled HTTP GET. Loaded lazily via
+ ;; requiring-resolve, so it is NOT pulled into a GraalVM native image (where the
+ ;; native lib is bundled/explicit and this download path never runs).
  :deps {org.jspecify/jspecify                            {:mvn/version "1.0.0"}
         com.cnuernber/charred                            {:mvn/version "1.038"}
-        io.github.tree-sitter/jtreesitter                {:mvn/version "0.26.0"}}
+        io.github.tree-sitter/jtreesitter                {:mvn/version "0.26.0"}
+        org.clojure/tools.deps                           {:mvn/version "0.31.1629"}}
 
  :aliases
  {:build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.13"}
