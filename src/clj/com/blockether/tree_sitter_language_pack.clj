@@ -14,8 +14,11 @@
         `dev.kreuzberg.treesitterlanguagepack.native.path` system property,
      2. a bundled `natives/<rid>/<lib>` classpath resource (e.g. when the
         matching `…-native-<rid>` jar is already on the classpath),
-     3. otherwise download `com.blockether/tree-sitter-language-pack-native-<rid>`
-        from Clojars into `~/.cache/clj-tslp`, extract the library, and point
+     3. otherwise resolve `com.blockether/tree-sitter-language-pack-native-<rid>`
+        through Clojure's own dependency machinery (`clojure.tools.deps`, the
+        same resolver the `clojure` CLI uses — so your `:mvn/repos`, mirrors,
+        `~/.m2/settings.xml`, and local repository are all honoured), extract the
+        library out of the resolved jar into `~/.cache/clj-tslp`, and point
         NativeLib at it via the system property.
 
    Require this namespace BEFORE using the Java API
@@ -23,16 +26,13 @@
    JVM with `--enable-native-access=ALL-UNNAMED`."
   (:require [clojure.java.io :as io]
             [clojure.string :as str])
-  (:import [java.net URI]
-           [java.net.http HttpClient HttpRequest HttpResponse$BodyHandlers]
-           [java.nio.file CopyOption Files LinkOption Path Paths StandardCopyOption]
+  (:import [java.nio.file CopyOption Files LinkOption Path StandardCopyOption]
            [java.nio.file.attribute FileAttribute]
            [java.util.jar JarFile]))
 
 (set! *warn-on-reflection* true)
 
 (def ^:private native-prop "com.blockether.treesitterlanguagepack.native.path")
-(def ^:private clojars-root "https://repo.clojars.org")
 (def ^:private no-link-options (make-array LinkOption 0))
 (def ^:private no-file-attributes (make-array FileAttribute 0))
 
@@ -67,23 +67,26 @@
                         (str (io/file (System/getProperty "user.home") ".cache" "clj-tslp")))
                     version rid)))
 
-(defn- native-jar-uri ^URI [version rid]
-  (let [artifact (str "tree-sitter-language-pack-native-" rid)]
-    (URI/create (format "%s/com/blockether/%s/%s/%s-%s.jar"
-                        clojars-root artifact version artifact version))))
+(defn- resolve-native-jar ^Path [version rid]
+  "Resolve the per-rid native jar through `clojure.tools.deps` — the same
+   resolver the `clojure` CLI uses, so configured Maven repositories, mirrors and
+   `~/.m2/settings.xml` are all honoured (no hand-rolled HTTP to a hardcoded
+   repo). Returns the path of the jar in the local Maven repository.
 
-(defn- download! [^URI uri ^Path dest]
-  (Files/createDirectories (.getParent dest) no-file-attributes)
-  (Files/deleteIfExists dest)
-  (let [client   (HttpClient/newHttpClient)
-        request  (-> (HttpRequest/newBuilder uri) (.GET) (.build))
-        response (.send client request (HttpResponse$BodyHandlers/ofFile dest))]
-    (when-not (= 200 (.statusCode response))
-      (Files/deleteIfExists dest)
-      (throw (ex-info (str "Unable to download native artifact from " uri
-                           " (HTTP " (.statusCode response) ")")
-                      {:uri (str uri) :status (.statusCode response)})))
-    dest))
+   tools.deps is loaded via `requiring-resolve` so it is only touched on this
+   runtime download path (never under native-image, where the native is bundled
+   or supplied via an explicit path)."
+  (let [lib          (symbol "com.blockether" (str "tree-sitter-language-pack-native-" rid))
+        create-basis (or (requiring-resolve 'clojure.tools.deps/create-basis)
+                         (throw (ex-info "org.clojure/tools.deps is not on the classpath; cannot resolve the native artifact. Add the matching native jar to the classpath or set TSLP_NATIVE_PATH."
+                                  {:lib lib})))
+        basis        (create-basis {:project nil :extra {:deps {lib {:mvn/version version}}}})
+        path         (-> basis :libs (get lib) :paths first)]
+    (when-not path
+      (throw (ex-info (str "Could not resolve native artifact " lib " " version
+                        " via Clojure's dependency resolver. Check your Maven repositories / mirrors.")
+               {:lib lib :version version})))
+    (.toPath (io/file path))))
 
 (defn- extract! [^Path jar-path ^String entry-name ^Path dest]
   (Files/createDirectories (.getParent dest) no-file-attributes)
@@ -115,15 +118,14 @@
       (if (io/resource (str "natives/" rid "/" fname))
         ;; (2) bundled on the classpath — let NativeLib extract+load it.
         nil
-        ;; (3) download the matching native jar from Clojars and cache it.
+        ;; (3) resolve the matching native jar via Clojure's dependency resolver
+        ;; (tools.deps — honours repos/mirrors/settings.xml) and cache the lib.
         (let [v   (or (version)
                       (throw (ex-info "Cannot determine artifact version (missing tslp-version resource)" {})))
               ^Path dir (cache-dir v rid)
               ^Path lib (.resolve dir ^String fname)]
           (when-not (Files/exists lib no-link-options)
-            (let [^Path jar (.resolve dir (str "tree-sitter-language-pack-native-" rid ".jar"))]
-              (download! (native-jar-uri v rid) jar)
-              (extract! jar (str "natives/" rid "/" fname) lib)))
+            (extract! (resolve-native-jar v rid) (str "natives/" rid "/" fname) lib))
           (let [abs (str (.toAbsolutePath lib))]
             (System/setProperty native-prop abs)
             abs))))))
