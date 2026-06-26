@@ -396,8 +396,16 @@ fn resolve_structure_name(node: &tree_sitter::Node, source: &str) -> Option<Stri
             return Some(text.to_string());
         }
     }
-    // 2–4. Walk named children, trying each kind in priority order
-    for target_kind in &["type_identifier", "identifier", "scoped_identifier"] {
+    // 2. C/C++ — the name is nested in the declarator chain
+    //    (function_definition declarator: (function_declarator declarator: (identifier))).
+    if let Some(decl) = node.child_by_field_name("declarator")
+        && let Some(name) = declarator_identifier(&decl, source)
+    {
+        return Some(name);
+    }
+    // 3. Walk named children, trying each identifier kind in priority order.
+    //    `simple_identifier` = Kotlin function / property / object names.
+    for target_kind in &["type_identifier", "simple_identifier", "identifier", "scoped_identifier", "IDENTIFIER"] {
         let mut cursor = node.walk();
         for child in node.named_children(&mut cursor) {
             if child.kind() == *target_kind {
@@ -411,6 +419,26 @@ fn resolve_structure_name(node: &tree_sitter::Node, source: &str) -> Option<Stri
     None
 }
 
+/// Descend a C/C++ declarator chain (function_declarator / pointer_declarator /
+/// reference_declarator …) to the innermost identifier — the function/method name.
+fn declarator_identifier(node: &tree_sitter::Node, source: &str) -> Option<String> {
+    match node.kind() {
+        "identifier" | "field_identifier" | "type_identifier" | "qualified_identifier"
+        | "destructor_name" | "operator_name" => {
+            let t = node_text(node, source);
+            (!t.is_empty()).then(|| t.to_string())
+        }
+        _ => {
+            if let Some(inner) = node.child_by_field_name("declarator") {
+                return declarator_identifier(&inner, source);
+            }
+            let mut cursor = node.walk();
+            node.named_children(&mut cursor)
+                .find_map(|child| declarator_identifier(&child, source))
+        }
+    }
+}
+
 fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, items: &mut Vec<StructureItem>) {
     let kind = node.kind();
     let structure_kind = match kind {
@@ -419,6 +447,13 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
         }
         "method_definition" | "method_declaration" => Some(StructureKind::Method),
         "method" | "singleton_method" if language == "ruby" => Some(StructureKind::Method),
+        // Dart splits a function into a `*_signature` node followed by a sibling
+        // `function_body` (TS uses these for ambient/overload sigs, so guard to dart).
+        "function_signature" if language == "dart" => Some(StructureKind::Function),
+        "method_signature" if language == "dart" => Some(StructureKind::Method),
+        // Zig: a function is `Decl > [FnProto, Block]`; FnProto carries the name
+        // (IDENTIFIER) and the Block is its sibling body — same shape as Dart.
+        "FnProto" if language == "zig" => Some(StructureKind::Function),
         "class_definition" | "class_declaration" | "class" => Some(StructureKind::Class),
         "struct_item" | "struct_definition" | "struct_declaration" => Some(StructureKind::Struct),
         "interface_declaration" | "interface_definition" => Some(StructureKind::Interface),
@@ -432,7 +467,30 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
 
     if let Some(sk) = structure_kind {
         let name = resolve_structure_name(node, source);
-        let body_span = node.child_by_field_name("body").map(|n| span_from_node(&n));
+        // Dart/Zig: the editable def spans a signature/proto node AND the
+        // following sibling body. Other languages keep the node's own span.
+        let dart_body = match (language, kind) {
+            ("dart", "function_signature" | "method_signature") => node
+                .next_named_sibling()
+                .filter(|s| matches!(s.kind(), "function_body" | "block")),
+            ("zig", "FnProto") => node.next_named_sibling().filter(|s| s.kind() == "Block"),
+            _ => None,
+        };
+        let span = match &dart_body {
+            Some(body) => {
+                let mut s = span_from_node(node);
+                let e = span_from_node(body);
+                s.end_byte = e.end_byte;
+                s.end_line = e.end_line;
+                s.end_column = e.end_column;
+                s
+            }
+            None => span_from_node(node),
+        };
+        let body_span = dart_body
+            .as_ref()
+            .map(|b| span_from_node(b))
+            .or_else(|| node.child_by_field_name("body").map(|n| span_from_node(&n)));
         let mut children = Vec::new();
         if let Some(body) = node.child_by_field_name("body") {
             collect_structure(&body, source, language, &mut children);
@@ -441,7 +499,7 @@ fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, ite
             kind: sk,
             name,
             visibility: None,
-            span: span_from_node(node),
+            span,
             children,
             decorators: Vec::new(),
             doc_comment: None,
