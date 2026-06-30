@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Clojure structure extraction now reports clean names, visibility, doc strings, and
+  signatures.** The Clojure intel extractor folded a def's reader metadata into its `name`
+  (`^:private foo`, `^{:const true} bar`) and left `visibility`, `doc_comment`, and `signature`
+  unset. Because the name carried the metadata, every name-based structural operation
+  (`StructuralApi.edit`/`replaceNode`/`rename`/`move`, and the docstring association used by
+  `replaceDoc`) failed to resolve a def by its real name — e.g. `replace` on `(def ^:private foo …)`
+  could only be targeted as `^:private foo`, never `foo`. `clojure_form` now reads the `sym_name`
+  child for the clean name, derives `visibility` (`defn-` or `^:private` / `^{:private true}` →
+  `private`), and populates `doc_comment` (the def-form's doc string) and `signature` (the arglist,
+  including multi-arity). `defmethod` dispatch-value naming is preserved.
+
+### Changed
+
+- **Intel extraction is now per-language (`intel::lang`).** The scattered `match language { … }` /
+  `if language == "…"` arms across `intelligence.rs` (structure, doc strings, imports, exports) are
+  replaced by a `LanguageIntel` trait with small hooks (`structure_kind`, `sibling_body`,
+  `docstring_at`, `is_import`, `is_export`) over shared generic walkers, one module per language, and
+  a single `for_language` dispatch point. Behaviour is unchanged for every language; adding a
+  language is now local.
+
 ## [1.10.3] - 2026-06-22
 
 ### Changed
