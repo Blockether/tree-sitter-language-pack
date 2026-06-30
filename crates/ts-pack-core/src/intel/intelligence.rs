@@ -23,7 +23,7 @@ pub fn extract_intelligence(source: &str, language: &str, tree: &tree_sitter::Tr
     }
 }
 
-fn span_from_node(node: &tree_sitter::Node) -> Span {
+pub(crate) fn span_from_node(node: &tree_sitter::Node) -> Span {
     let start = node.start_position();
     let end = node.end_position();
     Span {
@@ -36,7 +36,7 @@ fn span_from_node(node: &tree_sitter::Node) -> Span {
     }
 }
 
-fn node_text<'a>(node: &tree_sitter::Node, source: &'a str) -> &'a str {
+pub(crate) fn node_text<'a>(node: &tree_sitter::Node, source: &'a str) -> &'a str {
     &source[node.start_byte()..node.end_byte()]
 }
 
@@ -144,374 +144,19 @@ fn collect_comments(node: &tree_sitter::Node, source: &str, comments: &mut Vec<C
 }
 
 pub(crate) fn extract_docstrings(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<DocstringInfo> {
-    let mut docstrings = Vec::with_capacity(16);
-    collect_docstrings(root, source, language, &mut docstrings);
-    docstrings
-}
-
-fn collect_docstrings(node: &tree_sitter::Node, source: &str, language: &str, docstrings: &mut Vec<DocstringInfo>) {
-    match language {
-        "python" => {
-            // A Python docstring is the first statement of a module / function /
-            // class body, written as a string literal. Two tree shapes occur
-            // across tree-sitter-python versions: the string wrapped in an
-            // `expression_statement`, or — in current grammars — a bare `string`
-            // node directly under the `block` / `module`. Handle both, and only
-            // when it is the FIRST statement (else it is just a string, not a doc).
-            let string_child = if node.kind() == "expression_statement" {
-                node.child(0).filter(|c| c.kind() == "string" || c.kind() == "concatenated_string")
-            } else if node.kind() == "string" || node.kind() == "concatenated_string" {
-                Some(*node)
-            } else {
-                None
-            };
-            if let Some(child) = string_child
-                && let Some(parent) = node.parent()
-            {
-                let parent_kind = parent.kind();
-                let is_first = parent.named_child(0).map(|f| f.id()) == Some(node.id());
-                if (parent_kind == "block" || parent_kind == "module") && is_first {
-                    docstrings.push(DocstringInfo {
-                        text: node_text(&child, source).to_string(),
-                        format: DocstringFormat::PythonTripleQuote,
-                        span: span_from_node(&child),
-                        associated_item: parent.parent().and_then(|gp| {
-                            gp.child_by_field_name("name")
-                                .map(|n| node_text(&n, source).to_string())
-                        }),
-                        parsed_sections: Vec::new(),
-                    });
-                }
-            }
-        }
-        "clojure" => {
-            // A Clojure doc string is the str_lit right after the name in a
-            // def-form, e.g. `(defn f "doc" [x] …)`. It is only a docstring when
-            // a form follows it (otherwise `(def x "v")` would misread the value).
-            if node.kind() == "list_lit" {
-                let mut cursor = node.walk();
-                let kids: Vec<tree_sitter::Node> = node.named_children(&mut cursor).collect();
-                if kids.len() > 3
-                    && kids[0].kind() == "sym_lit"
-                    && kids[1].kind() == "sym_lit"
-                    && kids[2].kind() == "str_lit"
-                    && matches!(
-                        node_text(&kids[0], source),
-                        "defn" | "defn-" | "defmacro" | "def" | "defonce"
-                    )
-                {
-                    docstrings.push(DocstringInfo {
-                        text: node_text(&kids[2], source).to_string(),
-                        format: DocstringFormat::Plain,
-                        span: span_from_node(&kids[2]),
-                        associated_item: Some(node_text(&kids[1], source).to_string()),
-                        parsed_sections: Vec::new(),
-                    });
-                }
-            }
-        }
-        _ => {
-            // For other languages, doc comments are already captured in extract_comments
-        }
-    }
-    let mut cursor = node.walk();
-    for child in node.children(&mut cursor) {
-        collect_docstrings(&child, source, language, docstrings);
-    }
+    super::lang::for_language(language).docstrings(root, source)
 }
 
 pub(crate) fn extract_imports(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<ImportInfo> {
-    let mut imports = Vec::with_capacity(16);
-    collect_imports(root, source, language, &mut imports);
-    imports
-}
-
-fn collect_imports(node: &tree_sitter::Node, source: &str, language: &str, imports: &mut Vec<ImportInfo>) {
-    let kind = node.kind();
-    let is_import = match language {
-        "python" => kind == "import_statement" || kind == "import_from_statement",
-        "javascript" | "typescript" | "tsx" => kind == "import_statement",
-        "rust" => kind == "use_declaration",
-        "go" => kind == "import_declaration" || kind == "import_spec",
-        "java" | "kotlin" => kind == "import_declaration",
-        _ => false,
-    };
-    if is_import {
-        let text = node_text(node, source);
-        imports.push(ImportInfo {
-            source: text.to_string(),
-            items: Vec::new(),
-            alias: None,
-            is_wildcard: text.contains('*'),
-            span: span_from_node(node),
-        });
-    }
-    let mut cursor = node.walk();
-    for child in node.children(&mut cursor) {
-        collect_imports(&child, source, language, imports);
-    }
+    super::lang::for_language(language).imports(root, source)
 }
 
 pub(crate) fn extract_exports(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<ExportInfo> {
-    let mut exports = Vec::with_capacity(16);
-    collect_exports(root, source, language, &mut exports);
-    exports
-}
-
-fn collect_exports(node: &tree_sitter::Node, source: &str, language: &str, exports: &mut Vec<ExportInfo>) {
-    let kind = node.kind();
-    let is_export = match language {
-        "javascript" | "typescript" | "tsx" => kind == "export_statement",
-        _ => false,
-    };
-    if is_export {
-        let export_kind = if node.child_by_field_name("default").is_some() {
-            ExportKind::Default
-        } else if node.child_by_field_name("source").is_some() {
-            ExportKind::ReExport
-        } else {
-            ExportKind::Named
-        };
-        let text = node_text(node, source);
-        exports.push(ExportInfo {
-            name: text.lines().next().unwrap_or("").to_string(),
-            kind: export_kind,
-            span: span_from_node(node),
-        });
-    }
-    let mut cursor = node.walk();
-    for child in node.children(&mut cursor) {
-        collect_exports(&child, source, language, exports);
-    }
+    super::lang::for_language(language).exports(root, source)
 }
 
 pub(crate) fn extract_structure(root: &tree_sitter::Node, source: &str, language: &str) -> Vec<StructureItem> {
-    // Clojure (incl. cljs/cljc/bb — all reported as "clojure") parses as generic
-    // s-expressions (`list_lit`/`sym_lit`), so there are no `*_definition` node
-    // kinds to match on. Structure is SEMANTIC: a top-level list whose head
-    // symbol is a def-form (`defn`, `ns`, `defrecord`, …) is the definition.
-    if language == "clojure" {
-        return extract_clojure_structure(root, source);
-    }
-    let mut items = Vec::with_capacity(32);
-    collect_structure(root, source, language, &mut items);
-    items
-}
-
-/// Map a Clojure def-form head symbol to a structure kind. Non-def-form heads
-/// return `None` (the list is not a definition).
-fn clojure_def_kind(head: &str) -> Option<StructureKind> {
-    match head {
-        "defn" | "defn-" | "definline" => Some(StructureKind::Function),
-        "defmacro" => Some(StructureKind::Macro),
-        "def" | "defonce" => Some(StructureKind::Constant),
-        "defmulti" | "defmethod" => Some(StructureKind::Method),
-        "defprotocol" => Some(StructureKind::Protocol),
-        "definterface" => Some(StructureKind::Interface),
-        "defrecord" => Some(StructureKind::Struct),
-        "deftype" => Some(StructureKind::Type),
-        "ns" => Some(StructureKind::Namespace),
-        _ => None,
-    }
-}
-
-/// One Clojure structure item from a `list_lit`, or `None` when the list is not
-/// a recognised def-form. Head symbol → kind; the next symbol → name. For
-/// `defmethod` the dispatch value is appended to the name (e.g. `area :circle`)
-/// so callers can target one method of a multimethod unambiguously.
-fn clojure_form(node: &tree_sitter::Node, source: &str) -> Option<StructureItem> {
-    if node.kind() != "list_lit" {
-        return None;
-    }
-    let mut cursor = node.walk();
-    let named: Vec<tree_sitter::Node> = node.named_children(&mut cursor).collect();
-    // Head symbol identifies the def-form.
-    let head_node = named.first()?;
-    if head_node.kind() != "sym_lit" {
-        return None;
-    }
-    let head = node_text(head_node, source);
-    let kind = clojure_def_kind(head)?;
-    // The defined name is the next symbol (skip metadata/reader nodes between).
-    let name_node = named.iter().skip(1).find(|n| n.kind() == "sym_lit");
-    let name = name_node.map(|n| {
-        let base = node_text(n, source).to_string();
-        if head == "defmethod" {
-            // Append the dispatch value (the form right after the name) so two
-            // (defmethod area :circle …) / (defmethod area :rect …) are distinct.
-            let dispatch = named
-                .iter()
-                .skip_while(|x| x.id() != n.id())
-                .nth(1)
-                .map(|d| collapse_ws(node_text(d, source)));
-            match dispatch {
-                Some(d) if !d.is_empty() => format!("{base} {d}"),
-                _ => base,
-            }
-        } else {
-            base
-        }
-    });
-    Some(StructureItem {
-        kind,
-        name,
-        visibility: None,
-        span: span_from_node(node),
-        children: Vec::new(),
-        decorators: Vec::new(),
-        doc_comment: None,
-        signature: None,
-        body_span: None,
-    })
-}
-
-/// Trim and collapse internal whitespace runs to a single space.
-fn collapse_ws(s: &str) -> String {
-    s.split_whitespace().collect::<Vec<_>>().join(" ")
-}
-
-/// Top-level Clojure def-forms, in source order.
-fn extract_clojure_structure(root: &tree_sitter::Node, source: &str) -> Vec<StructureItem> {
-    let mut items = Vec::with_capacity(32);
-    let mut cursor = root.walk();
-    for child in root.named_children(&mut cursor) {
-        if let Some(item) = clojure_form(&child, source) {
-            items.push(item);
-        }
-    }
-    items
-}
-
-/// Resolve the name of a structure node using a fallback chain.
-///
-/// Tries `"name"` field first (covers Python, Rust, Java classes), then finds
-/// the first named child with kind `"type_identifier"` (Kotlin classes), then
-/// `"identifier"` (Kotlin packages), then `"scoped_identifier"` (Java packages).
-/// Returns `None` if no non-empty text is found via any strategy.
-fn resolve_structure_name(node: &tree_sitter::Node, source: &str) -> Option<String> {
-    // 1. Named field "name" — the common case
-    if let Some(n) = node.child_by_field_name("name") {
-        let text = node_text(&n, source);
-        if !text.is_empty() {
-            return Some(text.to_string());
-        }
-    }
-    // 2. C/C++ — the name is nested in the declarator chain
-    //    (function_definition declarator: (function_declarator declarator: (identifier))).
-    if let Some(decl) = node.child_by_field_name("declarator")
-        && let Some(name) = declarator_identifier(&decl, source)
-    {
-        return Some(name);
-    }
-    // 3. Walk named children, trying each identifier kind in priority order.
-    //    `simple_identifier` = Kotlin function / property / object names.
-    for target_kind in &["type_identifier", "simple_identifier", "identifier", "scoped_identifier", "IDENTIFIER"] {
-        let mut cursor = node.walk();
-        for child in node.named_children(&mut cursor) {
-            if child.kind() == *target_kind {
-                let text = node_text(&child, source);
-                if !text.is_empty() {
-                    return Some(text.to_string());
-                }
-            }
-        }
-    }
-    None
-}
-
-/// Descend a C/C++ declarator chain (function_declarator / pointer_declarator /
-/// reference_declarator …) to the innermost identifier — the function/method name.
-fn declarator_identifier(node: &tree_sitter::Node, source: &str) -> Option<String> {
-    match node.kind() {
-        "identifier" | "field_identifier" | "type_identifier" | "qualified_identifier"
-        | "destructor_name" | "operator_name" => {
-            let t = node_text(node, source);
-            (!t.is_empty()).then(|| t.to_string())
-        }
-        _ => {
-            if let Some(inner) = node.child_by_field_name("declarator") {
-                return declarator_identifier(&inner, source);
-            }
-            let mut cursor = node.walk();
-            node.named_children(&mut cursor)
-                .find_map(|child| declarator_identifier(&child, source))
-        }
-    }
-}
-
-fn collect_structure(node: &tree_sitter::Node, source: &str, language: &str, items: &mut Vec<StructureItem>) {
-    let kind = node.kind();
-    let structure_kind = match kind {
-        "function_definition" | "function_declaration" | "function_item" | "arrow_function" => {
-            Some(StructureKind::Function)
-        }
-        "method_definition" | "method_declaration" => Some(StructureKind::Method),
-        "method" | "singleton_method" if language == "ruby" => Some(StructureKind::Method),
-        // Dart splits a function into a `*_signature` node followed by a sibling
-        // `function_body` (TS uses these for ambient/overload sigs, so guard to dart).
-        "function_signature" if language == "dart" => Some(StructureKind::Function),
-        "method_signature" if language == "dart" => Some(StructureKind::Method),
-        // Zig: a function is `Decl > [FnProto, Block]`; FnProto carries the name
-        // (IDENTIFIER) and the Block is its sibling body — same shape as Dart.
-        "FnProto" if language == "zig" => Some(StructureKind::Function),
-        "class_definition" | "class_declaration" | "class" => Some(StructureKind::Class),
-        "struct_item" | "struct_definition" | "struct_declaration" => Some(StructureKind::Struct),
-        "interface_declaration" | "interface_definition" => Some(StructureKind::Interface),
-        "enum_item" | "enum_definition" | "enum_declaration" => Some(StructureKind::Enum),
-        "module_definition" | "mod_item" | "package_header" | "package_declaration" => Some(StructureKind::Module),
-        "module" if language == "ruby" => Some(StructureKind::Module),
-        "trait_item" => Some(StructureKind::Trait),
-        "impl_item" => Some(StructureKind::Impl),
-        _ => None,
-    };
-
-    if let Some(sk) = structure_kind {
-        let name = resolve_structure_name(node, source);
-        // Dart/Zig: the editable def spans a signature/proto node AND the
-        // following sibling body. Other languages keep the node's own span.
-        let dart_body = match (language, kind) {
-            ("dart", "function_signature" | "method_signature") => node
-                .next_named_sibling()
-                .filter(|s| matches!(s.kind(), "function_body" | "block")),
-            ("zig", "FnProto") => node.next_named_sibling().filter(|s| s.kind() == "Block"),
-            _ => None,
-        };
-        let span = match &dart_body {
-            Some(body) => {
-                let mut s = span_from_node(node);
-                let e = span_from_node(body);
-                s.end_byte = e.end_byte;
-                s.end_line = e.end_line;
-                s.end_column = e.end_column;
-                s
-            }
-            None => span_from_node(node),
-        };
-        let body_span = dart_body
-            .as_ref()
-            .map(|b| span_from_node(b))
-            .or_else(|| node.child_by_field_name("body").map(|n| span_from_node(&n)));
-        let mut children = Vec::new();
-        if let Some(body) = node.child_by_field_name("body") {
-            collect_structure(&body, source, language, &mut children);
-        }
-        items.push(StructureItem {
-            kind: sk,
-            name,
-            visibility: None,
-            span,
-            children,
-            decorators: Vec::new(),
-            doc_comment: None,
-            signature: None,
-            body_span,
-        });
-    } else {
-        let mut cursor = node.walk();
-        for child in node.children(&mut cursor) {
-            collect_structure(&child, source, language, items);
-        }
-    }
+    super::lang::for_language(language).structure(root, source)
 }
 
 pub(crate) fn extract_symbols(root: &tree_sitter::Node, source: &str, _language: &str) -> Vec<SymbolInfo> {
@@ -594,6 +239,61 @@ mod tests {
 
     fn parse_or_skip(source: &str, lang_name: &str) -> Option<tree_sitter::Tree> {
         parse_with_language(source, lang_name).map(|(_, tree)| tree)
+    }
+
+    /// Extract Clojure structure via the cached native grammar, skipping the
+    /// test (returning `None`) when the grammar lib is not present in the cache.
+    fn clojure_structure_or_skip(source: &str) -> Option<Vec<StructureItem>> {
+        let cache = dirs::cache_dir()?.join("tree-sitter-language-pack/v1.10.3/libs");
+        let registry = crate::LanguageRegistry::with_libs_dir(cache);
+        let lang = registry.get_language("clojure").ok()?;
+        let mut parser = tree_sitter::Parser::new();
+        parser.set_language(&lang).ok()?;
+        let tree = parser.parse(source, None)?;
+        Some(extract_structure(&tree.root_node(), source, "clojure"))
+    }
+
+    #[test]
+    fn clojure_clean_names_and_visibility() {
+        let src = "(def ^:private a 1)\n(def ^{:const true} b 2)\n(def ^{:private true} c 3)\n(defn- helper [x] x)\n(defn pub [y] y)\n(def plain 4)\n";
+        let Some(items) = clojure_structure_or_skip(src) else {
+            return;
+        };
+        let names: Vec<_> = items.iter().filter_map(|i| i.name.clone()).collect();
+        let by = |n: &str| {
+            items
+                .iter()
+                .find(|i| i.name.as_deref() == Some(n))
+                .unwrap_or_else(|| panic!("missing {n}; names were {names:?}"))
+        };
+        // Names are clean — the `^:private` / `^{...}` metadata is stripped.
+        assert_eq!(by("a").kind, StructureKind::Constant);
+        assert_eq!(by("a").visibility.as_deref(), Some("private")); // ^:private
+        assert_eq!(by("b").visibility.as_deref(), Some("public")); // ^{:const true} is not private
+        assert_eq!(by("c").visibility.as_deref(), Some("private")); // ^{:private true}
+        assert_eq!(by("helper").kind, StructureKind::Function);
+        assert_eq!(by("helper").visibility.as_deref(), Some("private")); // defn-
+        assert_eq!(by("pub").visibility.as_deref(), Some("public"));
+        assert_eq!(by("plain").visibility.as_deref(), Some("public"));
+    }
+
+    #[test]
+    fn clojure_docstring_and_signature() {
+        let src = "(defn greet \"Say hi to n.\" [n] (str \"hi \" n))\n(def ^:private k \"the limit\" 10)\n(defn multi ([x] x) ([x y] (+ x y)))\n(def noval 1)\n(def justval \"only a value\")\n";
+        let Some(items) = clojure_structure_or_skip(src) else {
+            return;
+        };
+        let by = |n: &str| items.iter().find(|i| i.name.as_deref() == Some(n)).unwrap();
+        assert_eq!(by("greet").doc_comment.as_deref(), Some("Say hi to n."));
+        assert_eq!(by("greet").signature.as_deref(), Some("[n]"));
+        // `def` with both a docstring AND a value → the string is the docstring.
+        assert_eq!(by("k").doc_comment.as_deref(), Some("the limit"));
+        // Multi-arity arglists are joined.
+        assert_eq!(by("multi").signature.as_deref(), Some("[x] [x y]"));
+        // A bare value (no trailing form) is NOT a docstring.
+        assert_eq!(by("noval").doc_comment, None);
+        assert_eq!(by("noval").signature, None);
+        assert_eq!(by("justval").doc_comment, None);
     }
 
     // -- Structure extraction tests --

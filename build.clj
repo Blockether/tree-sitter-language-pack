@@ -162,3 +162,14 @@
   (dd/deploy {:installer :local
               :artifact jar-file
               :pom-file (b/pom-path {:lib lib :class-dir class-dir})}))
+
+(defn install-native
+  "Build and install one platform's native jar into the local Maven repo
+   (~/.m2). Pass :rid <rid>. Local counterpart of `deploy-native` — lets a
+   consumer resolve a freshly-built native artifact offline (e.g. testing an
+   unreleased version) without a Clojars round-trip."
+  [{:keys [rid]}]
+  (let [{:keys [jar lib class-dir]} (native-jar {:rid rid})]
+    (dd/deploy {:installer :local
+                :artifact jar
+                :pom-file (b/pom-path {:lib lib :class-dir class-dir})})))

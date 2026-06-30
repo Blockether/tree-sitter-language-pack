@@ -7,6 +7,7 @@
 pub mod chunking;
 pub(crate) mod data_extraction;
 pub mod intelligence;
+pub(crate) mod lang;
 pub mod types;
 
 pub use types::*;
