@@ -1,7 +1,12 @@
 {
   "comment": "JSON at the FFI boundary is handled by charred (com.cnuernber/charred) via JsonCodec, NOT Jackson databind. charred parses to plain Map/List trees and the DTOs are built through their generated Builders + enum fromValue factories — entirely reflection-free, so no reflection metadata is needed here (the former Jackson databind reflection entries are gone). Only the FFI downcall stubs remain.",
   "reflection": [],
-  "resources": [],
+  "resources": [
+    {
+      "comment": "Embed the platform FFI lib from the tree-sitter-language-pack-native-<rid> jar when a consumer puts it on the native-image classpath (mirrors fff/rift/ruff prebuilds/**). Only the consumer-selected platform jar is ever on the classpath, so this broad glob stays per-platform by construction.",
+      "glob": "natives/**"
+    }
+  ],
   "foreign": {
     "downcalls": [
       {
