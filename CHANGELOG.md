@@ -1,4 +1,4 @@
-# 1.12.3-blockether.2
+# 1.12.3-blockether.3
 
 - **dart + zig join the static grammar list.** Both have per-language
   structural intel, but the shipped dylib did not embed their grammars — the
