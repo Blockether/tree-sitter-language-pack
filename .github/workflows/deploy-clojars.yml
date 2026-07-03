@@ -19,7 +19,7 @@ on:
     inputs:
       languages:
         description: 'TSLP_LANGUAGES to statically compile (curated default; pass "all" for every grammar)'
-        default: 'clojure,java,kotlin,scala,python,javascript,typescript,tsx,go,rust,c,cpp,csharp,ruby,php,swift,lua,bash,html,css,scss,json,yaml,toml,xml,sql,markdown,markdown_inline,dockerfile,regex'
+        default: 'clojure,elixir,java,kotlin,scala,python,javascript,typescript,tsx,go,rust,c,cpp,csharp,ruby,php,swift,lua,bash,html,css,scss,json,yaml,toml,xml,sql,markdown,markdown_inline,dockerfile,regex'
         required: true
 
 permissions:
@@ -30,11 +30,18 @@ env:
   # Clojure shop parses). ~52MB native lib vs ~410MB for `all`. Override via the
   # workflow_dispatch input (e.g. "all") to widen. clojure always comes from
   # our fork (see the `sources` job).
-  TSLP_LANGUAGES: ${{ github.event.inputs.languages || 'clojure,java,kotlin,scala,python,javascript,typescript,tsx,go,rust,c,cpp,csharp,ruby,php,swift,lua,bash,html,css,scss,json,yaml,toml,xml,sql,markdown,markdown_inline,dockerfile,regex' }}
+  TSLP_LANGUAGES: ${{ github.event.inputs.languages || 'clojure,elixir,java,kotlin,scala,python,javascript,typescript,tsx,go,rust,c,cpp,csharp,ruby,php,swift,lua,bash,html,css,scss,json,yaml,toml,xml,sql,markdown,markdown_inline,dockerfile,regex' }}
   TSLP_LINK_MODE: static
-  # Upstream's curated, known-to-compile source bundle for v1.10.3.
+  # Upstream's LAST published parser-sources bundle (they stopped attaching
+  # bundles to releases after v1.10.3). Still byte-correct for every curated
+  # grammar EXCEPT the ones whose rev moved in language_definitions.json —
+  # those are re-sourced per-grammar in the override step below, so the
+  # shipped sources always match the pinned revs.
   PARSER_BUNDLE_URL: https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v1.10.3/parser-sources-1.10.3.tar.zst
-  CLOJURE_FORK: https://github.com/Blockether/tree-sitter-clojure
+  # Grammars re-sourced from their repos at the definitions-pinned rev:
+  # clojure (Blockether fork), php + swift (rev-bumped in the v1.12.3 sync),
+  # elixir (NEW curated language — structural intel landed with the sync).
+  OVERRIDE_LANGS: clojure php swift elixir
 
 jobs:
   sources:
@@ -53,19 +60,17 @@ jobs:
           echo "languages in bundle: $(ls parsers | wc -l)"
           test -f parsers/clojure/src/parser.c
 
-      - name: Override clojure grammar with our fork
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Override drifted grammars (definitions-pinned revs)
         run: |
-          # Pin to the exact rev recorded in language_definitions.json so the
-          # build is reproducible (not floating on the fork's master).
-          REV=$(python3 -c "import json;print(json.load(open('sources/language_definitions.json'))['clojure']['rev'])")
-          git clone "$CLOJURE_FORK" /tmp/clj
-          git -C /tmp/clj checkout "$REV"
-          rm -rf parsers/clojure
-          mkdir -p parsers/clojure
-          cp -r /tmp/clj/src parsers/clojure/src
-          cp -r /tmp/clj/queries parsers/clojure/queries
-          echo "=== clojure now sourced from $(git -C /tmp/clj rev-parse HEAD) (pinned $REV) ==="
-          ls -R parsers/clojure
+          python3 scripts/override_grammars.py
+          test -f parsers/clojure/src/parser.c
+          test -f parsers/php/src/parser.c
+          test -f parsers/swift/src/parser.c
+          test -f parsers/elixir/src/parser.c
 
       - uses: actions/upload-artifact@v4
         with:

@@ -327,6 +327,64 @@ fn apply_wasm32_optimizations(build: &mut cc::Build) {
     }
 }
 
+/// Default upper bound (bytes) for a grammar's `parser.c` when compiling to wasm32.
+///
+/// A handful of grammars ship pathologically large *generated* `parser.c` files (e.g. `abl` at
+/// ~130 MB). Compiling one of those to wasm32 needs 18-25 GB＋ of clang RAM at *any* optimization
+/// level (the cost is in parsing/IR-building the giant single-function source, not optimization),
+/// which OOMs standard ≤16 GB CI runners — `CARGO_BUILD_JOBS=1` cannot help because a single file
+/// already exceeds the budget. 40 MB keeps every common language (including the ~40 MB `sql`
+/// grammar) while excluding only the unbuildable outliers.
+const DEFAULT_WASM_MAX_PARSER_BYTES: u64 = 40 * 1024 * 1024;
+
+/// Resolve the wasm32 `parser.c` size limit. Returns `None` (gate disabled) only when
+/// `TSLP_WASM_MAX_PARSER_BYTES=0`. Any unparsable value falls back to the default.
+fn wasm_parser_size_limit() -> Option<u64> {
+    match env::var("TSLP_WASM_MAX_PARSER_BYTES") {
+        Ok(raw) => match raw.trim().parse::<u64>() {
+            Ok(0) => None,
+            Ok(limit) => Some(limit),
+            Err(_) => Some(DEFAULT_WASM_MAX_PARSER_BYTES),
+        },
+        Err(_) => Some(DEFAULT_WASM_MAX_PARSER_BYTES),
+    }
+}
+
+/// Grammars whose external scanners cannot be compiled/linked for
+/// `wasm32-unknown-unknown` and are skipped on that target by default.
+///
+/// Each depends on host libc/libc++ facilities that wasi-libc does not provide
+/// freestanding:
+/// - `gitcommit`, `perl` — `<wctype.h>` (`iswcntrl`/`iswspace`) needs locale
+///   tables absent on wasm32; `perl` also calls `fprintf(stderr, …)` in a DEBUG
+///   macro (no stderr on wasm32).
+/// - `mojo`, `nim` — C++ `<cwctype>` (`std::iswspace`) fails to link against
+///   wasi-libc's C++ wctype/locale layer.
+/// - `norg` — C++ `<regex>` + `<locale>` + `<iostream>`, none available on wasm32.
+/// - `tmux` — its ~30 MB generated `parser.c` is under the size gate but still
+///   overruns the wasm32 clang backend during codegen (fails to compile), so it
+///   is skipped explicitly rather than by the byte-size heuristic.
+///
+/// These are niche grammars; dropping them from the wasm bundle degrades
+/// gracefully (absent from `STATIC_LANGUAGES`, no dangling FFI symbol). Override
+/// the set with `TSLP_WASM_SKIP_GRAMMARS` (comma-separated; empty disables the
+/// skip). Mirrors the `TSLP_WASM_MAX_PARSER_BYTES` size-gate pattern.
+const DEFAULT_WASM_SKIP_GRAMMARS: [&str; 6] = ["gitcommit", "mojo", "nim", "norg", "perl", "tmux"];
+
+/// Resolve the wasm32 grammar skip-list. Returns the default set unless
+/// `TSLP_WASM_SKIP_GRAMMARS` is set, in which case its comma-separated entries
+/// replace the default (an empty/whitespace value disables the skip entirely).
+fn wasm_skip_grammars() -> Vec<String> {
+    match env::var("TSLP_WASM_SKIP_GRAMMARS") {
+        Ok(raw) => raw
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect(),
+        Err(_) => DEFAULT_WASM_SKIP_GRAMMARS.iter().map(|s| s.to_string()).collect(),
+    }
+}
+
 /// Apply wasi-sysroot includes to a cc::Build for wasm32 targets.
 ///
 /// Use `-isystem` to add the wasm32-wasi include dir which has stdlib.h etc.
@@ -686,12 +744,14 @@ fn generate_extensions_lookup(definitions: &BTreeMap<String, LanguageDefinition>
     writeln!(af, "}}").unwrap();
 }
 
-/// Generate bundled highlight/injection/locals/tags query functions from parsers/{lang}/queries/*.scm.
+/// Generate bundled highlight/injection/locals/tags/indents/folds query functions from
+/// parsers/{lang}/queries/*.scm.
 ///
-/// Scans the parsers directory for query files and generates a Rust source file with four
+/// Scans the parsers directory for query files and generates a Rust source file with six
 /// match functions: `get_highlights_query_impl`, `get_injections_query_impl`,
-/// `get_locals_query_impl`, and `get_tags_query_impl`. Only languages that actually have the
-/// relevant .scm file on disk at build time are included.
+/// `get_locals_query_impl`, `get_tags_query_impl`, `get_indents_query_impl`, and
+/// `get_folds_query_impl`. Only languages that actually have the relevant .scm file on disk
+/// at build time are included.
 ///
 /// Query overlay files in `query-overlays/{lang}/{file}` (relative to the project root) take
 /// precedence over the vendored `parsers/{lang}/queries/{file}` files. This allows adding or
@@ -740,6 +800,8 @@ fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>,
     let mut injections: Vec<String> = Vec::new();
     let mut locals: Vec<String> = Vec::new();
     let mut tags: Vec<String> = Vec::new();
+    let mut indents: Vec<String> = Vec::new();
+    let mut folds: Vec<String> = Vec::new();
 
     for lang in definitions.keys() {
         if let Some(p) = effective_query_path(lang, "highlights.scm") {
@@ -756,6 +818,14 @@ fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>,
         }
         if let Some(p) = effective_query_path(lang, "tags.scm") {
             tags.push(lang.clone());
+            println!("cargo:rerun-if-changed={}", p.display());
+        }
+        if let Some(p) = effective_query_path(lang, "indents.scm") {
+            indents.push(lang.clone());
+            println!("cargo:rerun-if-changed={}", p.display());
+        }
+        if let Some(p) = effective_query_path(lang, "folds.scm") {
+            folds.push(lang.clone());
             println!("cargo:rerun-if-changed={}", p.display());
         }
     }
@@ -799,6 +869,8 @@ fn generate_queries_registry(definitions: &BTreeMap<String, LanguageDefinition>,
     gen_query_fn(&mut f, "get_injections_query_impl", &injections, "injections.scm");
     gen_query_fn(&mut f, "get_locals_query_impl", &locals, "locals.scm");
     gen_query_fn(&mut f, "get_tags_query_impl", &tags, "tags.scm");
+    gen_query_fn(&mut f, "get_indents_query_impl", &indents, "indents.scm");
+    gen_query_fn(&mut f, "get_folds_query_impl", &folds, "folds.scm");
 }
 
 /// Probe whether the parsers tree at `root` looks populated for the requested
@@ -975,7 +1047,7 @@ fn ensure_parser_sources(parsers_dir: &Path, selected: &[String], out_dir: &Path
 
     let version = env::var("CARGO_PKG_VERSION").unwrap_or_else(|_| "unknown".to_string());
     let default_url = format!(
-        "https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v{version}/parser-sources-{version}.tar.zst"
+        "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v{version}/parser-sources-{version}.tar.zst"
     );
     let url = env::var("TSLP_SOURCE_BUNDLE_URL").unwrap_or(default_url);
     let sha_url = format!("{url}.sha256");
@@ -1065,6 +1137,7 @@ fn main() {
     println!("cargo:rerun-if-env-changed=TSLP_LANGUAGES");
     println!("cargo:rerun-if-env-changed=PROJECT_ROOT");
     println!("cargo:rerun-if-env-changed=TSLP_LINK_MODE");
+    println!("cargo:rerun-if-env-changed=TSLP_WASM_MAX_PARSER_BYTES");
 
     let project_root = find_project_root();
 
@@ -1121,12 +1194,57 @@ fn main() {
     let mut static_compiled = Vec::new();
     let mut dynamic_compiled = Vec::new();
     let mut failed = Vec::new();
+    let mut skipped_wasm: Vec<String> = Vec::new();
+
+    // On wasm32, exclude grammars whose generated parser.c is too large to compile within
+    // runner memory (see DEFAULT_WASM_MAX_PARSER_BYTES). The gate runs before compilation so a
+    // single 130 MB outlier (e.g. abl) cannot OOM the build; skipped grammars are simply absent
+    // from STATIC_LANGUAGES (no dangling FFI symbol) and degrade gracefully at runtime.
+    let wasm_size_limit = if target_arch == "wasm32" {
+        wasm_parser_size_limit()
+    } else {
+        None
+    };
+
+    // On wasm32, exclude grammars whose external scanners cannot compile/link
+    // against wasi-libc (wctype/locale, C++ <regex>/<locale>/<iostream>, stderr).
+    // See DEFAULT_WASM_SKIP_GRAMMARS. Skipped grammars are absent from
+    // STATIC_LANGUAGES (no dangling FFI symbol) and degrade gracefully at runtime.
+    let wasm_skip = if target_arch == "wasm32" {
+        wasm_skip_grammars()
+    } else {
+        Vec::new()
+    };
 
     for name in &selected {
         let parser_dir = parsers_dir.join(name);
-        if !parser_dir.join("src/parser.c").exists() {
+        let parser_c = parser_dir.join("src/parser.c");
+        if !parser_c.exists() {
             println!("cargo:warning=Parser sources not found for '{}', skipping", name);
             failed.push(name.clone());
+            continue;
+        }
+
+        if wasm_skip.iter().any(|g| g == name) {
+            println!(
+                "cargo:warning=wasm32: skipping grammar '{}' — its external scanner is not wasm32-compatible (wctype/locale or C++ stdlib). Override with TSLP_WASM_SKIP_GRAMMARS.",
+                name,
+            );
+            skipped_wasm.push(name.clone());
+            continue;
+        }
+
+        if let Some(limit) = wasm_size_limit
+            && let Ok(size) = fs::metadata(&parser_c).map(|m| m.len())
+            && size > limit
+        {
+            println!(
+                "cargo:warning=wasm32: skipping grammar '{}' — parser.c is {} MB (limit {} MB); too large to compile to wasm32 within runner memory. Override with TSLP_WASM_MAX_PARSER_BYTES (0 disables the gate).",
+                name,
+                size / (1024 * 1024),
+                limit / (1024 * 1024),
+            );
+            skipped_wasm.push(name.clone());
             continue;
         }
 
@@ -1178,10 +1296,26 @@ fn main() {
         }
     }
 
+    if !skipped_wasm.is_empty() {
+        println!(
+            "cargo:warning=wasm32: skipped {} oversized grammar(s) (excluded from the wasm build): {}. Set TSLP_WASM_MAX_PARSER_BYTES=0 to force-compile them on a high-memory builder.",
+            skipped_wasm.len(),
+            skipped_wasm.join(", "),
+        );
+    }
+
     if !failed.is_empty() {
         // Persist the failure list so CI tooling can inspect it after the panic.
+        // Create the directory to ensure the write succeeds even if OUT_DIR is in an unusual state.
+        let _ = fs::create_dir_all(&out_dir);
         let failed_path = out_dir.join("failed_languages.txt");
-        fs::write(&failed_path, failed.join("\n") + "\n").expect("Failed to write failed_languages.txt");
+        if let Err(e) = fs::write(&failed_path, failed.join("\n") + "\n") {
+            eprintln!(
+                "WARNING: Failed to write {} for CI inspection: {}",
+                failed_path.display(),
+                e
+            );
+        }
         let allow_failures = env::var("TSLP_ALLOW_FAILED_GRAMMARS").ok().is_some_and(|v| v == "1");
         let message = format!(
             "FAILED to compile {} grammar(s): {}. Published artifacts must not advertise grammars that fail to build — fix the grammar pin or remove the entry from sources/language_definitions.json. Set TSLP_ALLOW_FAILED_GRAMMARS=1 for local debugging only.",

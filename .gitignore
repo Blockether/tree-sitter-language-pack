@@ -170,3 +170,6 @@ e2e/zig/zig-pkg/
 .github/commands/
 .github/skills/
 # END ai-rulez
+
+# agent session state
+.omc/

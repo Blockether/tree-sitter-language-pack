@@ -595,3 +595,44 @@ mod tests {
         assert_eq!(class.unwrap().name.as_deref(), Some("Widget"));
     }
 }
+
+// ---------------------------------------------------------------------------
+// Elixir compat walkers.
+//
+// Upstream's `intel::elixir` arms (`collect_structure_call` /
+// `collect_import_call`) mutually recurse through these for nested bodies.
+// Every OTHER language dispatches through the `lang` registry, so these only
+// ever see `language == "elixir"`: Elixir has no dedicated definition/import
+// node kinds (everything is a `call`), so the walk is just "let the Elixir
+// arm claim the node, else recurse into children".
+// ---------------------------------------------------------------------------
+
+pub(super) fn collect_structure(
+    node: &tree_sitter::Node,
+    source: &str,
+    language: &str,
+    items: &mut Vec<StructureItem>,
+) {
+    if language == "elixir" && super::elixir::collect_structure_call(node, source, language, items) {
+        return;
+    }
+    let mut cursor = node.walk();
+    for child in node.children(&mut cursor) {
+        collect_structure(&child, source, language, items);
+    }
+}
+
+pub(super) fn collect_imports(
+    node: &tree_sitter::Node,
+    source: &str,
+    language: &str,
+    imports: &mut Vec<ImportInfo>,
+) {
+    if language == "elixir" && node.kind() == "call" && super::elixir::collect_import_call(node, source, language, imports) {
+        return;
+    }
+    let mut cursor = node.walk();
+    for child in node.children(&mut cursor) {
+        collect_imports(&child, source, language, imports);
+    }
+}

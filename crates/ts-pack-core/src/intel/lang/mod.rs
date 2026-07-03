@@ -17,6 +17,7 @@ use crate::intel::types::*;
 use tree_sitter::Node;
 
 mod clojure;
+mod elixir;
 mod dart;
 mod go;
 mod java;
@@ -105,6 +106,7 @@ impl LanguageIntel for Generic {}
 pub(crate) fn for_language(language: &str) -> Box<dyn LanguageIntel> {
     match language {
         "clojure" => Box::new(clojure::Clojure),
+        "elixir" => Box::new(elixir::Elixir),
         "python" => Box::new(python::Python),
         "ruby" => Box::new(ruby::Ruby),
         "dart" => Box::new(dart::Dart),

@@ -1,3 +1,21 @@
+# 1.12.3-blockether.1
+
+- **Upstream sync v1.10.3 → v1.12.3** (core + ffi + cli + grammar sources; the
+  clojure grammar stays pinned to Blockether/tree-sitter-clojure):
+    - 34 grammar version bumps (elixir, matlab, lean, fsharp, cmake, zig, …).
+    - core loading fixes: `get_language()` mirroring (#146/#147),
+      `has_language`/download short-circuit, dynamic-grammar load mutex,
+      `indents.scm`/`folds.scm` harvesting, new `prefetch()` API.
+    - ffi: 17 NEW C functions, zero removed/changed — ABI-additive, the
+      existing Java/Clojure binding keeps working unchanged.
+- **NEW: Elixir structural intelligence** — upstream's `intel/elixir.rs`
+  call-arm extractors wired into the `LanguageIntel` registry as the 12th
+  language (structure + imports; docstrings/exports use the generic walkers).
+- **REMOVED: `tree-sitter-language-pack-jni` crate** — the Android/JNI binding
+  is not supported by this fork; the JVM path is the FFM/GraalVM binding.
+- packages/java NOT resynced (alef-regenerated here; upstream ABI additions
+  don't break it — regenerate with alef when the new C API is needed).
+
 # Changelog
 
 All notable changes to this project will be documented in this file.

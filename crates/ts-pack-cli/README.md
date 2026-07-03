@@ -1,48 +1,55 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/xberg-io/assets@v1/banner/readme-banner-dark.svg">
+    <img alt="Xberg" width="420" src="https://cdn.jsdelivr.net/gh/xberg-io/assets@v1/banner/readme-banner-light.svg">
+  </picture>
+</p>
+
 # tree-sitter-language-pack — CLI
 
-[![Bindings](https://img.shields.io/badge/Bindings-alef%20%D7%90-007ec6)](https://github.com/kreuzberg-dev/alef)
+[![Bindings](https://img.shields.io/badge/Bindings-alef%20%D7%90-007ec6)](https://github.com/xberg-io/alef)
 
 <div align="center" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;">
   <!-- Language Bindings -->  <a href="https://crates.io/crates/tree-sitter-language-pack">
     <img src="https://img.shields.io/crates/v/tree-sitter-language-pack?label=Rust&color=007ec6" alt="Rust">
   </a>  <a href="https://pypi.org/project/tree-sitter-language-pack/">
     <img src="https://img.shields.io/pypi/v/tree-sitter-language-pack?label=Python&color=007ec6" alt="Python">
-  </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack?label=Node.js&color=007ec6" alt="Node">
-  </a>  <a href="https://www.npmjs.com/package/@kreuzberg/tree-sitter-language-pack-wasm">
-    <img src="https://img.shields.io/npm/v/@kreuzberg/tree-sitter-language-pack-wasm?label=WASM&color=007ec6" alt="Wasm">
-  </a>  <a href="https://central.sonatype.com/artifact/dev.kreuzberg-dev/tree-sitter-language-pack">
-    <img src="https://img.shields.io/maven-central/v/dev.kreuzberg-dev/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
-  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/packages/go">
-    <img src="https://img.shields.io/github/v/tag/kreuzberg-dev/tree-sitter-language-pack?label=Go&color=007ec6" alt="Go">
-  </a>  <a href="https://www.nuget.org/packages/TreeSitterLanguagePack">
-    <img src="https://img.shields.io/nuget/v/TreeSitterLanguagePack?label=C%23&color=007ec6" alt="Csharp">
-  </a>  <a href="https://packagist.org/packages/kreuzberg-dev/tree-sitter-language-pack">
-    <img src="https://img.shields.io/packagist/v/kreuzberg-dev/tree-sitter-language-pack?label=PHP&color=007ec6" alt="Php">
+  </a>  <a href="https://www.npmjs.com/package/@xberg-io/tree-sitter-language-pack">
+    <img src="https://img.shields.io/npm/v/@xberg-io/tree-sitter-language-pack?label=Node.js&color=007ec6" alt="Node">
+  </a>  <a href="https://www.npmjs.com/package/@xberg-io/tree-sitter-language-pack-wasm">
+    <img src="https://img.shields.io/npm/v/@xberg-io/tree-sitter-language-pack-wasm?label=WASM&color=007ec6" alt="Wasm">
+  </a>  <a href="https://central.sonatype.com/artifact/io.xberg.treesitterlanguagepack/tree-sitter-language-pack">
+    <img src="https://img.shields.io/maven-central/v/io.xberg.treesitterlanguagepack/tree-sitter-language-pack?label=Java&color=007ec6" alt="Java">
+  </a>  <a href="https://github.com/xberg-io/tree-sitter-language-pack/tree/main/packages/go">
+    <img src="https://img.shields.io/github/v/tag/xberg-io/tree-sitter-language-pack?label=Go&color=007ec6" alt="Go">
+  </a>  <a href="https://www.nuget.org/packages/XbergIo.TreeSitterLanguagePack">
+    <img src="https://img.shields.io/nuget/v/XbergIo.TreeSitterLanguagePack?label=C%23&color=007ec6" alt="Csharp">
+  </a>  <a href="https://packagist.org/packages/xberg-io/tree-sitter-language-pack">
+    <img src="https://img.shields.io/packagist/v/xberg-io/tree-sitter-language-pack?label=PHP&color=007ec6" alt="Php">
   </a>  <a href="https://rubygems.org/gems/tree_sitter_language_pack">
     <img src="https://img.shields.io/gem/v/tree_sitter_language_pack?label=Ruby&color=007ec6" alt="Ruby">
   </a>  <a href="https://hex.pm/packages/tree_sitter_language_pack">
     <img src="https://img.shields.io/hexpm/v/tree_sitter_language_pack?label=Elixir&color=007ec6" alt="Elixir">
-  </a>  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/tree/main/crates/ts-pack-core-ffi">
+  </a>  <a href="https://github.com/xberg-io/tree-sitter-language-pack/tree/main/crates/ts-pack-core-ffi">
     <img src="https://img.shields.io/badge/C-FFI-007ec6" alt="Ffi">
   </a>
   <!-- Project Info -->
-  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/kreuzberg-dev/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI&color=007ec6" alt="CI">
+  <a href="https://github.com/xberg-io/tree-sitter-language-pack/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/xberg-io/tree-sitter-language-pack/ci-rust.yaml?branch=main&label=CI&color=007ec6" alt="CI">
   </a>
-  <a href="https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE">
+  <a href="https://github.com/xberg-io/tree-sitter-language-pack/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-007ec6.svg" alt="License">
   </a>
-  <a href="https://github.com/kreuzberg-dev/homebrew-tap">
+  <a href="https://github.com/xberg-io/homebrew-tap">
     <img src="https://img.shields.io/badge/homebrew-ts--pack-007ec6?logo=homebrew" alt="Homebrew">
   </a>
-  <a href="https://docs.tree-sitter-language-pack.kreuzberg.dev">
+  <a href="https://docs.tree-sitter-language-pack.xberg.io">
     <img src="https://img.shields.io/badge/Docs-tree--sitter--language--pack-007ec6" alt="Docs">
   </a>
 </div>
 
 <div align="center" style="margin: 24px 0 0;">
-  <a href="https://kreuzberg.dev">
+  <a href="https://xberg.io">
     <img alt="tree-sitter-language-pack" src="https://github.com/user-attachments/assets/478a83da-237b-446b-b3a8-e564c13e00a8" />
   </a>
 </div>
@@ -66,8 +73,8 @@ Or install via Homebrew:
 Homebrew 6.0+ requires explicit trust for third-party taps. Trust once, then install:
 
 ```sh
-brew trust kreuzberg-dev/tap
-brew install kreuzberg-dev/tap/ts-pack
+brew trust xberg-io/homebrew-tap
+brew install xberg-io/homebrew-tap/ts-pack
 ```
 
 ## Quick Start
@@ -111,21 +118,67 @@ ts-pack clone
 - `--verbose` / `-v` -- enable verbose output
 - `--help` -- show help for any command
 
-For full documentation, see [kreuzberg.dev](https://docs.tree-sitter-language-pack.kreuzberg.dev).
+## MCP Server
+
+The CLI includes an MCP server for integration with AI agents and IDEs. Start it with:
+
+```sh
+ts-pack mcp
+```
+
+The server runs over stdio by default. For HTTP transport (remote agents or team setups):
+
+```sh
+ts-pack mcp --transport http --host 127.0.0.1 --port 8011
+```
+
+### Options
+
+- `--transport <stdio|http>` -- transport mode (default: `stdio`)
+- `--host <addr>` -- bind address for HTTP transport (default: `127.0.0.1`)
+- `--port <u16>` -- port for HTTP transport (default: `8011`)
+- `--config <path>` -- optional language-pack.toml config file
+
+### Tools
+
+The MCP server exposes 8 tools:
+
+- **`parse`** — render syntax tree as S-expression or JSON
+- **`process`** — extract code intelligence (structure, imports, exports, symbols, docstrings, comments, diagnostics, chunking)
+- **`detect_language`** — identify language from file path or source code
+- **`list_languages`** — enumerate available, downloaded, or manifest languages with optional filtering
+- **`info`** — get status of a specific language (available, downloaded, etc.)
+- **`download`** — fetch parsers (list, groups, all, or fresh)
+- **`cache_dir`** — retrieve the local cache directory
+- **`clean_cache`** — delete cached parsers
+
+### Resources
+
+- `ts-pack://languages` — available language catalog
+- `ts-pack://languages/downloaded` — user-downloaded parsers
+- `ts-pack://language/{name}` — per-language status (template resource)
+
+### Prompt
+
+- **`analyze-code`** — analyze source code with language detection and code intelligence extraction
+
+For detailed setup and IDE configuration, see the [MCP Server guide](https://docs.tree-sitter-language-pack.xberg.io/guides/mcp-server/).
+
+For full documentation, see [xberg.io](https://docs.tree-sitter-language-pack.xberg.io).
 
 ## License
 
-MIT -- see [LICENSE](https://github.com/kreuzberg-dev/tree-sitter-language-pack/blob/main/LICENSE) for details.
+MIT -- see [LICENSE](https://github.com/xberg-io/tree-sitter-language-pack/blob/main/LICENSE) for details.
 
 ---
 
-Part of [tree-sitter-language-pack](https://github.com/kreuzberg-dev/tree-sitter-language-pack) -- A comprehensive collection of tree-sitter language parsers with polyglot bindings.
+Part of [tree-sitter-language-pack](https://github.com/xberg-io/tree-sitter-language-pack) -- A comprehensive collection of tree-sitter language parsers with polyglot bindings.
 
-## Part of Kreuzberg, Inc
+## Part of Xberg
 
-- [Kreuzberg](https://docs.kreuzberg.dev) — document intelligence: text, tables, metadata from 90+ formats with optional OCR.
-- [Kreuzberg Cloud](https://docs.kreuzberg.cloud) — managed extraction API with SDKs, dashboards, and observability.
-- [kreuzcrawl](https://docs.kreuzcrawl.kreuzberg.dev) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
-- [html-to-markdown](https://docs.html-to-markdown.kreuzberg.dev) — fast, lossless HTML→Markdown engine.
-- [liter-llm](https://docs.liter-llm.kreuzberg.dev) — universal LLM API client with native bindings for 14 languages and 143 providers.
+- [Xberg](https://docs.xberg.io) — document intelligence: text, tables, metadata from 91+ formats with optional OCR.
+- [Xberg Enterprise](https://enterprise.xberg.io) — managed extraction API with SDKs, dashboards, and observability.
+- [crawlberg](https://docs.crawlberg.xberg.io) — web crawling and scraping with HTML→Markdown and headless-Chrome fallback.
+- [html-to-markdown](https://docs.html-to-markdown.xberg.io) — fast, lossless HTML→Markdown engine.
+- [liter-llm](https://docs.liter-llm.xberg.io) — universal LLM API client with native bindings for 14 languages and 143 providers.
 - [Discord](https://discord.gg/xt9WY3GnKR) — community, roadmap, announcements.
