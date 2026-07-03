@@ -13,6 +13,7 @@ Writes parsers/<lang>/{src,queries} in the CWD, replacing bundle contents.
 import json
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 
@@ -35,6 +36,17 @@ for lang in os.environ["OVERRIDE_LANGS"].split():
     shutil.rmtree(dest, ignore_errors=True)
     dest.mkdir(parents=True)
     shutil.copytree(gdir / "src", dest / "src")
+    # Multi-grammar repos (tree-sitter-php) keep a shared common/ ABOVE the
+    # grammar dir, included as "../../common/…" from src/scanner.c — which a
+    # src/-only copy breaks. Mirror upstream clone_vendors.py: relocate
+    # common/ into src/ and rewrite the relative includes in every .c file.
+    common = work / "common"
+    if common.exists():
+        shutil.copytree(common, dest / "src" / "common")
+        for c in (dest / "src").glob("**/*.c"):
+            txt = c.read_text()
+            rel = os.path.relpath(dest / "src" / "common", c.parent).replace("\\", "/") + "/"
+            c.write_text(re.sub(r"\.\.[/\\](?:\.\.[/\\])*common[/\\]", rel, txt))
     q = gdir / "queries" if (gdir / "queries").exists() else work / "queries"
     if q.exists():
         shutil.copytree(q, dest / "queries")
