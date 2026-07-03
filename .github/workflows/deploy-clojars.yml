@@ -155,9 +155,56 @@ jobs:
           path: out/${{ matrix.rid }}/${{ matrix.lib }}
           if-no-files-found: error
 
+  integration-test:
+    name: JVM integration gate (static + intel + dynamic grammar)
+    needs: natives
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - uses: DeLaGuardo/setup-clojure@13.6.1
+        with:
+          cli: latest
+
+      - name: Cache Clojure deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.clojure/.cpcache
+          key: deps-it-${{ runner.os }}-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+            deps-it-${{ runner.os }}-
+
+      - name: Download freshly built linux native
+        uses: actions/download-artifact@v4
+        with:
+          name: native-linux-x86_64
+          path: it-native
+
+      # The gate vis's test suite used to be the only line of defence for:
+      # drives the FRESHLY BUILT library through the published binding —
+      # static grammar (clojure fork), per-language intel (elixir), and a
+      # DYNAMIC grammar (haskell) whose load must fetch the manifest+bundle
+      # from the pinned release on this cold runner. A broken dynamic path
+      # (1.12.3-blockether.1/.2/.3) fails HERE instead of in production.
+      - name: Run integration test against the fresh native
+        run: |
+          LIB=$(find it-native -type f \( -name '*.so' -o -name '*.dylib' \) | head -1)
+          test -n "$LIB" || { echo "no native lib artifact found"; exit 1; }
+          clojure -T:build compile-java
+          TSLP_NATIVE_PATH="$LIB" clojure -M:it
+
   release:
     name: Deploy native jars + main jar to Clojars
-    needs: natives
+    needs: [natives, integration-test]
     runs-on: ubuntu-latest
     steps:
       # Check out the triggering ref (the tag for v* pushes) so the deployed
