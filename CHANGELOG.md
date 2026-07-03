@@ -1,3 +1,13 @@
+# 1.12.3-blockether.2
+
+- **dart + zig join the static grammar list.** Both have per-language
+  structural intel, but the shipped dylib did not embed their grammars — the
+  binding fell back to the pack's runtime GitHub download, which points at
+  `xberg-io/…/releases/v<crate-version>/` and v1.12.3 upstream publishes NO
+  release assets, so dart/zig loading failed ("FFI call failed"). They were
+  network-dependent even before the sync; now every intel language is baked
+  in and works offline / inside native images.
+
 # 1.12.3-blockether.1
 
 - **Upstream sync v1.10.3 → v1.12.3** (core + ffi + cli + grammar sources; the
