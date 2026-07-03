@@ -20,6 +20,15 @@ use crate::error::Error;
 use crate::pack_config::TlsRootsMode;
 
 const GITHUB_RELEASE_BASE: &str = "https://github.com/xberg-io/tree-sitter-language-pack/releases/download";
+/// BLOCKETHER FORK: the last upstream release that PUBLISHED dynamic-grammar
+/// assets (parsers.json + per-platform bundles). Upstream stopped attaching
+/// release assets after v1.10.3, so deriving the manifest URL from the crate
+/// version 404s and every dynamically-loaded (non-static) grammar fails with
+/// "FFI call failed". Bundle URLs inside the manifest are absolute, so
+/// pinning the manifest version is sufficient. Grammars whose rev moved past
+/// v1.10.3 are served at their v1.10.3 build — identical to pre-sync
+/// behaviour. Override with TREE_SITTER_LANGUAGE_PACK_MANIFEST_URL.
+const DYNAMIC_ASSETS_VERSION: &str = "1.10.3";
 const CACHE_REMOVE_RETRIES: usize = 5;
 const CACHE_REMOVE_RETRY_DELAY: Duration = Duration::from_millis(10);
 const HTTP_TIMEOUT: Duration = Duration::from_secs(60);
@@ -34,13 +43,14 @@ const LOCK_FILE_NAME: &str = ".download.lock";
 /// air-gapped deployments, and private mirrors to redirect manifest fetches
 /// without recompiling. Supports both `http(s)://` (over the ureq agent) and
 /// `file://` (read straight from disk) schemes.
-fn resolve_manifest_url(version: &str) -> String {
+fn resolve_manifest_url(_crate_version: &str) -> String {
     if let Ok(url) = std::env::var(MANIFEST_URL_ENV)
         && !url.trim().is_empty()
     {
         return url;
     }
-    format!("{GITHUB_RELEASE_BASE}/v{version}/parsers.json")
+    // NOT the crate version — see DYNAMIC_ASSETS_VERSION.
+    format!("{GITHUB_RELEASE_BASE}/v{DYNAMIC_ASSETS_VERSION}/parsers.json")
 }
 
 /// Read a `file://` URL as a UTF-8 string.
@@ -496,7 +506,9 @@ impl DownloadManager {
         }
         let data = fs::read_to_string(&manifest_path)?;
         let manifest: ParserManifest = serde_json::from_str(&data)?;
-        if manifest.version == self.version {
+        // Cache freshness is keyed to the PINNED assets version, not the crate
+        // version — see DYNAMIC_ASSETS_VERSION.
+        if manifest.version == DYNAMIC_ASSETS_VERSION {
             Ok(Some(manifest))
         } else {
             Ok(None)
@@ -1273,7 +1285,8 @@ mod tests {
         let _env = EnvVarGuard::unset(MANIFEST_URL_ENV);
         assert_eq!(
             resolve_manifest_url("1.2.3"),
-            "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.2.3/parsers.json"
+            // pinned to DYNAMIC_ASSETS_VERSION, NOT the crate version
+            "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.10.3/parsers.json"
         );
     }
 

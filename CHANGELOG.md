@@ -1,3 +1,15 @@
+# 1.12.3-blockether.4
+
+- **Dynamic (non-static) grammars work again.** The runtime grammar download
+  derives its manifest URL from the CRATE version, and upstream stopped
+  attaching release assets after v1.10.3 — so haskell/erlang/ocaml/r/julia/
+  perl/groovy/nim/vim/proto/graphql (anything outside the static list) failed
+  with "FFI call failed". `DYNAMIC_ASSETS_VERSION` pins the manifest (and the
+  cache-freshness check) to v1.10.3, the last release WITH assets; bundle URLs
+  inside the manifest are absolute, so the pin is sufficient. Identical
+  behaviour to the pre-sync fork. Overridable via
+  `TREE_SITTER_LANGUAGE_PACK_MANIFEST_URL`.
+
 # 1.12.3-blockether.3
 
 - **dart + zig join the static grammar list.** Both have per-language
