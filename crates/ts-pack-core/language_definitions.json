@@ -322,7 +322,7 @@
       "edn"
     ],
     "repo": "https://github.com/Blockether/tree-sitter-clojure",
-    "rev": "03224d26f45d6058d2db3ab10b20b1244f437af2"
+    "rev": "fd2507286f95bff473f2593512d0740c02724891"
   },
   "cmake": {
     "branch": "master",
