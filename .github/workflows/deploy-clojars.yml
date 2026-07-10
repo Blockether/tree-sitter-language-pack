@@ -118,6 +118,7 @@ jobs:
       # toolchain so x86_64-apple-darwin etc. have a std library (E0463 otherwise).
       # Run inside the checkout so the rust-toolchain.toml override applies.
       - name: Add Rust target to pinned toolchain
+        shell: bash
         run: |
           rustup target add ${{ matrix.target }}
           if [ "${{ matrix.rid }}" = "macos-arm64" ]; then
