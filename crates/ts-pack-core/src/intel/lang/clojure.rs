@@ -38,10 +38,7 @@ impl LanguageIntel for Clojure {
             && kids[0].kind() == "sym_lit"
             && kids[1].kind() == "sym_lit"
             && kids[2].kind() == "str_lit"
-            && matches!(
-                node_text(&kids[0], source),
-                "defn" | "defn-" | "defmacro" | "def" | "defonce"
-            )
+            && node_text(&kids[0], source).starts_with("def")
         {
             out.push(DocstringInfo {
                 text: node_text(&kids[2], source).to_string(),
@@ -74,6 +71,18 @@ fn clojure_def_kind(head: &str) -> Option<StructureKind> {
         "defrecord" => Some(StructureKind::Struct),
         "deftype" => Some(StructureKind::Type),
         "ns" => Some(StructureKind::Namespace),
+        // Test-framework def-forms each bind a named test var: clojure.test
+        // (`deftest`), Lazytest / allure (`defdescribe`), Expectations
+        // (`defexpect`), test.check (`defspec`). Reported as functions.
+        "deftest" | "deftest-" | "defdescribe" | "defexpect" | "defspec" => {
+            Some(StructureKind::Function)
+        }
+        // Generic fallback: any other `def…`-prefixed head is treated as a
+        // definition macro — `defdelegate`, `defstate`, `defcomponent`, and
+        // project-local `def*` macros — keeping the exact head as the kind so
+        // callers still see which form defined the name. Matches clj-kondo's
+        // lenient handling of unknown `def*` macros.
+        _ if head.starts_with("def") => Some(StructureKind::Other(head.to_string())),
         _ => None,
     }
 }
@@ -131,7 +140,10 @@ fn clojure_meta_private(sym_lit: &Node, source: &str) -> bool {
 /// Visibility of a Clojure def: `private` for `defn-` or a `^:private` /
 /// `^{:private true}` metadata marker on the name; `public` otherwise.
 fn clojure_visibility(head: &str, name_sym_lit: &Node, source: &str) -> String {
-    if head == "defn-" || clojure_meta_private(name_sym_lit, source) {
+    // A trailing `-` is the private-def convention (`defn-`, `deftest-`); a
+    // `^:private` / `^{:private true}` metadata marker on the name means the
+    // same thing.
+    if head.ends_with('-') || clojure_meta_private(name_sym_lit, source) {
         "private".to_string()
     } else {
         "public".to_string()

@@ -296,6 +296,38 @@ mod tests {
         assert_eq!(by("justval").doc_comment, None);
     }
 
+    #[test]
+    fn clojure_custom_def_macros() {
+        // Test-framework def-forms (deftest/defdescribe/…) and arbitrary
+        // project-local `def*` macros must surface as definitions so tooling
+        // can target them by name — not fall through to nothing.
+        let src = "(defdescribe my-suite \"a test suite\" (it \"works\" (expect true)))\n(deftest a-test (is true))\n(deftest- priv-test (is true))\n(defdelegate wrapped some.ns/target)\n(ns my.app)\n";
+        let Some(items) = clojure_structure_or_skip(src) else {
+            return;
+        };
+        let names: Vec<_> = items.iter().filter_map(|i| i.name.clone()).collect();
+        let by = |n: &str| {
+            items
+                .iter()
+                .find(|i| i.name.as_deref() == Some(n))
+                .unwrap_or_else(|| panic!("missing {n}; names were {names:?}"))
+        };
+        // Known test-def forms report as functions, with clean name + docstring.
+        assert_eq!(by("my-suite").kind, StructureKind::Function);
+        assert_eq!(by("my-suite").doc_comment.as_deref(), Some("a test suite"));
+        assert_eq!(by("a-test").kind, StructureKind::Function);
+        // Trailing `-` marks the private convention (`deftest-`).
+        assert_eq!(by("priv-test").visibility.as_deref(), Some("private"));
+        // Unknown `def*` macros still surface — the exact head is kept as kind.
+        assert_eq!(
+            by("wrapped").kind,
+            StructureKind::Other("defdelegate".to_string())
+        );
+        // A nested `(it …)` inside the def-form is NOT a top-level definition.
+        assert!(!names.iter().any(|n| n == "works"));
+        assert_eq!(by("my.app").kind, StructureKind::Namespace);
+    }
+
     // -- Structure extraction tests --
 
     #[test]
