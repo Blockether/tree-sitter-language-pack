@@ -1,3 +1,19 @@
+# 1.12.3-blockether.11
+
+- **JS/TS/TSX structure now names function & class bindings (and drops inline
+  callback noise).** The generic walker recorded bare `arrow_function` /
+  `function_expression` nodes, so the ubiquitous modern pattern —
+  `const Button = () => …`, `export const useThing = () => …`,
+  `const C = memo(() => …)`, class-field arrows `handleClick = () => …` — came
+  out as *nameless* rows, and every inline callback (`arr.map(x => …)`,
+  `onPress={() => …}`, `useEffect(() => …)`) added its own anonymous row,
+  burying the real components. `JsTs` now overrides `structure()` with a
+  JS/TS-aware walk: it names a function/class after the identifier it is bound
+  to (recovering the name from the `variable_declarator` / class field / known
+  HOC wrapper `memo`/`forwardRef`/`observer`), spans the whole `const … = …;`
+  statement, and skips anonymous inline functions. Function/class/method
+  *declarations* are unchanged.
+
 # 1.12.3-blockether.4
 
 - **Dynamic (non-static) grammars work again.** The runtime grammar download
