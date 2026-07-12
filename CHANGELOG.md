@@ -1,3 +1,19 @@
+# 1.12.3-blockether.12
+
+- **JS/TS/TSX structure now covers type-level & namespaced definitions.** The
+  JS/TS-aware `structure()` walk only recognised function/class *declarations*
+  plus arrow/HOC value bindings and class methods, so everything type-level was
+  silently dropped from the outline: `interface Props { … }`, `type T = …`,
+  `enum E { … }`, `namespace X { … }` / `declare module "pkg" { … }`, and
+  `abstract` method signatures inside abstract classes. Worse, a namespace's
+  members leaked to the top level (the walker descended through the unrecorded
+  `internal_module`). The walk now records each as its proper `StructureKind`
+  (`Interface` / `Type` / `Enum` / `Namespace` / `Module` / `Method`), nests a
+  namespace/ambient-module's members as its children, and de-quotes the ambient
+  module specifier. Real-world TSX (decorated classes, generics, default-export
+  classes, getters/setters) is unaffected — plain data fields/consts and
+  `StyleSheet.create(…)`-style calls are still correctly skipped.
+
 # 1.12.3-blockether.11
 
 - **JS/TS/TSX structure now names function & class bindings (and drops inline

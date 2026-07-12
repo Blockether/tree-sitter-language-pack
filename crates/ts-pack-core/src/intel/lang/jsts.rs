@@ -21,7 +21,9 @@
 //! **every** inline callback too — `arr.map(x => …)`, `onPress={() => …}`,
 //! `useEffect(() => …)` — burying the real components under a pile of anonymous
 //! rows. This walker instead names a function/class after the identifier it is
-//! bound to and skips anonymous inline functions entirely.
+//! bound to and skips anonymous inline functions entirely. It also records the
+//! type-level definitions the generic walker would miss for TS/TSX — `interface`,
+//! `type` alias, `enum`, `namespace`/ambient `module`, and abstract methods.
 
 use super::LanguageIntel;
 use crate::intel::intelligence::{node_text, span_from_node};
@@ -98,6 +100,53 @@ fn walk(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
                 Some((_, body)) => push(node, StructureKind::Method, name_field(node, source), body, source, out),
                 None => descend(node, source, out),
             }
+        }
+        // Named type-level definitions (`interface Props { … }`, `type T = …`,
+        // `enum E { … }`). Recorded as leaves: their members — property/method
+        // signatures, enum variants — are type structure, not nested defs.
+        "interface_declaration" => {
+            push(
+                node,
+                StructureKind::Interface,
+                name_field(node, source),
+                None,
+                source,
+                out,
+            );
+        }
+        "type_alias_declaration" => {
+            push(node, StructureKind::Type, name_field(node, source), None, source, out);
+        }
+        "enum_declaration" => {
+            push(node, StructureKind::Enum, name_field(node, source), None, source, out);
+        }
+        // `namespace X { … }` / `module X.Y { … }` (both parse as internal_module).
+        // Descend into the body so nested functions/classes/interfaces surface as
+        // children rather than leaking to the top level.
+        "internal_module" => {
+            push(
+                node,
+                StructureKind::Namespace,
+                name_field(node, source),
+                body_of(node),
+                source,
+                out,
+            );
+        }
+        // Ambient `declare module "pkg" { … }` — the name is a string specifier.
+        "module" => {
+            push(
+                node,
+                StructureKind::Module,
+                module_name(node, source),
+                body_of(node),
+                source,
+                out,
+            );
+        }
+        // Abstract method signatures inside an abstract class body (`abstract f(): T;`).
+        "abstract_method_signature" => {
+            push(node, StructureKind::Method, name_field(node, source), None, source, out);
         }
         "lexical_declaration" | "variable_declaration" => walk_declaration(node, source, out),
         _ => descend(node, source, out),
@@ -201,6 +250,21 @@ fn name_field(node: &Node, source: &str) -> Option<String> {
     node.child_by_field_name("name")
         .map(|n| node_text(&n, source).to_string())
         .filter(|s| !s.is_empty())
+}
+
+/// Name for an ambient `module "pkg" { … }` — the specifier is a string node, so
+/// return its inner text without the surrounding quotes. Falls back to the raw
+/// name text for any non-string form.
+fn module_name(node: &Node, source: &str) -> Option<String> {
+    let name = node.child_by_field_name("name")?;
+    if name.kind() == "string" {
+        let mut cursor = name.walk();
+        if let Some(frag) = name.named_children(&mut cursor).find(|c| c.kind() == "string_fragment") {
+            return Some(node_text(&frag, source).to_string());
+        }
+    }
+    let t = node_text(&name, source);
+    (!t.is_empty()).then(|| t.to_string())
 }
 
 /// Record one definition, descending into `body` for its nested definitions.
@@ -346,5 +410,99 @@ class Panel extends React.Component {
         let method_names: Vec<&str> = panel.children.iter().filter_map(|s| s.name.as_deref()).collect();
         assert!(method_names.contains(&"handleClick"), "class methods: {method_names:?}");
         assert!(method_names.contains(&"render"), "class methods: {method_names:?}");
+    }
+
+    const TYPE_SAMPLE: &str = r#"
+export interface ButtonProps {
+  label: string;
+  onClick(): void;
+}
+
+type Variant = "primary" | "secondary";
+export type Handler = (e: Event) => void;
+
+export enum Status {
+  Active,
+  Inactive,
+}
+
+export namespace Geometry {
+  export function area(r: number): number {
+    return Math.PI * r * r;
+  }
+  export interface Point {
+    x: number;
+    y: number;
+  }
+}
+
+declare module "virtual:foo" {
+  export const version: string;
+}
+
+abstract class Base {
+  abstract render(): void;
+  concrete(): void {}
+}
+"#;
+
+    /// Find the first structure item with `name` anywhere in the tree.
+    fn find_named<'a>(items: &'a [StructureItem], name: &str) -> Option<&'a StructureItem> {
+        for s in items {
+            if s.name.as_deref() == Some(name) {
+                return Some(s);
+            }
+            if let Some(found) = find_named(&s.children, name) {
+                return Some(found);
+            }
+        }
+        None
+    }
+
+    #[test]
+    fn tsx_records_type_level_and_namespaced_definitions() {
+        let Some(tree) = parse_or_skip(TYPE_SAMPLE, "tsx") else {
+            return; // grammar not available in this build — CI covers it.
+        };
+        let intel = extract_intelligence(TYPE_SAMPLE, "tsx", &tree);
+        let top = &intel.structure;
+
+        // interface / type alias / enum — previously dropped entirely.
+        assert_eq!(
+            find_named(top, "ButtonProps").map(|s| &s.kind),
+            Some(&StructureKind::Interface)
+        );
+        assert_eq!(find_named(top, "Variant").map(|s| &s.kind), Some(&StructureKind::Type));
+        assert_eq!(find_named(top, "Handler").map(|s| &s.kind), Some(&StructureKind::Type));
+        assert_eq!(find_named(top, "Status").map(|s| &s.kind), Some(&StructureKind::Enum));
+
+        // `namespace Geometry { … }` is recorded AND its members nest as children
+        // rather than leaking to the top level.
+        let geometry = top
+            .iter()
+            .find(|s| s.name.as_deref() == Some("Geometry"))
+            .expect("namespace Geometry recorded");
+        assert_eq!(geometry.kind, StructureKind::Namespace);
+        let nested: Vec<&str> = geometry.children.iter().filter_map(|s| s.name.as_deref()).collect();
+        assert!(nested.contains(&"area"), "namespace members: {nested:?}");
+        assert!(nested.contains(&"Point"), "namespace members: {nested:?}");
+        // `area` must NOT also appear at the top level.
+        assert!(
+            !top.iter().any(|s| s.name.as_deref() == Some("area")),
+            "namespace member leaked to top level"
+        );
+
+        // Ambient `declare module "virtual:foo"` — recorded with the quotes stripped.
+        let module = find_named(top, "virtual:foo").expect("ambient module recorded");
+        assert_eq!(module.kind, StructureKind::Module);
+
+        // Abstract method signature inside an abstract class body.
+        let base = top
+            .iter()
+            .find(|s| s.name.as_deref() == Some("Base"))
+            .expect("abstract class Base recorded");
+        let methods: Vec<&str> = base.children.iter().filter_map(|s| s.name.as_deref()).collect();
+        assert!(methods.contains(&"render"), "abstract methods: {methods:?}");
+        assert!(methods.contains(&"concrete"), "class methods: {methods:?}");
     }
 }
