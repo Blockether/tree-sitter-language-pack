@@ -4,78 +4,71 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-
 /**
  * A chunk of source code with rich metadata.
  */
-public record CodeChunk(
-    String content,
-    long startByte,
-    long endByte,
-    long startLine,
-    long endLine,
-    ChunkContext metadata) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for CodeChunk deserialization. */
-  public static final class Builder {
-
-    private String content;
-
-    private long startByte;
-
-    private long endByte;
-
-    private long startLine;
-
-    private long endLine;
-
-    private ChunkContext metadata;
-
-    /** Sets the content field. */
-    public Builder withContent(final String value) {
-      this.content = value;
-      return this;
+public record CodeChunk(String content, long startByte, long endByte, long startLine, long endLine, ChunkContext metadata) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the startByte field. */
-    public Builder withStartByte(final long value) {
-      this.startByte = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for CodeChunk deserialization. */
+    public static final class Builder {
 
-    /** Sets the endByte field. */
-    public Builder withEndByte(final long value) {
-      this.endByte = value;
-      return this;
-    }
+        private String content;
 
-    /** Sets the startLine field. */
-    public Builder withStartLine(final long value) {
-      this.startLine = value;
-      return this;
-    }
+        private long startByte;
 
-    /** Sets the endLine field. */
-    public Builder withEndLine(final long value) {
-      this.endLine = value;
-      return this;
-    }
+        private long endByte;
 
-    /** Sets the metadata field. */
-    public Builder withMetadata(final ChunkContext value) {
-      this.metadata = value;
-      return this;
-    }
+        private long startLine;
 
-    /** Constructs a CodeChunk instance from the builder's current state. */
-    public CodeChunk build() {
-      return new CodeChunk(content, startByte, endByte, startLine, endLine, metadata);
+        private long endLine;
+
+        private ChunkContext metadata;
+
+        /** Sets the content field. */
+        public Builder withContent(final String value) {
+            this.content = value;
+            return this;
+        }
+
+        /** Sets the startByte field. */
+        public Builder withStartByte(final long value) {
+            this.startByte = value;
+            return this;
+        }
+
+        /** Sets the endByte field. */
+        public Builder withEndByte(final long value) {
+            this.endByte = value;
+            return this;
+        }
+
+        /** Sets the startLine field. */
+        public Builder withStartLine(final long value) {
+            this.startLine = value;
+            return this;
+        }
+
+        /** Sets the endLine field. */
+        public Builder withEndLine(final long value) {
+            this.endLine = value;
+            return this;
+        }
+
+        /** Sets the metadata field. */
+        public Builder withMetadata(final ChunkContext value) {
+            this.metadata = value;
+            return this;
+        }
+
+        /** Constructs a CodeChunk instance from the builder's current state. */
+        public CodeChunk build() {
+            return new CodeChunk(content, startByte, endByte, startLine, endLine, metadata);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

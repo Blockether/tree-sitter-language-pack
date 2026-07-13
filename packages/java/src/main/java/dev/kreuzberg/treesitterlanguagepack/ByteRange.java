@@ -4,40 +4,38 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-
 /**
  * A byte range — start (inclusive) to end (exclusive).
  */
-public record ByteRange(
-    long start, long end) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for ByteRange deserialization. */
-  public static final class Builder {
-
-    private long start;
-    private long end;
-
-    /** Sets the start field. */
-    public Builder withStart(final long value) {
-      this.start = value;
-      return this;
+public record ByteRange(long start, long end) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the end field. */
-    public Builder withEnd(final long value) {
-      this.end = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for ByteRange deserialization. */
+    public static final class Builder {
 
-    /** Constructs a ByteRange instance from the builder's current state. */
-    public ByteRange build() {
-      return new ByteRange(start, end);
+        private long start;
+        private long end;
+
+        /** Sets the start field. */
+        public Builder withStart(final long value) {
+            this.start = value;
+            return this;
+        }
+
+        /** Sets the end field. */
+        public Builder withEnd(final long value) {
+            this.end = value;
+            return this;
+        }
+
+        /** Constructs a ByteRange instance from the builder's current state. */
+        public ByteRange build() {
+            return new ByteRange(start, end);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

@@ -9,65 +9,60 @@ import org.jspecify.annotations.Nullable;
 /**
  * A symbol (variable, function, type, etc.) extracted from source code.
  */
-public record SymbolInfo(
-    String name,
-    SymbolKind kind,
-    Span span,
-    @Nullable String typeAnnotation,
-    @Nullable String doc) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for SymbolInfo deserialization. */
-  public static final class Builder {
-
-    private String name;
-    private SymbolKind kind;
-    private Span span;
-
-    @Nullable
-    private String typeAnnotation;
-
-    @Nullable
-    private String doc;
-
-    /** Sets the name field. */
-    public Builder withName(final String value) {
-      this.name = value;
-      return this;
+public record SymbolInfo(String name, SymbolKind kind, Span span, @Nullable String typeAnnotation, @Nullable String doc) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the kind field. */
-    public Builder withKind(final SymbolKind value) {
-      this.kind = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for SymbolInfo deserialization. */
+    public static final class Builder {
 
-    /** Sets the span field. */
-    public Builder withSpan(final Span value) {
-      this.span = value;
-      return this;
-    }
+        private String name;
+        private SymbolKind kind;
+        private Span span;
 
-    /** Sets the typeAnnotation field. */
-    public Builder withTypeAnnotation(final @Nullable String value) {
-      this.typeAnnotation = value;
-      return this;
-    }
+        @Nullable
+        private String typeAnnotation;
 
-    /** Sets the doc field. */
-    public Builder withDoc(final @Nullable String value) {
-      this.doc = value;
-      return this;
-    }
+        @Nullable
+        private String doc;
 
-    /** Constructs a SymbolInfo instance from the builder's current state. */
-    public SymbolInfo build() {
-      return new SymbolInfo(name, kind, span, typeAnnotation, doc);
+        /** Sets the name field. */
+        public Builder withName(final String value) {
+            this.name = value;
+            return this;
+        }
+
+        /** Sets the kind field. */
+        public Builder withKind(final SymbolKind value) {
+            this.kind = value;
+            return this;
+        }
+
+        /** Sets the span field. */
+        public Builder withSpan(final Span value) {
+            this.span = value;
+            return this;
+        }
+
+        /** Sets the typeAnnotation field. */
+        public Builder withTypeAnnotation(final @Nullable String value) {
+            this.typeAnnotation = value;
+            return this;
+        }
+
+        /** Sets the doc field. */
+        public Builder withDoc(final @Nullable String value) {
+            this.doc = value;
+            return this;
+        }
+
+        /** Constructs a SymbolInfo instance from the builder's current state. */
+        public SymbolInfo build() {
+            return new SymbolInfo(name, kind, span, typeAnnotation, doc);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

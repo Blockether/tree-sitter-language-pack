@@ -4,52 +4,47 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-
 /**
  * An XML-style attribute attached to an Element(DataNodeKind.Element) node.
  *
- * Populated only for {@code DataNodeKind.Element}; always empty for {@code KeyValue} and
- * {@code Sequence} nodes.
+ * Populated only for {@code DataNodeKind.Element}; always empty for {@code KeyValue} and {@code Sequence} nodes.
  */
-public record DataAttribute(
-    String name,
-    String value,
-    Span span) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for DataAttribute deserialization. */
-  public static final class Builder {
-
-    private String name;
-    private String value;
-    private Span span;
-
-    /** Sets the name field. */
-    public Builder withName(final String value) {
-      this.name = value;
-      return this;
+public record DataAttribute(String name, String value, Span span) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the value field. */
-    public Builder withValue(final String value) {
-      this.value = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for DataAttribute deserialization. */
+    public static final class Builder {
 
-    /** Sets the span field. */
-    public Builder withSpan(final Span value) {
-      this.span = value;
-      return this;
-    }
+        private String name;
+        private String value;
+        private Span span;
 
-    /** Constructs a DataAttribute instance from the builder's current state. */
-    public DataAttribute build() {
-      return new DataAttribute(name, value, span);
+        /** Sets the name field. */
+        public Builder withName(final String value) {
+            this.name = value;
+            return this;
+        }
+
+        /** Sets the value field. */
+        public Builder withValue(final String value) {
+            this.value = value;
+            return this;
+        }
+
+        /** Sets the span field. */
+        public Builder withSpan(final Span value) {
+            this.span = value;
+            return this;
+        }
+
+        /** Constructs a DataAttribute instance from the builder's current state. */
+        public DataAttribute build() {
+            return new DataAttribute(name, value, span);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

@@ -10,67 +10,62 @@ import org.jspecify.annotations.Nullable;
 /**
  * An import statement extracted from source code.
  */
-public record ImportInfo(
-    String source,
-    @Nullable List<String> items,
-    @Nullable String alias,
-    boolean isWildcard,
-    Span span) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for ImportInfo deserialization. */
-  public static final class Builder {
-
-    private String source;
-
-    @Nullable
-    private List<String> items;
-
-    @Nullable
-    private String alias;
-
-    private boolean isWildcard;
-
-    private Span span;
-
-    /** Sets the source field. */
-    public Builder withSource(final String value) {
-      this.source = value;
-      return this;
+public record ImportInfo(String source, @Nullable List<String> items, @Nullable String alias, boolean isWildcard, Span span) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the items field. */
-    public Builder withItems(final @Nullable List<String> value) {
-      this.items = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for ImportInfo deserialization. */
+    public static final class Builder {
 
-    /** Sets the alias field. */
-    public Builder withAlias(final @Nullable String value) {
-      this.alias = value;
-      return this;
-    }
+        private String source;
 
-    /** Sets the isWildcard field. */
-    public Builder withIsWildcard(final boolean value) {
-      this.isWildcard = value;
-      return this;
-    }
+        @Nullable
+        private List<String> items;
 
-    /** Sets the span field. */
-    public Builder withSpan(final Span value) {
-      this.span = value;
-      return this;
-    }
+        @Nullable
+        private String alias;
 
-    /** Constructs a ImportInfo instance from the builder's current state. */
-    public ImportInfo build() {
-      return new ImportInfo(source, items, alias, isWildcard, span);
+        private boolean isWildcard;
+
+        private Span span;
+
+        /** Sets the source field. */
+        public Builder withSource(final String value) {
+            this.source = value;
+            return this;
+        }
+
+        /** Sets the items field. */
+        public Builder withItems(final @Nullable List<String> value) {
+            this.items = value;
+            return this;
+        }
+
+        /** Sets the alias field. */
+        public Builder withAlias(final @Nullable String value) {
+            this.alias = value;
+            return this;
+        }
+
+        /** Sets the isWildcard field. */
+        public Builder withIsWildcard(final boolean value) {
+            this.isWildcard = value;
+            return this;
+        }
+
+        /** Sets the span field. */
+        public Builder withSpan(final Span value) {
+            this.span = value;
+            return this;
+        }
+
+        /** Constructs a ImportInfo instance from the builder's current state. */
+        public ImportInfo build() {
+            return new ImportInfo(source, items, alias, isWildcard, span);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

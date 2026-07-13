@@ -318,8 +318,7 @@
     "extensions": [
       "clj",
       "cljs",
-      "cljc",
-      "edn"
+      "cljc"
     ],
     "repo": "https://github.com/Blockether/tree-sitter-clojure",
     "rev": "fd2507286f95bff473f2593512d0740c02724891"

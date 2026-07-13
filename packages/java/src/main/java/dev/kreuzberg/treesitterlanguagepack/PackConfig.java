@@ -10,53 +10,49 @@ import org.jspecify.annotations.Nullable;
 /**
  * Configuration for the tree-sitter language pack.
  *
- * Controls cache directory and which languages to pre-download.
- * Can be loaded from a TOML file, constructed programmatically,
- * or passed as a dict/object from language bindings.
+ * Controls cache directory and which languages to pre-download. Can be loaded from a TOML file, constructed programmatically, or passed as
+ * a dict/object from language bindings.
  */
-public record PackConfig(
-    java.nio.file.@Nullable Path cacheDir,
-    @Nullable List<String> languages,
-    @Nullable List<String> groups) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for PackConfig deserialization. */
-  public static final class Builder {
-
-    private java.nio.file.@Nullable Path cacheDir;
-
-    @Nullable
-    private List<String> languages;
-
-    @Nullable
-    private List<String> groups;
-
-    /** Sets the cacheDir field. */
-    public Builder withCacheDir(final java.nio.file.@Nullable Path value) {
-      this.cacheDir = value;
-      return this;
+public record PackConfig(java.nio.file.@Nullable Path cacheDir, @Nullable List<String> languages, @Nullable List<String> groups) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the languages field. */
-    public Builder withLanguages(final @Nullable List<String> value) {
-      this.languages = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for PackConfig deserialization. */
+    public static final class Builder {
 
-    /** Sets the groups field. */
-    public Builder withGroups(final @Nullable List<String> value) {
-      this.groups = value;
-      return this;
-    }
+        private java.nio.file.@Nullable Path cacheDir;
 
-    /** Constructs a PackConfig instance from the builder's current state. */
-    public PackConfig build() {
-      return new PackConfig(cacheDir, languages, groups);
+        @Nullable
+        private List<String> languages;
+
+        @Nullable
+        private List<String> groups;
+
+        /** Sets the cacheDir field. */
+        public Builder withCacheDir(final java.nio.file.@Nullable Path value) {
+            this.cacheDir = value;
+            return this;
+        }
+
+        /** Sets the languages field. */
+        public Builder withLanguages(final @Nullable List<String> value) {
+            this.languages = value;
+            return this;
+        }
+
+        /** Sets the groups field. */
+        public Builder withGroups(final @Nullable List<String> value) {
+            this.groups = value;
+            return this;
+        }
+
+        /** Constructs a PackConfig instance from the builder's current state. */
+        public PackConfig build() {
+            return new PackConfig(cacheDir, languages, groups);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

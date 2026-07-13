@@ -4,53 +4,51 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-
 /**
  * The kind of a comment found in source code.
  *
- * Distinguishes between single-line comments, block (multi-line) comments,
- * and documentation comments.
+ * Distinguishes between single-line comments, block (multi-line) comments, and documentation comments.
  */
 @SuppressWarnings("PMD")
 public enum CommentKind {
-  /**
-   * A single-line comment (e.g., {@code // ...} or {@code # ...}).
-   */
-  Line("line"),
-  /**
-   * A block or multi-line comment using slash-star delimiters.
-   */
-  Block("block"),
-  /**
-   * A documentation comment such as {@code /// ...} or slash-double-star block.
-   */
-  Doc("doc");
+    /**
+     * A single-line comment (e.g., {@code // ...} or {@code # ...}).
+     */
+    Line("line"),
+    /**
+     * A block or multi-line comment using slash-star delimiters.
+     */
+    Block("block"),
+    /**
+     * A documentation comment such as {@code /// ...} or slash-double-star block.
+     */
+    Doc("doc");
 
-  /** The string value. */
-  private final String value;
+    /** The string value. */
+    private final String value;
 
-  CommentKind(final String value) {
-    this.value = value;
-  }
-
-  /** Returns the string value. */
-  public String getValue() {
-    return value;
-  }
-
-  /** Creates an instance from a string value. */
-  public static CommentKind fromValue(final String value) {
-    for (CommentKind e : values()) {
-      if (e.value.equalsIgnoreCase(value)) {
-        return e;
-      }
+    CommentKind(final String value) {
+        this.value = value;
     }
-    throw new IllegalArgumentException("Unknown CommentKind value: " + value);
-  }
 
-  /** Returns the wire-format string value (matches JSON serialization). */
-  @Override
-  public String toString() {
-    return value;
-  }
+    /** Returns the string value. */
+    public String getValue() {
+        return value;
+    }
+
+    /** Creates an instance from a string value. */
+    public static CommentKind fromValue(final String value) {
+        for (CommentKind e : values()) {
+            if (e.value.equalsIgnoreCase(value)) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("Unknown CommentKind value: " + value);
+    }
+
+    /** Returns the wire-format string value (matches JSON serialization). */
+    @Override
+    public String toString() {
+        return value;
+    }
 }

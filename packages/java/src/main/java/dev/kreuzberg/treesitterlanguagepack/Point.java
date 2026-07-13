@@ -4,40 +4,38 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-
 /**
  * A source position — row + column, zero-indexed.
  */
-public record Point(
-    long row, long column) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for Point deserialization. */
-  public static final class Builder {
-
-    private long row;
-    private long column;
-
-    /** Sets the row field. */
-    public Builder withRow(final long value) {
-      this.row = value;
-      return this;
+public record Point(long row, long column) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the column field. */
-    public Builder withColumn(final long value) {
-      this.column = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for Point deserialization. */
+    public static final class Builder {
 
-    /** Constructs a Point instance from the builder's current state. */
-    public Point build() {
-      return new Point(row, column);
+        private long row;
+        private long column;
+
+        /** Sets the row field. */
+        public Builder withRow(final long value) {
+            this.row = value;
+            return this;
+        }
+
+        /** Sets the column field. */
+        public Builder withColumn(final long value) {
+            this.column = value;
+            return this;
+        }
+
+        /** Constructs a Point instance from the builder's current state. */
+        public Point build() {
+            return new Point(row, column);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

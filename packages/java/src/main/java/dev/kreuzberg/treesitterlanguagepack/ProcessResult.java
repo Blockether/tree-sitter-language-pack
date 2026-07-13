@@ -10,155 +10,132 @@ import org.jspecify.annotations.Nullable;
 /**
  * Complete analysis result from processing a source file.
  *
- * Contains metrics, structural analysis, imports/exports, comments,
- * docstrings, symbols, diagnostics, and optionally chunked code segments.
+ * Contains metrics, structural analysis, imports/exports, comments, docstrings, symbols, diagnostics, and optionally chunked code segments.
  * Fields are populated based on the {@code ProcessConfig} flags.
  *
  * # Fields
  *
- * - {@code language} - The language used for parsing
- * - {@code metrics} - Always computed: line counts, byte sizes, error counts
- * - {@code structure} - Functions, classes, structs (when {@code config.structure = true})
- * - {@code imports} - Import statements (when {@code config.imports = true})
- * - {@code exports} - Export statements (when {@code config.exports = true})
- * - {@code comments} - Comments (when {@code config.comments = true})
- * - {@code docstrings} - Docstrings (when {@code config.docstrings = true})
- * - {@code symbols} - Symbol definitions (when {@code config.symbols = true})
- * - {@code diagnostics} - Parse errors (when {@code config.diagnostics = true})
- * - {@code chunks} - Chunked code segments (when {@code config.chunk_max_size} is set)
+ * - {@code language} - The language used for parsing - {@code metrics} - Always computed: line counts, byte sizes, error counts -
+ * {@code structure} - Functions, classes, structs (when {@code config.structure = true}) - {@code imports} - Import statements (when
+ * {@code config.imports = true}) - {@code exports} - Export statements (when {@code config.exports = true}) - {@code comments} - Comments
+ * (when {@code config.comments = true}) - {@code docstrings} - Docstrings (when {@code config.docstrings = true}) - {@code symbols} -
+ * Symbol definitions (when {@code config.symbols = true}) - {@code diagnostics} - Parse errors (when {@code config.diagnostics = true}) -
+ * {@code chunks} - Chunked code segments (when {@code config.chunk_max_size} is set)
  */
-public record ProcessResult(
-    String language,
-    FileMetrics metrics,
-    @Nullable List<StructureItem> structure,
-    @Nullable List<ImportInfo> imports,
-    @Nullable List<ExportInfo> exports,
-    @Nullable List<CommentInfo> comments,
-    @Nullable List<DocstringInfo> docstrings,
-    @Nullable List<SymbolInfo> symbols,
-    @Nullable List<Diagnostic> diagnostics,
-    @Nullable List<CodeChunk> chunks,
-    @Nullable DataNode data) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for ProcessResult deserialization. */
-  public static final class Builder {
-
-    private String language;
-    private FileMetrics metrics;
-
-    @Nullable
-    private List<StructureItem> structure;
-
-    @Nullable
-    private List<ImportInfo> imports;
-
-    @Nullable
-    private List<ExportInfo> exports;
-
-    @Nullable
-    private List<CommentInfo> comments;
-
-    @Nullable
-    private List<DocstringInfo> docstrings;
-
-    @Nullable
-    private List<SymbolInfo> symbols;
-
-    @Nullable
-    private List<Diagnostic> diagnostics;
-
-    @Nullable
-    private List<CodeChunk> chunks;
-
-    @Nullable
-    private DataNode data;
-
-    /** Sets the language field. */
-    public Builder withLanguage(final String value) {
-      this.language = value;
-      return this;
+public record ProcessResult(String language, FileMetrics metrics, @Nullable List<StructureItem> structure,
+        @Nullable List<ImportInfo> imports, @Nullable List<ExportInfo> exports, @Nullable List<CommentInfo> comments,
+        @Nullable List<DocstringInfo> docstrings, @Nullable List<SymbolInfo> symbols, @Nullable List<Diagnostic> diagnostics,
+        @Nullable List<CodeChunk> chunks, @Nullable DataNode data) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the metrics field. */
-    public Builder withMetrics(final FileMetrics value) {
-      this.metrics = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for ProcessResult deserialization. */
+    public static final class Builder {
 
-    /** Sets the structure field. */
-    public Builder withStructure(final @Nullable List<StructureItem> value) {
-      this.structure = value;
-      return this;
-    }
+        private String language;
+        private FileMetrics metrics;
 
-    /** Sets the imports field. */
-    public Builder withImports(final @Nullable List<ImportInfo> value) {
-      this.imports = value;
-      return this;
-    }
+        @Nullable
+        private List<StructureItem> structure;
 
-    /** Sets the exports field. */
-    public Builder withExports(final @Nullable List<ExportInfo> value) {
-      this.exports = value;
-      return this;
-    }
+        @Nullable
+        private List<ImportInfo> imports;
 
-    /** Sets the comments field. */
-    public Builder withComments(final @Nullable List<CommentInfo> value) {
-      this.comments = value;
-      return this;
-    }
+        @Nullable
+        private List<ExportInfo> exports;
 
-    /** Sets the docstrings field. */
-    public Builder withDocstrings(final @Nullable List<DocstringInfo> value) {
-      this.docstrings = value;
-      return this;
-    }
+        @Nullable
+        private List<CommentInfo> comments;
 
-    /** Sets the symbols field. */
-    public Builder withSymbols(final @Nullable List<SymbolInfo> value) {
-      this.symbols = value;
-      return this;
-    }
+        @Nullable
+        private List<DocstringInfo> docstrings;
 
-    /** Sets the diagnostics field. */
-    public Builder withDiagnostics(final @Nullable List<Diagnostic> value) {
-      this.diagnostics = value;
-      return this;
-    }
+        @Nullable
+        private List<SymbolInfo> symbols;
 
-    /** Sets the chunks field. */
-    public Builder withChunks(final @Nullable List<CodeChunk> value) {
-      this.chunks = value;
-      return this;
-    }
+        @Nullable
+        private List<Diagnostic> diagnostics;
 
-    /** Sets the data field. */
-    public Builder withData(final @Nullable DataNode value) {
-      this.data = value;
-      return this;
-    }
+        @Nullable
+        private List<CodeChunk> chunks;
 
-    /** Constructs a ProcessResult instance from the builder's current state. */
-    public ProcessResult build() {
-      return new ProcessResult(
-          language,
-          metrics,
-          structure,
-          imports,
-          exports,
-          comments,
-          docstrings,
-          symbols,
-          diagnostics,
-          chunks,
-          data);
+        @Nullable
+        private DataNode data;
+
+        /** Sets the language field. */
+        public Builder withLanguage(final String value) {
+            this.language = value;
+            return this;
+        }
+
+        /** Sets the metrics field. */
+        public Builder withMetrics(final FileMetrics value) {
+            this.metrics = value;
+            return this;
+        }
+
+        /** Sets the structure field. */
+        public Builder withStructure(final @Nullable List<StructureItem> value) {
+            this.structure = value;
+            return this;
+        }
+
+        /** Sets the imports field. */
+        public Builder withImports(final @Nullable List<ImportInfo> value) {
+            this.imports = value;
+            return this;
+        }
+
+        /** Sets the exports field. */
+        public Builder withExports(final @Nullable List<ExportInfo> value) {
+            this.exports = value;
+            return this;
+        }
+
+        /** Sets the comments field. */
+        public Builder withComments(final @Nullable List<CommentInfo> value) {
+            this.comments = value;
+            return this;
+        }
+
+        /** Sets the docstrings field. */
+        public Builder withDocstrings(final @Nullable List<DocstringInfo> value) {
+            this.docstrings = value;
+            return this;
+        }
+
+        /** Sets the symbols field. */
+        public Builder withSymbols(final @Nullable List<SymbolInfo> value) {
+            this.symbols = value;
+            return this;
+        }
+
+        /** Sets the diagnostics field. */
+        public Builder withDiagnostics(final @Nullable List<Diagnostic> value) {
+            this.diagnostics = value;
+            return this;
+        }
+
+        /** Sets the chunks field. */
+        public Builder withChunks(final @Nullable List<CodeChunk> value) {
+            this.chunks = value;
+            return this;
+        }
+
+        /** Sets the data field. */
+        public Builder withData(final @Nullable DataNode value) {
+            this.data = value;
+            return this;
+        }
+
+        /** Constructs a ProcessResult instance from the builder's current state. */
+        public ProcessResult build() {
+            return new ProcessResult(language, metrics, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunks,
+                    data);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

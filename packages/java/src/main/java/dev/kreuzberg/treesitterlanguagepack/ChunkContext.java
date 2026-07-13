@@ -9,109 +9,93 @@ import java.util.List;
 /**
  * Metadata for a single chunk of source code.
  */
-public record ChunkContext(
-    String language,
-    long chunkIndex,
-    long totalChunks,
-    List<String> nodeTypes,
-    List<String> contextPath,
-    List<String> symbolsDefined,
-    List<CommentInfo> comments,
-    List<DocstringInfo> docstrings,
-    boolean hasErrorNodes) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for ChunkContext deserialization. */
-  public static final class Builder {
-
-    private String language;
-
-    private long chunkIndex;
-
-    private long totalChunks;
-
-    private List<String> nodeTypes = List.of();
-
-    private List<String> contextPath = List.of();
-
-    private List<String> symbolsDefined = List.of();
-
-    private List<CommentInfo> comments = List.of();
-    private List<DocstringInfo> docstrings = List.of();
-
-    private boolean hasErrorNodes;
-
-    /** Sets the language field. */
-    public Builder withLanguage(final String value) {
-      this.language = value;
-      return this;
+public record ChunkContext(String language, long chunkIndex, long totalChunks, List<String> nodeTypes, List<String> contextPath,
+        List<String> symbolsDefined, List<CommentInfo> comments, List<DocstringInfo> docstrings, boolean hasErrorNodes) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the chunkIndex field. */
-    public Builder withChunkIndex(final long value) {
-      this.chunkIndex = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for ChunkContext deserialization. */
+    public static final class Builder {
 
-    /** Sets the totalChunks field. */
-    public Builder withTotalChunks(final long value) {
-      this.totalChunks = value;
-      return this;
-    }
+        private String language;
 
-    /** Sets the nodeTypes field. */
-    public Builder withNodeTypes(final List<String> value) {
-      this.nodeTypes = value;
-      return this;
-    }
+        private long chunkIndex;
 
-    /** Sets the contextPath field. */
-    public Builder withContextPath(final List<String> value) {
-      this.contextPath = value;
-      return this;
-    }
+        private long totalChunks;
 
-    /** Sets the symbolsDefined field. */
-    public Builder withSymbolsDefined(final List<String> value) {
-      this.symbolsDefined = value;
-      return this;
-    }
+        private List<String> nodeTypes = List.of();
 
-    /** Sets the comments field. */
-    public Builder withComments(final List<CommentInfo> value) {
-      this.comments = value;
-      return this;
-    }
+        private List<String> contextPath = List.of();
 
-    /** Sets the docstrings field. */
-    public Builder withDocstrings(final List<DocstringInfo> value) {
-      this.docstrings = value;
-      return this;
-    }
+        private List<String> symbolsDefined = List.of();
 
-    /** Sets the hasErrorNodes field. */
-    public Builder withHasErrorNodes(final boolean value) {
-      this.hasErrorNodes = value;
-      return this;
-    }
+        private List<CommentInfo> comments = List.of();
+        private List<DocstringInfo> docstrings = List.of();
 
-    /** Constructs a ChunkContext instance from the builder's current state. */
-    public ChunkContext build() {
-      return new ChunkContext(
-          language,
-          chunkIndex,
-          totalChunks,
-          nodeTypes,
-          contextPath,
-          symbolsDefined,
-          comments,
-          docstrings,
-          hasErrorNodes);
+        private boolean hasErrorNodes;
+
+        /** Sets the language field. */
+        public Builder withLanguage(final String value) {
+            this.language = value;
+            return this;
+        }
+
+        /** Sets the chunkIndex field. */
+        public Builder withChunkIndex(final long value) {
+            this.chunkIndex = value;
+            return this;
+        }
+
+        /** Sets the totalChunks field. */
+        public Builder withTotalChunks(final long value) {
+            this.totalChunks = value;
+            return this;
+        }
+
+        /** Sets the nodeTypes field. */
+        public Builder withNodeTypes(final List<String> value) {
+            this.nodeTypes = value;
+            return this;
+        }
+
+        /** Sets the contextPath field. */
+        public Builder withContextPath(final List<String> value) {
+            this.contextPath = value;
+            return this;
+        }
+
+        /** Sets the symbolsDefined field. */
+        public Builder withSymbolsDefined(final List<String> value) {
+            this.symbolsDefined = value;
+            return this;
+        }
+
+        /** Sets the comments field. */
+        public Builder withComments(final List<CommentInfo> value) {
+            this.comments = value;
+            return this;
+        }
+
+        /** Sets the docstrings field. */
+        public Builder withDocstrings(final List<DocstringInfo> value) {
+            this.docstrings = value;
+            return this;
+        }
+
+        /** Sets the hasErrorNodes field. */
+        public Builder withHasErrorNodes(final boolean value) {
+            this.hasErrorNodes = value;
+            return this;
+        }
+
+        /** Constructs a ChunkContext instance from the builder's current state. */
+        public ChunkContext build() {
+            return new ChunkContext(language, chunkIndex, totalChunks, nodeTypes, contextPath, symbolsDefined, comments, docstrings,
+                    hasErrorNodes);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

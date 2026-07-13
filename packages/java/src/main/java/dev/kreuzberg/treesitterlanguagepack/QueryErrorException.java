@@ -6,15 +6,15 @@ package dev.kreuzberg.treesitterlanguagepack;
  * A tree-sitter query could not be compiled or executed.
  */
 public class QueryErrorException extends ErrorException {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  /** Creates a new QueryErrorException with the given message. */
-  public QueryErrorException(final String message) {
-    super(message);
-  }
+    /** Creates a new QueryErrorException with the given message. */
+    public QueryErrorException(final String message) {
+        super(message);
+    }
 
-  /** Creates a new QueryErrorException with the given message and cause. */
-  public QueryErrorException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+    /** Creates a new QueryErrorException with the given message and cause. */
+    public QueryErrorException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 }

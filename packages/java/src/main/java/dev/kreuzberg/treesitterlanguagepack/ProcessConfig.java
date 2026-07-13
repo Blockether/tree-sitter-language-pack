@@ -11,141 +11,124 @@ import org.jspecify.annotations.Nullable;
  *
  * Controls which analysis features are enabled and whether chunking is performed.
  */
-public record ProcessConfig(
-    String language,
-    @Nullable Boolean structure,
-    @Nullable Boolean imports,
-    @Nullable Boolean exports,
-    @Nullable Boolean comments,
-    @Nullable Boolean docstrings,
-    @Nullable Boolean symbols,
-    @Nullable Boolean diagnostics,
-    @Nullable Long chunkMaxSize,
-    @Nullable Boolean dataExtraction) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  public ProcessConfig {
-    if (structure == null) {
-      structure = true;
-    }
-    if (imports == null) {
-      imports = true;
-    }
-    if (exports == null) {
-      exports = true;
-    }
-  }
-
-  // CPD-OFF
-  /** Jackson builder for ProcessConfig deserialization. */
-  public static final class Builder {
-
-    private String language;
-
-    @Nullable
-    private Boolean structure;
-
-    @Nullable
-    private Boolean imports;
-
-    @Nullable
-    private Boolean exports;
-
-    @Nullable
-    private Boolean comments;
-
-    @Nullable
-    private Boolean docstrings;
-
-    @Nullable
-    private Boolean symbols;
-
-    @Nullable
-    private Boolean diagnostics;
-
-    @Nullable
-    private Long chunkMaxSize;
-
-    @Nullable
-    private Boolean dataExtraction;
-
-    /** Sets the language field. */
-    public Builder withLanguage(final String value) {
-      this.language = value;
-      return this;
+public record ProcessConfig(String language, @Nullable Boolean structure, @Nullable Boolean imports, @Nullable Boolean exports,
+        @Nullable Boolean comments, @Nullable Boolean docstrings, @Nullable Boolean symbols, @Nullable Boolean diagnostics,
+        @Nullable Long chunkMaxSize, @Nullable Boolean dataExtraction) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the structure field. */
-    public Builder withStructure(final @Nullable Boolean value) {
-      this.structure = value;
-      return this;
+    public ProcessConfig {
+        if (structure == null) {
+            structure = true;
+        }
+        if (imports == null) {
+            imports = true;
+        }
+        if (exports == null) {
+            exports = true;
+        }
     }
 
-    /** Sets the imports field. */
-    public Builder withImports(final @Nullable Boolean value) {
-      this.imports = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for ProcessConfig deserialization. */
+    public static final class Builder {
 
-    /** Sets the exports field. */
-    public Builder withExports(final @Nullable Boolean value) {
-      this.exports = value;
-      return this;
-    }
+        private String language;
 
-    /** Sets the comments field. */
-    public Builder withComments(final @Nullable Boolean value) {
-      this.comments = value;
-      return this;
-    }
+        @Nullable
+        private Boolean structure;
 
-    /** Sets the docstrings field. */
-    public Builder withDocstrings(final @Nullable Boolean value) {
-      this.docstrings = value;
-      return this;
-    }
+        @Nullable
+        private Boolean imports;
 
-    /** Sets the symbols field. */
-    public Builder withSymbols(final @Nullable Boolean value) {
-      this.symbols = value;
-      return this;
-    }
+        @Nullable
+        private Boolean exports;
 
-    /** Sets the diagnostics field. */
-    public Builder withDiagnostics(final @Nullable Boolean value) {
-      this.diagnostics = value;
-      return this;
-    }
+        @Nullable
+        private Boolean comments;
 
-    /** Sets the chunkMaxSize field. */
-    public Builder withChunkMaxSize(final @Nullable Long value) {
-      this.chunkMaxSize = value;
-      return this;
-    }
+        @Nullable
+        private Boolean docstrings;
 
-    /** Sets the dataExtraction field. */
-    public Builder withDataExtraction(final @Nullable Boolean value) {
-      this.dataExtraction = value;
-      return this;
-    }
+        @Nullable
+        private Boolean symbols;
 
-    /** Constructs a ProcessConfig instance from the builder's current state. */
-    public ProcessConfig build() {
-      return new ProcessConfig(
-          language,
-          structure,
-          imports,
-          exports,
-          comments,
-          docstrings,
-          symbols,
-          diagnostics,
-          chunkMaxSize,
-          dataExtraction);
+        @Nullable
+        private Boolean diagnostics;
+
+        @Nullable
+        private Long chunkMaxSize;
+
+        @Nullable
+        private Boolean dataExtraction;
+
+        /** Sets the language field. */
+        public Builder withLanguage(final String value) {
+            this.language = value;
+            return this;
+        }
+
+        /** Sets the structure field. */
+        public Builder withStructure(final @Nullable Boolean value) {
+            this.structure = value;
+            return this;
+        }
+
+        /** Sets the imports field. */
+        public Builder withImports(final @Nullable Boolean value) {
+            this.imports = value;
+            return this;
+        }
+
+        /** Sets the exports field. */
+        public Builder withExports(final @Nullable Boolean value) {
+            this.exports = value;
+            return this;
+        }
+
+        /** Sets the comments field. */
+        public Builder withComments(final @Nullable Boolean value) {
+            this.comments = value;
+            return this;
+        }
+
+        /** Sets the docstrings field. */
+        public Builder withDocstrings(final @Nullable Boolean value) {
+            this.docstrings = value;
+            return this;
+        }
+
+        /** Sets the symbols field. */
+        public Builder withSymbols(final @Nullable Boolean value) {
+            this.symbols = value;
+            return this;
+        }
+
+        /** Sets the diagnostics field. */
+        public Builder withDiagnostics(final @Nullable Boolean value) {
+            this.diagnostics = value;
+            return this;
+        }
+
+        /** Sets the chunkMaxSize field. */
+        public Builder withChunkMaxSize(final @Nullable Long value) {
+            this.chunkMaxSize = value;
+            return this;
+        }
+
+        /** Sets the dataExtraction field. */
+        public Builder withDataExtraction(final @Nullable Boolean value) {
+            this.dataExtraction = value;
+            return this;
+        }
+
+        /** Constructs a ProcessConfig instance from the builder's current state. */
+        public ProcessConfig build() {
+            return new ProcessConfig(language, structure, imports, exports, comments, docstrings, symbols, diagnostics, chunkMaxSize,
+                    dataExtraction);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

@@ -6,24 +6,24 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 /** Exception thrown by TreeSitterLanguagePackRs. */
 public class TreeSitterLanguagePackRsException extends Exception {
-  private static final long serialVersionUID = 1L;
-  /** The error code. */
-  private final int code;
+    private static final long serialVersionUID = 1L;
+    /** The error code. */
+    private final int code;
 
-  /** Creates a new TreeSitterLanguagePackRsException. */
-  public TreeSitterLanguagePackRsException(final int code, final String message) {
-    super(message);
-    this.code = code;
-  }
+    /** Creates a new TreeSitterLanguagePackRsException. */
+    public TreeSitterLanguagePackRsException(final int code, final String message) {
+        super(message);
+        this.code = code;
+    }
 
-  /** Creates a new TreeSitterLanguagePackRsException with a cause. */
-  public TreeSitterLanguagePackRsException(final String message, final Throwable cause) {
-    super(message, cause);
-    this.code = -1;
-  }
+    /** Creates a new TreeSitterLanguagePackRsException with a cause. */
+    public TreeSitterLanguagePackRsException(final String message, final Throwable cause) {
+        super(message, cause);
+        this.code = -1;
+    }
 
-  /** Returns the error code. */
-  public int getCode() {
-    return code;
-  }
+    /** Returns the error code. */
+    public int getCode() {
+        return code;
+    }
 }

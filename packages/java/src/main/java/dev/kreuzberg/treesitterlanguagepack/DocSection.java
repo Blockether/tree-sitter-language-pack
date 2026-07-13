@@ -9,48 +9,45 @@ import org.jspecify.annotations.Nullable;
 /**
  * A section within a docstring (e.g., Args, Returns, Raises).
  */
-public record DocSection(
-    String kind,
-    @Nullable String name,
-    String description) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for DocSection deserialization. */
-  public static final class Builder {
-
-    private String kind;
-
-    @Nullable
-    private String name;
-
-    private String description;
-
-    /** Sets the kind field. */
-    public Builder withKind(final String value) {
-      this.kind = value;
-      return this;
+public record DocSection(String kind, @Nullable String name, String description) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the name field. */
-    public Builder withName(final @Nullable String value) {
-      this.name = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for DocSection deserialization. */
+    public static final class Builder {
 
-    /** Sets the description field. */
-    public Builder withDescription(final String value) {
-      this.description = value;
-      return this;
-    }
+        private String kind;
 
-    /** Constructs a DocSection instance from the builder's current state. */
-    public DocSection build() {
-      return new DocSection(kind, name, description);
+        @Nullable
+        private String name;
+
+        private String description;
+
+        /** Sets the kind field. */
+        public Builder withKind(final String value) {
+            this.kind = value;
+            return this;
+        }
+
+        /** Sets the name field. */
+        public Builder withName(final @Nullable String value) {
+            this.name = value;
+            return this;
+        }
+
+        /** Sets the description field. */
+        public Builder withDescription(final String value) {
+            this.description = value;
+            return this;
+        }
+
+        /** Constructs a DocSection instance from the builder's current state. */
+        public DocSection build() {
+            return new DocSection(kind, name, description);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

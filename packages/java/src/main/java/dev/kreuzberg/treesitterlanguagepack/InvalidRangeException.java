@@ -6,15 +6,15 @@ package dev.kreuzberg.treesitterlanguagepack;
  * A byte range was invalid (e.g., end before start, or out of bounds).
  */
 public class InvalidRangeException extends ErrorException {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  /** Creates a new InvalidRangeException with the given message. */
-  public InvalidRangeException(final String message) {
-    super(message);
-  }
+    /** Creates a new InvalidRangeException with the given message. */
+    public InvalidRangeException(final String message) {
+        super(message);
+    }
 
-  /** Creates a new InvalidRangeException with the given message and cause. */
-  public InvalidRangeException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+    /** Creates a new InvalidRangeException with the given message and cause. */
+    public InvalidRangeException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 }

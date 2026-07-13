@@ -4,127 +4,123 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-
 /**
  * The kind of structural item found in source code.
  *
- * Categorizes top-level and nested declarations such as functions, classes,
- * structs, enums, traits, and more. Use Other(StructureKind.Other) for
- * language-specific constructs that do not fit a standard category.
+ * Categorizes top-level and nested declarations such as functions, classes, structs, enums, traits, and more. Use
+ * Other(StructureKind.Other) for language-specific constructs that do not fit a standard category.
  *
  * # Wire format (public JSON contract)
  *
- * Unit variants serialize as a bare string ({@code "Function"}); the {@code Other}
- * variant serializes as a single-keyed object ({@code {"Other": "macro"}}). DO
- * NOT add {@code #[serde(tag = "...")]} or rename variants — every language
- * binding has a hand-written deserializer matching this exact shape, and
- * any change breaks all bindings' {@code process()} tests simultaneously.
- * Covered by {@code tests/wire_format.rs}.
+ * Unit variants serialize as a bare string ({@code "Function"}); the {@code Other} variant serializes as a single-keyed object
+ * ({@code {"Other": "macro"}}). DO NOT add {@code #[serde(tag = "...")]} or rename variants — every language binding has a hand-written
+ * deserializer matching this exact shape, and any change breaks all bindings' {@code process()} tests simultaneously. Covered by
+ * {@code tests/wire_format.rs}.
  */
 @SuppressWarnings("PMD")
 public enum StructureKind {
-  /**
-   * A free-standing or associated function.
-   */
-  Function("function"),
-  /**
-   * A method defined inside a class, struct, trait, or impl block.
-   */
-  Method("method"),
-  /**
-   * A class definition.
-   */
-  Class("class"),
-  /**
-   * A struct definition.
-   */
-  Struct("struct"),
-  /**
-   * An interface or protocol definition.
-   */
-  Interface("interface"),
-  /**
-   * An enum definition.
-   */
-  Enum("enum"),
-  /**
-   * A module or package declaration.
-   */
-  Module("module"),
-  /**
-   * A trait definition.
-   */
-  Trait("trait"),
-  /**
-   * An impl block (Rust) or similar implementation block.
-   */
-  Impl("impl"),
-  /**
-   * A namespace declaration.
-   */
-  Namespace("namespace"),
-  /**
-   * A constant / immutable value binding (e.g. Clojure {@code def}).
-   */
-  Constant("constant"),
-  /**
-   * A macro definition (e.g. Clojure {@code defmacro}).
-   */
-  Macro("macro"),
-  /**
-   * A protocol definition (e.g. Clojure {@code defprotocol}, Swift protocol).
-   */
-  Protocol("protocol"),
-  /**
-   * A mutable variable binding.
-   */
-  Variable("variable"),
-  /**
-   * A field of a struct/class/record.
-   */
-  Field("field"),
-  /**
-   * A type alias or named type (e.g. Clojure {@code deftype}).
-   */
-  Type("type"),
-  /**
-   * A property / accessor.
-   */
-  Property("property"),
-  /**
-   * A constructor.
-   */
-  Constructor("constructor"),
-  /**
-   * A language-specific construct that does not fit any standard category.
-   */
-  Other("other");
+    /**
+     * A free-standing or associated function.
+     */
+    Function("function"),
+    /**
+     * A method defined inside a class, struct, trait, or impl block.
+     */
+    Method("method"),
+    /**
+     * A class definition.
+     */
+    Class("class"),
+    /**
+     * A struct definition.
+     */
+    Struct("struct"),
+    /**
+     * An interface or protocol definition.
+     */
+    Interface("interface"),
+    /**
+     * An enum definition.
+     */
+    Enum("enum"),
+    /**
+     * A module or package declaration.
+     */
+    Module("module"),
+    /**
+     * A trait definition.
+     */
+    Trait("trait"),
+    /**
+     * An impl block (Rust) or similar implementation block.
+     */
+    Impl("impl"),
+    /**
+     * A namespace declaration.
+     */
+    Namespace("namespace"),
+    /**
+     * A constant / immutable value binding (e.g. Clojure {@code def}).
+     */
+    Constant("constant"),
+    /**
+     * A macro definition (e.g. Clojure {@code defmacro}).
+     */
+    Macro("macro"),
+    /**
+     * A protocol definition (e.g. Clojure {@code defprotocol}, Swift protocol).
+     */
+    Protocol("protocol"),
+    /**
+     * A mutable variable binding.
+     */
+    Variable("variable"),
+    /**
+     * A field of a struct/class/record.
+     */
+    Field("field"),
+    /**
+     * A type alias or named type (e.g. Clojure {@code deftype}).
+     */
+    Type("type"),
+    /**
+     * A property / accessor.
+     */
+    Property("property"),
+    /**
+     * A constructor.
+     */
+    Constructor("constructor"),
+    /**
+     * A language-specific construct that does not fit any standard category.
+     */
+    Other("other");
 
-  /** The string value. */
-  private final String value;
+    /** The string value. */
+    private final String value;
 
-  StructureKind(final String value) {
-    this.value = value;
-  }
-
-  /** Returns the string value. */
-  public String getValue() {
-    return value;
-  }
-
-  /** Creates an instance from a string value. */
-  public static StructureKind fromValue(final String value) {
-    for (StructureKind e : values()) {
-      if (e.value.equalsIgnoreCase(value)) {
-        return e;
-      }
+    StructureKind(final String value) {
+        this.value = value;
     }
-    throw new IllegalArgumentException("Unknown StructureKind value: " + value);
-  }
 
-  /** Returns the wire-format string value (matches JSON serialization). */
-  @Override
-  public String toString() {
-    return value;
-  }
+    /** Returns the string value. */
+    public String getValue() {
+        return value;
+    }
+
+    /** Creates an instance from a string value. */
+    public static StructureKind fromValue(final String value) {
+        for (StructureKind e : values()) {
+            if (e.value.equalsIgnoreCase(value)) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("Unknown StructureKind value: " + value);
+    }
+
+    /** Returns the wire-format string value (matches JSON serialization). */
+    @Override
+    public String toString() {
+        return value;
+    }
 }

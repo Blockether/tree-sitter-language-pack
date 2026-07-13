@@ -10,65 +10,61 @@ import org.jspecify.annotations.Nullable;
 /**
  * A docstring extracted from source code.
  */
-public record DocstringInfo(
-    String text,
-    DocstringFormat format,
-    Span span,
-    @Nullable String associatedItem,
-    @Nullable List<DocSection> parsedSections) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for DocstringInfo deserialization. */
-  public static final class Builder {
-
-    private String text;
-    private DocstringFormat format;
-    private Span span;
-
-    @Nullable
-    private String associatedItem;
-
-    @Nullable
-    private List<DocSection> parsedSections;
-
-    /** Sets the text field. */
-    public Builder withText(final String value) {
-      this.text = value;
-      return this;
+public record DocstringInfo(String text, DocstringFormat format, Span span, @Nullable String associatedItem,
+        @Nullable List<DocSection> parsedSections) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the format field. */
-    public Builder withFormat(final DocstringFormat value) {
-      this.format = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for DocstringInfo deserialization. */
+    public static final class Builder {
 
-    /** Sets the span field. */
-    public Builder withSpan(final Span value) {
-      this.span = value;
-      return this;
-    }
+        private String text;
+        private DocstringFormat format;
+        private Span span;
 
-    /** Sets the associatedItem field. */
-    public Builder withAssociatedItem(final @Nullable String value) {
-      this.associatedItem = value;
-      return this;
-    }
+        @Nullable
+        private String associatedItem;
 
-    /** Sets the parsedSections field. */
-    public Builder withParsedSections(final @Nullable List<DocSection> value) {
-      this.parsedSections = value;
-      return this;
-    }
+        @Nullable
+        private List<DocSection> parsedSections;
 
-    /** Constructs a DocstringInfo instance from the builder's current state. */
-    public DocstringInfo build() {
-      return new DocstringInfo(text, format, span, associatedItem, parsedSections);
+        /** Sets the text field. */
+        public Builder withText(final String value) {
+            this.text = value;
+            return this;
+        }
+
+        /** Sets the format field. */
+        public Builder withFormat(final DocstringFormat value) {
+            this.format = value;
+            return this;
+        }
+
+        /** Sets the span field. */
+        public Builder withSpan(final Span value) {
+            this.span = value;
+            return this;
+        }
+
+        /** Sets the associatedItem field. */
+        public Builder withAssociatedItem(final @Nullable String value) {
+            this.associatedItem = value;
+            return this;
+        }
+
+        /** Sets the parsedSections field. */
+        public Builder withParsedSections(final @Nullable List<DocSection> value) {
+            this.parsedSections = value;
+            return this;
+        }
+
+        /** Constructs a DocstringInfo instance from the builder's current state. */
+        public DocstringInfo build() {
+            return new DocstringInfo(text, format, span, associatedItem, parsedSections);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

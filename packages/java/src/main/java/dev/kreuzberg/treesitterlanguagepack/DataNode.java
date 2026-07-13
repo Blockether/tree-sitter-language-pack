@@ -10,90 +10,83 @@ import org.jspecify.annotations.Nullable;
 /**
  * A node in the hierarchical data tree produced by data-format extraction.
  *
- * When ProcessConfig.data_extraction(crate.ProcessConfig.data_extraction) is
- * {@code true}, ProcessResult.data is populated with a root {@code DataNode} whose
- * children(DataNode.children) mirror the structure of the parsed file.
+ * When ProcessConfig.data_extraction(crate.ProcessConfig.data_extraction) is {@code true}, ProcessResult.data is populated with a root
+ * {@code DataNode} whose children(DataNode.children) mirror the structure of the parsed file.
  *
  * The {@code kind} field determines which other fields are meaningful:
  *
- * | {@code kind}     | {@code key}                    | {@code value}       | {@code attributes} | {@code children} |
- * |------------|--------------------------|---------------|--------------|------------|
- * | {@code KeyValue} | key / mapping key / index | leaf value   | empty        | nested map |
- * | {@code Element}  | XML tag name             | text content  | XML attrs    | child elements |
- * | {@code Sequence} | positional index ({@code "0"}) | leaf value   | empty        | sub-items  |
+ * | {@code kind} | {@code key} | {@code value} | {@code attributes} | {@code children} |
+ * |------------|--------------------------|---------------|--------------|------------| | {@code KeyValue} | key / mapping key / index |
+ * leaf value | empty | nested map | | {@code Element} | XML tag name | text content | XML attrs | child elements | | {@code Sequence} |
+ * positional index ({@code "0"}) | leaf value | empty | sub-items |
  */
-public record DataNode(
-    DataNodeKind kind,
-    @Nullable String key,
-    @Nullable String value,
-    @Nullable List<DataAttribute> attributes,
-    @Nullable List<DataNode> children,
-    Span span) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for DataNode deserialization. */
-  public static final class Builder {
-
-    private DataNodeKind kind;
-
-    @Nullable
-    private String key;
-
-    @Nullable
-    private String value;
-
-    @Nullable
-    private List<DataAttribute> attributes;
-
-    @Nullable
-    private List<DataNode> children;
-
-    private Span span;
-
-    /** Sets the kind field. */
-    public Builder withKind(final DataNodeKind value) {
-      this.kind = value;
-      return this;
+public record DataNode(DataNodeKind kind, @Nullable String key, @Nullable String value, @Nullable List<DataAttribute> attributes,
+        @Nullable List<DataNode> children, Span span) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the key field. */
-    public Builder withKey(final @Nullable String value) {
-      this.key = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for DataNode deserialization. */
+    public static final class Builder {
 
-    /** Sets the value field. */
-    public Builder withValue(final @Nullable String value) {
-      this.value = value;
-      return this;
-    }
+        private DataNodeKind kind;
 
-    /** Sets the attributes field. */
-    public Builder withAttributes(final @Nullable List<DataAttribute> value) {
-      this.attributes = value;
-      return this;
-    }
+        @Nullable
+        private String key;
 
-    /** Sets the children field. */
-    public Builder withChildren(final @Nullable List<DataNode> value) {
-      this.children = value;
-      return this;
-    }
+        @Nullable
+        private String value;
 
-    /** Sets the span field. */
-    public Builder withSpan(final Span value) {
-      this.span = value;
-      return this;
-    }
+        @Nullable
+        private List<DataAttribute> attributes;
 
-    /** Constructs a DataNode instance from the builder's current state. */
-    public DataNode build() {
-      return new DataNode(kind, key, value, attributes, children, span);
+        @Nullable
+        private List<DataNode> children;
+
+        private Span span;
+
+        /** Sets the kind field. */
+        public Builder withKind(final DataNodeKind value) {
+            this.kind = value;
+            return this;
+        }
+
+        /** Sets the key field. */
+        public Builder withKey(final @Nullable String value) {
+            this.key = value;
+            return this;
+        }
+
+        /** Sets the value field. */
+        public Builder withValue(final @Nullable String value) {
+            this.value = value;
+            return this;
+        }
+
+        /** Sets the attributes field. */
+        public Builder withAttributes(final @Nullable List<DataAttribute> value) {
+            this.attributes = value;
+            return this;
+        }
+
+        /** Sets the children field. */
+        public Builder withChildren(final @Nullable List<DataNode> value) {
+            this.children = value;
+            return this;
+        }
+
+        /** Sets the span field. */
+        public Builder withSpan(final Span value) {
+            this.span = value;
+            return this;
+        }
+
+        /** Constructs a DataNode instance from the builder's current state. */
+        public DataNode build() {
+            return new DataNode(kind, key, value, attributes, children, span);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

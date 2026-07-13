@@ -9,55 +9,51 @@ import org.jspecify.annotations.Nullable;
 /**
  * A comment extracted from source code.
  */
-public record CommentInfo(
-    String text,
-    CommentKind kind,
-    Span span,
-    @Nullable String associatedNode) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for CommentInfo deserialization. */
-  public static final class Builder {
-
-    private String text;
-    private CommentKind kind;
-    private Span span;
-
-    @Nullable
-    private String associatedNode;
-
-    /** Sets the text field. */
-    public Builder withText(final String value) {
-      this.text = value;
-      return this;
+public record CommentInfo(String text, CommentKind kind, Span span, @Nullable String associatedNode) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the kind field. */
-    public Builder withKind(final CommentKind value) {
-      this.kind = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for CommentInfo deserialization. */
+    public static final class Builder {
 
-    /** Sets the span field. */
-    public Builder withSpan(final Span value) {
-      this.span = value;
-      return this;
-    }
+        private String text;
+        private CommentKind kind;
+        private Span span;
 
-    /** Sets the associatedNode field. */
-    public Builder withAssociatedNode(final @Nullable String value) {
-      this.associatedNode = value;
-      return this;
-    }
+        @Nullable
+        private String associatedNode;
 
-    /** Constructs a CommentInfo instance from the builder's current state. */
-    public CommentInfo build() {
-      return new CommentInfo(text, kind, span, associatedNode);
+        /** Sets the text field. */
+        public Builder withText(final String value) {
+            this.text = value;
+            return this;
+        }
+
+        /** Sets the kind field. */
+        public Builder withKind(final CommentKind value) {
+            this.kind = value;
+            return this;
+        }
+
+        /** Sets the span field. */
+        public Builder withSpan(final Span value) {
+            this.span = value;
+            return this;
+        }
+
+        /** Sets the associatedNode field. */
+        public Builder withAssociatedNode(final @Nullable String value) {
+            this.associatedNode = value;
+            return this;
+        }
+
+        /** Constructs a CommentInfo instance from the builder's current state. */
+        public CommentInfo build() {
+            return new CommentInfo(text, kind, span, associatedNode);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

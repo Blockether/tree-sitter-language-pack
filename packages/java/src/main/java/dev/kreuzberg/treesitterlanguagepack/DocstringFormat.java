@@ -4,77 +4,73 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-
 /**
  * The format of a docstring extracted from source code.
  *
- * Identifies the docstring convention used, which varies by language
- * (e.g., Python triple-quoted strings, JSDoc, Rustdoc {@code ///} comments).
+ * Identifies the docstring convention used, which varies by language (e.g., Python triple-quoted strings, JSDoc, Rustdoc {@code ///}
+ * comments).
  *
  * # Wire format (public JSON contract)
  *
- * Unit variants serialize as a bare string ({@code "JSDoc"}); the {@code Other}
- * variant serializes as a single-keyed object ({@code {"Other": "rst"}}). DO
- * NOT add {@code #[serde(tag = "...")]}. Covered by {@code tests/wire_format.rs}.
+ * Unit variants serialize as a bare string ({@code "JSDoc"}); the {@code Other} variant serializes as a single-keyed object
+ * ({@code {"Other": "rst"}}). DO NOT add {@code #[serde(tag = "...")]}. Covered by {@code tests/wire_format.rs}.
  */
 @SuppressWarnings("PMD")
 public enum DocstringFormat {
-  /**
-   * Python triple-quoted string docstring ({@code """..."""}).
-   */
-  PythonTripleQuote("pythontriplequote"),
-  /**
-   * JavaScript/TypeScript JSDoc block comment (opens with two stars, closes
-   * with star-slash).
-   */
-  JSDoc("jsdoc"),
-  /**
-   * Rust {@code ///} or {@code //!} doc comment.
-   */
-  Rustdoc("rustdoc"),
-  /**
-   * Go doc comment (a comment block immediately preceding a declaration).
-   */
-  GoDoc("godoc"),
-  /**
-   * Java Javadoc block comment (opens with two stars, closes with
-   * star-slash).
-   */
-  JavaDoc("javadoc"),
-  /**
-   * A plain string docstring (e.g. a Clojure {@code defn} doc string).
-   */
-  Plain("plain"),
-  /**
-   * A language-specific docstring format not covered by the standard variants.
-   */
-  Other("other");
+    /**
+     * Python triple-quoted string docstring ({@code """..."""}).
+     */
+    PythonTripleQuote("pythontriplequote"),
+    /**
+     * JavaScript/TypeScript JSDoc block comment (opens with two stars, closes with star-slash).
+     */
+    JSDoc("jsdoc"),
+    /**
+     * Rust {@code ///} or {@code //!} doc comment.
+     */
+    Rustdoc("rustdoc"),
+    /**
+     * Go doc comment (a comment block immediately preceding a declaration).
+     */
+    GoDoc("godoc"),
+    /**
+     * Java Javadoc block comment (opens with two stars, closes with star-slash).
+     */
+    JavaDoc("javadoc"),
+    /**
+     * A plain string docstring (e.g. a Clojure {@code defn} doc string).
+     */
+    Plain("plain"),
+    /**
+     * A language-specific docstring format not covered by the standard variants.
+     */
+    Other("other");
 
-  /** The string value. */
-  private final String value;
+    /** The string value. */
+    private final String value;
 
-  DocstringFormat(final String value) {
-    this.value = value;
-  }
-
-  /** Returns the string value. */
-  public String getValue() {
-    return value;
-  }
-
-  /** Creates an instance from a string value. */
-  public static DocstringFormat fromValue(final String value) {
-    for (DocstringFormat e : values()) {
-      if (e.value.equalsIgnoreCase(value)) {
-        return e;
-      }
+    DocstringFormat(final String value) {
+        this.value = value;
     }
-    throw new IllegalArgumentException("Unknown DocstringFormat value: " + value);
-  }
 
-  /** Returns the wire-format string value (matches JSON serialization). */
-  @Override
-  public String toString() {
-    return value;
-  }
+    /** Returns the string value. */
+    public String getValue() {
+        return value;
+    }
+
+    /** Creates an instance from a string value. */
+    public static DocstringFormat fromValue(final String value) {
+        for (DocstringFormat e : values()) {
+            if (e.value.equalsIgnoreCase(value)) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("Unknown DocstringFormat value: " + value);
+    }
+
+    /** Returns the wire-format string value (matches JSON serialization). */
+    @Override
+    public String toString() {
+        return value;
+    }
 }

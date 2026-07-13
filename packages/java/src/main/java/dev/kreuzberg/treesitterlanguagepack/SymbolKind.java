@@ -4,83 +4,80 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-
 /**
  * The kind of a symbol definition found in source code.
  *
- * Categorizes symbol definitions such as variables, constants, functions,
- * classes, types, interfaces, enums, and modules.
+ * Categorizes symbol definitions such as variables, constants, functions, classes, types, interfaces, enums, and modules.
  *
  * # Wire format (public JSON contract)
  *
- * Unit variants serialize as a bare string ({@code "Function"}); the {@code Other}
- * variant serializes as a single-keyed object ({@code {"Other": "macro"}}). DO
- * NOT add {@code #[serde(tag = "...")]}. Covered by {@code tests/wire_format.rs}.
+ * Unit variants serialize as a bare string ({@code "Function"}); the {@code Other} variant serializes as a single-keyed object
+ * ({@code {"Other": "macro"}}). DO NOT add {@code #[serde(tag = "...")]}. Covered by {@code tests/wire_format.rs}.
  */
 @SuppressWarnings("PMD")
 public enum SymbolKind {
-  /**
-   * A variable binding.
-   */
-  Variable("variable"),
-  /**
-   * A constant (immutable binding).
-   */
-  Constant("constant"),
-  /**
-   * A function definition.
-   */
-  Function("function"),
-  /**
-   * A class definition.
-   */
-  Class("class"),
-  /**
-   * A type alias or typedef.
-   */
-  Type("type"),
-  /**
-   * An interface definition.
-   */
-  Interface("interface"),
-  /**
-   * An enum definition.
-   */
-  Enum("enum"),
-  /**
-   * A module declaration.
-   */
-  Module("module"),
-  /**
-   * A symbol kind not covered by the standard variants.
-   */
-  Other("other");
+    /**
+     * A variable binding.
+     */
+    Variable("variable"),
+    /**
+     * A constant (immutable binding).
+     */
+    Constant("constant"),
+    /**
+     * A function definition.
+     */
+    Function("function"),
+    /**
+     * A class definition.
+     */
+    Class("class"),
+    /**
+     * A type alias or typedef.
+     */
+    Type("type"),
+    /**
+     * An interface definition.
+     */
+    Interface("interface"),
+    /**
+     * An enum definition.
+     */
+    Enum("enum"),
+    /**
+     * A module declaration.
+     */
+    Module("module"),
+    /**
+     * A symbol kind not covered by the standard variants.
+     */
+    Other("other");
 
-  /** The string value. */
-  private final String value;
+    /** The string value. */
+    private final String value;
 
-  SymbolKind(final String value) {
-    this.value = value;
-  }
-
-  /** Returns the string value. */
-  public String getValue() {
-    return value;
-  }
-
-  /** Creates an instance from a string value. */
-  public static SymbolKind fromValue(final String value) {
-    for (SymbolKind e : values()) {
-      if (e.value.equalsIgnoreCase(value)) {
-        return e;
-      }
+    SymbolKind(final String value) {
+        this.value = value;
     }
-    throw new IllegalArgumentException("Unknown SymbolKind value: " + value);
-  }
 
-  /** Returns the wire-format string value (matches JSON serialization). */
-  @Override
-  public String toString() {
-    return value;
-  }
+    /** Returns the string value. */
+    public String getValue() {
+        return value;
+    }
+
+    /** Creates an instance from a string value. */
+    public static SymbolKind fromValue(final String value) {
+        for (SymbolKind e : values()) {
+            if (e.value.equalsIgnoreCase(value)) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("Unknown SymbolKind value: " + value);
+    }
+
+    /** Returns the wire-format string value (matches JSON serialization). */
+    @Override
+    public String toString() {
+        return value;
+    }
 }

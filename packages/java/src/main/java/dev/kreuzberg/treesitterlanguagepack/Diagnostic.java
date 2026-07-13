@@ -4,49 +4,45 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-
 /**
  * A diagnostic (syntax error, missing node, etc.) from parsing.
  */
-public record Diagnostic(
-    String message,
-    DiagnosticSeverity severity,
-    Span span) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for Diagnostic deserialization. */
-  public static final class Builder {
-
-    private String message;
-    private DiagnosticSeverity severity;
-    private Span span;
-
-    /** Sets the message field. */
-    public Builder withMessage(final String value) {
-      this.message = value;
-      return this;
+public record Diagnostic(String message, DiagnosticSeverity severity, Span span) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the severity field. */
-    public Builder withSeverity(final DiagnosticSeverity value) {
-      this.severity = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for Diagnostic deserialization. */
+    public static final class Builder {
 
-    /** Sets the span field. */
-    public Builder withSpan(final Span value) {
-      this.span = value;
-      return this;
-    }
+        private String message;
+        private DiagnosticSeverity severity;
+        private Span span;
 
-    /** Constructs a Diagnostic instance from the builder's current state. */
-    public Diagnostic build() {
-      return new Diagnostic(message, severity, span);
+        /** Sets the message field. */
+        public Builder withMessage(final String value) {
+            this.message = value;
+            return this;
+        }
+
+        /** Sets the severity field. */
+        public Builder withSeverity(final DiagnosticSeverity value) {
+            this.severity = value;
+            return this;
+        }
+
+        /** Sets the span field. */
+        public Builder withSpan(final Span value) {
+            this.span = value;
+            return this;
+        }
+
+        /** Constructs a Diagnostic instance from the builder's current state. */
+        public Diagnostic build() {
+            return new Diagnostic(message, severity, span);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

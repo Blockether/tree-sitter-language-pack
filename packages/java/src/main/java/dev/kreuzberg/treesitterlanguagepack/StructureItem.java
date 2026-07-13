@@ -10,109 +10,101 @@ import org.jspecify.annotations.Nullable;
 /**
  * A structural item (function, class, struct, etc.) in source code.
  */
-public record StructureItem(
-    StructureKind kind,
-    @Nullable String name,
-    @Nullable String visibility,
-    Span span,
-    @Nullable List<StructureItem> children,
-    @Nullable List<String> decorators,
-    @Nullable String docComment,
-    @Nullable String signature,
-    @Nullable Span bodySpan) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for StructureItem deserialization. */
-  public static final class Builder {
-
-    private StructureKind kind;
-
-    @Nullable
-    private String name;
-
-    @Nullable
-    private String visibility;
-
-    private Span span;
-
-    @Nullable
-    private List<StructureItem> children;
-
-    @Nullable
-    private List<String> decorators;
-
-    @Nullable
-    private String docComment;
-
-    @Nullable
-    private String signature;
-
-    @Nullable
-    private Span bodySpan;
-
-    /** Sets the kind field. */
-    public Builder withKind(final StructureKind value) {
-      this.kind = value;
-      return this;
+public record StructureItem(StructureKind kind, @Nullable String name, @Nullable String visibility, Span span,
+        @Nullable List<StructureItem> children, @Nullable List<String> decorators, @Nullable String docComment, @Nullable String signature,
+        @Nullable Span bodySpan) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the name field. */
-    public Builder withName(final @Nullable String value) {
-      this.name = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for StructureItem deserialization. */
+    public static final class Builder {
 
-    /** Sets the visibility field. */
-    public Builder withVisibility(final @Nullable String value) {
-      this.visibility = value;
-      return this;
-    }
+        private StructureKind kind;
 
-    /** Sets the span field. */
-    public Builder withSpan(final Span value) {
-      this.span = value;
-      return this;
-    }
+        @Nullable
+        private String name;
 
-    /** Sets the children field. */
-    public Builder withChildren(final @Nullable List<StructureItem> value) {
-      this.children = value;
-      return this;
-    }
+        @Nullable
+        private String visibility;
 
-    /** Sets the decorators field. */
-    public Builder withDecorators(final @Nullable List<String> value) {
-      this.decorators = value;
-      return this;
-    }
+        private Span span;
 
-    /** Sets the docComment field. */
-    public Builder withDocComment(final @Nullable String value) {
-      this.docComment = value;
-      return this;
-    }
+        @Nullable
+        private List<StructureItem> children;
 
-    /** Sets the signature field. */
-    public Builder withSignature(final @Nullable String value) {
-      this.signature = value;
-      return this;
-    }
+        @Nullable
+        private List<String> decorators;
 
-    /** Sets the bodySpan field. */
-    public Builder withBodySpan(final @Nullable Span value) {
-      this.bodySpan = value;
-      return this;
-    }
+        @Nullable
+        private String docComment;
 
-    /** Constructs a StructureItem instance from the builder's current state. */
-    public StructureItem build() {
-      return new StructureItem(
-          kind, name, visibility, span, children, decorators, docComment, signature, bodySpan);
+        @Nullable
+        private String signature;
+
+        @Nullable
+        private Span bodySpan;
+
+        /** Sets the kind field. */
+        public Builder withKind(final StructureKind value) {
+            this.kind = value;
+            return this;
+        }
+
+        /** Sets the name field. */
+        public Builder withName(final @Nullable String value) {
+            this.name = value;
+            return this;
+        }
+
+        /** Sets the visibility field. */
+        public Builder withVisibility(final @Nullable String value) {
+            this.visibility = value;
+            return this;
+        }
+
+        /** Sets the span field. */
+        public Builder withSpan(final Span value) {
+            this.span = value;
+            return this;
+        }
+
+        /** Sets the children field. */
+        public Builder withChildren(final @Nullable List<StructureItem> value) {
+            this.children = value;
+            return this;
+        }
+
+        /** Sets the decorators field. */
+        public Builder withDecorators(final @Nullable List<String> value) {
+            this.decorators = value;
+            return this;
+        }
+
+        /** Sets the docComment field. */
+        public Builder withDocComment(final @Nullable String value) {
+            this.docComment = value;
+            return this;
+        }
+
+        /** Sets the signature field. */
+        public Builder withSignature(final @Nullable String value) {
+            this.signature = value;
+            return this;
+        }
+
+        /** Sets the bodySpan field. */
+        public Builder withBodySpan(final @Nullable Span value) {
+            this.bodySpan = value;
+            return this;
+        }
+
+        /** Constructs a StructureItem instance from the builder's current state. */
+        public StructureItem build() {
+            return new StructureItem(kind, name, visibility, span, children, decorators, docComment, signature, bodySpan);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

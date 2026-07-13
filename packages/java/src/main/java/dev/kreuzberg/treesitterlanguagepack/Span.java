@@ -4,81 +4,73 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-
 /**
  * Byte and line/column range in source code.
  *
- * Represents both byte offsets (for slicing) and human-readable line/column
- * positions (for display and diagnostics).
+ * Represents both byte offsets (for slicing) and human-readable line/column positions (for display and diagnostics).
  */
-public record Span(
-    long startByte,
-    long endByte,
-    long startLine,
-    long startColumn,
-    long endLine,
-    long endColumn) {
-  /** Creates a new Builder for constructing instances of this record. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  // CPD-OFF
-  /** Jackson builder for Span deserialization. */
-  public static final class Builder {
-
-    private long startByte;
-
-    private long endByte;
-
-    private long startLine;
-
-    private long startColumn;
-
-    private long endLine;
-
-    private long endColumn;
-
-    /** Sets the startByte field. */
-    public Builder withStartByte(final long value) {
-      this.startByte = value;
-      return this;
+public record Span(long startByte, long endByte, long startLine, long startColumn, long endLine, long endColumn) {
+    /** Creates a new Builder for constructing instances of this record. */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /** Sets the endByte field. */
-    public Builder withEndByte(final long value) {
-      this.endByte = value;
-      return this;
-    }
+    // CPD-OFF
+    /** Jackson builder for Span deserialization. */
+    public static final class Builder {
 
-    /** Sets the startLine field. */
-    public Builder withStartLine(final long value) {
-      this.startLine = value;
-      return this;
-    }
+        private long startByte;
 
-    /** Sets the startColumn field. */
-    public Builder withStartColumn(final long value) {
-      this.startColumn = value;
-      return this;
-    }
+        private long endByte;
 
-    /** Sets the endLine field. */
-    public Builder withEndLine(final long value) {
-      this.endLine = value;
-      return this;
-    }
+        private long startLine;
 
-    /** Sets the endColumn field. */
-    public Builder withEndColumn(final long value) {
-      this.endColumn = value;
-      return this;
-    }
+        private long startColumn;
 
-    /** Constructs a Span instance from the builder's current state. */
-    public Span build() {
-      return new Span(startByte, endByte, startLine, startColumn, endLine, endColumn);
+        private long endLine;
+
+        private long endColumn;
+
+        /** Sets the startByte field. */
+        public Builder withStartByte(final long value) {
+            this.startByte = value;
+            return this;
+        }
+
+        /** Sets the endByte field. */
+        public Builder withEndByte(final long value) {
+            this.endByte = value;
+            return this;
+        }
+
+        /** Sets the startLine field. */
+        public Builder withStartLine(final long value) {
+            this.startLine = value;
+            return this;
+        }
+
+        /** Sets the startColumn field. */
+        public Builder withStartColumn(final long value) {
+            this.startColumn = value;
+            return this;
+        }
+
+        /** Sets the endLine field. */
+        public Builder withEndLine(final long value) {
+            this.endLine = value;
+            return this;
+        }
+
+        /** Sets the endColumn field. */
+        public Builder withEndColumn(final long value) {
+            this.endColumn = value;
+            return this;
+        }
+
+        /** Constructs a Span instance from the builder's current state. */
+        public Span build() {
+            return new Span(startByte, endByte, startLine, startColumn, endLine, endColumn);
+        }
     }
-  }
-  // CPD-ON
+    // CPD-ON
 }

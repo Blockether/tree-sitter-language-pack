@@ -6,15 +6,15 @@ package dev.kreuzberg.treesitterlanguagepack;
  * The tree-sitter parser returned no tree for the given source input.
  */
 public class ParseFailedException extends ErrorException {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  /** Creates a new ParseFailedException with the given message. */
-  public ParseFailedException(final String message) {
-    super(message);
-  }
+    /** Creates a new ParseFailedException with the given message. */
+    public ParseFailedException(final String message) {
+        super(message);
+    }
 
-  /** Creates a new ParseFailedException with the given message and cause. */
-  public ParseFailedException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+    /** Creates a new ParseFailedException with the given message and cause. */
+    public ParseFailedException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 }

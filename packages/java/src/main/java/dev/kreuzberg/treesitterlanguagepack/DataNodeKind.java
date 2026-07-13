@@ -4,63 +4,57 @@
 // To verify freshness: alef verify --exit-code
 package dev.kreuzberg.treesitterlanguagepack;
 
-
 /**
  * The kind of a data node extracted from a data-format file.
  *
- * Classifies each node in the hierarchical DataNode tree returned when
- * {@code data_extraction} is enabled on {@code ProcessConfig}.
+ * Classifies each node in the hierarchical DataNode tree returned when {@code data_extraction} is enabled on {@code ProcessConfig}.
  *
  * # Wire format (public JSON contract)
  *
- * Unit variants serialize as a bare string ({@code "KeyValue"}). DO NOT add
- * {@code #[serde(tag = "...")]} or rename variants — every language binding has a
- * hand-written deserializer matching this exact shape, and any change breaks
- * all bindings' {@code process()} tests simultaneously.
- * Covered by {@code tests/wire_format.rs}.
+ * Unit variants serialize as a bare string ({@code "KeyValue"}). DO NOT add {@code #[serde(tag = "...")]} or rename variants — every
+ * language binding has a hand-written deserializer matching this exact shape, and any change breaks all bindings' {@code process()} tests
+ * simultaneously. Covered by {@code tests/wire_format.rs}.
  */
 @SuppressWarnings("PMD")
 public enum DataNodeKind {
-  /**
-   * A key/value pair or mapping (json/toml/properties/yaml/hcl/cue/kdl pair,
-   * or a wrapper "object"/"mapping" container).
-   */
-  KeyValue("keyvalue"),
-  /**
-   * An XML element with a tag name in {@code key} and attributes in {@code attributes}.
-   */
-  Element("element"),
-  /**
-   * A positional sequence item (JSON array element, YAML block sequence item,
-   * CSV/PSV row or cell).
-   */
-  Sequence("sequence");
+    /**
+     * A key/value pair or mapping (json/toml/properties/yaml/hcl/cue/kdl pair, or a wrapper "object"/"mapping" container).
+     */
+    KeyValue("keyvalue"),
+    /**
+     * An XML element with a tag name in {@code key} and attributes in {@code attributes}.
+     */
+    Element("element"),
+    /**
+     * A positional sequence item (JSON array element, YAML block sequence item, CSV/PSV row or cell).
+     */
+    Sequence("sequence");
 
-  /** The string value. */
-  private final String value;
+    /** The string value. */
+    private final String value;
 
-  DataNodeKind(final String value) {
-    this.value = value;
-  }
-
-  /** Returns the string value. */
-  public String getValue() {
-    return value;
-  }
-
-  /** Creates an instance from a string value. */
-  public static DataNodeKind fromValue(final String value) {
-    for (DataNodeKind e : values()) {
-      if (e.value.equalsIgnoreCase(value)) {
-        return e;
-      }
+    DataNodeKind(final String value) {
+        this.value = value;
     }
-    throw new IllegalArgumentException("Unknown DataNodeKind value: " + value);
-  }
 
-  /** Returns the wire-format string value (matches JSON serialization). */
-  @Override
-  public String toString() {
-    return value;
-  }
+    /** Returns the string value. */
+    public String getValue() {
+        return value;
+    }
+
+    /** Creates an instance from a string value. */
+    public static DataNodeKind fromValue(final String value) {
+        for (DataNodeKind e : values()) {
+            if (e.value.equalsIgnoreCase(value)) {
+                return e;
+            }
+        }
+        throw new IllegalArgumentException("Unknown DataNodeKind value: " + value);
+    }
+
+    /** Returns the wire-format string value (matches JSON serialization). */
+    @Override
+    public String toString() {
+        return value;
+    }
 }
