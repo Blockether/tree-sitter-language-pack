@@ -1,3 +1,21 @@
+# 1.12.3-blockether.13
+
+- **JS/TS/TSX structure now names hook- and callback-bound definitions.** The
+  walker only recognised a value binding as a definition when it was a direct
+  function/class expression or wrapped in one of three whitelisted HOCs
+  (`memo`/`forwardRef`/`observer`). So the dominant React pattern —
+  `const send = useCallback(() => …, [])`, `const rows = useMemo(() => …, [])`,
+  and any custom-hook or HOF callback (`debounce(() => …)`,
+  `useMySelector(() => …)`) — was silently dropped, leaving big components (a
+  1600-line `App.tsx` whose `Root` holds ~40 such handlers) showing as a
+  childless leaf. The rule is now general: a `const NAME = call(… fn …)` whose
+  call carries a **function-expression argument** is a named definition, named
+  after the binding, with the callback body descended for nested defs. Calls
+  with no function argument still bind values, not defs, and stay out
+  (`useRef(null)`, `useState(0)`, `StyleSheet.create({…})`). This also powers
+  structural editing: `struct_patch`'s `edit` locates targets through the same
+  outline, so these handlers are now editable by name.
+
 # 1.12.3-blockether.12
 
 - **JS/TS/TSX structure now covers type-level & namespaced definitions.** The

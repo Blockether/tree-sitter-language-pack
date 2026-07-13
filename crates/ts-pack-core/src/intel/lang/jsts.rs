@@ -48,12 +48,6 @@ impl LanguageIntel for JsTs {
     }
 }
 
-/// Known higher-order-component wrappers: `const C = memo(() => …)` names the
-/// binding `C`, not an anonymous inner function. Kept intentionally small — a
-/// vetted set of ubiquitous React / MobX wrappers, matched by the callee's
-/// final identifier so both `memo(…)` and `React.memo(…)` resolve.
-const HOC_WRAPPERS: &[&str] = &["memo", "forwardRef", "observer"];
-
 /// Recursive structure walk. At a *definition* node record it (naming it and,
 /// where the language hides the name on a binding, recovering it) and descend
 /// into its body for nested defs; otherwise recurse into all children so
@@ -95,7 +89,7 @@ fn walk(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
         "public_field_definition" | "field_definition" => {
             match node
                 .child_by_field_name("value")
-                .and_then(|v| callable_value(&v, source))
+                .and_then(|v| callable_value(&v))
             {
                 Some((_, body)) => push(node, StructureKind::Method, name_field(node, source), body, source, out),
                 None => descend(node, source, out),
@@ -169,7 +163,7 @@ fn walk_declaration(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
 
     let callable: Vec<&Node> = declarators
         .iter()
-        .filter(|d| declarator_value(d).and_then(|v| callable_value(&v, source)).is_some())
+        .filter(|d| declarator_value(d).and_then(|v| callable_value(&v)).is_some())
         .collect();
 
     if callable.is_empty() {
@@ -180,22 +174,22 @@ fn walk_declaration(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
     if declarators.len() == 1 {
         // Span the whole `const NAME = … ;` statement.
         let d = &declarators[0];
-        if let Some((kind, body)) = declarator_value(d).and_then(|v| callable_value(&v, source)) {
+        if let Some((kind, body)) = declarator_value(d).and_then(|v| callable_value(&v)) {
             push(node, kind, name_field(d, source), body, source, out);
         }
     } else {
         for d in callable {
-            if let Some((kind, body)) = declarator_value(d).and_then(|v| callable_value(&v, source)) {
+            if let Some((kind, body)) = declarator_value(d).and_then(|v| callable_value(&v)) {
                 push(d, kind, name_field(d, source), body, source, out);
             }
         }
     }
 }
 
-/// Classify a declarator/field *value*: a function/class expression, or a
-/// callback wrapped in a known HOC. Returns the [`StructureKind`] plus the
-/// function/class body to descend into for nested definitions.
-fn callable_value<'t>(value: &Node<'t>, source: &str) -> Option<(StructureKind, Option<Node<'t>>)> {
+/// Classify a declarator/field *value*: a function/class expression, or a call
+/// carrying a callback argument (a hook/HOC like `useCallback`/`memo`). Returns
+/// the [`StructureKind`] plus the function/class body to descend for nested defs.
+fn callable_value<'t>(value: &Node<'t>) -> Option<(StructureKind, Option<Node<'t>>)> {
     let kind = value.kind();
     if is_function_expr(kind) {
         return Some((StructureKind::Function, value.child_by_field_name("body")));
@@ -203,8 +197,12 @@ fn callable_value<'t>(value: &Node<'t>, source: &str) -> Option<(StructureKind, 
     if kind == "class" {
         return Some((StructureKind::Class, value.child_by_field_name("body")));
     }
+    // A call whose argument list carries a function expression — the callback in
+    // a hook or HOC (`useCallback(() => …)`, `useMemo(() => …)`, `memo(…)`,
+    // `forwardRef((p, r) => …)`, a custom `useThing(() => …)`). The binding name
+    // is the real definition; descend the callback body for any nested defs.
     if kind == "call_expression"
-        && let Some(cb) = hoc_callback(value, source)
+        && let Some(cb) = call_fn_arg(value)
     {
         return Some((StructureKind::Function, cb.child_by_field_name("body")));
     }
@@ -220,19 +218,13 @@ fn is_function_expr(kind: &str) -> bool {
     )
 }
 
-/// For `wrapper(() => …)` where `wrapper` is a known HOC, the function argument
-/// whose body carries the real component. Resolves both `memo(…)` and the
-/// member form `React.memo(…)`.
-fn hoc_callback<'t>(call: &Node<'t>, source: &str) -> Option<Node<'t>> {
-    let callee = call.child_by_field_name("function")?;
-    let name = match callee.kind() {
-        "identifier" => node_text(&callee, source),
-        "member_expression" => node_text(&callee.child_by_field_name("property")?, source),
-        _ => return None,
-    };
-    if !HOC_WRAPPERS.contains(&name) {
-        return None;
-    }
+/// The first argument of `call` that is a function expression — the callback in
+/// a hook or HOC call (`useCallback(() => …)`, `memo(() => …)`). Its presence is
+/// what marks the enclosing `const NAME = call(…)` binding as a named definition;
+/// the callback body carries any nested defs. A call with no function argument
+/// (`useRef(null)`, `StyleSheet.create({…})`) binds a value, not a def, and is
+/// intentionally not matched.
+fn call_fn_arg<'t>(call: &Node<'t>) -> Option<Node<'t>> {
     let args = call.child_by_field_name("arguments")?;
     let mut cursor = args.walk();
     args.named_children(&mut cursor).find(|a| is_function_expr(a.kind()))
@@ -504,5 +496,41 @@ abstract class Base {
         let methods: Vec<&str> = base.children.iter().filter_map(|s| s.name.as_deref()).collect();
         assert!(methods.contains(&"render"), "abstract methods: {methods:?}");
         assert!(methods.contains(&"concrete"), "class methods: {methods:?}");
+    }
+
+    const HOOK_SAMPLE: &str = r#"
+export function Screen() {
+  const value = useMemo(() => compute(), [dep]);
+  const onPress = useCallback(() => { doThing(); }, []);
+  const listRef = useRef(null);
+  const [count, setCount] = useState(0);
+  const styles = StyleSheet.create({ a: {} });
+  return null;
+}
+"#;
+
+    #[test]
+    fn tsx_names_hook_bound_callbacks_and_skips_value_hooks() {
+        let Some(tree) = parse_or_skip(HOOK_SAMPLE, "tsx") else {
+            return; // grammar not available in this build — CI covers it.
+        };
+        let intel = extract_intelligence(HOOK_SAMPLE, "tsx", &tree);
+        let screen = intel
+            .structure
+            .iter()
+            .find(|s| s.name.as_deref() == Some("Screen"))
+            .expect("Screen component recorded");
+        let kids: Vec<&str> = screen.children.iter().filter_map(|s| s.name.as_deref()).collect();
+
+        // `useMemo` / `useCallback` bindings ARE named definitions (a call with a
+        // function argument) — the component's handlers, previously dropped.
+        assert!(kids.contains(&"value"), "useMemo binding missing: {kids:?}");
+        assert!(kids.contains(&"onPress"), "useCallback binding missing: {kids:?}");
+
+        // `useRef` / `useState` / `StyleSheet.create` carry NO function argument —
+        // they bind values, not definitions, and must stay out of the outline.
+        assert!(!kids.contains(&"listRef"), "useRef must not be a def: {kids:?}");
+        assert!(!kids.contains(&"styles"), "StyleSheet.create must not be a def: {kids:?}");
+        assert!(!kids.contains(&"count"), "useState must not be a def: {kids:?}");
     }
 }
