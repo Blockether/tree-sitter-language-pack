@@ -1,3 +1,15 @@
+# 1.12.3-blockether.14
+
+- **JS/TS/TSX outline rows now carry the leading comment as a doc gist.** Every
+  definition picks up the `//` line-comment run or `/* … */`/JSDoc block written
+  directly above it (climbing through an `export` wrapper first), de-delimited so
+  the first line reads as prose — surfaced on the outline's indented
+  continuation line, the same slot Clojure docstrings already use. A blank line
+  between the comment and the def detaches it (not a gist). This makes the
+  skeleton show intent-per-row without reading the body. Added
+  `leading_doc_comment`/`clean_comment` helpers + a regression test
+  (`tsx_attaches_leading_comments_as_doc_gists`).
+
 # 1.12.3-blockether.13
 
 - **JS/TS/TSX structure now names hook- and callback-bound definitions.** The

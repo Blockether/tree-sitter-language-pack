@@ -87,10 +87,7 @@ fn walk(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
         // Class-field arrow methods (`handleClick = () => { … }`). A plain data
         // field is not structural — descend past it without recording.
         "public_field_definition" | "field_definition" => {
-            match node
-                .child_by_field_name("value")
-                .and_then(|v| callable_value(&v))
-            {
+            match node.child_by_field_name("value").and_then(|v| callable_value(&v)) {
                 Some((_, body)) => push(node, StructureKind::Method, name_field(node, source), body, source, out),
                 None => descend(node, source, out),
             }
@@ -259,6 +256,70 @@ fn module_name(node: &Node, source: &str) -> Option<String> {
     (!t.is_empty()).then(|| t.to_string())
 }
 
+/// The `//` / `/* … */` / JSDoc comment block written directly above a
+/// definition — its intent gist for the outline. An `export`-wrapped def keeps
+/// its comment above the `export` keyword, so climb through export wrappers
+/// first, then gather the run of `comment` siblings immediately preceding the
+/// def (a blank line between the comment and the def detaches it). The comment
+/// delimiters are stripped so the first line reads as prose. `None` when there
+/// is no attached comment.
+fn leading_doc_comment(node: &Node, source: &str) -> Option<String> {
+    let mut anchor = *node;
+    while let Some(parent) = anchor.parent() {
+        if parent.kind() == "export_statement" {
+            anchor = parent;
+        } else {
+            break;
+        }
+    }
+
+    let mut comments: Vec<Node> = Vec::new();
+    let mut below = anchor.start_position().row;
+    let mut sib = anchor.prev_sibling();
+    while let Some(comment) = sib {
+        if comment.kind() != "comment" {
+            break;
+        }
+        // A blank line between the comment and what follows detaches it.
+        if comment.end_position().row + 1 < below {
+            break;
+        }
+        below = comment.start_position().row;
+        comments.push(comment);
+        sib = comment.prev_sibling();
+    }
+    if comments.is_empty() {
+        return None;
+    }
+    comments.reverse();
+    let text = comments
+        .iter()
+        .map(|c| clean_comment(node_text(c, source)))
+        .collect::<Vec<_>>()
+        .join("\n");
+    let text = text.trim();
+    (!text.is_empty()).then(|| text.to_string())
+}
+
+/// Strip comment delimiters (`//`, `///`, `/* … */`, per-line `*`) from a raw
+/// comment node, leaving one cleaned line of human text per source line.
+fn clean_comment(raw: &str) -> String {
+    let raw = raw.trim();
+    let block = raw
+        .strip_prefix("/**")
+        .or_else(|| raw.strip_prefix("/*"))
+        .map(|s| s.strip_suffix("*/").unwrap_or(s));
+    if let Some(block) = block {
+        block
+            .lines()
+            .map(|l| l.trim().trim_start_matches('*').trim())
+            .collect::<Vec<_>>()
+            .join("\n")
+    } else {
+        raw.trim_start_matches('/').trim().to_string()
+    }
+}
+
 /// Record one definition, descending into `body` for its nested definitions.
 fn push(
     span_node: &Node,
@@ -278,6 +339,7 @@ fn push(
         span: span_from_node(span_node),
         children,
         body_span: body.map(|b| span_from_node(&b)),
+        doc_comment: leading_doc_comment(span_node, source),
         ..Default::default()
     });
 }
@@ -530,7 +592,63 @@ export function Screen() {
         // `useRef` / `useState` / `StyleSheet.create` carry NO function argument —
         // they bind values, not definitions, and must stay out of the outline.
         assert!(!kids.contains(&"listRef"), "useRef must not be a def: {kids:?}");
-        assert!(!kids.contains(&"styles"), "StyleSheet.create must not be a def: {kids:?}");
+        assert!(
+            !kids.contains(&"styles"),
+            "StyleSheet.create must not be a def: {kids:?}"
+        );
         assert!(!kids.contains(&"count"), "useState must not be a def: {kids:?}");
+    }
+
+    const COMMENT_SAMPLE: &str = r#"
+// A greeting component.
+export function Hello() {
+  return null;
+}
+
+/**
+ * Adds two numbers.
+ * @param a first
+ */
+function add(a: number, b: number) {
+  return a + b;
+}
+
+// A detached note.
+
+function undocumented() {}
+
+// Bound handler intent.
+const handler = () => {};
+"#;
+
+    #[test]
+    fn tsx_attaches_leading_comments_as_doc_gists() {
+        let Some(tree) = parse_or_skip(COMMENT_SAMPLE, "tsx") else {
+            return; // grammar not available in this build — CI covers it.
+        };
+        let intel = extract_intelligence(COMMENT_SAMPLE, "tsx", &tree);
+        let doc = |name: &str| {
+            intel
+                .structure
+                .iter()
+                .find(|s| s.name.as_deref() == Some(name))
+                .unwrap_or_else(|| panic!("{name} recorded"))
+                .doc_comment
+                .clone()
+        };
+
+        // A line comment above the def rides in as its gist — the exported
+        // function keeps the comment written above `export`.
+        assert_eq!(doc("Hello").as_deref(), Some("A greeting component."));
+
+        // A JSDoc block is de-delimited; the first line is the gist.
+        let add = doc("add").expect("add has a doc comment");
+        assert!(add.starts_with("Adds two numbers."), "add doc: {add:?}");
+
+        // A blank line between the comment and the def detaches it.
+        assert_eq!(doc("undocumented"), None);
+
+        // Comments attach to name-bound arrow definitions too.
+        assert_eq!(doc("handler").as_deref(), Some("Bound handler intent."));
     }
 }
