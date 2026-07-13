@@ -1,3 +1,18 @@
+# 1.12.3-blockether.16
+
+- **Structural inserts normalise blank lines to exactly one at the seam.**
+  Building on `.15` (which stopped gluing an inserted definition onto its
+  neighbour), `StructuralApi.splice` for `INSERT_BEFORE` / `INSERT_AFTER` /
+  `APPEND` now collapses any run of blank lines at each seam down to a single
+  blank line — never zero (glued), never two-or-more (double blank) — whether
+  the extra blanks were pre-existing in the source or would have been added by
+  the edit. The inserted `code`'s own leading/trailing blank lines are also
+  stripped (internal blanks preserved), so `struct_patch` insert/append no
+  longer leaves a double blank like `(inc x))\n\n\n(defn gamma …`. New
+  `trimLeadingBlanks` / `trimTrailingBlanks` / `stripBlankLines` helpers; four
+  new `StructuralApiInsertTest` cases cover the double-blank-above/below,
+  code-edge-blank, and trailing-double-blank normalisations.
+
 # 1.12.3-blockether.15
 
 - **Structural inserts no longer glue a definition onto its neighbour.** The

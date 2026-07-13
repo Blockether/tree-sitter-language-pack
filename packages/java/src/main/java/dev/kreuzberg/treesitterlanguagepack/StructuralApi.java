@@ -165,7 +165,8 @@ public final class StructuralApi {
 
   private static String splice(final List<String> lines, final Op op, final int start,
       final int end, final String code) {
-    final List<String> out = new ArrayList<>(lines.size() + 2);
+    final List<String> body = stripBlankLines(code);
+    final List<String> out = new ArrayList<>(lines.size() + body.size() + 2);
     switch (op) {
       case APPEND -> {
         out.addAll(lines);
@@ -173,44 +174,76 @@ public final class StructuralApi {
         // blanks away, then append exactly one blank-line separator before the new
         // node and keep a final newline — so an appended defn is never glued onto
         // the previous form.
-        while (!out.isEmpty() && out.get(out.size() - 1).isBlank()) {
-          out.remove(out.size() - 1);
-        }
+        trimTrailingBlanks(out);
         if (!out.isEmpty()) {
           out.add("");
         }
-        out.add(code);
+        out.addAll(body);
         out.add("");
       }
       case REPLACE -> {
         out.addAll(lines.subList(0, start - 1));
-        out.add(code);
+        out.addAll(body);
         out.addAll(lines.subList(end, lines.size()));
       }
       case INSERT_BEFORE -> {
         final int before = start - 1; // 0-based index of the target's first line
-        out.addAll(lines.subList(0, before));
-        // Blank line above, unless we're at the top of the file or one already sits there.
-        if (before > 0 && !lines.get(before - 1).isBlank()) {
-          out.add("");
+        final List<String> head = new ArrayList<>(lines.subList(0, before));
+        final List<String> tail = new ArrayList<>(lines.subList(before, lines.size()));
+        // Normalise any run of blank lines at the seam down to exactly one — never
+        // zero (glued) and never two-or-more (double blank), whether the extra
+        // blanks came from us or were already sitting in the source.
+        trimTrailingBlanks(head);
+        if (!head.isEmpty()) {
+          out.addAll(head);
+          out.add(""); // exactly one blank above the inserted node
         }
-        out.add(code);
-        out.add(""); // blank line between the inserted node and the target
-        out.addAll(lines.subList(before, lines.size()));
+        out.addAll(body);
+        out.add(""); // exactly one blank between the inserted node and the target
+        out.addAll(tail);
       }
       case INSERT_AFTER -> {
-        out.addAll(lines.subList(0, end));
-        out.add(""); // blank line between the target and the inserted node
-        out.add(code);
-        // ...and one below it, unless a blank line already follows.
-        if (end < lines.size() && !lines.get(end).isBlank()) {
-          out.add("");
+        final List<String> head = new ArrayList<>(lines.subList(0, end));
+        final List<String> tail = new ArrayList<>(lines.subList(end, lines.size()));
+        trimTrailingBlanks(head);
+        trimLeadingBlanks(tail);
+        out.addAll(head);
+        out.add(""); // exactly one blank between the target and the inserted node
+        out.addAll(body);
+        if (!tail.isEmpty()) {
+          out.add(""); // exactly one blank below the inserted node
         }
-        out.addAll(lines.subList(end, lines.size()));
+        out.addAll(tail);
       }
       default -> throw new EditException("Unknown op: " + op);
     }
     return String.join("\n", out);
+  }
+
+  /** Drop trailing blank lines from a mutable list, in place. */
+  private static void trimTrailingBlanks(final List<String> l) {
+    while (!l.isEmpty() && l.get(l.size() - 1).isBlank()) {
+      l.remove(l.size() - 1);
+    }
+  }
+
+  /** Drop leading blank lines from a mutable list, in place. */
+  private static void trimLeadingBlanks(final List<String> l) {
+    while (!l.isEmpty() && l.get(0).isBlank()) {
+      l.remove(0);
+    }
+  }
+
+  /**
+   * Split {@code code} into lines with its leading and trailing blank lines
+   * stripped, so an inserted node never carries its own edge blanks into the
+   * seam (internal blank lines are preserved).
+   */
+  private static List<String> stripBlankLines(final String code) {
+    final List<String> l = new ArrayList<>(Arrays.asList(code.split("\n", -1)));
+    trimLeadingBlanks(l);
+    trimTrailingBlanks(l);
+    return l;
   }
 
   /**
