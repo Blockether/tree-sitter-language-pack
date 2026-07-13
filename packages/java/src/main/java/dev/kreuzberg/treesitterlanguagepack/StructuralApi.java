@@ -165,11 +165,22 @@ public final class StructuralApi {
 
   private static String splice(final List<String> lines, final Op op, final int start,
       final int end, final String code) {
-    final List<String> out = new ArrayList<>(lines.size() + 1);
+    final List<String> out = new ArrayList<>(lines.size() + 2);
     switch (op) {
       case APPEND -> {
         out.addAll(lines);
+        // A source ending in "\n" leaves a trailing "" element. Normalise trailing
+        // blanks away, then append exactly one blank-line separator before the new
+        // node and keep a final newline — so an appended defn is never glued onto
+        // the previous form.
+        while (!out.isEmpty() && out.get(out.size() - 1).isBlank()) {
+          out.remove(out.size() - 1);
+        }
+        if (!out.isEmpty()) {
+          out.add("");
+        }
         out.add(code);
+        out.add("");
       }
       case REPLACE -> {
         out.addAll(lines.subList(0, start - 1));
@@ -177,13 +188,24 @@ public final class StructuralApi {
         out.addAll(lines.subList(end, lines.size()));
       }
       case INSERT_BEFORE -> {
-        out.addAll(lines.subList(0, start - 1));
+        final int before = start - 1; // 0-based index of the target's first line
+        out.addAll(lines.subList(0, before));
+        // Blank line above, unless we're at the top of the file or one already sits there.
+        if (before > 0 && !lines.get(before - 1).isBlank()) {
+          out.add("");
+        }
         out.add(code);
-        out.addAll(lines.subList(start - 1, lines.size()));
+        out.add(""); // blank line between the inserted node and the target
+        out.addAll(lines.subList(before, lines.size()));
       }
       case INSERT_AFTER -> {
         out.addAll(lines.subList(0, end));
+        out.add(""); // blank line between the target and the inserted node
         out.add(code);
+        // ...and one below it, unless a blank line already follows.
+        if (end < lines.size() && !lines.get(end).isBlank()) {
+          out.add("");
+        }
         out.addAll(lines.subList(end, lines.size()));
       }
       default -> throw new EditException("Unknown op: " + op);

@@ -1,3 +1,16 @@
+# 1.12.3-blockether.15
+
+- **Structural inserts no longer glue a definition onto its neighbour.** The
+  `StructuralApi.edit` splice for `INSERT_BEFORE` / `INSERT_AFTER` / `APPEND` now
+  puts exactly one blank line between the inserted node and the surrounding
+  forms (idempotent when a blank line already sits on that side, and `APPEND`
+  keeps a trailing newline). Previously a `struct_patch` insert/append of a
+  `defn` landed with no separating newline — e.g. `(inc x))\n(defn gamma …`. The
+  Clojure `move-source` workaround that pre-padded the code with a leading `\n`
+  is dropped (the engine now owns the separator, so a move no longer doubles the
+  gap). New `StructuralApiInsertTest` covers all three ops + the adjacent-form
+  and trailing-newline edges.
+
 # 1.12.3-blockether.14
 
 - **JS/TS/TSX outline rows now carry the leading comment as a doc gist.** Every
