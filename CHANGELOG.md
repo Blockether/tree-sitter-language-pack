@@ -1,3 +1,13 @@
+# 1.12.3-blockether.17
+
+- **Regenerate the alef-generated Java bindings (4-space codegen) and re-sync the
+  crate `language_definitions`.** Housekeeping only — no behavioural change to
+  structural editing or grammar loading. The structural-insert blank-line
+  normalisation (never glued, never double-blank at the seam) shipped in `.15`
+  and `.16` and is unchanged here; this cut simply publishes a fresh artifact
+  that carries those fixes plus the regenerated bindings, so downstream
+  consumers can pin a single up-to-date version.
+
 # 1.12.3-blockether.16
 
 - **Structural inserts normalise blank lines to exactly one at the seam.**
