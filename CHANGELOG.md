@@ -1,3 +1,25 @@
+# 1.12.3-blockether.18
+
+- **Decode serde-tagged `Other(..)` enum variants instead of throwing, and give
+  custom Clojure `def*` forms a signature.** Two fixes for the same latent gap.
+  (1) The hand-written Java JSON decoder (`JsonCodec`) read every enum field via
+  `v.toString()`, so serde's externally-tagged `Other(String)` variant — sent as
+  the single-keyed object `{"Other":"defdelegate"}` — stringified to
+  `"{Other=defdelegate}"` and threw `IllegalArgumentException: Unknown
+  StructureKind value` in `fromValue`. A single unparseable item nuked the whole
+  `process(...)` call, surfaced only as an opaque `FFI call failed`. A new
+  `variant()` helper maps the `{"Other":..}` object form to the enum's own
+  `"other"` unit and now guards all seven enum fields (StructureKind, ExportKind,
+  CommentKind, DocstringFormat, SymbolKind, DiagnosticSeverity, DataNodeKind);
+  bare-string variants are unchanged. Clojure hit this first via any custom
+  `def*` macro (`defdelegate`, `defstate`, `defmethod`, …), which tags as
+  `StructureKind::Other(head)`. (2) The Clojure intel tagger only computed a
+  signature for `Function | Macro`, so those custom `def*` forms outlined as a
+  bare name — e.g. `(defdelegate db-log! [db-info opts])` lost its arglist.
+  `clojure_form` now includes `Other(_)` in the signature match, extracting the
+  `[params]` vector via the existing `clojure_signature`; non-arglist `Other`
+  forms still yield `None`.
+
 # 1.12.3-blockether.17
 
 - **Regenerate the alef-generated Java bindings (4-space codegen) and re-sync the
