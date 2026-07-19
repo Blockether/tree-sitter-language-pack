@@ -91,6 +91,26 @@ final class JsonCodec {
         return v == null ? null : v.toString();
     }
 
+    /**
+     * Resolve a serde-tagged enum field to the string {@code fromValue} expects.
+     *
+     * <p>
+     * Unit variants arrive as a bare string ({@code "Function"}); the {@code Other(String)} variant arrives as a single-keyed object
+     * ({@code {"Other": "defdelegate"}}). Map that object form to the enum's own {@code "other"} unit so {@code fromValue} resolves to
+     * {@code ....Other} instead of stringifying the map (e.g. {@code "{Other=defdelegate}"}) and throwing {@code IllegalArgumentException}.
+     * See the wire-format contract on {@link StructureKind}.
+     */
+    private static @Nullable String variant(final Map<String, Object> m, final String k) {
+        final Object v = m.get(k);
+        if (v == null) {
+            return null;
+        }
+        if (v instanceof Map<?, ?> mm) {
+            return mm.containsKey("Other") ? "other" : null;
+        }
+        return v.toString();
+    }
+
     private static long lng(final Map<String, Object> m, final String k) {
         final Object v = m.get(k);
         return v == null ? 0L : ((Number) v).longValue();
@@ -174,7 +194,7 @@ final class JsonCodec {
     }
 
     private static StructureItem structureItem(final Map<String, Object> m) {
-        final String kind = str(m, "kind");
+        final String kind = variant(m, "kind");
         return StructureItem.builder().withKind(kind == null ? null : StructureKind.fromValue(kind)).withName(str(m, "name"))
                 .withVisibility(str(m, "visibility")).withSpan(span(asMap(m.get("span"))))
                 .withChildren(mapList(m, "children", JsonCodec::structureItem)).withDecorators(strList(m, "decorators"))
@@ -188,13 +208,13 @@ final class JsonCodec {
     }
 
     private static ExportInfo exportInfo(final Map<String, Object> m) {
-        final String kind = str(m, "kind");
+        final String kind = variant(m, "kind");
         return ExportInfo.builder().withName(str(m, "name")).withKind(kind == null ? null : ExportKind.fromValue(kind))
                 .withSpan(span(asMap(m.get("span")))).build();
     }
 
     private static CommentInfo commentInfo(final Map<String, Object> m) {
-        final String kind = str(m, "kind");
+        final String kind = variant(m, "kind");
         return CommentInfo.builder().withText(str(m, "text")).withKind(kind == null ? null : CommentKind.fromValue(kind))
                 .withSpan(span(asMap(m.get("span")))).withAssociatedNode(str(m, "associated_node")).build();
     }
@@ -204,20 +224,20 @@ final class JsonCodec {
     }
 
     private static DocstringInfo docstringInfo(final Map<String, Object> m) {
-        final String format = str(m, "format");
+        final String format = variant(m, "format");
         return DocstringInfo.builder().withText(str(m, "text")).withFormat(format == null ? null : DocstringFormat.fromValue(format))
                 .withSpan(span(asMap(m.get("span")))).withAssociatedItem(str(m, "associated_item"))
                 .withParsedSections(mapList(m, "parsed_sections", JsonCodec::docSection)).build();
     }
 
     private static SymbolInfo symbolInfo(final Map<String, Object> m) {
-        final String kind = str(m, "kind");
+        final String kind = variant(m, "kind");
         return SymbolInfo.builder().withName(str(m, "name")).withKind(kind == null ? null : SymbolKind.fromValue(kind))
                 .withSpan(span(asMap(m.get("span")))).withTypeAnnotation(str(m, "type_annotation")).withDoc(str(m, "doc")).build();
     }
 
     private static Diagnostic diagnostic(final Map<String, Object> m) {
-        final String severity = str(m, "severity");
+        final String severity = variant(m, "severity");
         return Diagnostic.builder().withMessage(str(m, "message"))
                 .withSeverity(severity == null ? null : DiagnosticSeverity.fromValue(severity)).withSpan(span(asMap(m.get("span"))))
                 .build();
@@ -228,7 +248,7 @@ final class JsonCodec {
     }
 
     private static DataNode dataNode(final Map<String, Object> m) {
-        final String kind = str(m, "kind");
+        final String kind = variant(m, "kind");
         return DataNode.builder().withKind(kind == null ? null : DataNodeKind.fromValue(kind)).withKey(str(m, "key"))
                 .withValue(str(m, "value")).withAttributes(mapList(m, "attributes", JsonCodec::dataAttribute))
                 .withChildren(mapList(m, "children", JsonCodec::dataNode)).withSpan(span(asMap(m.get("span")))).build();
