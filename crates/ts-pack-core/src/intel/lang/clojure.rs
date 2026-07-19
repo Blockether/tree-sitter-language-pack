@@ -229,7 +229,13 @@ fn clojure_form(node: &Node, source: &str) -> Option<StructureItem> {
     });
     let doc_comment = clojure_doc_comment(&named, source);
     let signature = match kind {
-        StructureKind::Function | StructureKind::Macro => clojure_signature(&named, source),
+        // fn/macro forms carry an arglist; so do the custom `def*` macros
+        // (defdelegate, defstate, project-local `def*`) tagged `Other` — extract
+        // their `[params]` vector too so the outline shows a signature, not a
+        // bare name. Non-arglist `Other` forms simply yield `None` (unchanged).
+        StructureKind::Function | StructureKind::Macro | StructureKind::Other(_) => {
+            clojure_signature(&named, source)
+        }
         _ => None,
     };
     Some(StructureItem {
