@@ -1,3 +1,20 @@
+# 1.12.3-blockether.20
+
+- **`replaceNode` also matches a contiguous run of adjacent sibling nodes.**
+  `StructuralApi.replaceNode` (used by every consumer's structural sub-expr
+  replace — vis exposes it as `struct_patch` with `match`) only matched a snippet
+  equal to exactly one whole syntax node, so a `match` spanning several adjacent
+  forms — e.g. two `let`-binding pairs like `ca-file (write-ca-pem cert)
+  java-trust (write-java-truststore cert)` — found zero nodes and failed with
+  `No node matching the snippet inside '<target>' was found`. `collectMatches`
+  now, in addition to single-node matching, records child byte spans while
+  recursing and also matches any window of two-or-more contiguous siblings whose
+  combined whitespace-normalised text equals the snippet, recording the run's
+  byte span. Single-node matching, scope filtering, uniqueness refusal, and the
+  post-splice syntax check are unchanged. New `StructuralApiReplaceNodeTest`
+  covers the multi-sibling run, single-node, no-match, ambiguous-refusal,
+  top-level run, and syntax-break rejection cases.
+
 # 1.12.3-blockether.19
 
 - **Drop the maki-specific tool name from the missing-definition error.** The
