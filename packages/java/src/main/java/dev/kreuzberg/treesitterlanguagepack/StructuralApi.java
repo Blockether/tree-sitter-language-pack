@@ -147,7 +147,7 @@ public final class StructuralApi {
     }
     if (matches.isEmpty()) {
       throw new EditException("No definition named '" + target + "'"
-          + (kind == null ? "" : " of kind " + kind) + " found. Use index(path) to list definitions.");
+          + (kind == null ? "" : " of kind " + kind) + " found. List the file's definitions to see valid names.");
     }
     if (matches.size() > 1) {
       final StringBuilder kinds = new StringBuilder();
