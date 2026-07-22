@@ -279,11 +279,13 @@ public final class StructuralApi {
   }
 
   /**
-   * Structurally replace a sub-expression: find the unique syntax node whose
-   * text equals {@code match} (optionally scoped to definition {@code target}),
-   * and replace it with {@code code}. Unlike a raw-text patch this matches a
-   * whole node at a real syntax boundary (never inside a string/comment or a
-   * partial token), and refuses to act if the match is not unique.
+   * Structurally replace a sub-expression: find the unique syntax node — or the
+   * unique contiguous run of sibling nodes — whose text equals {@code match}
+   * (optionally scoped to definition {@code target}), and replace it with
+   * {@code code}. Unlike a raw-text patch this matches whole nodes at real syntax
+   * boundaries (never inside a string/comment or a partial token), so a snippet
+   * spanning several adjacent forms (e.g. some let-binding pairs) works too. It
+   * refuses to act if the match is not unique.
    *
    * @param source   current file contents
    * @param language tree-sitter language name
@@ -348,12 +350,45 @@ public final class StructuralApi {
       hits.add(new int[] {sb, eb});
       return; // a matched node's children can't be a distinct match of the same text
     }
-    final long count = node.childCount();
-    for (long i = 0; i < count; i++) {
-      final java.util.Optional<Node> child = node.child((int) i);
+    final int count = (int) node.childCount();
+    // Record child byte spans while recursing, so we can additionally match a
+    // CONTIGUOUS RUN of sibling nodes whose combined text equals the snippet —
+    // e.g. several let-binding pairs or statements that are not, on their own, a
+    // single syntax node. Single children are already covered by the recursion.
+    final int[] cstart = new int[count];
+    final int[] cend = new int[count];
+    for (int i = 0; i < count; i++) {
+      final java.util.Optional<Node> child = node.child(i);
       if (child.isPresent()) {
         try (Node c = child.get()) {
+          cstart[i] = (int) c.startByte();
+          cend[i] = (int) c.endByte();
           collectMatches(c, src, normNeedle, start, end, hits);
+        }
+      } else {
+        cstart[i] = -1;
+        cend[i] = -1;
+      }
+    }
+    // Windows of two or more adjacent siblings (start child i, end child j).
+    for (int i = 0; i < count; i++) {
+      if (cstart[i] < 0 || cstart[i] < start) {
+        continue;
+      }
+      for (int j = i + 1; j < count; j++) {
+        if (cend[j] < 0) {
+          break; // a gap breaks the contiguous run
+        }
+        if (cend[j] > end) {
+          break; // spans past the scope; wider windows only grow
+        }
+        final int ws = cstart[i];
+        final int we = cend[j];
+        if (we - ws < normNeedle.length()) {
+          continue; // too short to equal the snippet even after ws-normalisation
+        }
+        if (normalizeWs(new String(src, ws, we - ws, StandardCharsets.UTF_8)).equals(normNeedle)) {
+          hits.add(new int[] {ws, we});
         }
       }
     }
