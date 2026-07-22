@@ -60,6 +60,7 @@ fn walk(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
                 StructureKind::Function,
                 name_field(node, source),
                 body_of(node),
+                signature_of(node, source),
                 source,
                 out,
             );
@@ -70,6 +71,7 @@ fn walk(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
                 StructureKind::Class,
                 name_field(node, source),
                 body_of(node),
+                None,
                 source,
                 out,
             );
@@ -80,6 +82,7 @@ fn walk(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
                 StructureKind::Method,
                 name_field(node, source),
                 body_of(node),
+                signature_of(node, source),
                 source,
                 out,
             );
@@ -88,7 +91,15 @@ fn walk(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
         // field is not structural — descend past it without recording.
         "public_field_definition" | "field_definition" => {
             match node.child_by_field_name("value").and_then(|v| callable_value(&v)) {
-                Some((_, body)) => push(node, StructureKind::Method, name_field(node, source), body, source, out),
+                Some((_, body, fn_node)) => push(
+                    node,
+                    StructureKind::Method,
+                    name_field(node, source),
+                    body,
+                    signature_of(&fn_node, source),
+                    source,
+                    out,
+                ),
                 None => descend(node, source, out),
             }
         }
@@ -101,15 +112,32 @@ fn walk(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
                 StructureKind::Interface,
                 name_field(node, source),
                 None,
+                None,
                 source,
                 out,
             );
         }
         "type_alias_declaration" => {
-            push(node, StructureKind::Type, name_field(node, source), None, source, out);
+            push(
+                node,
+                StructureKind::Type,
+                name_field(node, source),
+                None,
+                None,
+                source,
+                out,
+            );
         }
         "enum_declaration" => {
-            push(node, StructureKind::Enum, name_field(node, source), None, source, out);
+            push(
+                node,
+                StructureKind::Enum,
+                name_field(node, source),
+                None,
+                None,
+                source,
+                out,
+            );
         }
         // `namespace X { … }` / `module X.Y { … }` (both parse as internal_module).
         // Descend into the body so nested functions/classes/interfaces surface as
@@ -120,6 +148,7 @@ fn walk(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
                 StructureKind::Namespace,
                 name_field(node, source),
                 body_of(node),
+                None,
                 source,
                 out,
             );
@@ -131,13 +160,22 @@ fn walk(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
                 StructureKind::Module,
                 module_name(node, source),
                 body_of(node),
+                None,
                 source,
                 out,
             );
         }
         // Abstract method signatures inside an abstract class body (`abstract f(): T;`).
         "abstract_method_signature" => {
-            push(node, StructureKind::Method, name_field(node, source), None, source, out);
+            push(
+                node,
+                StructureKind::Method,
+                name_field(node, source),
+                None,
+                signature_of(node, source),
+                source,
+                out,
+            );
         }
         "lexical_declaration" | "variable_declaration" => walk_declaration(node, source, out),
         _ => descend(node, source, out),
@@ -146,11 +184,17 @@ fn walk(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
 
 /// `const`/`let`/`var` declarations. A declarator whose value is a function or
 /// class expression (directly, or wrapped in a known HOC) is a named definition;
-/// the identifier being bound supplies the name. When the whole statement binds
-/// exactly one such value, record the whole statement (so the span covers the
-/// `const … = …;`); with several declarators, record each callable one on its
-/// own declarator span. Declarations that bind no function value are not
-/// structural, but we still descend in case a value literal nests a named def.
+/// the identifier being bound supplies the name and the callback body its arity.
+/// When the whole statement binds exactly one such value, record the whole
+/// statement (so the span covers `const … = …;`); with several declarators,
+/// record each on its own declarator span.
+///
+/// A declarator whose value is NOT callable is a plain value binding. At module
+/// scope (`const TERMINAL_EVENTS = new Set([…])`, a top-level or namespace-level
+/// `const`/`let`/`var`) it is a targetable constant/variable definition and is
+/// recorded. Inside a function body the same shape is value noise (`useRef(null)`,
+/// `useState(0)`, `StyleSheet.create(…)`) and is intentionally skipped. Only plain
+/// identifier bindings are recorded — destructuring patterns are not.
 fn walk_declaration(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
     let mut cursor = node.walk();
     let declarators: Vec<Node> = node
@@ -158,50 +202,71 @@ fn walk_declaration(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
         .filter(|n| n.kind() == "variable_declarator")
         .collect();
 
-    let callable: Vec<&Node> = declarators
-        .iter()
-        .filter(|d| declarator_value(d).and_then(|v| callable_value(&v)).is_some())
-        .collect();
+    let single = declarators.len() == 1;
+    let module_scope = is_module_scope(node);
+    let value_kind = declaration_kind(node, source);
+    let mut recorded = false;
 
-    if callable.is_empty() {
-        descend(node, source, out);
-        return;
+    for d in &declarators {
+        // Span the whole `const NAME = … ;` statement when it is the only binding;
+        // otherwise each declarator carries its own span.
+        let span_node = if single { node } else { d };
+        match declarator_value(d).and_then(|v| callable_value(&v)) {
+            Some((kind, body, fn_node)) => {
+                push(
+                    span_node,
+                    kind,
+                    name_field(d, source),
+                    body,
+                    signature_of(&fn_node, source),
+                    source,
+                    out,
+                );
+                recorded = true;
+            }
+            None if module_scope && declarator_name_is_identifier(d) => {
+                push(
+                    span_node,
+                    value_kind.clone(),
+                    name_field(d, source),
+                    None,
+                    None,
+                    source,
+                    out,
+                );
+                recorded = true;
+            }
+            None => {}
+        }
     }
 
-    if declarators.len() == 1 {
-        // Span the whole `const NAME = … ;` statement.
-        let d = &declarators[0];
-        if let Some((kind, body)) = declarator_value(d).and_then(|v| callable_value(&v)) {
-            push(node, kind, name_field(d, source), body, source, out);
-        }
-    } else {
-        for d in callable {
-            if let Some((kind, body)) = declarator_value(d).and_then(|v| callable_value(&v)) {
-                push(d, kind, name_field(d, source), body, source, out);
-            }
-        }
+    // Nothing recorded (no callable value, and not a module-scope binding): descend
+    // in case a value literal nests a named def.
+    if !recorded {
+        descend(node, source, out);
     }
 }
 
 /// Classify a declarator/field *value*: a function/class expression, or a call
 /// carrying a callback argument (a hook/HOC like `useCallback`/`memo`). Returns
-/// the [`StructureKind`] plus the function/class body to descend for nested defs.
-fn callable_value<'t>(value: &Node<'t>) -> Option<(StructureKind, Option<Node<'t>>)> {
+/// the [`StructureKind`], the function/class body to descend for nested defs, and
+/// the function-ish node whose parameter list supplies the signature/arity.
+fn callable_value<'t>(value: &Node<'t>) -> Option<(StructureKind, Option<Node<'t>>, Node<'t>)> {
     let kind = value.kind();
     if is_function_expr(kind) {
-        return Some((StructureKind::Function, value.child_by_field_name("body")));
+        return Some((StructureKind::Function, value.child_by_field_name("body"), *value));
     }
     if kind == "class" {
-        return Some((StructureKind::Class, value.child_by_field_name("body")));
+        return Some((StructureKind::Class, value.child_by_field_name("body"), *value));
     }
     // A call whose argument list carries a function expression — the callback in
     // a hook or HOC (`useCallback(() => …)`, `useMemo(() => …)`, `memo(…)`,
     // `forwardRef((p, r) => …)`, a custom `useThing(() => …)`). The binding name
-    // is the real definition; descend the callback body for any nested defs.
+    // is the real definition; the callback supplies the body and the signature.
     if kind == "call_expression"
         && let Some(cb) = call_fn_arg(value)
     {
-        return Some((StructureKind::Function, cb.child_by_field_name("body")));
+        return Some((StructureKind::Function, cb.child_by_field_name("body"), cb));
     }
     None
 }
@@ -326,6 +391,7 @@ fn push(
     kind: StructureKind,
     name: Option<String>,
     body: Option<Node>,
+    signature: Option<String>,
     source: &str,
     out: &mut Vec<StructureItem>,
 ) {
@@ -338,10 +404,81 @@ fn push(
         name,
         span: span_from_node(span_node),
         children,
+        signature,
         body_span: body.map(|b| span_from_node(&b)),
         doc_comment: leading_doc_comment(span_node, source),
         ..Default::default()
     });
+}
+
+/// Trim and collapse internal whitespace runs to a single space.
+fn collapse_ws(s: &str) -> String {
+    s.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+/// The parameter-list signature (arity) of a function/method/arrow node: its
+/// `formal_parameters` text, or a bare single arrow parameter (`x => …`) wrapped
+/// in parens, with any TypeScript return-type annotation appended
+/// (`(a: number, b: number): number`). `None` when the node carries no parameter
+/// list (e.g. a class expression).
+fn signature_of(node: &Node, source: &str) -> Option<String> {
+    let params = node
+        .child_by_field_name("parameters")
+        .or_else(|| node.child_by_field_name("parameter"))?;
+    let mut sig = collapse_ws(node_text(&params, source));
+    if !sig.starts_with('(') {
+        sig = format!("({sig})");
+    }
+    if let Some(rt) = node.child_by_field_name("return_type") {
+        let rt = collapse_ws(node_text(&rt, source));
+        if !rt.is_empty() {
+            sig.push_str(&rt);
+        }
+    }
+    Some(sig)
+}
+
+/// Whether `node` sits at module scope — no function/method/arrow body encloses
+/// it. Distinguishes a top-level (or namespace-level) `const NAME = value`
+/// definition from a value binding inside a function body.
+fn is_module_scope(node: &Node) -> bool {
+    let mut cur = node.parent();
+    while let Some(p) = cur {
+        if matches!(
+            p.kind(),
+            "function_declaration"
+                | "generator_function_declaration"
+                | "function_expression"
+                | "function"
+                | "generator_function"
+                | "arrow_function"
+                | "method_definition"
+        ) {
+            return false;
+        }
+        cur = p.parent();
+    }
+    true
+}
+
+/// Classify a declaration statement by its keyword: `const` → [`Constant`], any
+/// other (`let`/`var`) → [`Variable`].
+fn declaration_kind(node: &Node, source: &str) -> StructureKind {
+    let mut cursor = node.walk();
+    let is_const = node.children(&mut cursor).any(|c| node_text(&c, source) == "const");
+    if is_const {
+        StructureKind::Constant
+    } else {
+        StructureKind::Variable
+    }
+}
+
+/// Whether the declarator binds a plain identifier (not a destructuring
+/// array/object pattern) — only those yield a clean, targetable name.
+fn declarator_name_is_identifier(declarator: &Node) -> bool {
+    declarator
+        .child_by_field_name("name")
+        .is_some_and(|n| n.kind() == "identifier")
 }
 
 fn descend(node: &Node, source: &str, out: &mut Vec<StructureItem>) {
@@ -650,5 +787,99 @@ const handler = () => {};
 
         // Comments attach to name-bound arrow definitions too.
         assert_eq!(doc("handler").as_deref(), Some("Bound handler intent."));
+    }
+
+    const CONST_SAMPLE: &str = r#"
+const TERMINAL_EVENTS = new Set(["turn.completed", "turn.failed"]);
+export const MAX = 42;
+let mutableCount = 0;
+
+export function reducer(state: State, event: Event): State {
+  const local = new Map();
+  const [a, b] = pair;
+  return state;
+}
+"#;
+
+    #[test]
+    fn tsx_records_module_scope_value_bindings_and_function_signatures() {
+        let Some(tree) = parse_or_skip(CONST_SAMPLE, "tsx") else {
+            return; // grammar not available in this build — CI covers it.
+        };
+        let intel = extract_intelligence(CONST_SAMPLE, "tsx", &tree);
+        let top = &intel.structure;
+
+        // A top-level `const NAME = <non-callable>` is now a targetable constant
+        // (previously dropped, so `struct_patch` could not find it).
+        let ev = find_named(top, "TERMINAL_EVENTS").expect("TERMINAL_EVENTS recorded");
+        assert_eq!(ev.kind, StructureKind::Constant);
+        // Span covers the whole `const … = …;` statement.
+        assert_eq!(ev.span.start_line, 1);
+        // `export const` is a constant too.
+        assert_eq!(find_named(top, "MAX").map(|s| &s.kind), Some(&StructureKind::Constant));
+        // `let` is a mutable variable, not a constant.
+        assert_eq!(
+            find_named(top, "mutableCount").map(|s| &s.kind),
+            Some(&StructureKind::Variable)
+        );
+
+        // Value bindings INSIDE a function body stay out of the outline…
+        assert!(find_named(top, "local").is_none(), "in-body const must not be a def");
+        // …and destructuring patterns are never recorded (no clean identifier name).
+        assert!(find_named(top, "a").is_none(), "destructuring must not be a def");
+
+        // The function reports its parameter-list signature (arity + types).
+        let reducer = find_named(top, "reducer").expect("reducer recorded");
+        assert_eq!(reducer.kind, StructureKind::Function);
+        assert_eq!(
+            reducer.signature.as_deref(),
+            Some("(state: State, event: Event): State")
+        );
+    }
+
+    const SIG_SAMPLE: &str = r#"
+export const Button = (label: string, onClick: () => void) => {
+  return null;
+};
+
+const single = x => x + 1;
+
+function plain(a, b, c) {
+  return a;
+}
+
+class C {
+  method(p: number): void {}
+}
+"#;
+
+    #[test]
+    fn tsx_reports_signatures_for_arrow_function_and_method_arities() {
+        let Some(tree) = parse_or_skip(SIG_SAMPLE, "tsx") else {
+            return; // grammar not available in this build — CI covers it.
+        };
+        let intel = extract_intelligence(SIG_SAMPLE, "tsx", &tree);
+        let top = &intel.structure;
+
+        // Arrow-bound component: full parenthesised parameter list.
+        assert_eq!(
+            find_named(top, "Button").and_then(|s| s.signature.as_deref()),
+            Some("(label: string, onClick: () => void)")
+        );
+        // A single unparenthesised arrow param is wrapped in parens.
+        assert_eq!(
+            find_named(top, "single").and_then(|s| s.signature.as_deref()),
+            Some("(x)")
+        );
+        // A plain function declaration reports its arity.
+        assert_eq!(
+            find_named(top, "plain").and_then(|s| s.signature.as_deref()),
+            Some("(a, b, c)")
+        );
+        // A class method reports params plus its return type.
+        assert_eq!(
+            find_named(top, "method").and_then(|s| s.signature.as_deref()),
+            Some("(p: number): void")
+        );
     }
 }

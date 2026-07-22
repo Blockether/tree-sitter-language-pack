@@ -74,9 +74,7 @@ fn clojure_def_kind(head: &str) -> Option<StructureKind> {
         // Test-framework def-forms each bind a named test var: clojure.test
         // (`deftest`), Lazytest / allure (`defdescribe`), Expectations
         // (`defexpect`), test.check (`defspec`). Reported as functions.
-        "deftest" | "deftest-" | "defdescribe" | "defexpect" | "defspec" => {
-            Some(StructureKind::Function)
-        }
+        "deftest" | "deftest-" | "defdescribe" | "defexpect" | "defspec" => Some(StructureKind::Function),
         // Generic fallback: any other `def…`-prefixed head is treated as a
         // definition macro — `defdelegate`, `defstate`, `defcomponent`, and
         // project-local `def*` macros — keeping the exact head as the kind so
@@ -233,9 +231,7 @@ fn clojure_form(node: &Node, source: &str) -> Option<StructureItem> {
         // (defdelegate, defstate, project-local `def*`) tagged `Other` — extract
         // their `[params]` vector too so the outline shows a signature, not a
         // bare name. Non-arglist `Other` forms simply yield `None` (unchanged).
-        StructureKind::Function | StructureKind::Macro | StructureKind::Other(_) => {
-            clojure_signature(&named, source)
-        }
+        StructureKind::Function | StructureKind::Macro | StructureKind::Other(_) => clojure_signature(&named, source),
         _ => None,
     };
     Some(StructureItem {

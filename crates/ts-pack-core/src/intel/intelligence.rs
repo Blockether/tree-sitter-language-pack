@@ -319,10 +319,7 @@ mod tests {
         // Trailing `-` marks the private convention (`deftest-`).
         assert_eq!(by("priv-test").visibility.as_deref(), Some("private"));
         // Unknown `def*` macros still surface — the exact head is kept as kind.
-        assert_eq!(
-            by("wrapped").kind,
-            StructureKind::Other("defdelegate".to_string())
-        );
+        assert_eq!(by("wrapped").kind, StructureKind::Other("defdelegate".to_string()));
         // A nested `(it …)` inside the def-form is NOT a top-level definition.
         assert!(!names.iter().any(|n| n == "works"));
         assert_eq!(by("my.app").kind, StructureKind::Namespace);
@@ -654,13 +651,11 @@ pub(super) fn collect_structure(
     }
 }
 
-pub(super) fn collect_imports(
-    node: &tree_sitter::Node,
-    source: &str,
-    language: &str,
-    imports: &mut Vec<ImportInfo>,
-) {
-    if language == "elixir" && node.kind() == "call" && super::elixir::collect_import_call(node, source, language, imports) {
+pub(super) fn collect_imports(node: &tree_sitter::Node, source: &str, language: &str, imports: &mut Vec<ImportInfo>) {
+    if language == "elixir"
+        && node.kind() == "call"
+        && super::elixir::collect_import_call(node, source, language, imports)
+    {
         return;
     }
     let mut cursor = node.walk();

@@ -17,8 +17,8 @@ use crate::intel::types::*;
 use tree_sitter::Node;
 
 mod clojure;
-mod elixir;
 mod dart;
+mod elixir;
 mod go;
 mod java;
 mod jsts;

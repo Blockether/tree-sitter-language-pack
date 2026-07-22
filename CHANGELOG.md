@@ -1,3 +1,19 @@
+# 1.12.3-blockether.21
+
+- **TSX/JS/TS: record module-scope value bindings and report function arities.**
+  The JS/TS structure walker only recorded `const` bindings whose value was a
+  function/class (or hook/HOC callback), so a plain value binding like
+  `const TERMINAL_EVENTS = new Set([…])` produced no definition and
+  `struct_patch` could not target it. Module/namespace-scope value bindings are
+  now recorded — `const NAME = <non-callable>` → `Constant`, `let`/`var` →
+  `Variable` — restricted to plain-identifier names so in-body value noise
+  (`useRef`, `useState`, `StyleSheet.create`, destructuring) stays excluded.
+  Separately, the walker never populated `StructureItem.signature`, so functions
+  showed with no parameter list; a new `signature_of` now extracts the parameter
+  list (arity) and return type for every function/arrow/method/field-arrow/
+  abstract-method (`(state: State, event: Event): State`; single arrow `x =>` →
+  `(x)`). Hook/HOC-bound arrows get signatures too.
+
 # 1.12.3-blockether.20
 
 - **`replaceNode` also matches a contiguous run of adjacent sibling nodes.**
