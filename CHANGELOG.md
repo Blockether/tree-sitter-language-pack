@@ -1,3 +1,17 @@
+# 1.12.3-blockether.19
+
+- **Drop the maki-specific tool name from the missing-definition error.** The
+  shared `StructuralApi` `EditException` for an unmatched `target` ended with
+  `Use index(path) to list definitions.` — `index` is maki's outline tool, but
+  every other consumer exposes the same outline under its own name (vis calls it
+  `struct_index`). The hardcoded name leaked into those consumers and told
+  agents to call a tool that does not exist there, so a legitimate name miss
+  steered recovery to a dead end. The message is now tool-agnostic — `... found.
+  List the file's definitions to see valid names.` — so each consumer's own
+  outline tool is the obvious next step and no post-hoc string rewrite is
+  needed. Only this one message named a tool; the other missing-name errors
+  were already neutral.
+
 # 1.12.3-blockether.18
 
 - **Decode serde-tagged `Other(..)` enum variants instead of throwing, and give
