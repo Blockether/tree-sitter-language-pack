@@ -111,6 +111,11 @@ public final class StructuralApi {
     if (code == null) {
       throw new EditException("structural edit requires non-null code");
     }
+    if (op != Op.APPEND && (target == null || target.isBlank())) {
+      throw new EditException("The " + op + " structural edit needs a `target` definition name"
+          + " (or a path/anchor locator); none was supplied. List the file's definitions to"
+          + " see valid names.");
+    }
     if (op == Op.REPLACE_DOC) {
       return replaceDoc(source, language, target, code);
     }

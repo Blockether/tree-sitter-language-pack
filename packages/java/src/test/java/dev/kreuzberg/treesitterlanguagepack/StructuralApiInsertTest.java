@@ -2,6 +2,7 @@ package dev.kreuzberg.treesitterlanguagepack;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import dev.kreuzberg.treesitterlanguagepack.StructuralApi.Op;
@@ -100,5 +101,15 @@ final class StructuralApiInsertTest {
     assertTrue(out.contains("(inc x))\n\n(def end 3)"), "one blank before appended node:\n" + out);
     assertTrue(out.endsWith("(def end 3)\n"), "trailing newline kept:\n" + out);
     assertFalse(out.contains("\n\n\n"), "no triple newline remains:\n" + out);
+  }
+
+  @Test
+  @DisplayName("a non-append edit with no target reports the missing locator, not 'null'")
+  void missingTargetReportsActionableError() {
+    final StructuralApi.EditException ex = assertThrows(StructuralApi.EditException.class,
+        () -> StructuralApi.edit(CLJ, "clojure", Op.INSERT_AFTER, null, null,
+            "(defn gamma\n  [z]\n  (* z z))"));
+    assertFalse(ex.getMessage().contains("'null'"), "must not name a 'null' definition:\n" + ex.getMessage());
+    assertTrue(ex.getMessage().contains("target"), "names the missing locator:\n" + ex.getMessage());
   }
 }

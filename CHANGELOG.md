@@ -1,3 +1,16 @@
+# 1.12.3-blockether.22
+
+- **`edit` reports the missing locator instead of "No definition named 'null'".**
+  `StructuralApi.edit` passed a `null` `target` straight into name-based
+  `locate`, so any non-`APPEND` edit with no `target` (the model omitted a
+  locator, or a consumer routed a no-target op to the name path) failed with the
+  nonsensical `No definition named 'null' found.` — a phantom definition the
+  agent then hunted for. `edit` now guards up front: for every op except
+  `APPEND`, a null/blank `target` throws `The <OP> structural edit needs a
+  \`target\` definition name (or a path/anchor locator); none was supplied. List
+  the file's definitions to see valid names.` `APPEND` (which ignores `target`)
+  is unaffected. New `StructuralApiInsertTest` case covers the guard.
+
 # 1.12.3-blockether.21
 
 - **TSX/JS/TS: record module-scope value bindings and report function arities.**

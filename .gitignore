@@ -173,3 +173,7 @@ e2e/zig/zig-pkg/
 
 # agent session state
 .omc/
+
+# Local Rust toolchain / cargo home (agent sandbox)
+.cargo-local/
+.rustup-local/
