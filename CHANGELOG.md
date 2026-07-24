@@ -1,3 +1,13 @@
+# 1.12.3-blockether.25
+
+- **Java structural editing: `add_doc` accepts a null target again for module-level docstrings.**
+  The `.22` locator guard in `StructuralApi.edit` rejected every non-`APPEND` op with a
+  null/blank `target`, but `ADD_DOC` legitimately uses a null target to insert a
+  module-level docstring (the `DOC_IN_BODY` branch in `addDoc`). This broke
+  `StructuralApiDocTest.addDocModule` / `addDocModuleAfterShebang` and failed the JUnit
+  CI job (and the release JVM integration gate) since `.22`/`.23`. The guard now excludes
+  `ADD_DOC`; the full Java suite passes (34/34).
+
 # 1.12.3-blockether.24
 
 - **Vendoring: fall back to the repo-root `queries/` when `<directory>/queries` is absent.**

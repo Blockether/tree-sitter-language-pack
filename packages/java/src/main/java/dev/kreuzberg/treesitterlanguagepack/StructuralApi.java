@@ -111,7 +111,9 @@ public final class StructuralApi {
     if (code == null) {
       throw new EditException("structural edit requires non-null code");
     }
-    if (op != Op.APPEND && (target == null || target.isBlank())) {
+    // ADD_DOC allows a null target: it inserts a module-level docstring (see addDoc's
+    // DOC_IN_BODY branch). Every other locating op still needs a target name.
+    if (op != Op.APPEND && op != Op.ADD_DOC && (target == null || target.isBlank())) {
       throw new EditException("The " + op + " structural edit needs a `target` definition name"
           + " (or a path/anchor locator); none was supplied. List the file's definitions to"
           + " see valid names.");
