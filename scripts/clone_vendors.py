@@ -323,12 +323,15 @@ async def move_src_folder(language_name: str, directory: str | None) -> None:
             file_contents = COMMON_RE_PATTERN.sub(replacement_path, file_contents)
             await AsyncPath(file).write_text(file_contents)
 
-    # Copy queries/ directory if present in the vendor repo
-    queries_source_dir = (
-        (vendor_directory / language_name / directory / "queries").resolve()
-        if directory
-        else (vendor_directory / language_name / "queries").resolve()
-    )
+    # Copy queries/ directory if present in the vendor repo. Multi-grammar repos
+    # (e.g. tree-sitter-typescript: typescript/ + tsx/) keep their highlights.scm
+    # at the REPO ROOT, not under <directory>/queries, so fall back to the
+    # repo-root queries/ when the per-directory queries/ is absent.
+    queries_source_dir = (vendor_directory / language_name / "queries").resolve()
+    if directory:
+        subdir_queries = (vendor_directory / language_name / directory / "queries").resolve()
+        if await AsyncPath(subdir_queries).exists():
+            queries_source_dir = subdir_queries
     if await AsyncPath(queries_source_dir).exists():
         print(f"Copying {language_name} queries")
         target_queries = target_source_dir / "queries"

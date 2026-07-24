@@ -1,3 +1,16 @@
+# 1.12.3-blockether.24
+
+- **Vendoring: fall back to the repo-root `queries/` when `<directory>/queries` is absent.**
+  `move_src_folder` looked for a grammar's `queries/` only under
+  `<language>/<directory>/queries`, so multi-grammar repos that keep their
+  `highlights.scm`/`locals.scm`/`tags.scm` at the REPO ROOT — tree-sitter-typescript
+  ships `typescript/` and `tsx/` parsers but one shared root `queries/` — vendored
+  with zero query files, leaving TypeScript/TSX with no upstream highlights to
+  layer under the overlays. `clone_vendors.py` now defaults to the repo-root
+  `queries/` and uses `<directory>/queries` only when that per-directory folder
+  actually exists, so single- and multi-grammar repos both vendor their queries.
+  (`scripts/clone_vendors.py`)
+
 # 1.12.3-blockether.22
 
 - **`edit` reports the missing locator instead of "No definition named 'null'".**
