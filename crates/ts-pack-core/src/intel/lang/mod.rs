@@ -19,13 +19,21 @@ use tree_sitter::Node;
 mod clojure;
 mod dart;
 mod elixir;
+mod embedded;
 mod go;
+mod graphql;
+mod groovy;
+mod haskell;
+mod hcl;
 mod java;
 mod jsts;
 mod kotlin;
+mod nix;
+mod ocaml;
 mod python;
 mod ruby;
 mod rust;
+mod web;
 mod zig;
 
 /// The per-language extraction strategy. Defaults implement the generic,
@@ -41,12 +49,51 @@ pub(crate) trait LanguageIntel {
         generic_structure_kind(node_kind)
     }
 
+    /// Node-aware variant of [`Self::structure_kind`], used by the walker.
+    /// Override when the kind cannot be decided from the node kind alone —
+    /// OCaml's `value_definition` is a Function or a Constant depending on
+    /// whether the binding takes parameters, Terraform's `block` kind comes
+    /// from its first label. Default: delegate to [`Self::structure_kind`].
+    fn structure_kind_of(&self, node: &Node, _source: &str) -> Option<StructureKind> {
+        self.structure_kind(node.kind())
+    }
+
+    /// The declared name of a definition node. Default: the shared
+    /// field/declarator/identifier fallback chain. Override for grammars whose
+    /// name lives somewhere else (Nix `attrpath`, GraphQL `name`, OCaml
+    /// `let_binding pattern:`).
+    fn name_of(&self, node: &Node, source: &str) -> Option<String> {
+        resolve_structure_name(node, source)
+    }
+
+    /// Visibility modifier of a definition (`"pub"`, `"public"`, …), when the
+    /// grammar exposes one. Default: none.
+    fn visibility_of(&self, _node: &Node, _source: &str) -> Option<String> {
+        None
+    }
+
     /// For languages where a definition spans a *signature* node plus a
     /// following sibling *body* (Dart `function_signature` + `function_body`,
     /// Zig `FnProto` + `Block`), return that sibling so the span and body span
     /// can be extended to cover it. Default: none (the node spans itself).
     fn sibling_body<'t>(&self, _node: &Node<'t>) -> Option<Node<'t>> {
         None
+    }
+
+    /// The mirror image of [`Self::sibling_body`]: a *preceding* sibling that
+    /// belongs to the definition and must be absorbed into its span (Haskell's
+    /// `signature` declaration sitting above the `function` it types). Default:
+    /// none.
+    fn leading_sibling<'t>(&self, _node: &Node<'t>, _source: &str) -> Option<Node<'t>> {
+        None
+    }
+
+    /// The node holding a definition's nested definitions (and its body span).
+    /// Default: the `body` field, which most grammars expose. Override for
+    /// grammars that name it otherwise (Haskell's `class_declarations`, GraphQL's
+    /// `fields_definition`).
+    fn body_of<'t>(&self, node: &Node<'t>) -> Option<Node<'t>> {
+        node.child_by_field_name("body")
     }
 
     /// Full structure extraction. Default: a generic recursive walk driven by
@@ -77,6 +124,13 @@ pub(crate) trait LanguageIntel {
     /// Whether a node kind is an import statement for this language.
     fn is_import(&self, _node_kind: &str) -> bool {
         false
+    }
+
+    /// Node-aware variant of [`Self::is_import`], used by the walker. Override
+    /// for grammars whose imports are not distinguishable by node kind (Groovy's
+    /// `command` starting with the `import` keyword). Default: delegate.
+    fn is_import_node(&self, node: &Node, _source: &str) -> bool {
+        self.is_import(node.kind())
     }
 
     /// Whether a node kind is an export statement for this language.
@@ -115,6 +169,13 @@ pub(crate) fn for_language(language: &str) -> Box<dyn LanguageIntel> {
         "go" => Box::new(go::Go),
         "java" => Box::new(java::Java),
         "kotlin" => Box::new(kotlin::Kotlin),
+        "haskell" => Box::new(haskell::Haskell),
+        "ocaml" | "ocaml_interface" => Box::new(ocaml::Ocaml),
+        "nix" => Box::new(nix::Nix),
+        "hcl" | "terraform" => Box::new(hcl::Hcl),
+        "graphql" => Box::new(graphql::GraphQl),
+        "groovy" => Box::new(groovy::Groovy),
+        "svelte" | "vue" => Box::new(web::Web),
         "javascript" | "typescript" | "tsx" => Box::new(jsts::JsTs),
         _ => Box::new(Generic),
     }
@@ -148,34 +209,39 @@ pub(crate) fn generic_structure_kind(node_kind: &str) -> Option<StructureKind> {
 /// the span over a `sibling_body` when the language uses one) and descend into
 /// its `body` field for nested defs; otherwise recurse into all children.
 fn walk_structure<L: LanguageIntel + ?Sized>(rules: &L, node: &Node, source: &str, items: &mut Vec<StructureItem>) {
-    if let Some(sk) = rules.structure_kind(node.kind()) {
-        let name = resolve_structure_name(node, source);
+    if let Some(sk) = rules.structure_kind_of(node, source) {
+        let name = rules.name_of(node, source);
         // Dart/Zig: the editable def spans a signature/proto node AND the
-        // following sibling body. Other languages keep the node's own span.
+        // following sibling body. Haskell: it also spans the PRECEDING type
+        // signature. Other languages keep the node's own span.
         let sibling_body = rules.sibling_body(node);
-        let span = match &sibling_body {
-            Some(body) => {
-                let mut s = span_from_node(node);
-                let e = span_from_node(body);
-                s.end_byte = e.end_byte;
-                s.end_line = e.end_line;
-                s.end_column = e.end_column;
-                s
-            }
-            None => span_from_node(node),
-        };
+        let leading = rules.leading_sibling(node, source);
+        let mut span = span_from_node(node);
+        if let Some(lead) = &leading {
+            let s = span_from_node(lead);
+            span.start_byte = s.start_byte;
+            span.start_line = s.start_line;
+            span.start_column = s.start_column;
+        }
+        if let Some(body) = &sibling_body {
+            let e = span_from_node(body);
+            span.end_byte = e.end_byte;
+            span.end_line = e.end_line;
+            span.end_column = e.end_column;
+        }
+        let body = rules.body_of(node);
         let body_span = sibling_body
             .as_ref()
             .map(span_from_node)
-            .or_else(|| node.child_by_field_name("body").map(|n| span_from_node(&n)));
+            .or_else(|| body.as_ref().map(span_from_node));
         let mut children = Vec::new();
-        if let Some(body) = node.child_by_field_name("body") {
-            walk_structure(rules, &body, source, &mut children);
+        if let Some(body) = &body {
+            walk_structure(rules, body, source, &mut children);
         }
         items.push(StructureItem {
             kind: sk,
             name,
-            visibility: None,
+            visibility: rules.visibility_of(node, source),
             span,
             children,
             decorators: Vec::new(),
@@ -200,7 +266,7 @@ fn walk_docstrings<L: LanguageIntel + ?Sized>(rules: &L, node: &Node, source: &s
 }
 
 fn walk_imports<L: LanguageIntel + ?Sized>(rules: &L, node: &Node, source: &str, out: &mut Vec<ImportInfo>) {
-    if rules.is_import(node.kind()) {
+    if rules.is_import_node(node, source) {
         let text = node_text(node, source);
         out.push(ImportInfo {
             source: text.to_string(),
@@ -209,6 +275,9 @@ fn walk_imports<L: LanguageIntel + ?Sized>(rules: &L, node: &Node, source: &str,
             is_wildcard: text.contains('*'),
             span: span_from_node(node),
         });
+        // An import never nests another import: descending would re-report the
+        // `import` KEYWORD token, whose node kind equals the statement's.
+        return;
     }
     let mut cursor = node.walk();
     for child in node.children(&mut cursor) {

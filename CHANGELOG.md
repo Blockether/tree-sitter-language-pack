@@ -1,3 +1,38 @@
+# 1.12.3-blockether.27
+
+- **Structure intelligence for nine more languages: Haskell, OCaml (+ `.mli` interfaces), Nix,
+  HCL/Terraform, GraphQL, Groovy (+ Gradle DSL), Svelte, Vue — and a rewritten Rust module.**
+  These languages parsed fine but produced no `structure`, so consumers fell back to
+  "no structural index for this language yet". Each now has a `LanguageIntel` module under
+  `crates/ts-pack-core/src/intel/lang/`, shape-driven rather than a node-kind table:
+  Haskell gates on the PARENT so a `where`-bound helper is not mistaken for a top-level
+  binding and `class`/`instance` bodies nest; OCaml names `exception`s and modules;
+  Nix distinguishes lambda bindings from value bindings; HCL/Terraform names blocks by their
+  labels (`resource aws_s3_bucket.assets`, `module network`); GraphQL nests fields and enum
+  values; Groovy covers classes/traits/enums AND the top-level Gradle DSL (`plugins { }`,
+  `group = "…"`, `task hello`); Svelte/Vue expose `template`/`script`/`style` sections and
+  recover each `<script>`'s real definitions by re-parsing the body with the TypeScript
+  grammar, shifting spans back into host-file coordinates.
+- **Single-file-component imports.** A Svelte/Vue `<script>`'s `import … from "…"` is now
+  reported as an import OF THE COMPONENT, with the span addressing the host file.
+- **`LanguageIntel` gained composable hooks** — `structure_kind_of`, `name_of`, `visibility_of`,
+  `leading_sibling`, `is_import_node`, `body_of` — so a language module states its shape rules
+  instead of duplicating the walk. `walk_imports` now stops descending once a statement is
+  recorded (it used to re-report Haskell's `import` KEYWORD as a second import).
+- **Tests:** `crates/ts-pack-core/tests/structure_intel.rs` pins the FULL flattened structure
+  (kind, nesting path, visibility) of a sample file per language, plus component import spans —
+  a grammar bump that changes node kinds fails there instead of degrading output in the field.
+
+# 1.12.3-blockether.26
+
+- **Grammar bumps: scala, dart, swift to upstream HEAD** (Scala 3 colon-arguments and
+  indented `for` enumerator blocks, digit-separated floats; Dart `prec`-based precedence and
+  single-type-arg generic invocation; Swift `if let x = try await f()`). `scala` and `dart`
+  joined `OVERRIDE_LANGS` so their sources are re-vendored rather than served from the frozen
+  parser-sources bundle.
+- **Clojure:** pinned the Blockether fork `v0.0.13-blockether.5`, mapped `.edn` to `clojure`,
+  and recorded `bb` as a `bitbake`/`clojure` ambiguity (duplicate extensions panic `build.rs`).
+
 # 1.12.3-blockether.25
 
 - **Java structural editing: `add_doc` accepts a null target again for module-level docstrings.**
