@@ -361,16 +361,37 @@ public final class StructuralApi {
     int end = -1;
     for (int i = comments.size() - 1; i >= 0; i--) {
       final int[] c = comments.get(i);
-      final int gapTo = start < 0 ? defStart : start;
+      int gapTo = start < 0 ? defStart : start;
+      // A definition's own start can sit BEHIND modifiers on its line (`export function`,
+      // `pub fn`, `public static void`), so measure the gap to the start of that LINE.
+      final int lineStart = lineStartOf(src, gapTo);
+      if (lineStart >= c[1]) {
+        gapTo = lineStart;
+      }
       if (c[1] > gapTo || !isDocGap(src, c[1], gapTo)) {
         break;
       }
       start = c[0];
       if (end < 0) {
-        end = c[1];
+        // Some grammars (Rust doc comments) end a comment node ON the newline that
+        // terminates it; splicing that away would glue the doc to the definition.
+        int e = c[1];
+        while (e > c[0] && isAsciiWhitespace(src[e - 1])) {
+          e--;
+        }
+        end = e;
       }
     }
     return start < 0 ? null : new int[] {start, end};
+  }
+
+  /** Index of the first byte of the line holding {@code pos}. */
+  private static int lineStartOf(final byte[] src, final int pos) {
+    int i = Math.min(pos, src.length);
+    while (i > 0 && src[i - 1] != '\n') {
+      i--;
+    }
+    return i;
   }
 
   /** Collect the byte spans of every comment node ending at or before {@code limit}. */

@@ -59,4 +59,22 @@ final class StructuralApiDocCommentTest {
         assertTrue(out.contains("// unrelated note"), "unrelated comment lost:\n" + out);
         assertTrue(out.contains("// Alpha returns one.\nfunc Alpha()"), "doc not hugging the def:\n" + out);
     }
+    @Test
+    @DisplayName("a doc comment is found even when modifiers precede the definition on its line")
+    void docCommentIsFoundBehindModifiers() throws Exception {
+        final String ts = "// Alpha adds.\nexport function alpha(x: number): number {\n  return x + 1;\n}\n";
+        final String out = StructuralApi.edit(ts, "typescript", Op.REPLACE_DOC, "alpha", null, "// Alpha increments.");
+        assertTrue(out.contains("// Alpha increments."), "replacement not applied:\n" + out);
+        assertFalse(out.contains("Alpha adds."), "old doc survived:\n" + out);
+        assertTrue(out.contains("export function alpha"), "definition damaged:\n" + out);
+        assertThrows(StructuralApi.EditException.class, () -> StructuralApi.edit(ts, "typescript", Op.ADD_DOC, "alpha", null, "// stacked"));
+    }
+
+    @Test
+    @DisplayName("replacing a doc comment keeps the newline that terminates it")
+    void replaceDocKeepsTheCommentTerminator() throws Exception {
+        final String rs = "/// Alpha.\nfn alpha() -> i32 { 1 }\n";
+        final String out = StructuralApi.edit(rs, "rust", Op.REPLACE_DOC, "alpha", null, "/// Alpha returns one.");
+        assertEquals("/// Alpha returns one.\nfn alpha() -> i32 { 1 }\n", out);
+    }
 }

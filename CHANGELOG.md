@@ -1,3 +1,14 @@
+# 1.12.3-blockether.33
+
+- **A doc comment is found behind modifiers, and its terminator survives.** `docCommentSpan`
+  measured the gap from the comment to the definition's own start byte, which in `export function
+  alpha`, `pub fn alpha` or `public static void gamma` sits AFTER the modifiers — the modifier text
+  read as a non-blank gap, so the doc went unseen and `add_doc` stacked a second one while
+  `replace_doc` refused. It now measures to the start of the definition's LINE. Separately, Rust
+  ends a `///` comment node ON its terminating newline; replacing that span glued the doc to the
+  definition (`/// New.fn alpha`), so the span is trimmed back over trailing whitespace.
+- Covered by two new cases in `StructuralApiDocCommentTest` (6 total).
+
 # 1.12.3-blockether.32
 
 - **Doc edits now see a doc written as a COMMENT.** The native docstring extractor only reports
