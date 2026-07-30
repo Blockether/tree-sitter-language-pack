@@ -1,3 +1,15 @@
+# 1.12.3-blockether.29
+
+- **Line-based structural edits no longer swallow the definition that follows.**
+  tree-sitter end positions are EXCLUSIVE, and several grammars let a definition node run to
+  column 0 of the following line — Groovy's `command` even absorbs the blank rows up to its next
+  sibling. `StructuralApi.outline` reported that trailing row as `endLine`, so the line splice
+  behind `Op.REPLACE`/`DELETE`/`INSERT_*` deleted whatever started there: replacing a Groovy
+  `interface I { … }` silently removed the `enum E` two lines below it. The new `endLineOf`
+  converts a span to its last CONTENT line (drops a column-0 overshoot, then trailing blank
+  rows), so `outline` spans and every line-based edit now stop where the definition does.
+- Covered by `StructuralApiSpanEndTest`.
+
 # 1.12.3-blockether.28
 
 - **`StructureItem.kindLabel`: the `StructureKind::Other(..)` payload survives the Java binding.**

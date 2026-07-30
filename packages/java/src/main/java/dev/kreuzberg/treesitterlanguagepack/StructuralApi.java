@@ -73,19 +73,43 @@ public final class StructuralApi {
     final ProcessConfig cfg = ProcessConfig.builder().withLanguage(language).withStructure(true).build();
     final ProcessResult res = TreeSitterLanguagePack.process(source, cfg);
     final List<Target> out = new ArrayList<>();
-    flatten(res.structure(), out);
+    flatten(res.structure(), out, source.split("\n", -1));
     return out;
   }
 
-  private static void flatten(final @Nullable List<StructureItem> items, final List<Target> out) {
+  private static void flatten(final @Nullable List<StructureItem> items, final List<Target> out,
+      final String[] lines) {
     if (items == null) {
       return;
     }
     for (final StructureItem it : items) {
       final Span s = it.span();
-      out.add(new Target(it.name(), kindOf(it), (int) s.startLine() + 1, (int) s.endLine() + 1));
-      flatten(it.children(), out);
+      out.add(new Target(it.name(), kindOf(it), (int) s.startLine() + 1, endLineOf(s, lines)));
+      flatten(it.children(), out, lines);
     }
+  }
+
+  /**
+   * The 1-based LAST CONTENT line of a span. tree-sitter end positions are
+   * exclusive, and several grammars let a definition node swallow its terminating
+   * newline and even the blank lines up to the next sibling (Groovy's
+   * {@code command}). Line-based edits must not inherit those extra lines:
+   * splicing them away deletes whatever definition starts there.
+   *
+   * @param s     the span to convert
+   * @param lines the source split on {@code \n}
+   * @return 1-based inclusive last line the span actually has content on
+   */
+  private static int endLineOf(final Span s, final String[] lines) {
+    final int start = (int) s.startLine() + 1;
+    int end = (int) s.endLine() + 1;
+    if (s.endColumn() == 0 && end > start) {
+      end--;
+    }
+    while (end > start && (end > lines.length || lines[end - 1].isBlank())) {
+      end--;
+    }
+    return end;
   }
 
   /**
