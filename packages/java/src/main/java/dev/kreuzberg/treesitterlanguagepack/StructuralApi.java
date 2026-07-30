@@ -327,8 +327,96 @@ public final class StructuralApi {
   }
 
   /**
+   * Byte span [start, end) of the COMMENT BLOCK that documents {@code target} —
+   * the run of comment nodes sitting directly above the definition with no blank
+   * line in between — or {@code null} when there is none.
+   *
+   * <p>Most languages carry a definition's doc as such a leading comment, and the
+   * native docstring extractor only reports docs that are a real string node
+   * INSIDE the definition (Python, Clojure). Without this, {@code add_doc} could
+   * never see an existing comment doc (so it stacked a second one) and
+   * {@code replace_doc} could never edit one.
+   */
+  private static int @Nullable [] docCommentSpan(final String source, final String language,
+      final @Nullable String target) throws TreeSitterLanguagePackRsException {
+    if (target == null || target.isBlank()) {
+      return null;
+    }
+    final int defStart;
+    try {
+      defStart = locateDef(source, language, target).startByte();
+    } catch (final EditException e) {
+      return null;
+    }
+    final byte[] src = source.getBytes(StandardCharsets.UTF_8);
+    final List<int[]> comments = new ArrayList<>();
+    try (Parser parser = TreeSitterLanguagePack.getParser(language);
+        Tree tree = parser.parse(source).orElseThrow(
+            () -> new EditException("could not parse " + language + " source"));
+        Node root = tree.rootNode()) {
+      collectComments(root, defStart, comments);
+    }
+    comments.sort((a, b) -> Integer.compare(a[0], b[0]));
+    int start = -1;
+    int end = -1;
+    for (int i = comments.size() - 1; i >= 0; i--) {
+      final int[] c = comments.get(i);
+      final int gapTo = start < 0 ? defStart : start;
+      if (c[1] > gapTo || !isDocGap(src, c[1], gapTo)) {
+        break;
+      }
+      start = c[0];
+      if (end < 0) {
+        end = c[1];
+      }
+    }
+    return start < 0 ? null : new int[] {start, end};
+  }
+
+  /** Collect the byte spans of every comment node ending at or before {@code limit}. */
+  private static void collectComments(final Node node, final int limit, final List<int[]> out)
+      throws TreeSitterLanguagePackRsException {
+    if (node.startByte() > limit) {
+      return;
+    }
+    if (node.kind().toLowerCase(java.util.Locale.ROOT).contains("comment")
+        && node.endByte() <= limit) {
+      out.add(new int[] {(int) node.startByte(), (int) node.endByte()});
+      return;
+    }
+    final int count = (int) node.childCount();
+    for (int i = 0; i < count; i++) {
+      final java.util.Optional<Node> child = node.child(i);
+      if (child.isPresent()) {
+        try (Node c = child.get()) {
+          collectComments(c, limit, out);
+        }
+      }
+    }
+  }
+
+  /**
+   * True when everything between {@code from} and {@code to} is whitespace holding
+   * at most ONE line break — i.e. the comment hugs what follows it, so it reads as
+   * its doc rather than as a detached remark.
+   */
+  private static boolean isDocGap(final byte[] src, final int from, final int to) {
+    int newlines = 0;
+    for (int i = from; i < to; i++) {
+      if (!isAsciiWhitespace(src[i])) {
+        return false;
+      }
+      if (src[i] == '\n' && ++newlines > 1) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Replace the existing doc string of {@code target} (byte-precise, so inline
-   * docs are handled). Throws if the definition has no doc string to replace.
+   * docs are handled), falling back to its leading comment block. Throws if the
+   * definition has no doc at all.
    */
   private static String replaceDoc(final String source, final String language,
       final @Nullable String target, final String code) throws TreeSitterLanguagePackRsException {
@@ -344,12 +432,22 @@ public final class StructuralApi {
         }
       }
     }
+    final int docStart;
+    final int docEnd;
     if (match == null) {
-      throw new EditException("No existing doc string for '" + target
-          + "'. Add one by replacing the whole definition (struct_edit replace) with code that includes the doc.");
+      final int[] commentSpan = docCommentSpan(source, language, target);
+      if (commentSpan == null) {
+        throw new EditException("No existing doc string for '" + target
+            + "'. Add one by replacing the whole definition (struct_edit replace) with code that includes the doc.");
+      }
+      docStart = commentSpan[0];
+      docEnd = commentSpan[1];
+    } else {
+      final Span s = match.span();
+      docStart = (int) s.startByte();
+      docEnd = (int) s.endByte();
     }
-    final Span s = match.span();
-    final String result = spliceBytes(source, (int) s.startByte(), (int) s.endByte(), code);
+    final String result = spliceBytes(source, docStart, docEnd, code);
     final List<Diagnostic> errors = errorDiagnostics(result, language);
     if (!errors.isEmpty()) {
       throw new EditException("Doc replacement rejected: it introduces " + errors.size()
@@ -566,6 +664,10 @@ public final class StructuralApi {
           throw new EditException("'" + target + "' already has a doc string — use replace_doc to change it.");
         }
       }
+    }
+    if (docCommentSpan(source, language, target) != null) {
+      throw new EditException("'" + target
+          + "' already has a doc comment — use replace_doc to change it.");
     }
 
     final byte[] src = source.getBytes(StandardCharsets.UTF_8);

@@ -1,3 +1,15 @@
+# 1.12.3-blockether.32
+
+- **Doc edits now see a doc written as a COMMENT.** The native docstring extractor only reports
+  docs that are a string node inside the definition (Python, Clojure), yet in most languages a
+  definition's doc is the comment block directly above it. So `add_doc` never noticed an existing
+  doc and stacked a second one on top, and `replace_doc` refused with "No existing doc string" for
+  every commented definition in Java, Go, Rust, C/C++, Kotlin, Swift, Ruby, Lua, Haskell, HCL,
+  GraphQL, shell and the rest. A new `docCommentSpan` finds the run of comment nodes that hugs the
+  definition (no blank line in between, so a detached remark is never mistaken for a doc);
+  `add_doc` refuses on it and `replace_doc` rewrites it in place.
+- Covered by the new `StructuralApiDocCommentTest` (4 cases).
+
 # 1.12.3-blockether.31
 
 - **`replaceNode` no longer eats the whitespace around the node it replaces.** The snippet match
