@@ -89,4 +89,21 @@ final class StructuralApiReplaceNodeTest {
             () -> StructuralApi.replaceNode("(a)\n(b)\n(c)\n", "clojure", "(a)\n(b)", "(oops", null, null));
     assertTrue(ex.getMessage().contains("syntax error"), ex.getMessage());
   }
+
+  @Test
+  @DisplayName("replace_node with a node's own text is a byte-identity edit (Groovy)")
+  void replaceNodeIdentityKeepsSeparators() throws Exception {
+    final String src = "class Alpha {\n    String hi(String n) { \"hi $n\" }\n}\n\ninterface Beta { int m() }\n";
+    final String own = "class Alpha {\n    String hi(String n) { \"hi $n\" }\n}";
+    assertEquals(src, StructuralApi.replaceNode(src, "groovy", own, own, null, null),
+        "replacing a node with its own text must not touch the whitespace around it");
+  }
+
+  @Test
+  @DisplayName("replace_node keeps the final newline when the match is the last definition")
+  void replaceNodeKeepsFinalNewline() throws Exception {
+    final String src = "def alpha() { 1 }\n\ndef beta() { 2 }\n";
+    final String out = StructuralApi.replaceNode(src, "groovy", "def beta() { 2 }", "def beta() { 3 }", null, null);
+    assertEquals("def alpha() { 1 }\n\ndef beta() { 3 }\n", out);
+  }
 }

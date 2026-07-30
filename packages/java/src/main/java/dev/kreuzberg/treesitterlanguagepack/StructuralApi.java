@@ -411,13 +411,32 @@ public final class StructuralApi {
           + " make the snippet more specific. Refusing to guess.");
     }
     final int[] hit = hits.get(0);
-    final String result = spliceBytes(source, hit[0], hit[1], code);
+    // The match is whitespace-NORMALISED, so the winning node's byte span can reach
+    // past the snippet's own text — several grammars (Groovy's `command`, Elixir's
+    // top-level call) end a definition node ON the following newline. Splicing that
+    // span would swallow the separator: the next definition ends up glued to the
+    // replacement, or the file loses its final newline. Shrink the hit to its
+    // non-whitespace core; surrounding whitespace is the file's, not the snippet's.
+    int hitStart = hit[0];
+    int hitEnd = hit[1];
+    while (hitStart < hitEnd && isAsciiWhitespace(srcBytes[hitStart])) {
+      hitStart++;
+    }
+    while (hitEnd > hitStart && isAsciiWhitespace(srcBytes[hitEnd - 1])) {
+      hitEnd--;
+    }
+    final String result = spliceBytes(source, hitStart, hitEnd, code);
     final List<Diagnostic> errors = errorDiagnostics(result, language);
     if (!errors.isEmpty()) {
       throw new EditException("Edit rejected: it introduces " + errors.size()
           + " syntax error(s); the file was not changed.");
     }
     return result;
+  }
+
+  /** UTF-8 keeps ASCII whitespace unambiguous, so a byte test is safe here. */
+  private static boolean isAsciiWhitespace(final byte b) {
+    return b == ' ' || b == '\t' || b == '\n' || b == '\r' || b == '\f' || b == 0x0B;
   }
 
   private static void collectMatches(final Node node, final byte[] src, final String normNeedle,

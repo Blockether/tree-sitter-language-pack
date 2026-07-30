@@ -1,3 +1,14 @@
+# 1.12.3-blockether.31
+
+- **`replaceNode` no longer eats the whitespace around the node it replaces.** The snippet match
+  is whitespace-NORMALISED, so the winning node's byte span can reach past the snippet's own text
+  — Groovy's `command` and Elixir's top-level call end a definition node ON the following newline.
+  Splicing that span glued the next definition to the replacement (replacing a Groovy `class` with
+  its OWN text produced `}interface Beta …`) or dropped the file's final newline. The hit is now
+  shrunk to its non-whitespace core before the splice, so `replace_node` with a node's own text is
+  a byte-identity edit in every grammar.
+- Covered by two new cases in `StructuralApiReplaceNodeTest`.
+
 # 1.12.3-blockether.30
 
 - **A structural edit no longer strips the file's final newline.** `splice` rebuilds the file
