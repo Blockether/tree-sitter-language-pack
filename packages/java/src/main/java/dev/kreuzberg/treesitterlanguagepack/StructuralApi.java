@@ -350,11 +350,13 @@ public final class StructuralApi {
     }
     final byte[] src = source.getBytes(StandardCharsets.UTF_8);
     final List<int[]> comments = new ArrayList<>();
+    final int[] rawRegion = new int[] {-1, -1};
     try (Parser parser = TreeSitterLanguagePack.getParser(language);
         Tree tree = parser.parse(source).orElseThrow(
             () -> new EditException("could not parse " + language + " source"));
         Node root = tree.rootNode()) {
       collectComments(root, defStart, comments);
+      findRawTextRegion(root, defStart, rawRegion);
     }
     comments.sort((a, b) -> Integer.compare(a[0], b[0]));
     int start = -1;
@@ -382,6 +384,12 @@ public final class StructuralApi {
         end = e;
       }
     }
+    if (start < 0 && rawRegion[0] >= 0) {
+      // The definition lives in a region the HOST grammar leaves unparsed (a Svelte/Vue
+      // <script> body is one raw_text node), so its doc comment is not a comment node in
+      // this tree at all. Read the comment lines textually, inside that region only.
+      return rawTextDocComment(src, rawRegion[0], defStart);
+    }
     return start < 0 ? null : new int[] {start, end};
   }
 
@@ -392,6 +400,89 @@ public final class StructuralApi {
       i--;
     }
     return i;
+  }
+
+  /** Openers a doc comment can start with in the embedded languages we leave unparsed. */
+  private static final String[] COMMENT_OPENERS = {"//", "#", "--", ";", "/*", "*", "<!--", "%"};
+
+  /**
+   * Byte span of the innermost RAW-TEXT leaf holding {@code pos} — a region the host grammar
+   * keeps as one opaque token (Svelte/Vue script bodies, template literals). Written into
+   * {@code out} as {start, end}, left untouched when there is none.
+   */
+  private static void findRawTextRegion(final Node node, final int pos, final int[] out)
+      throws TreeSitterLanguagePackRsException {
+    if (node.startByte() > pos || node.endByte() <= pos) {
+      return;
+    }
+    if (node.namedChildCount() == 0 && node.kind().toLowerCase(java.util.Locale.ROOT).contains("raw_text")) {
+      out[0] = (int) node.startByte();
+      out[1] = (int) node.endByte();
+      return;
+    }
+    final int count = (int) node.childCount();
+    for (int i = 0; i < count; i++) {
+      final java.util.Optional<Node> child = node.child(i);
+      if (child.isPresent()) {
+        try (Node c = child.get()) {
+          findRawTextRegion(c, pos, out);
+        }
+      }
+    }
+  }
+
+  /**
+   * Span of the run of comment-looking LINES directly above {@code defStart}, bounded by
+   * {@code regionStart}. Purely textual on purpose: inside a raw-text region there is no
+   * tree to ask, and the alternative is stacking a second doc on a documented definition.
+   */
+  private static int @Nullable [] rawTextDocComment(final byte[] src, final int rawStart, final int defStart) {
+    // A raw_text node can begin AFTER the indentation of its first line, so bound the scan
+    // by that line's start instead — never earlier, so the host markup is never touched.
+    final int regionStart = lineStartOf(src, rawStart);
+    int lineStart = lineStartOf(src, defStart);
+    int start = -1;
+    int end = -1;
+    while (lineStart > regionStart) {
+      final int prevEnd = lineStart - 1;
+      final int prevStart = lineStartOf(src, prevEnd);
+      if (prevStart < regionStart) {
+        break;
+      }
+      final String line = new String(src, prevStart, prevEnd - prevStart, StandardCharsets.UTF_8).trim();
+      boolean isComment = false;
+      for (final String opener : COMMENT_OPENERS) {
+        if (!line.startsWith(opener)) {
+          continue;
+        }
+        // `#`, `--`, `*` and `%` also open real code (a JS private field, a decrement,
+        // a multiplication), so those only count as a comment when a space follows.
+        final boolean needsSpace = "#".equals(opener) || "--".equals(opener) || "*".equals(opener) || "%".equals(opener);
+        if (needsSpace && line.length() > opener.length()
+            && !isAsciiWhitespace((byte) line.charAt(opener.length()))) {
+          continue;
+        }
+        isComment = true;
+        break;
+      }
+      if (!isComment) {
+        break;
+      }
+      int contentStart = prevStart;
+      while (contentStart < prevEnd && isAsciiWhitespace(src[contentStart])) {
+        contentStart++;
+      }
+      int contentEnd = prevEnd;
+      while (contentEnd > contentStart && isAsciiWhitespace(src[contentEnd - 1])) {
+        contentEnd--;
+      }
+      start = contentStart;
+      if (end < 0) {
+        end = contentEnd;
+      }
+      lineStart = prevStart;
+    }
+    return start < 0 ? null : new int[] {start, end};
   }
 
   /** Collect the byte spans of every comment node ending at or before {@code limit}. */

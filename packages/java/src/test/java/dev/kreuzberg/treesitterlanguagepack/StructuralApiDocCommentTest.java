@@ -77,4 +77,25 @@ final class StructuralApiDocCommentTest {
         final String out = StructuralApi.edit(rs, "rust", Op.REPLACE_DOC, "alpha", null, "/// Alpha returns one.");
         assertEquals("/// Alpha returns one.\nfn alpha() -> i32 { 1 }\n", out);
     }
+    @Test
+    @DisplayName("a doc comment inside an unparsed <script> body still counts as the doc")
+    void docCommentInsideARawTextRegion() throws Exception {
+        final String svelte = "<script>\n  // Alpha holds one.\n  let alpha = 1;\n</script>\n\n<div>{alpha}</div>\n";
+        final String out = StructuralApi.edit(svelte, "svelte", Op.REPLACE_DOC, "alpha", null, "// Alpha holds a number.");
+        assertTrue(out.contains("// Alpha holds a number."), "replacement not applied:\n" + out);
+        assertFalse(out.contains("holds one"), "old doc survived:\n" + out);
+        assertTrue(out.contains("let alpha = 1;"), "definition damaged:\n" + out);
+        assertEquals(svelte.lines().count(), out.lines().count(), "line count changed:\n" + out);
+        assertThrows(StructuralApi.EditException.class, () -> StructuralApi.edit(svelte, "svelte", Op.ADD_DOC, "alpha", null, "// stacked"));
+    }
+
+    @Test
+    @DisplayName("code that merely starts like a comment is not mistaken for one")
+    void privateFieldIsNotADocComment() throws Exception {
+        final String svelte = "<script>\n  let beta = 2;\n  let alpha = 1;\n</script>\n\n<div>{alpha}</div>\n";
+        assertThrows(StructuralApi.EditException.class, () -> StructuralApi.edit(svelte, "svelte", Op.REPLACE_DOC, "alpha", null, "// nope"));
+        final String out = StructuralApi.edit(svelte, "svelte", Op.ADD_DOC, "alpha", null, "// Alpha holds one.");
+        assertTrue(out.contains("// Alpha holds one.\n  let alpha = 1;"), "doc not hugging the def:\n" + out);
+        assertTrue(out.contains("let beta = 2;"), "neighbour damaged:\n" + out);
+    }
 }

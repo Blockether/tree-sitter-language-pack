@@ -1,3 +1,13 @@
+# 1.12.3-blockether.34
+
+- **A doc comment inside an unparsed region is found too.** A Svelte/Vue `<script>` body is one
+  opaque `raw_text` node to the host grammar, so a definition living there has no comment NODE
+  above it: `add_doc` stacked a second doc and `replace_doc` refused. When (and only when) the
+  definition sits in such a raw-text region, the doc comment is now read textually from the lines
+  directly above it, bounded by that region. Openers that also open real code (`#`, `--`, `*`,
+  `%`) only count when a space follows, so a JS private field is never mistaken for a doc.
+- Covered by two new cases in `StructuralApiDocCommentTest` (8 total).
+
 # 1.12.3-blockether.33
 
 - **A doc comment is found behind modifiers, and its terminator survives.** `docCommentSpan`
