@@ -1,4 +1,21 @@
+# 1.12.3-blockether.28
+
+- **`StructureItem.kindLabel`: the `StructureKind::Other(..)` payload survives the Java binding.**
+  Rust's `StructureKind` is a payload-carrying enum — a GraphQL `type Query`, a Terraform
+  `resource`, an HCL `job` block, an Elixir `defmacro` and a Svelte/Vue `<script>` section all
+  ride as `{"Other": "type"}` on the wire. A Java enum cannot hold a payload, so `JsonCodec`
+  mapped every one of them onto the single constant `StructureKind.OTHER` and threw the word
+  away: consumers rendered a generic, useless `other` bucket for whole languages (Terraform's
+  entire vocabulary is `Other`). The label is now lifted into a new nullable `kindLabel` record
+  component (last position, so the existing constructor order is untouched) plus
+  `StructureItem.Builder#withKindLabel`.
+- `StructuralApi` uses it too: the new `kindOf`/`kindMatches` helpers mean `findSpans` and the
+  flattening walk match on the *labelled* kind, so kind-targeted structural edits can address
+  `resource`, `type` or `macro` instead of the ambiguous `other`.
+- Covered by `JsonCodecTest#readProcessResultOtherKindLabel`.
+
 # 1.12.3-blockether.27
+
 
 - **Structure intelligence for nine more languages: Haskell, OCaml (+ `.mli` interfaces), Nix,
   HCL/Terraform, GraphQL, Groovy (+ Gradle DSL), Svelte, Vue — and a rewritten Rust module.**

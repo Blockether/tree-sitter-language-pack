@@ -111,6 +111,23 @@ final class JsonCodec {
         return v.toString();
     }
 
+    /**
+     * The payload of a serde-tagged {@code Other(String)} variant, or {@code null} for a unit variant.
+     *
+     * <p>
+     * {@code {"Other": "resource"}} carries the language-specific label ({@code resource}, {@code type}, {@code Macro}, …) that the Java
+     * {@code enum} cannot hold. {@link #variant} deliberately flattens that object to {@code "other"} so {@code fromValue} resolves; this
+     * keeps the payload so consumers can still name the construct instead of showing a generic {@code other}.
+     */
+    private static @Nullable String variantLabel(final Map<String, Object> m, final String k) {
+        final Object v = m.get(k);
+        if (v instanceof Map<?, ?> mm) {
+            final Object label = mm.get("Other");
+            return label == null ? null : label.toString();
+        }
+        return null;
+    }
+
     private static long lng(final Map<String, Object> m, final String k) {
         final Object v = m.get(k);
         return v == null ? 0L : ((Number) v).longValue();
@@ -199,7 +216,7 @@ final class JsonCodec {
                 .withVisibility(str(m, "visibility")).withSpan(span(asMap(m.get("span"))))
                 .withChildren(mapList(m, "children", JsonCodec::structureItem)).withDecorators(strList(m, "decorators"))
                 .withDocComment(str(m, "doc_comment")).withSignature(str(m, "signature")).withBodySpan(span(asMap(m.get("body_span"))))
-                .build();
+                .withKindLabel(variantLabel(m, "kind")).build();
     }
 
     private static ImportInfo importInfo(final Map<String, Object> m) {

@@ -83,10 +83,37 @@ public final class StructuralApi {
     }
     for (final StructureItem it : items) {
       final Span s = it.span();
-      final String kind = it.kind() == null ? "" : it.kind().getValue();
-      out.add(new Target(it.name(), kind, (int) s.startLine() + 1, (int) s.endLine() + 1));
+      out.add(new Target(it.name(), kindOf(it), (int) s.startLine() + 1, (int) s.endLine() + 1));
       flatten(it.children(), out);
     }
+  }
+
+  /**
+   * The item's kind as a user-facing word: the {@code StructureKind.Other} label
+   * when the item carries one (a GraphQL {@code type}, a Terraform
+   * {@code resource}, an Elixir {@code Macro}), else the enum's own value.
+   * Without the label every language-specific construct flattens into one
+   * indistinguishable {@code "other"}.
+   */
+  private static String kindOf(final StructureItem it) {
+    final String label = it.kindLabel();
+    if (label != null && !label.isBlank()) {
+      return label;
+    }
+    return it.kind() == null ? "" : it.kind().getValue();
+  }
+
+  /**
+   * Kind filter: matches the enum value OR the {@code Other} label, so both
+   * {@code "other"} and {@code "resource"} select a Terraform resource.
+   */
+  private static boolean kindMatches(final StructureItem it, final @Nullable String kind) {
+    if (kind == null) {
+      return true;
+    }
+    final String enumValue = it.kind() == null ? "" : it.kind().getValue();
+    final String label = it.kindLabel();
+    return kind.equalsIgnoreCase(enumValue) || (label != null && kind.equalsIgnoreCase(label));
   }
 
   /**
@@ -428,8 +455,7 @@ public final class StructuralApi {
       return;
     }
     for (final StructureItem it : items) {
-      final String k = it.kind() == null ? "" : it.kind().getValue();
-      if (Objects.equals(it.name(), target) && (kind == null || kind.equalsIgnoreCase(k))) {
+      if (Objects.equals(it.name(), target) && kindMatches(it, kind)) {
         final Span s = it.span();
         out.add(new long[] {s.startByte(), s.endByte()});
       }

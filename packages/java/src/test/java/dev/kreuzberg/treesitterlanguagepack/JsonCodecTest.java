@@ -94,4 +94,26 @@ final class JsonCodecTest {
         assertEquals(2L, p.row());
         assertEquals(5L, p.column());
     }
+
+    @Test
+    @DisplayName("StructureKind.Other keeps its payload in kindLabel")
+    void readProcessResultOtherKindLabel() {
+        final String json = "{\"language\":\"hcl\",\"structure\":["
+                + "{\"kind\":{\"Other\":\"resource\"},\"name\":\"aws_s3_bucket.b\",\"span\":{\"start_byte\":0,\"end_byte\":20,"
+                + "\"start_line\":0,\"start_column\":0,\"end_line\":2,\"end_column\":1}},"
+                + "{\"kind\":\"variable\",\"name\":\"region\",\"span\":{\"start_byte\":21,\"end_byte\":30,"
+                + "\"start_line\":3,\"start_column\":0,\"end_line\":4,\"end_column\":1}}]}";
+        final ProcessResult r = JsonCodec.readProcessResult(json);
+
+        final StructureItem resource = r.structure().get(0);
+        // The object form still resolves to the Other enum member ...
+        assertEquals(StructureKind.Other, resource.kind());
+        // ... and no longer throws the payload away.
+        assertEquals("resource", resource.kindLabel());
+
+        // Unit variants carry no label.
+        final StructureItem variable = r.structure().get(1);
+        assertEquals(StructureKind.Variable, variable.kind());
+        assertNull(variable.kindLabel());
+    }
 }
