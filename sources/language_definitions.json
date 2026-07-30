@@ -159,6 +159,11 @@
     "rev": "bff59884307c0ab009bd5e81afd9324b46a6c0f9"
   },
   "bitbake": {
+    "ambiguous": {
+      "bb": [
+        "clojure"
+      ]
+    },
     "extensions": [
       "bb",
       "bbappend",
@@ -318,10 +323,11 @@
     "extensions": [
       "clj",
       "cljs",
-      "cljc"
+      "cljc",
+      "edn"
     ],
     "repo": "https://github.com/Blockether/tree-sitter-clojure",
-    "rev": "fd2507286f95bff473f2593512d0740c02724891"
+    "rev": "954e5db2fbc910b3c57c6e17b68634e56d10c9f3"
   },
   "cmake": {
     "branch": "master",
