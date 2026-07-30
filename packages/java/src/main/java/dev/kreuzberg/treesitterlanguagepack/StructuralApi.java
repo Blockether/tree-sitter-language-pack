@@ -223,7 +223,25 @@ public final class StructuralApi {
 
   private static String splice(final List<String> lines, final Op op, final int start,
       final int end, final String code) {
-    final List<String> body = stripBlankLines(code);
+    // Splitting on "\n" leaves each CRLF line ending as a trailing "\r" on the line.
+    // Inserted code and blank separators come in LF-only, so a CRLF file would end up
+    // with mixed endings — stamp them to match the file instead.
+    final boolean crlf = lines.size() > 1 && lines.get(0).endsWith("\r");
+    final String blank = crlf ? "\r" : "";
+    List<String> body = stripBlankLines(code);
+    if (crlf) {
+      final List<String> stamped = new ArrayList<>(body.size());
+      for (final String l : body) {
+        stamped.add(l.endsWith("\r") ? l : l + "\r");
+      }
+      body = stamped;
+    }
+    // `source.split("\n", -1)` leaves a trailing "" element for a file that ends in a
+    // newline. Seam normalisation (trimTrailingBlanks / trimLeadingBlanks) can eat that
+    // element — INSERT_AFTER on the LAST definition trims the whole tail away — which
+    // would silently strip the file's final newline (and, in Groovy, whose grammar
+    // requires a terminating newline, make the edit fail the syntax gate outright).
+    final boolean hadFinalNewline = !lines.isEmpty() && lines.get(lines.size() - 1).isEmpty();
     final List<String> out = new ArrayList<>(lines.size() + body.size() + 2);
     switch (op) {
       case APPEND -> {
@@ -234,10 +252,10 @@ public final class StructuralApi {
         // the previous form.
         trimTrailingBlanks(out);
         if (!out.isEmpty()) {
-          out.add("");
+          out.add(blank);
         }
         out.addAll(body);
-        out.add("");
+        out.add(blank);
       }
       case REPLACE -> {
         out.addAll(lines.subList(0, start - 1));
@@ -254,10 +272,10 @@ public final class StructuralApi {
         trimTrailingBlanks(head);
         if (!head.isEmpty()) {
           out.addAll(head);
-          out.add(""); // exactly one blank above the inserted node
+          out.add(blank); // exactly one blank above the inserted node
         }
         out.addAll(body);
-        out.add(""); // exactly one blank between the inserted node and the target
+        out.add(blank); // exactly one blank between the inserted node and the target
         out.addAll(tail);
       }
       case INSERT_AFTER -> {
@@ -266,14 +284,18 @@ public final class StructuralApi {
         trimTrailingBlanks(head);
         trimLeadingBlanks(tail);
         out.addAll(head);
-        out.add(""); // exactly one blank between the target and the inserted node
+        out.add(blank); // exactly one blank between the target and the inserted node
         out.addAll(body);
         if (!tail.isEmpty()) {
-          out.add(""); // exactly one blank below the inserted node
+          out.add(blank); // exactly one blank below the inserted node
         }
         out.addAll(tail);
       }
       default -> throw new EditException("Unknown op: " + op);
+    }
+    // Restore a final newline the source had (never remove one it lacked).
+    if (hadFinalNewline && (out.isEmpty() || !out.get(out.size() - 1).isEmpty())) {
+      out.add(""); // the terminator itself is just the empty trailing element
     }
     return String.join("\n", out);
   }

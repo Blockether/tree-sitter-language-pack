@@ -1,3 +1,17 @@
+# 1.12.3-blockether.30
+
+- **A structural edit no longer strips the file's final newline.** `splice` rebuilds the file
+  from `source.split("\n", -1)`, whose trailing `""` element IS the terminating newline. Seam
+  normalisation (`trimTrailingBlanks`) ate that element, so `Op.INSERT_AFTER` on the LAST
+  definition — and `Op.APPEND` — returned a file ending mid-line in every language. For Groovy,
+  whose grammar requires a terminating newline, the edit then failed the syntax gate outright,
+  making "insert after the last definition" impossible. `splice` now restores a final newline the
+  source had, and never invents one it lacked.
+- **CRLF files stay CRLF.** Splitting on `"\n"` leaves the `\r` on each line, but inserted code
+  and blank separator lines arrived LF-only, so any insert/append/move left mixed endings behind.
+  `splice` now stamps inserted and separator lines to match the file's own ending.
+- Covered by `StructuralApiFinalNewlineTest` (4 cases).
+
 # 1.12.3-blockether.29
 
 - **Line-based structural edits no longer swallow the definition that follows.**
