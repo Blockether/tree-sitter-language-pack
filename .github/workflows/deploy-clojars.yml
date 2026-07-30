@@ -40,8 +40,9 @@ env:
   PARSER_BUNDLE_URL: https://github.com/kreuzberg-dev/tree-sitter-language-pack/releases/download/v1.10.3/parser-sources-1.10.3.tar.zst
   # Grammars re-sourced from their repos at the definitions-pinned rev:
   # clojure (Blockether fork), php + swift (rev-bumped in the v1.12.3 sync),
-  # elixir (NEW curated language — structural intel landed with the sync).
-  OVERRIDE_LANGS: clojure php swift elixir
+  # elixir (NEW curated language — structural intel landed with the sync),
+  # scala + dart (rev-bumped past the bundle: upstream grammar fixes).
+  OVERRIDE_LANGS: clojure php swift elixir scala dart
 
 jobs:
   sources:
@@ -71,6 +72,8 @@ jobs:
           test -f parsers/php/src/parser.c
           test -f parsers/swift/src/parser.c
           test -f parsers/elixir/src/parser.c
+          test -f parsers/scala/src/parser.c
+          test -f parsers/dart/src/parser.c
 
       - uses: actions/upload-artifact@v4
         with:

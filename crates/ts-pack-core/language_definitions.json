@@ -484,7 +484,7 @@
     ],
     "generate": true,
     "repo": "https://github.com/UserNobody14/tree-sitter-dart",
-    "rev": "a9bdfa3db2fbc9b9f12c93450d04a671f33a5102"
+    "rev": "be07cf7118d3dba06236a3f19541685a68209934"
   },
   "desktop": {
     "abi_version": 14,
@@ -1982,7 +1982,7 @@
     ],
     "generate": true,
     "repo": "https://github.com/tree-sitter/tree-sitter-scala",
-    "rev": "4d081d98670ff6e98ca42c085294fc75eec15e1d"
+    "rev": "6d83c337a5cfb1b0a77ebfe362af07d2e4e3aa71"
   },
   "scheme": {
     "extensions": [
@@ -2155,7 +2155,7 @@
     ],
     "generate": true,
     "repo": "https://github.com/alex-pinkus/tree-sitter-swift",
-    "rev": "0c469cbb77457ebabe2702268bcf7f116b3fac8f"
+    "rev": "28fe3a8a85586aa297524fe6164140b9521dcaff"
   },
   "systemverilog": {
     "abi_version": 14,
