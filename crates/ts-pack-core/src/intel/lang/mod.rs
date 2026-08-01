@@ -82,7 +82,9 @@ pub(crate) trait LanguageIntel {
         ) {
             return None;
         }
-        let parameters = node.child_by_field_name("parameters")?;
+        let parameters = node
+            .child_by_field_name("parameters")
+            .or_else(|| declarator_parameters(node))?;
         let mut signature = compact_signature(node_text(&parameters, source));
         if let Some(return_type) = ["return_type", "result", "type"]
             .into_iter()
@@ -233,6 +235,20 @@ pub(crate) fn generic_structure_kind(node_kind: &str) -> Option<StructureKind> {
 /// Collapse a source fragment for compact, single-line structure output.
 pub(crate) fn compact_signature(text: &str) -> String {
     text.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+/// C-family grammars (C, C++, Objective-C) hang the parameter list off the
+/// definition's `declarator`, which may itself be wrapped by pointer/reference
+/// declarators, so the definition node has no `parameters` field of its own.
+fn declarator_parameters<'t>(node: &Node<'t>) -> Option<Node<'t>> {
+    let mut current = node.child_by_field_name("declarator")?;
+    for _ in 0..8 {
+        if let Some(parameters) = current.child_by_field_name("parameters") {
+            return Some(parameters);
+        }
+        current = current.child_by_field_name("declarator")?;
+    }
+    None
 }
 
 /// Generic recursive structure walk: at a definition node, record it (extending

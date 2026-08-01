@@ -1,3 +1,13 @@
+# 1.12.3-blockether.36
+
+- **C, C++ and Objective-C callables get their signature too.** The C family hangs the parameter
+  list off the definition's `declarator` (wrapped again for every `*`/`&`), so `signature_of`
+  found no `parameters` field and `int sample(int a, char *b)` still listed as a bare name. The
+  default now walks the declarator chain, so C-family functions read
+  `(int a, char *b) -> int`, pointer returns included.
+- Covered by three more `callable_signatures_across_languages` cases (C, a pointer-returning C
+  function, and C++).
+
 # 1.12.3-blockether.35
 
 - **Every callable now carries its signature.** `StructureItem.signature` was filled only by the

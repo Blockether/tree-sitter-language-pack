@@ -473,6 +473,17 @@ mod tests {
             ),
             ("dart", "void sample(int a) { print(a); }\n", "(int a) -> void"),
             ("python", "def sample(a, b):\n    return a\n", "(a, b)"),
+            (
+                "c",
+                "int sample(int a, char *b) { return a; }\n",
+                "(int a, char *b) -> int",
+            ),
+            ("c", "char *sample(int a) { return 0; }\n", "(int a) -> char"),
+            (
+                "cpp",
+                "bool sample(const std::string &a, int b) { return true; }\n",
+                "(const std::string &a, int b) -> bool",
+            ),
         ];
         for (language, source, expected) in cases {
             let language_definition = crate::get_language(language)
