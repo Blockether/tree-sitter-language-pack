@@ -3,7 +3,7 @@
 //! `name`/`pattern` field. A `value_definition` is a Function when its binding
 //! takes `parameter`s and a Constant otherwise.
 
-use super::LanguageIntel;
+use super::{LanguageIntel, compact_signature};
 use crate::intel::intelligence::node_text;
 use crate::intel::types::StructureKind;
 use tree_sitter::Node;
@@ -78,5 +78,18 @@ impl LanguageIntel for Ocaml {
 
     fn is_import(&self, node_kind: &str) -> bool {
         node_kind == "open_module" || node_kind == "include_module"
+    }
+    fn signature_of(&self, node: &Node, source: &str) -> Option<String> {
+        if !matches!(node.kind(), "value_definition" | "method_definition") {
+            return None;
+        }
+        let binding = binding(node);
+        let mut cursor = binding.walk();
+        let parameters = binding
+            .named_children(&mut cursor)
+            .filter(|child| child.kind() == "parameter")
+            .map(|parameter| compact_signature(node_text(&parameter, source)))
+            .collect::<Vec<_>>();
+        (!parameters.is_empty()).then(|| parameters.join(" "))
     }
 }

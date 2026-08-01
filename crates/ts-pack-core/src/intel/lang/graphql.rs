@@ -3,7 +3,7 @@
 //! carried as [`StructureKind::Other`], because GraphQL's categories do not map
 //! onto host-language ones without losing information.
 
-use super::LanguageIntel;
+use super::{LanguageIntel, compact_signature};
 use crate::intel::intelligence::node_text;
 use crate::intel::types::StructureKind;
 use tree_sitter::Node;
@@ -79,5 +79,24 @@ impl LanguageIntel for GraphQl {
                 "fields_definition" | "input_fields_definition" | "enum_values_definition"
             )
         })
+    }
+    fn signature_of(&self, node: &Node, source: &str) -> Option<String> {
+        if node.kind() != "field_definition" {
+            return None;
+        }
+        let mut cursor = node.walk();
+        let parameters = node
+            .named_children(&mut cursor)
+            .find(|child| child.kind() == "arguments_definition")?;
+        let mut signature = compact_signature(node_text(&parameters, source));
+        let mut cursor = node.walk();
+        if let Some(return_type) = node
+            .named_children(&mut cursor)
+            .find(|child| child.start_byte() > parameters.end_byte())
+        {
+            signature.push_str(" -> ");
+            signature.push_str(&compact_signature(node_text(&return_type, source)));
+        }
+        Some(signature)
     }
 }

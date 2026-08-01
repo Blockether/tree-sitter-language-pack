@@ -1,3 +1,25 @@
+# 1.12.3-blockether.35
+
+- **Every callable now carries its signature.** `StructureItem.signature` was filled only by the
+  JS/TS extractor, so a structure listing showed a bare `sample` for Python, Java, Go, Ruby, C,
+  C++, C#, Rust, Kotlin, Dart, Zig, Haskell, OCaml, Elixir, Groovy and GraphQL — the parameter
+  list, the one thing that distinguishes an overload, was gone. `LanguageIntel::signature_of`
+  now fills it: the default reads the `parameters` field plus a `return_type`/`result`/`type`
+  return field (covering the field-shaped grammars), and Rust, Kotlin, Dart, Zig, Haskell,
+  OCaml, Elixir, Groovy and GraphQL override it for their own AST shape. Signatures are
+  whitespace-collapsed to one line, so a parameter list wrapped over five source lines still
+  reads as `(first: u8, second: &str) -> Result<(), String>`.
+- **A Kotlin body is no longer read as a return type.** The return type is the child that
+  follows the parameters, but so is `= expr`/`{ … }`, so `fun sample(a: String, b: Int)
+  { println(a) }` reported `(a: String, b: Int) -> { println(a) }`. Bodies and type constraints
+  are skipped; a function without a declared return type shows none.
+- Covered by `callable_signatures_across_languages` (15 languages, block bodies and
+  return-type-less heads included) and a signature assertion in `test_extract_rust_function`.
+- Grammar revisions reviewed against upstream v1.13.7: for every language we ship, the newer
+  upstream revs differ only by CI/tooling/binding commits (elixir, C#, php, markdown, elm, vim)
+  or are OLDER than ours (scala), and upstream's vendored graphql grammar fixes multi-directive
+  fields that our pinned rev already parses — so no rev moved.
+
 # 1.12.3-blockether.34
 
 - **A doc comment inside an unparsed region is found too.** A Svelte/Vue `<script>` body is one

@@ -18,7 +18,7 @@
 //! member rules fire only inside a type body, which keeps Gradle DSL blocks
 //! (`plugins { … }`, `repositories { mavenCentral() }`) out of the results.
 
-use super::LanguageIntel;
+use super::{LanguageIntel, compact_signature};
 use crate::intel::intelligence::{node_text, span_from_node};
 use crate::intel::types::{StructureItem, StructureKind};
 use tree_sitter::Node;
@@ -62,13 +62,30 @@ fn func_name(func: &Node, source: &str) -> Option<String> {
         .map(|c| node_text(&c, source).to_string())
 }
 
+fn callable_signature(command: &Node, source: &str) -> Option<String> {
+    let mut cursor = command.walk();
+    let block = command
+        .named_children(&mut cursor)
+        .find(|child| child.kind() == "block")?;
+    let func = block_head_func(&block)?;
+    let mut cursor = func.walk();
+    func.named_children(&mut cursor)
+        .find(|child| child.kind() == "arg_block")
+        .map(|parameters| compact_signature(node_text(&parameters, source)))
+}
+
 fn item(
+    source: &str,
     kind: StructureKind,
     name: Option<String>,
     node: &Node,
     body: Option<&Node>,
     children: Vec<StructureItem>,
 ) -> StructureItem {
+    let is_callable = matches!(
+        kind,
+        StructureKind::Function | StructureKind::Method | StructureKind::Constructor
+    );
     StructureItem {
         kind,
         name,
@@ -77,7 +94,7 @@ fn item(
         children,
         decorators: Vec::new(),
         doc_comment: None,
-        signature: None,
+        signature: is_callable.then(|| callable_signature(node, source)).flatten(),
         body_span: body.map(span_from_node),
     }
 }
@@ -154,6 +171,7 @@ fn gradle_entry(command: &Node, source: &str) -> Option<StructureItem> {
             return None;
         }
         return Some(item(
+            source,
             StructureKind::Other("block".to_string()),
             Some(parts.join(" ")),
             command,
@@ -168,6 +186,7 @@ fn gradle_entry(command: &Node, source: &str) -> Option<StructureItem> {
     let name = kids.first().filter(|n| is_plain_identifier(n))?;
     assigns.then(|| {
         item(
+            source,
             StructureKind::Constant,
             Some(node_text(name, source).to_string()),
             command,
@@ -203,7 +222,7 @@ fn type_declaration(command: &Node, source: &str) -> Option<StructureItem> {
     if let Some(block) = &block {
         walk(block, source, Some(&name), false, &mut children);
     }
-    Some(item(kind, Some(name), command, block.as_ref(), children))
+    Some(item(source, kind, Some(name), command, block.as_ref(), children))
 }
 
 /// A method / constructor / `def` function: a `block` whose head is a `func`.
@@ -217,7 +236,7 @@ fn callable_declaration(command: &Node, source: &str, enclosing: Option<&str>) -
         Some(_) => StructureKind::Method,
         None => StructureKind::Function,
     };
-    Some(item(kind, Some(name), command, Some(&block), Vec::new()))
+    Some(item(source, kind, Some(name), command, Some(&block), Vec::new()))
 }
 
 /// Inside a type body only: an abstract method (`String render()`) or a field
@@ -238,13 +257,27 @@ fn member(command: &Node, source: &str, _enclosing: &str) -> Option<StructureIte
         && kids[..kids.len() - 1].iter().all(is_plain_identifier)
         && let Some(name) = func_name(&func, source)
     {
-        return Some(item(StructureKind::Method, Some(name), command, None, Vec::new()));
+        return Some(item(
+            source,
+            StructureKind::Method,
+            Some(name),
+            command,
+            None,
+            Vec::new(),
+        ));
     }
     // Field: `Type name` or `Type name = value` — plain identifier units only.
     let idents: Vec<&Node> = kids.iter().take_while(|n| is_plain_identifier(n)).collect();
     if idents.len() >= 2 {
         let name = node_text(idents[idents.len() - 1], source).to_string();
-        return Some(item(StructureKind::Field, Some(name), command, None, Vec::new()));
+        return Some(item(
+            source,
+            StructureKind::Field,
+            Some(name),
+            command,
+            None,
+            Vec::new(),
+        ));
     }
     None
 }

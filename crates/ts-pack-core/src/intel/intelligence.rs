@@ -241,6 +241,15 @@ mod tests {
         parse_with_language(source, lang_name).map(|(_, tree)| tree)
     }
 
+    fn signature_named<'a>(items: &'a [StructureItem], name: &str) -> Option<&'a str> {
+        items.iter().find_map(|item| {
+            (item.name.as_deref() == Some(name))
+                .then_some(item.signature.as_deref())
+                .flatten()
+                .or_else(|| signature_named(&item.children, name))
+        })
+    }
+
     /// Extract Clojure structure via the cached native grammar, skipping the
     /// test (returning `None`) when the grammar lib is not present in the cache.
     fn clojure_structure_or_skip(source: &str) -> Option<Vec<StructureItem>> {
@@ -389,7 +398,7 @@ mod tests {
 
     #[test]
     fn test_extract_rust_function() {
-        let source = "fn main() {\n    let x = 5;\n}\n";
+        let source = "fn main(first: u8,\n        second: &str) -> Result<(), String> {\n    Ok(())\n}\n";
         let Some(tree) = parse_or_skip(source, "rust") else {
             return;
         };
@@ -399,6 +408,90 @@ mod tests {
         let func = &intel.structure[0];
         assert_eq!(func.kind, StructureKind::Function);
         assert_eq!(func.name.as_deref(), Some("main"));
+        assert_eq!(
+            func.signature.as_deref(),
+            Some("(first: u8, second: &str) -> Result<(), String>")
+        );
+    }
+
+    #[test]
+    #[ignore = "requires downloaded dynamic grammar libraries"]
+    fn callable_signatures_across_languages() {
+        let cases = [
+            (
+                "python",
+                "def sample(a: int, b: str) -> bool:\n    return True\n",
+                "(a: int, b: str) -> bool",
+            ),
+            ("ruby", "def sample(a, b)\n  true\nend\n", "(a, b)"),
+            (
+                "go",
+                "package p\nfunc sample(a int, b string) error { return nil }\n",
+                "(a int, b string) -> error",
+            ),
+            (
+                "java",
+                "class C { boolean sample(String a, int b) { return true; } }\n",
+                "(String a, int b) -> boolean",
+            ),
+            (
+                "dart",
+                "bool sample(String a, int b) => true;\n",
+                "(String a, int b) -> bool",
+            ),
+            (
+                "zig",
+                "fn sample(a: u8, b: []const u8) void {}\n",
+                "(a: u8, b: []const u8) -> void",
+            ),
+            (
+                "kotlin",
+                "fun sample(a: String, b: Int): Boolean = true\n",
+                "(a: String, b: Int) -> Boolean",
+            ),
+            (
+                "haskell",
+                "sample :: Int -> String -> Bool\nsample a b = True\n",
+                "sample :: Int -> String -> Bool",
+            ),
+            ("ocaml", "let sample (a : int) b = true\n", "(a : int) b"),
+            (
+                "elixir",
+                "defmodule M do\n  def sample(a, b), do: true\nend\n",
+                "(a, b)",
+            ),
+            ("groovy", "def sample(String a, int b) { true }\n", "(String a, int b)"),
+            (
+                "graphql",
+                "type Query { sample(a: String!, b: Int): Boolean! }\n",
+                "(a: String!, b: Int) -> Boolean!",
+            ),
+            (
+                "kotlin",
+                "fun sample(a: String, b: Int) { println(a) }\n",
+                "(a: String, b: Int)",
+            ),
+            ("dart", "void sample(int a) { print(a); }\n", "(int a) -> void"),
+            ("python", "def sample(a, b):\n    return a\n", "(a, b)"),
+        ];
+        for (language, source, expected) in cases {
+            let language_definition = crate::get_language(language)
+                .unwrap_or_else(|error| panic!("{language} grammar did not load: {error}"));
+            let mut parser = tree_sitter::Parser::new();
+            parser
+                .set_language(&language_definition)
+                .unwrap_or_else(|error| panic!("{language} parser did not initialize: {error}"));
+            let tree = parser
+                .parse(source, None)
+                .unwrap_or_else(|| panic!("{language} fixture did not parse"));
+            let intel = extract_intelligence(source, language, &tree);
+            assert_eq!(
+                signature_named(&intel.structure, "sample"),
+                Some(expected),
+                "{language} returned the wrong callable signature: {:#?}",
+                intel.structure
+            );
+        }
     }
 
     // -- Import extraction tests --

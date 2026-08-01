@@ -14,6 +14,7 @@
 //! its own descent.
 
 use super::intelligence::{collect_imports, collect_structure, node_text, span_from_node};
+use super::lang::compact_signature;
 use super::types::*;
 
 /// Classify an Elixir definition `call` by its macro keyword. Elixir
@@ -183,6 +184,34 @@ fn elixir_callable_name(call: &tree_sitter::Node, source: &str) -> Option<String
     None
 }
 
+/// The source-level parameter list of a function-family definition, when its
+/// head is a call (`def f(a, b)`). Bare zero-arity heads have no parameter list.
+fn elixir_callable_signature(call: &tree_sitter::Node, source: &str) -> Option<String> {
+    let args = elixir_child_by_kind(call, "arguments")?;
+    let mut cursor = args.walk();
+    for child in args.named_children(&mut cursor) {
+        let is_when = child.kind() == "binary_operator"
+            && child
+                .child_by_field_name("operator")
+                .is_some_and(|op| node_text(&op, source) == "when");
+        let head = if is_when {
+            child.child_by_field_name("left")
+        } else if child.kind() == "binary_operator" {
+            None
+        } else {
+            Some(child)
+        };
+        let Some(head) = head else { continue };
+        if head.kind() == "call" {
+            let parameters = elixir_child_by_kind(&head, "arguments")
+                .map(|arguments| compact_signature(node_text(&arguments, source)))
+                .unwrap_or_default();
+            return Some(parameters);
+        }
+    }
+    None
+}
+
 /// Handle the Elixir arm of the structure walk for `node`.
 ///
 /// Returns `true` when `node` is Elixir-significant and has been fully handled
@@ -227,7 +256,7 @@ pub(super) fn collect_structure_call(
             children,
             decorators: Vec::new(),
             doc_comment: None,
-            signature: None,
+            signature: elixir_callable_signature(node, source),
             body_span,
         });
         return true;

@@ -3,7 +3,7 @@
 //! optional `signature` (the type signature) which belongs to the definition and
 //! is absorbed into its span via [`LanguageIntel::leading_sibling`].
 
-use super::LanguageIntel;
+use super::{LanguageIntel, compact_signature};
 use crate::intel::intelligence::node_text;
 use crate::intel::types::StructureKind;
 use tree_sitter::Node;
@@ -88,5 +88,11 @@ impl LanguageIntel for Haskell {
 
     fn is_import(&self, node_kind: &str) -> bool {
         node_kind == "import"
+    }
+    fn signature_of(&self, node: &Node, source: &str) -> Option<String> {
+        (node.kind() == "function")
+            .then(|| self.leading_sibling(node, source))
+            .flatten()
+            .map(|signature| compact_signature(node_text(&signature, source)))
     }
 }

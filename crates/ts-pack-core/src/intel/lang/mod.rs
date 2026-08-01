@@ -72,6 +72,31 @@ pub(crate) trait LanguageIntel {
         None
     }
 
+    /// Compact callable signature, normally its parameter list plus return type.
+    /// The default supports the common field-based shapes used by Python, Ruby,
+    /// Go, Java, and similar grammars; languages with a different AST override it.
+    fn signature_of(&self, node: &Node, source: &str) -> Option<String> {
+        if !matches!(
+            self.structure_kind_of(node, source),
+            Some(StructureKind::Function | StructureKind::Method)
+        ) {
+            return None;
+        }
+        let parameters = node.child_by_field_name("parameters")?;
+        let mut signature = compact_signature(node_text(&parameters, source));
+        if let Some(return_type) = ["return_type", "result", "type"]
+            .into_iter()
+            .find_map(|field| node.child_by_field_name(field))
+        {
+            let return_type = compact_signature(node_text(&return_type, source));
+            if !return_type.is_empty() {
+                signature.push_str(" -> ");
+                signature.push_str(&return_type);
+            }
+        }
+        Some(signature)
+    }
+
     /// For languages where a definition spans a *signature* node plus a
     /// following sibling *body* (Dart `function_signature` + `function_body`,
     /// Zig `FnProto` + `Block`), return that sibling so the span and body span
@@ -205,6 +230,11 @@ pub(crate) fn generic_structure_kind(node_kind: &str) -> Option<StructureKind> {
     }
 }
 
+/// Collapse a source fragment for compact, single-line structure output.
+pub(crate) fn compact_signature(text: &str) -> String {
+    text.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
 /// Generic recursive structure walk: at a definition node, record it (extending
 /// the span over a `sibling_body` when the language uses one) and descend into
 /// its `body` field for nested defs; otherwise recurse into all children.
@@ -246,7 +276,7 @@ fn walk_structure<L: LanguageIntel + ?Sized>(rules: &L, node: &Node, source: &st
             children,
             decorators: Vec::new(),
             doc_comment: None,
-            signature: None,
+            signature: rules.signature_of(node, source),
             body_span,
         });
     } else {

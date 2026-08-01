@@ -2,7 +2,7 @@
 //! (consts, statics, type aliases, unions, macros, trait method signatures),
 //! `pub`/`pub(crate)` visibility, and `use_declaration` imports.
 
-use super::{LanguageIntel, generic_structure_kind};
+use super::{LanguageIntel, compact_signature, generic_structure_kind};
 use crate::intel::intelligence::node_text;
 use crate::intel::types::StructureKind;
 use tree_sitter::Node;
@@ -42,6 +42,23 @@ impl LanguageIntel for Rust {
             };
         }
         super::resolve_structure_name(node, source)
+    }
+
+    /// The source-level call shape: parameters plus an optional return type.
+    fn signature_of(&self, node: &Node, source: &str) -> Option<String> {
+        if !matches!(node.kind(), "function_item" | "function_signature_item") {
+            return None;
+        }
+        let parameters = node.child_by_field_name("parameters")?;
+        let mut signature = compact_signature(node_text(&parameters, source));
+        if let Some(return_type) = node.child_by_field_name("return_type") {
+            let return_type = compact_signature(node_text(&return_type, source));
+            if !return_type.is_empty() {
+                signature.push_str(" -> ");
+                signature.push_str(&return_type);
+            }
+        }
+        Some(signature)
     }
 
     fn visibility_of(&self, node: &Node, source: &str) -> Option<String> {
