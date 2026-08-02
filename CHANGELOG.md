@@ -1,3 +1,27 @@
+# 1.12.3-blockether.38
+
+- **`find_references` no longer matches names inside strings and comments.** Both the Rust and Java
+  contracts already promised code occurrences only, and only Clojure honoured it: the walk skipped a
+  leaf whose kind was exactly `string`, but most grammars put the text in a CHILD — `string_content`
+  (python, ruby, bash, c/c++, ...), `string_fragment` (js/ts), `interpreted_string_literal_content`
+  (go), `line_str_text` (kotlin), `doc_comment` (rust) — so a name mentioned in a string body or a
+  multi-token comment came back as a reference in 15 of 18 sampled languages. A leaf is now literal
+  text when its OWN kind or its PARENT's kind names a string / comment / heredoc, and identifier-ish
+  kinds win first, so `f"{name}"`, `"${name}"` and Kotlin's `interpolated_identifier` stay real
+  references. Covered by `a_name_inside_a_string_or_comment_is_never_a_reference` (14 languages) and
+  `an_interpolated_identifier_is_still_a_reference` (6 languages).
+- **`StructuralApi.rename` no longer rewrote string bodies and comments** — it is built on
+  `findReferences`, so it inherited the bug above and silently edited text it had promised not to
+  touch. `StructuralApiRenameTest` now pins both that and byte-exact multi-byte output.
+- **`rename` is one pass instead of quadratic.** Each occurrence used to re-encode AND re-decode the
+  whole file (`spliceBytes` per hit); the gaps between occurrences are now copied once into a single
+  pre-sized byte array. Out-of-order or overlapping spans are skipped rather than trusted.
+- **The batch `findReferences` map stops allocating for absent names.** Names with no hit share one
+  immutable empty list and an `ArrayList` is allocated only on the first hit — vis' repo-wide trace
+  asks for 680,540 name-file buckets to find 31,006 hits.
+- `ReferenceHit` documents what it always did: `startByte`, `endByte` and `column` count UTF-8 BYTES,
+  not characters.
+
 # 1.12.3-blockether.37
 
 - **Reference search moved into Rust, and it is now a batch.** `find_references` is a real core

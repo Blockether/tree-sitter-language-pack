@@ -73,23 +73,21 @@ pub fn find_references(source: &str, language: &str, names: &[&str]) -> Result<V
         // takes every other session running in it down too.
         if let Some(text) = bytes.get(node.start_byte()..node.end_byte())
             && let Some(name) = sieved_lookup(&needles, &sieve, text)
+            && !is_literal_text(&node)
         {
-            let kind = node.kind();
-            if kind != "string" && kind != "comment" {
-                let start_point = node.start_position();
-                let end_point = node.end_position();
-                hits.push(ReferenceHit {
-                    name: name.to_owned(),
-                    span: Span {
-                        start_byte: node.start_byte(),
-                        end_byte: node.end_byte(),
-                        start_line: start_point.row,
-                        start_column: start_point.column,
-                        end_line: end_point.row,
-                        end_column: end_point.column,
-                    },
-                });
-            }
+            let start_point = node.start_position();
+            let end_point = node.end_position();
+            hits.push(ReferenceHit {
+                name: name.to_owned(),
+                span: Span {
+                    start_byte: node.start_byte(),
+                    end_byte: node.end_byte(),
+                    start_line: start_point.row,
+                    start_column: start_point.column,
+                    end_line: end_point.row,
+                    end_column: end_point.column,
+                },
+            });
         }
         loop {
             if cursor.goto_next_sibling() {
@@ -112,6 +110,51 @@ fn sieved_lookup<'a>(needles: &AHashMap<&'a [u8], &'a str>, sieve: &[bool], text
     } else {
         None
     }
+}
+
+/// Is this leaf the TEXT of a string or a comment, rather than code?
+///
+/// Grammars disagree about where that text lives. Some keep the whole literal in
+/// one token (`comment`, `string_literal`), and those never match a bare
+/// identifier anyway because the quotes and the `#` ride along. Most split the
+/// body out into its own leaf — `string_content` (Python, Ruby, Rust, C, Bash,
+/// Kotlin, Lua, PHP), `string_fragment` (JavaScript, TypeScript, Java),
+/// `interpreted_string_literal_content` (Go), `comment_content` (Lua),
+/// `doc_comment` (Rust) — and THAT leaf is exactly `alpha` for `"alpha"`. Testing
+/// only `kind == "string"` let every one of those through, so `s = "alpha"`
+/// counted as a reference to `alpha` in most of the pack while Clojure, whose
+/// string is one token, correctly reported none.
+///
+/// Swift names its body `line_str_text`, saying nothing about strings, so the
+/// parent kind is consulted too. Interpolations survive both rules: `f"{alpha}"`
+/// and `${alpha}` put the identifier under an `interpolation` /
+/// `template_substitution` node, and where a grammar hangs it straight off the
+/// string (Kotlin's `interpolated_identifier`) the identifier-ish kind wins — an
+/// interpolated name IS a real reference.
+fn is_literal_text(node: &tree_sitter::Node) -> bool {
+    let kind = node.kind();
+    if is_literal_kind(kind) {
+        return true;
+    }
+    if is_identifier_kind(kind) {
+        return false;
+    }
+    node.parent().is_some_and(|parent| is_literal_kind(parent.kind()))
+}
+
+/// Kinds that name string or comment TEXT. Substrings, because the pack carries
+/// 300+ third-party grammars and each spells its own variant (`raw_string_literal`,
+/// `line_comment`, `heredoc_body`, `line_str_text`, …).
+#[inline]
+fn is_literal_kind(kind: &str) -> bool {
+    kind.contains("string") || kind.contains("comment") || kind.contains("heredoc") || kind.contains("str_text")
+}
+
+/// Kinds that name an identifier, checked only to keep an interpolated name that
+/// a grammar parents directly to its string literal.
+#[inline]
+fn is_identifier_kind(kind: &str) -> bool {
+    kind.contains("identifier") || kind.ends_with("_name") || kind == "name" || kind == "word"
 }
 
 #[cfg(test)]
@@ -224,5 +267,81 @@ mod tests {
                 });
             }
         });
+    }
+    /// Every grammar spells a string body its own way, and testing `kind != "string"`
+    /// only ever caught the one that spells it exactly that. A name inside a literal
+    /// is TEXT in all of them, never a reference — `s = "alpha"` used to count.
+    #[test]
+    fn a_name_inside_a_string_or_comment_is_never_a_reference() {
+        let cases: &[(&str, &str)] = &[
+            ("python", "alpha = 1\ns = \"alpha\"\n# alpha\n"),
+            ("javascript", "const alpha = 1;\nconst s = \"alpha\";\n// alpha\n"),
+            (
+                "typescript",
+                "const alpha: number = 1;\nconst s = \"alpha\";\n// alpha\n",
+            ),
+            (
+                "rust",
+                "fn alpha() {}\nconst S: &str = \"alpha\";\n// alpha\n/// alpha\nfn b() {}\n",
+            ),
+            ("go", "package p\nfunc alpha() {}\nvar s = \"alpha\"\n// alpha\n"),
+            ("java", "class C { int alpha = 1;\nString s = \"alpha\";\n// alpha\n}\n"),
+            ("ruby", "alpha = 1\ns = \"alpha\"\n# alpha\n"),
+            ("c", "int alpha = 1;\nchar *s = \"alpha\";\n// alpha\n"),
+            ("bash", "alpha=1\ns=\"alpha\"\n# alpha\n"),
+            ("swift", "let alpha = 1\nlet s = \"alpha\"\n// alpha\n"),
+            ("kotlin", "val alpha = 1\nval s = \"alpha\"\n// alpha\n"),
+            ("lua", "local alpha = 1\nlocal s = \"alpha\"\n-- alpha\n"),
+            ("php", "<?php $alpha = 1; $s = \"alpha\"; // alpha\n"),
+            ("clojure", "(def alpha 1)\n(def s \"alpha\")\n;; alpha\n"),
+        ];
+        let mut checked = 0;
+        for (language, source) in cases {
+            if !crate::has_language(language) {
+                continue;
+            }
+            let hits = find_references(source, language, &["alpha"]).unwrap();
+            assert_eq!(
+                hits.len(),
+                1,
+                "{language}: only the declaration is a reference, got {hits:?}"
+            );
+            assert_eq!(
+                &source[hits[0].span.start_byte..hits[0].span.end_byte],
+                "alpha",
+                "{language}: the hit has to span the declaration itself"
+            );
+            checked += 1;
+        }
+        assert!(checked > 0, "no language of the case table was available");
+    }
+
+    /// An interpolated identifier is code that happens to sit inside a literal, so
+    /// it stays a reference — including in Kotlin, which hangs it straight off the
+    /// string with no interpolation node in between.
+    #[test]
+    fn an_interpolated_identifier_is_still_a_reference() {
+        let cases: &[(&str, &str)] = &[
+            ("python", "def f(alpha):\n    return f\"{alpha}\"\n"),
+            ("javascript", "const t = (alpha) => `${alpha}`;\n"),
+            ("ruby", "alpha = 1\nt = \"#{alpha}\"\n"),
+            ("bash", "alpha=1\nt=\"$alpha\"\n"),
+            ("swift", "let alpha = 1\nlet t = \"\\(alpha)\"\n"),
+            ("kotlin", "val alpha = 1\nval t = \"$alpha\"\n"),
+        ];
+        let mut checked = 0;
+        for (language, source) in cases {
+            if !crate::has_language(language) {
+                continue;
+            }
+            let hits = find_references(source, language, &["alpha"]).unwrap();
+            assert_eq!(
+                hits.len(),
+                2,
+                "{language}: declaration plus the interpolated use, got {hits:?}"
+            );
+            checked += 1;
+        }
+        assert!(checked > 0, "no language of the case table was available");
     }
 }
