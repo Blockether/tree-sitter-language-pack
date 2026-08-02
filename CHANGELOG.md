@@ -1,3 +1,32 @@
+# 1.12.3-blockether.37
+
+- **Reference search moved into Rust, and it is now a batch.** `find_references` is a real core
+  API (`ts_pack_find_references` over FFI, `StructuralApi.findReferences(source, language,
+  Collection<String>)` in Java): ONE parse and ONE tree walk serve every requested identifier,
+  matching is a hashed lookup behind a byte-length sieve, and only the hits cross the boundary.
+  Cost is `O(nodes + hits)` and barely moves with the number of names. The single-name form is
+  kept and simply delegates, so the Java-side recursive walk that re-parsed the file once per
+  name is gone.
+- **Recently parsed trees are reused.** `parse_with_language` now keeps a bounded, process-wide
+  cache of trees (256 entries / 16 MiB) keyed by language plus the COMPLETE source bytes, so a
+  hit is content-addressed and can never hand back stale syntax after an edit. It is also the
+  same serialization point the previous `PARSE_LOCK` provided for third-party scanners that keep
+  process-global mutable state.
+- **One panicking caller can no longer take the whole process down with it.** A panic under the
+  cache lock used to poison it, and every later parse in that process failed with `LockPoisoned`
+  forever. The lock is now recovered (the interrupted state is pure derived bookkeeping: it is
+  cleared and the poison with it), covered by `a_panic_under_the_lock_does_not_break_later_callers`.
+- **Concurrently starting JVMs can no longer load a half-written native library.** The Clojure
+  `ensure-native!` copied the dylib straight into the shared `~/.cache/clj-tslp` path, so a second
+  process saw the file exist while the first was still streaming megabytes into it. Bytes now go
+  to a unique temp file in the same directory and are published with one atomic rename; a
+  zero-length leftover counts as absent and is re-extracted.
+- A stray index panic can no longer abort the host: the reference walk slices with `get` instead
+  of indexing, so nothing unwinds across the `extern "C"` boundary.
+- New concurrency coverage: `concurrent_callers_each_get_the_single_threaded_result` (Rust) and
+  `StructuralApiConcurrencyTest` (Java, platform and virtual threads) both demand the exact
+  single-threaded answer back from many threads at once.
+
 # 1.12.3-blockether.36
 
 - **C, C++ and Objective-C callables get their signature too.** The C family hangs the parameter

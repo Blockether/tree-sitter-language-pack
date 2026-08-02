@@ -3,7 +3,10 @@ package dev.kreuzberg.treesitterlanguagepack;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
@@ -997,9 +1000,12 @@ public final class StructuralApi {
   /**
    * Every occurrence of the identifier {@code name} in {@code source} — leaf
    * tokens whose text equals {@code name}, so matches sit at real identifier
-   * boundaries (never inside a larger token, string, or comment). Reuses the
-   * pack's parse tree; no scope resolution, so shadowed / unrelated same-named
-   * identifiers are included too.
+   * boundaries (never inside a larger token, string, or comment). No scope
+   * resolution, so shadowed / unrelated same-named identifiers are included too.
+   *
+   * <p>Tracing MANY identifiers through one file? Call
+   * {@link #findReferences(String, String, Collection)} instead: it scans ONCE
+   * for the whole batch, where N single-name calls parse the file N times.
    *
    * @param source   file contents
    * @param language tree-sitter language name
@@ -1013,55 +1019,56 @@ public final class StructuralApi {
       throw new EditException("findReferences requires a non-blank name");
     }
     final String needle = name.strip();
-    final byte[] src = source.getBytes(StandardCharsets.UTF_8);
-    final int len = needle.getBytes(StandardCharsets.UTF_8).length;
-    final List<ReferenceHit> hits = new ArrayList<>();
-    try (Parser parser = TreeSitterLanguagePack.getParser(language);
-        Tree tree = parser.parse(source).orElseThrow(
-            () -> new EditException("could not parse " + language + " source"));
-        Node root = tree.rootNode()) {
-      collectRefs(root, src, needle, len, hits);
+    return findReferences(source, language, List.of(needle)).get(needle);
+  }
+
+  /**
+   * Every occurrence of EACH identifier in {@code names} — the batch form of
+   * {@link #findReferences(String, String, String)}, and the one to use when a
+   * file is traced for many symbols at once (an index, a call graph, a rename
+   * preview).
+   *
+   * <p>The scan itself runs in Rust: ONE parse and ONE tree walk serve the whole
+   * batch, matching is a hashed lookup behind a byte-length sieve, and only the
+   * hits cross the FFI boundary. Cost is O(nodes) + O(hits) and barely moves with
+   * the number of names, where the per-name form parses the file again for every
+   * single one.
+   *
+   * <p>Identical matching rules to the single-name form.
+   *
+   * @param source   file contents
+   * @param language tree-sitter language name
+   * @param names    identifiers to find; blank entries and duplicates are dropped
+   * @return name to occurrences in source order: one entry per distinct non-blank
+   *         name, in input order, with an empty list when it never occurs
+   * @throws EditException when no non-blank name was given
+   * @throws TreeSitterLanguagePackRsException on a native processing error
+   */
+  public static Map<String, List<ReferenceHit>> findReferences(final String source,
+      final String language, final Collection<String> names)
+      throws TreeSitterLanguagePackRsException {
+    final Map<String, List<ReferenceHit>> hits = new LinkedHashMap<>();
+    if (names != null) {
+      for (final String n : names) {
+        if (n != null && !n.isBlank()) {
+          hits.computeIfAbsent(n.strip(), k -> new ArrayList<>());
+        }
+      }
+    }
+    if (hits.isEmpty()) {
+      throw new EditException("findReferences requires at least one non-blank name");
+    }
+    final List<dev.kreuzberg.treesitterlanguagepack.ReferenceHit> found =
+        TreeSitterLanguagePackRs.findReferences(source, language, List.copyOf(hits.keySet()));
+    for (final dev.kreuzberg.treesitterlanguagepack.ReferenceHit hit : found) {
+      final List<ReferenceHit> bucket = hits.get(hit.name());
+      if (bucket != null) {
+        final Span span = hit.span();
+        bucket.add(new ReferenceHit((int) span.startByte(), (int) span.endByte(),
+            (int) span.startLine() + 1, (int) span.startColumn()));
+      }
     }
     return hits;
-  }
-
-  private static void collectRefs(final Node node, final byte[] src, final String needle,
-      final int len, final List<ReferenceHit> hits) throws TreeSitterLanguagePackRsException {
-    final long childCount = node.childCount();
-    if (childCount == 0) {
-      // Leaf token — the granularity at which identifiers live.
-      final String kind = node.kind();
-      if (!"string".equals(kind) && !"comment".equals(kind)) {
-        final int sb = (int) node.startByte();
-        final int eb = (int) node.endByte();
-        if (eb - sb == len && new String(src, sb, eb - sb, StandardCharsets.UTF_8).equals(needle)) {
-          hits.add(new ReferenceHit(sb, eb, lineOf(src, sb), columnOf(src, sb)));
-        }
-      }
-      return;
-    }
-    for (long i = 0; i < childCount; i++) {
-      final java.util.Optional<Node> child = node.child((int) i);
-      if (child.isPresent()) {
-        try (Node c = child.get()) {
-          collectRefs(c, src, needle, len, hits);
-        }
-      }
-    }
-  }
-
-  private static int lineOf(final byte[] src, final int pos) {
-    int line = 1;
-    for (int i = 0; i < pos && i < src.length; i++) {
-      if (src[i] == '\n') {
-        line++;
-      }
-    }
-    return line;
-  }
-
-  private static int columnOf(final byte[] src, final int pos) {
-    return pos - startOfLine(src, pos);
   }
 
   /**

@@ -88,17 +88,56 @@
                {:lib lib :version version})))
     (.toPath (io/file path))))
 
-(defn- extract! [^Path jar-path ^String entry-name ^Path dest]
-  (Files/createDirectories (.getParent dest) no-file-attributes)
-  (with-open [jar (JarFile. (.toFile jar-path))]
-    (let [entry (.getEntry jar entry-name)]
-      (when-not entry
-        (throw (ex-info (str "Native jar " jar-path " is missing entry " entry-name)
-                        {:jar (str jar-path) :entry entry-name})))
-      (with-open [in ^java.io.InputStream (.getInputStream jar entry)]
-        (Files/copy in dest
+(defn- usable-lib?
+  "Whether `lib` is a library another process has already published in full.
+   A zero-length file is the corpse of an interrupted extraction, never a
+   loadable library, so it is treated as absent and re-extracted."
+  [^Path lib]
+  (and (Files/exists lib no-link-options)
+       (pos? (Files/size lib))))
+
+(defn- extract!
+  "Publish `entry-name` of `jar-path` at `dest` so that CONCURRENTLY STARTING
+   PROCESSES can never observe a half-written library.
+
+   The cache directory is shared by every JVM on the machine, so copying straight
+   into the final path is a race: a second process sees the path exist while the
+   first is still streaming megabytes into it and `System.load`s a truncated
+   library. Instead the bytes go to a unique temp file in the SAME directory and
+   are published with one atomic rename, so every other process observes either no
+   file or the complete one. Losing the race is success, not failure: the winner's
+   bytes are identical, and on POSIX a rename leaves any already-mapped inode
+   alive for the processes using it."
+  [^Path jar-path ^String entry-name ^Path dest]
+  (let [dir (.getParent dest)
+        _   (Files/createDirectories dir no-file-attributes)
+        tmp (Files/createTempFile dir ".ts_pack_core_ffi" ".partial" no-file-attributes)]
+    (try
+      (with-open [jar (JarFile. (.toFile jar-path))]
+        (let [entry (.getEntry jar entry-name)]
+          (when-not entry
+            (throw (ex-info (str "Native jar " jar-path " is missing entry " entry-name)
+                            {:jar (str jar-path) :entry entry-name})))
+          (with-open [in ^java.io.InputStream (.getInputStream jar entry)]
+            (Files/copy in tmp
+                        ^"[Ljava.nio.file.CopyOption;"
+                        (into-array CopyOption [StandardCopyOption/REPLACE_EXISTING])))))
+      (try
+        (Files/move tmp dest
                     ^"[Ljava.nio.file.CopyOption;"
-                    (into-array CopyOption [StandardCopyOption/REPLACE_EXISTING])))))
+                    (into-array CopyOption [StandardCopyOption/ATOMIC_MOVE
+                                            StandardCopyOption/REPLACE_EXISTING]))
+        (catch java.nio.file.AtomicMoveNotSupportedException _
+          (Files/move tmp dest
+                      ^"[Ljava.nio.file.CopyOption;"
+                      (into-array CopyOption [StandardCopyOption/REPLACE_EXISTING])))
+        (catch java.io.IOException e
+          ;; Another process published it first (on Windows the loaded DLL cannot
+          ;; be replaced at all) — its bytes are the same bytes.
+          (when-not (usable-lib? dest)
+            (throw e))))
+      (finally
+        (Files/deleteIfExists tmp))))
   dest)
 
 (defn ensure-native!
@@ -124,7 +163,7 @@
                       (throw (ex-info "Cannot determine artifact version (missing tslp-version resource)" {})))
               ^Path dir (cache-dir v rid)
               ^Path lib (.resolve dir ^String fname)]
-          (when-not (Files/exists lib no-link-options)
+          (when-not (usable-lib? lib)
             (extract! (resolve-native-jar v rid) (str "natives/" rid "/" fname) lib))
           (let [abs (str (.toAbsolutePath lib))]
             (System/setProperty native-prop abs)

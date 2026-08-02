@@ -2861,4 +2861,44 @@ char *ts_pack_cache_dir(void);
  */
 uintptr_t ts_pack_cache_dir_len(void);
 
+/**
+ * Every occurrence of each identifier in `names`, in source order.
+ *
+ * A match is a leaf token whose text equals one of the names, so occurrences sit
+ * at real token boundaries: never inside a larger identifier, and never inside a
+ * string or comment token. There is no scope resolution — a shadowed or unrelated
+ * same-named identifier is reported too.
+ *
+ * One parse and one tree walk serve the entire batch: cost is `O(nodes + hits)`
+ * and barely moves with the number of names, where calling this once per name
+ * would re-parse the file every time. Blank names and duplicates are ignored; an
+ * empty (or all-blank) `names` yields an empty result.
+ * \note Returns `Error.LanguageNotFound` if the language is unknown, or
+ * `Error.ParseFailed` if the source cannot be parsed.
+ * \note SAFETY: Caller must ensure all pointer arguments are valid or null. Returned pointers must be
+ * freed with the appropriate free function.
+ * \code
+ * use tree_sitter_language_pack::find_references;
+ *
+ * let hits = find_references("def hello():\n    hello()\n", "python", &["hello"])?;
+ * assert_eq!(hits.len(), 2);
+ * assert_eq!(hits[0].span.start_line, 0);
+ * # Ok::<(), tree_sitter_language_pack::Error>(())
+ * \endcode
+ */
+char *ts_pack_find_references(const char *source,
+                              const char *language,
+                              const char *names);
+
+/**
+ * Return the byte length of the C string most recently returned by `ts_pack_find_references` on this
+ * thread. Returns 0 when the primary call returned null or failed before producing a string. Enables
+ * safe slice construction in Zig and Java FFM Panama without a NUL-scan.
+ * \note SAFETY: Pointer arguments are ignored and are present only to keep the companion ABI aligned
+ * with `ts_pack_find_references`.
+ */
+uintptr_t ts_pack_find_references_len(const char *_source,
+                                      const char *_language,
+                                      const char *_names);
+
 #endif  /* TS_PACK_H */

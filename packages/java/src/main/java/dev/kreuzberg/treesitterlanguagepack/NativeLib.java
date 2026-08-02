@@ -444,6 +444,20 @@ final class NativeLib {
                     // Fallback underscore variant
                     .orElseThrow(), FunctionDescriptor.of(ValueLayout.JAVA_LONG, ValueLayout.ADDRESS));
 
+    static final MethodHandle TS_PACK_FIND_REFERENCES = LINKER.downcallHandle(
+            LIB.find("ts_pack_find_references").or(() -> LIB.find("_ts_pack_find_references"))
+                    // Try underscore-prefixed variant for macOS
+                    .or(() -> LINKER.defaultLookup().find("ts_pack_find_references"))
+                    // Fallback to default lookup
+                    .or(() -> LINKER.defaultLookup().find("_ts_pack_find_references"))
+                    // Fallback underscore variant
+                    .orElseThrow(() -> new ExceptionInInitializerError(
+                            "Native symbol not found: ts_pack_find_references (tried: ts_pack_find_references,"
+                                    + " _ts_pack_find_references). Ensure the native library was compiled with"
+                                    + " this function exported. If this is an optional feature, check that all"
+                                    + " required features are enabled.")),
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
     static final MethodHandle TS_PACK_GET_TAGS_QUERY = LINKER
             .downcallHandle(LIB.find("ts_pack_get_tags_query").or(() -> LIB.find("_ts_pack_get_tags_query"))
                     // Try underscore-prefixed variant for macOS

@@ -23,6 +23,11 @@ import org.jspecify.annotations.Nullable;
  * GraalVM native-image (Jackson databind reflecting over every record was the liability this replaces).
  */
 final class JsonCodec {
+    private record StringListJson(List<String> names, String json) {
+    }
+
+    private static final ThreadLocal<StringListJson> STRING_LIST_JSON = new ThreadLocal<>();
+
     private JsonCodec() {
     }
 
@@ -163,6 +168,26 @@ final class JsonCodec {
     }
 
     // ------------------------------------------------------------- typed readers
+
+    /** Identifier occurrences from the Rust batch scan: a JSON array of {@code {name, span}}, in source order. */
+    static List<ReferenceHit> readReferenceHits(final String json) {
+        final List<Object> l = asList(parse(json));
+        if (l == null) {
+            return List.of();
+        }
+        final List<ReferenceHit> out = new ArrayList<>(l.size());
+        for (final Object o : l) {
+            final Map<String, Object> m = asMap(o);
+            if (m != null) {
+                final String name = str(m, "name");
+                final Span sp = span(asMap(m.get("span")));
+                if (name != null && sp != null) {
+                    out.add(new ReferenceHit(name, sp));
+                }
+            }
+        }
+        return out;
+    }
 
     static @Nullable List<String> readStringList(final String json) {
         final List<Object> l = asList(parse(json));
@@ -322,7 +347,13 @@ final class JsonCodec {
     }
 
     static String writeStringList(final List<String> names) {
-        return write(new ArrayList<Object>(names));
+        final StringListJson cached = STRING_LIST_JSON.get();
+        if (cached != null && cached.names().equals(names)) {
+            return cached.json();
+        }
+        final String json = write(new ArrayList<Object>(names));
+        STRING_LIST_JSON.set(new StringListJson(List.copyOf(names), json));
+        return json;
     }
 
     private static void putIf(final Map<String, Object> m, final String k, final @Nullable Object v) {

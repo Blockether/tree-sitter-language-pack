@@ -542,6 +542,37 @@ public final class TreeSitterLanguagePackRs {
         }
     }
 
+    /**
+     * Every occurrence of each identifier in {@code names}, in source order.
+     *
+     * A match is a leaf token whose text equals one of the names, so occurrences sit at real token boundaries: never inside a larger
+     * identifier, and never inside a string or comment token. There is no scope resolution — a shadowed or unrelated same-named identifier
+     * is reported too.
+     *
+     * One parse and one tree walk serve the entire batch: cost is O(nodes + hits) and barely moves with the number of names, where calling
+     * this once per name would re-parse the file every time. Blank names and duplicates are ignored; an empty (or all-blank) {@code names}
+     * yields an empty result. {@literal @}throws TreeSitterLanguagePackRsException Returns Error.LanguageNotFound if the language is
+     * unknown, or Error.ParseFailed if the source cannot be parsed.
+     */
+    public static List<ReferenceHit> findReferences(final String source, final String language, final List<String> names)
+            throws TreeSitterLanguagePackRsException {
+        try (var arena = Arena.ofConfined()) {
+            var csource = arena.allocateFrom(source);
+            var clanguage = arena.allocateFrom(language);
+            var cnames = arena.allocateFrom(JsonCodec.writeStringList(names));
+            var resultPtr = (MemorySegment) NativeLib.TS_PACK_FIND_REFERENCES.invoke(csource, clanguage, cnames);
+            if (resultPtr.equals(MemorySegment.NULL)) {
+                checkLastError();
+                return List.of();
+            }
+            String json = resultPtr.reinterpret(Long.MAX_VALUE).getString(0);
+            NativeLib.TS_PACK_FREE_STRING.invoke(resultPtr);
+            return JsonCodec.readReferenceHits(json);
+        } catch (Throwable e) {
+            throw new TreeSitterLanguagePackRsException("FFI call failed", e);
+        }
+    }
+
     private static String readCString(MemorySegment ptr, long byteLen) {
         if (ptr == null || ptr.address() == 0) {
             return null;

@@ -110,6 +110,20 @@ pub struct Span {
     pub end_column: usize,
 }
 
+/// One occurrence of an identifier in a source file.
+///
+/// Produced by `find_references`: a leaf token whose text equals the requested
+/// identifier, so matches always sit on real token boundaries and never inside
+/// a larger word, string, or comment.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct ReferenceHit {
+    /// The requested identifier this occurrence matched.
+    pub name: String,
+    /// Source span covering the matched token.
+    pub span: Span,
+}
+
 /// Complete analysis result from processing a source file.
 ///
 /// Contains metrics, structural analysis, imports/exports, comments,

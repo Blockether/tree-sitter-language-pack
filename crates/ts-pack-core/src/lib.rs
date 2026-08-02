@@ -59,6 +59,7 @@ pub mod process_config;
 pub(crate) mod queries;
 /// Process-wide cache of compiled tree-sitter queries (`Arc<Query>`), keyed by language + kind.
 pub mod query_cache;
+pub(crate) mod references;
 /// Thread-safe language registry mapping names to compiled tree-sitter parsers.
 pub mod registry;
 pub(crate) mod text_splitter;
@@ -81,7 +82,7 @@ pub use extensions::{detect_language_from_content, detect_language_from_extensio
 pub use intel::types::{
     ChunkContext, CodeChunk, CommentInfo, CommentKind, DataAttribute, DataNode, DataNodeKind, Diagnostic,
     DiagnosticSeverity, DocSection, DocstringFormat, DocstringInfo, ExportInfo, ExportKind, FileMetrics, ImportInfo,
-    ProcessResult, Span, StructureItem, StructureKind, SymbolInfo, SymbolKind,
+    ProcessResult, ReferenceHit, Span, StructureItem, StructureKind, SymbolInfo, SymbolKind,
 };
 pub use pack_config::{PackConfig, TlsRootsMode};
 pub use parsing::{ByteRange, Node, Parser, Point, Tree, TreeCursor};
@@ -90,6 +91,7 @@ pub use queries::{
     get_folds_query, get_highlights_query, get_indents_query, get_injections_query, get_locals_query, get_tags_query,
 };
 pub use query_cache::{QueryKind, get_query};
+pub use references::find_references;
 pub use registry::LanguageRegistry;
 pub use tree_sitter::Language;
 
