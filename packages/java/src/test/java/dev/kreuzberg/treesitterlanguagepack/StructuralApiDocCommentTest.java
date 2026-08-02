@@ -67,7 +67,8 @@ final class StructuralApiDocCommentTest {
         assertTrue(out.contains("// Alpha increments."), "replacement not applied:\n" + out);
         assertFalse(out.contains("Alpha adds."), "old doc survived:\n" + out);
         assertTrue(out.contains("export function alpha"), "definition damaged:\n" + out);
-        assertThrows(StructuralApi.EditException.class, () -> StructuralApi.edit(ts, "typescript", Op.ADD_DOC, "alpha", null, "// stacked"));
+        assertThrows(StructuralApi.EditException.class,
+                () -> StructuralApi.edit(ts, "typescript", Op.ADD_DOC, "alpha", null, "// stacked"));
     }
 
     @Test
@@ -86,14 +87,16 @@ final class StructuralApiDocCommentTest {
         assertFalse(out.contains("holds one"), "old doc survived:\n" + out);
         assertTrue(out.contains("let alpha = 1;"), "definition damaged:\n" + out);
         assertEquals(svelte.lines().count(), out.lines().count(), "line count changed:\n" + out);
-        assertThrows(StructuralApi.EditException.class, () -> StructuralApi.edit(svelte, "svelte", Op.ADD_DOC, "alpha", null, "// stacked"));
+        assertThrows(StructuralApi.EditException.class,
+                () -> StructuralApi.edit(svelte, "svelte", Op.ADD_DOC, "alpha", null, "// stacked"));
     }
 
     @Test
     @DisplayName("code that merely starts like a comment is not mistaken for one")
     void privateFieldIsNotADocComment() throws Exception {
         final String svelte = "<script>\n  let beta = 2;\n  let alpha = 1;\n</script>\n\n<div>{alpha}</div>\n";
-        assertThrows(StructuralApi.EditException.class, () -> StructuralApi.edit(svelte, "svelte", Op.REPLACE_DOC, "alpha", null, "// nope"));
+        assertThrows(StructuralApi.EditException.class,
+                () -> StructuralApi.edit(svelte, "svelte", Op.REPLACE_DOC, "alpha", null, "// nope"));
         final String out = StructuralApi.edit(svelte, "svelte", Op.ADD_DOC, "alpha", null, "// Alpha holds one.");
         assertTrue(out.contains("// Alpha holds one.\n  let alpha = 1;"), "doc not hugging the def:\n" + out);
         assertTrue(out.contains("let beta = 2;"), "neighbour damaged:\n" + out);
