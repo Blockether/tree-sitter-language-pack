@@ -5,9 +5,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -1124,5 +1128,198 @@ public final class StructuralApi {
             throw new EditException("rename rejected: it introduces " + errors.size() + " syntax error(s); the file was not changed.");
         }
         return result;
+    }
+
+    // ---------------------------------------------------------------------------
+    // Batch scanning over MANY FILES — the fan-out lives next to the parse.
+    //
+    // A single file's scan is already one parse and one walk (see the batch
+    // `findReferences` above). What a repo-wide consumer does on top of that is
+    // always the same: hold a worker pool, keep results in request order, keep one
+    // bad file from sinking the run, and resolve every language BEFORE the threads
+    // start. That policy belongs here, with the parse it is sized for, instead of
+    // being reinvented (and mistuned) in every JVM caller.
+    // ---------------------------------------------------------------------------
+
+    /**
+     * How many files {@link #mapParallel(List, Function)} walks at once: one worker per CPU, floor 2, ceiling 16.
+     *
+     * <p>
+     * The parse itself is serialized process-wide (the tree cache's lock is also the serialization point third-party scanners with mutable
+     * static state need), but everything around it is not: the content-addressed tree cache, the structure/reference walks, the FFI
+     * boundary and the caller's own per-file work all run concurrently. So a repo-wide scan scales nearly linearly until the parse
+     * serialization saturates, and past the core count the curve is flat — there is nothing to buy by oversubscribing.
+     */
+    private static final int SCAN_PARALLELISM = Math.max(2, Math.min(16, Runtime.getRuntime().availableProcessors()));
+
+    /**
+     * One file handed to a batch scan: its identity, the language to parse it as, and its contents.
+     *
+     * <p>
+     * The caller reads the file. This library never touches the filesystem for you, so path confinement, encoding and unsaved-buffer
+     * contents stay where they belong — with the host.
+     *
+     * @param path
+     *            how the caller identifies this file; echoed back on the result row, never interpreted
+     * @param language
+     *            tree-sitter language name (e.g. {@code "clojure"})
+     * @param source
+     *            file contents
+     */
+    public record FileSource(String path, String language, String source) {
+
+        /**
+         * @throws NullPointerException
+         *             when any component is null
+         */
+        public FileSource {
+            Objects.requireNonNull(path, "path");
+            Objects.requireNonNull(language, "language");
+            Objects.requireNonNull(source, "source");
+        }
+    }
+
+    /**
+     * One file's outcome in {@link #findReferences(List, Collection)} — TOTAL: either references or the message of the failure THIS file
+     * alone hit, never a thrown batch.
+     *
+     * @param path
+     *            the {@link FileSource#path()} this row answers, echoed verbatim
+     * @param references
+     *            name to occurrences, exactly as the single-file batch form returns; empty when this file failed
+     * @param error
+     *            the failure message for this file, or null when it scanned
+     */
+    public record FileReferences(String path, Map<String, List<ReferenceHit>> references, @Nullable String error) {
+
+        /** @return true when this file failed and {@link #references()} is therefore empty */
+        public boolean isFailed() {
+            return error != null;
+        }
+    }
+
+    /**
+     * {@code map} over {@code items} across {@link #SCAN_PARALLELISM} workers, in REQUEST ORDER.
+     *
+     * <p>
+     * Workers pull the next index off a shared cursor, so one huge file cannot strand a worker while the others idle. The first failure
+     * observed is rethrown AS THROWN — never wrapped in an {@code ExecutionException} — so a caller's error handling still sees its own
+     * exception type; every worker is awaited first, so no task outlives the call.
+     *
+     * <p>
+     * This is the pool {@link #findReferences(List, Collection)} runs on, exposed because a host's per-file work (reading, decoding,
+     * building its own rows) wants the same sizing and the same ordering guarantee as the scan it wraps.
+     *
+     * @param <T>
+     *            item type
+     * @param <R>
+     *            result type
+     * @param items
+     *            work items; null or empty yields an empty list
+     * @param fn
+     *            applied to each item, possibly on another thread — it must be safe to call concurrently
+     * @return one result per item, in the order the items were given
+     */
+    public static <T, R> List<R> mapParallel(final @Nullable List<T> items, final Function<? super T, ? extends R> fn) {
+        Objects.requireNonNull(fn, "fn");
+        final List<T> work = items == null ? List.of() : new ArrayList<>(items);
+        final int n = work.size();
+        final List<R> results = new ArrayList<>(n);
+        if (n < 2) {
+            for (final T item : work) {
+                results.add(fn.apply(item));
+            }
+            return results;
+        }
+        final Object[] out = new Object[n];
+        final AtomicInteger cursor = new AtomicInteger();
+        final AtomicReference<Throwable> failure = new AtomicReference<>();
+        final int workers = Math.min(SCAN_PARALLELISM, n);
+        final List<Thread> threads = new ArrayList<>(workers);
+        for (int w = 0; w < workers; w++) {
+            final Thread thread = new Thread(() -> {
+                for (int i = cursor.getAndIncrement(); i < n; i = cursor.getAndIncrement()) {
+                    try {
+                        out[i] = fn.apply(work.get(i));
+                    } catch (final RuntimeException | Error e) {
+                        // First one wins; the remaining workers keep draining so the call
+                        // never returns while a thread of ours is still running.
+                        failure.compareAndSet(null, e);
+                    }
+                }
+            }, "tslp-scan-" + w);
+            thread.start();
+            threads.add(thread);
+        }
+        for (final Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new EditException("batch scan interrupted");
+            }
+        }
+        final Throwable first = failure.get();
+        if (first instanceof RuntimeException runtime) {
+            throw runtime;
+        }
+        if (first instanceof Error error) {
+            throw error;
+        }
+        for (int i = 0; i < n; i++) {
+            @SuppressWarnings("unchecked")
+            final R value = (R) out[i];
+            results.add(value);
+        }
+        return results;
+    }
+
+    /**
+     * Every occurrence of EACH identifier in {@code names}, in EVERY file of {@code files} — the batch form over FILES, where
+     * {@link #findReferences(String, String, Collection)} is the batch form over names.
+     *
+     * <p>
+     * Files are scanned across {@link #SCAN_PARALLELISM} workers and returned in REQUEST ORDER, one row per input file. Every distinct
+     * language is resolved ONCE on the calling thread before the workers start, so a dynamically loaded grammar is fetched and registered
+     * exactly once instead of being raced for by every worker that needs it.
+     *
+     * <p>
+     * TOTAL per file: an unparsable file, an unknown language or any native error becomes that row's {@link FileReferences#error()} instead
+     * of failing the batch, because one unreadable file must not sink a repo-wide trace.
+     *
+     * @param files
+     *            files to scan; null or empty yields an empty list
+     * @param names
+     *            identifiers to find; blank entries and duplicates are dropped
+     * @return one row per input file, in input order
+     * @throws EditException
+     *             when no non-blank name was given
+     */
+    public static List<FileReferences> findReferences(final @Nullable List<FileSource> files, final Collection<String> names) {
+        final List<String> wanted = new ArrayList<>(new LinkedHashSet<>(
+                names == null ? List.<String>of() : names.stream().filter(n -> n != null && !n.isBlank()).map(String::strip).toList()));
+        if (wanted.isEmpty()) {
+            throw new EditException("findReferences requires at least one non-blank name");
+        }
+        if (files == null || files.isEmpty()) {
+            return List.of();
+        }
+        for (final String language : new LinkedHashSet<>(files.stream().map(FileSource::language).toList())) {
+            try {
+                TreeSitterLanguagePackRs.hasLanguage(language);
+            } catch (final TreeSitterLanguagePackRsException | RuntimeException e) {
+                // A language that cannot be resolved is reported per FILE below, with the
+                // scan error that names it — prewarming is an optimisation, not a gate.
+                continue;
+            }
+        }
+        return mapParallel(files, file -> {
+            try {
+                return new FileReferences(file.path(), findReferences(file.source(), file.language(), wanted), null);
+            } catch (final TreeSitterLanguagePackRsException | RuntimeException e) {
+                final String message = e.getMessage();
+                return new FileReferences(file.path(), Map.of(), message == null || message.isBlank() ? e.getClass().getName() : message);
+            }
+        });
     }
 }

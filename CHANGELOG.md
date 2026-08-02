@@ -1,3 +1,24 @@
+# 1.12.3-blockether.39
+
+- **`findReferences` is now a batch over FILES, not just over names.**
+  `StructuralApi.findReferences(List<FileSource>, Collection<String>)` takes `{path, language, source}` rows and
+  returns one `FileReferences` row per file, in REQUEST ORDER. The fan-out lives next to the parse: files are
+  scanned across `min(16, availableProcessors)` workers, and every distinct language is resolved ONCE on the
+  calling thread before the workers start, so a dynamically loaded grammar is fetched and registered once
+  instead of being raced for by every worker that needs it.
+- **A batch is TOTAL.** An unknown language, an unparsable file or any native error becomes that row's
+  `error` (with empty `references`) instead of throwing — one unreadable file cannot sink a repo-wide trace.
+  The library still never touches the filesystem: the caller reads, so path confinement and encoding stay with
+  the host.
+- **`StructuralApi.mapParallel(List, Function)` exposes the pool the batch runs on.** Same sizing, same
+  request-ordering guarantee, and the first failure is rethrown AS THROWN — never wrapped in an
+  `ExecutionException` — so a host's per-file work (reads, decoding, its own row building) no longer has to
+  reinvent (and mistune) the policy the parse is sized for. Every worker is awaited, so no task outlives the
+  call.
+- Covered by `StructuralApiBatchScanTest`: request order, batch-equals-file-by-file answers, one error row for
+  one bad file, degenerate inputs, name normalization, and the original exception coming back out of
+  `mapParallel`.
+
 # 1.12.3-blockether.38
 
 - **`find_references` no longer matches names inside strings and comments.** Both the Rust and Java
